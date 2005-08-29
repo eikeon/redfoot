@@ -23,7 +23,7 @@
   <redfoot:Resource rdf:ID="Defaults">
     <rdfs:label>Redfoot Defaults</rdfs:label>
     <!-- Soon to be released... working on it at the moment ;)-->
-    <redfoot:program rdf:resource="http://redfoot.net/dev/hypercode/kernel#"/>
+    <redfoot:program rdf:resource="http://redfoot.net/2005/08/20/hypercode/kernel#"/>
   </redfoot:Resource>
 
   <rdfs:Class rdf:ID="Resource">
