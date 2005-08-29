@@ -16,7 +16,7 @@
     <commands:command rdf:resource="#print"/>
     <commands:command rdf:resource="#contexts"/>
     <commands:command rdf:resource="#remove_context"/>
-    <commands:command rdf:resource="#reload_all"/>
+    <commands:command rdf:resource="#reload"/>
     <commands:command rdf:resource="#save_all"/>
     <commands:command rdf:resource="#auto_reload"/>
     <commands:command rdf:resource="#import"/>
@@ -164,13 +164,19 @@ for arg in args:
   </commands:Command>
 
 
-  <commands:Command rdf:ID="reload_all">
-    <rdfs:label>reload_all</rdfs:label>
+  <commands:Command rdf:ID="reload">
+    <rdfs:label>reload</rdfs:label>
     <redfoot:code>
-     <redfoot:Python rdf:ID="reload_all_code">
+     <redfoot:Python rdf:ID="reload_code">
       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
+# usage reload all contexts starting with prefix (first arg)... defaults to all contexts
+try:
+    prefix = args[0]
+except:
+    prefix = ""
+    
 REDFOOT = redfoot.namespace("http://redfoot.net/2005/redfoot#")
 DC_creator = URIRef("http://purl.org/dc/elements/1.1/creator")
 
@@ -178,7 +184,7 @@ for cid, _, source in redfoot.triples((None, RDF.type, REDFOOT.Context)):
     source = redfoot.value(cid, REDFOOT.source, default=None)
     context_id = redfoot.value(cid, REDFOOT.context_id, default=None)
     creator = redfoot.value(cid, DC_creator, default=None) or redfoot.uri
-    if source:
+    if source and cid.startswith(prefix):
         print "loading %s" % source
         try:
             redfoot.load(source, publicID=cid, context_id=context_id, creator=creator)

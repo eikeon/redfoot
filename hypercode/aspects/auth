@@ -155,22 +155,36 @@ login_uri = URIRef(request.parameters.get("login_uri"))
 sid = request.session_id
 context = redfoot.get_context(redfoot.context_id(sid))
 
-if uid.startswith("http"):
+if not uid:
+    uid = BNode()
+elif uid.startswith("http") or not "@" in uid:
+    if not uid.startswith("http"):
+        uid = "http://%s" % uid
     from rdflib import Graph
-    print "UID:", uid
     FOAF = redfoot.namespace("http://xmlns.com/foaf/0.1/")
+    if not "#" in uid:
+        uid = "%s#" % uid
     uid = URIRef(uid)
     g = Graph()
-    g.load(uid)
-    cid = redfoot.context_id(uid, context_id="#user")
-    redfoot.remove_context(cid)
-    c = redfoot.get_context(cid)
-    c.add((uid, RDF.type, SESSION.User))
-    for s, p, o in g.triples((uid, None, None)):
-        if p.startswith(RDF.RDFNS) or p.startswith(RDFS.RDFSNS) or p.startswith(FOAF.NS) or p.startswith(SESSION.NS):
-            if p==FOAF.name:
-                c.add((s, RDFS.label, o))
-            c.add((s, p, o))
+    if not uid.startswith(request.host): # more checks localhost, server IP, etc.
+        g.load(uid)
+        cid = redfoot.context_id(uid, context_id="#user")
+        #redfoot.remove_context(cid)
+        c = redfoot.get_context(cid)
+        c.add((uid, RDF.type, SESSION.User))
+        c.remove((uid, SESSION.hexdigest, None))
+        for hexdigest in g.objects(uid, SESSION.hexdigest):
+            c.add((uid, SESSION.hexdigest, hexdigest))
+        label = g.label(uid) or g.value(uid, FOAF.name)
+        if label:
+            c.remove((uid, RDFS.label, None))            
+            c.add((uid, RDFS.label, label))
+
+#         for s, p, o in g.triples((uid, None, None)):
+#             if p.startswith(RDF.RDFNS) or p.startswith(RDFS.RDFSNS) or p.startswith(FOAF.NS) or p.startswith(SESSION.NS):
+#                 if p==FOAF.name:
+#                     c.add((s, RDFS.label, o))
+#                 c.add((s, p, o))
 elif not uid.startswith("mailto:"):
     uid = URIRef("mailto:%s" % uid)
 

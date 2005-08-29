@@ -134,7 +134,7 @@
 
   <rdfs:Class rdf:ID="Aspect">
     <rdfs:label>Aspect</rdfs:label>
-    <rdfs:comment>A context intended to align its publicID with an existing context as to augment it is some aspect. For example, the following command will add functionality to add/view comments to a site: redfoot load http://redfoot.net/dev/content/comments http://localhost:8080 "#comments_context"</rdfs:comment>
+    <rdfs:comment>A context intended to align its publicID with an existing context as to augment it is some aspect. For example, the following command will add functionality to add/view comments to a site: redfoot load http://redfoot.net/hypercode/aspects/comments http://localhost:8080 "#comments_aspect"</rdfs:comment>
     <rdfs:subClassOf rdf:resource="#Context"/>
   </rdfs:Class>
 
