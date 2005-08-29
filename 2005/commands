@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+>
+
+  <redfoot:Namespace rdf:about="#">
+    <rdfs:label>Redfoot commands Namespace</rdfs:label>
+    <rdfs:comment>
+    </rdfs:comment>
+  </redfoot:Namespace>
+
+  <rdfs:Property rdf:ID="config">
+    <rdfs:label>config</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:domain rdf:resource="http://redfoot.net/2005/redfoot#Main"/>
+    <rdfs:range rdf:resource="#Config"/>
+  </rdfs:Property> 
+
+   <rdfs:Property rdf:ID="command">
+    <rdfs:label>command</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:domain rdf:resource="#Config"/>
+    <rdfs:range rdf:resource="#Command"/>
+  </rdfs:Property> 
+
+  <rdfs:Class rdf:ID="Command">
+    <rdfs:label>Command</rdfs:label>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/redfoot#Resource"/>
+  </rdfs:Class>
+
+  <rdfs:Property rdf:about="redfoot#code">
+    <rdfs:domain rdf:resource="#Command"/>
+  </rdfs:Property>
+
+</rdf:RDF>

@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:program="http://redfoot.net/2005/program#"
+   xmlns:handler="http://redfoot.net/2005/01/handler#"
+>
+
+  <handler:Page rdf:ID="page">
+    <rdfs:label>Default page template (0.9.1)</rdfs:label>
+    <handler:content_type>application/xhtml+xml</handler:content_type>
+    <handler:kid>
+<![CDATA[
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:kid="http://purl.org/kid/ns#">
+  <head>
+<?kid
+title = store.label(request.uri, None) or store.label(request.uri.abstract(), None)
+type = first(store.objects(request.uri, RDF.type)) or first(store.objects(request.uri.abstract(), RDF.type))
+if type:
+    title = "%s %s" % (title, store.label(type, ''))
+?>
+
+  <title>${store.label(request.host)}: ${title}</title>
+    <meta name="keywords" content=""/>
+    <meta http-equiv="Content-Type" content="text/xhtml; charset=UTF-8"/>
+    <link rel="shortcut icon" href="http://redfoot.net/2002/11/25/favicon.ico"/>
+    <style type="text/css">
+${display(lookup(HANDLER.css, URIRef("http://redfoot.net/dev/default/templates#css")))}
+    </style>
+    
+   <span kid:omit="" kid:for="alternate in store.objects(request.uri, HANDLER.alternate)">
+    <link rel="alternate"
+      href="${alternate}" title="${store.label(alternate)}"
+      type="${first(store.objects(alternate, HANDLER.content_type))}" />
+   </span> 
+  </head>
+  <body>
+    <h1><a href="${request.host}/">${store.label(request.host)}</a></h1>
+
+    <div class="header">
+     ${display(lookup(HANDLER.header))}
+    </div>
+
+    <div class="content">
+      ${display(lookup(HANDLER.content))}
+    </div>
+
+    <div class="footer">
+      ${display(lookup(HANDLER.footer))}
+    </div>
+
+  </body>
+</html>
+]]>
+    </handler:kid>    
+  </handler:Page>
+
+  <handler:Content rdf:ID="css">
+    <rdfs:label>Default css</rdfs:label>
+    <handler:content_type>text/css</handler:content_type>
+    <redfoot:codestr>
+
+HANDLER = redfoot.namespace("http://redfoot.net/2005/01/handler#")
+color = redfoot.value(request.host, HANDLER.background_color, default="#cccccc")
+
+response.write("""
+
+html {
+    background-color: %(color)s;
+}
+
+body {
+    margin: 0.5em 1em;
+    padding: 0em;
+}
+
+div.header {
+    background-color: %(color)s;
+    margin: 0em 0em;
+    padding: 0em 0em 0em 0em;
+}
+
+h1 {
+  background-color: transparent;
+  margin: 0em 0em 0em 0em;
+  padding: 0em 0em 0.25em 10px;
+}       
+
+.nav ul {
+  padding: 3px 10px;
+  margin: 0px 0px 0px 0px;
+  font: bold 12px Verdana, sans-serif;
+}
+
+.nav li {
+  list-style: none;
+  margin: 0;
+  display: inline;
+}
+
+.nav li a {
+  padding: 3px 0.5em;
+  margin-left: 3px;
+  border: 1px solid #000;
+  border-bottom: none;
+  background: #DDE;
+  text-decoration: none;
+}
+
+.nav li a { color: #000; }
+
+.nav li a:hover {
+  color: #fc6305;
+  background: #ccc;
+  border-color: #227;
+}
+
+.nav li a#current {
+background: white;
+border-bottom: 1px solid white;
+}
+
+#nav a:active {
+  background: white;
+}
+
+
+div.content {
+    color: #000000;
+    background:#ffffff;
+    margin: 0em; 
+    padding: 0em 2em;
+    border: 1px solid black;
+    clear: both;
+}
+
+div.footer {
+    background-color: %(color)s;
+    margin: 0em 0em;
+    padding: 0em 0em 0em 10px;
+    vertical-align: middle;
+    font-size: small; 
+    font-style: italic;
+    clear: both;
+}
+
+div.footer img {
+  border: 0; 
+  vertical-align: middle;
+}
+
+h1, h2, h3, h4, b {
+  font-family: Arial;
+  color: #000000;
+}
+
+a {
+    color: #000000;
+    font-weight: bold;
+    text-decoration: none
+}
+
+div.content a {
+    border-bottom: 1px dotted #fc6305;
+}
+
+a:hover {
+    color: #fc6305;
+    font-weight: bold;
+    text-decoration: none
+}
+
+body, table, tr, td, p, a, b, ul, li, blockquote { 
+  font-family: Arial
+}
+
+img {
+  border: 0;
+}
+
+
+.recipe .ingredients {
+  width:48%%; float: left;
+}
+
+.recipe .directions {
+  width:48%%; float: left;
+}
+
+.recipe .footer {
+  clear: both;
+  border: 0px;
+}
+
+div.spacer {
+  clear: both;
+}
+
+dd {
+  margin: 0.5em 1em 1.5em 0em;
+}
+""" % {"color": color})
+
+    </redfoot:codestr>
+  </handler:Content>
+
+  <handler:Content rdf:ID="not_found">
+    <rdfs:label>Not Found</rdfs:label>
+    <redfoot:codestr>
+<![CDATA[
+
+response.write("""
+<h1>Not Found</h1>
+""")        
+    
+]]>
+    </redfoot:codestr>
+  </handler:Content>
+
+  <handler:Content rdf:ID="content">
+    <rdfs:label>Generic Display of Resource</rdfs:label>
+    <handler:kid>
+<![CDATA[
+<div xmlns:kid="http://purl.org/kid/ns#"
+     kid:strip=""
+>
+<?python
+if (request.uri.abstract(), None, None) in store:
+    uri = request.uri.abstract()
+elif (request.uri, None, None) in store:
+    uri = request.uri
+else:
+    uri = request.uri.abstract()
+    
+format_uri = redfoot.module("http://eikco.com/2005/03/simple_format#module").format_uri
+seeAlsoList = list(redfoot.objects(uri, RDFS.seeAlso))
+
+?>
+
+  <h2 kid:if="(uri, None, None) not in store">Not Found</h2>
+
+  <h2>Instance: ${redfoot.label(uri)}</h2>
+  <p>${XML(format_uri(redfoot.comment(uri)))}</p>
+  
+  <ul>
+    <li kid:for="p, o in store.predicate_objects(uri)">${store.label(p) or p},
+      <span kid:strip="" kid:if="isinstance(o, Literal)">
+        <pre>${o}</pre>
+      </span>
+      <span kid:strip="" kid:if="isinstance(o, URIRef)">      
+        <a href="${request.host}/;${o.concrete()}">
+          ${", ".join(redfoot.objects(o, RDFS.label)) or o}
+        </a>
+      </span>
+      <span kid:strip="" kid:if="isinstance(o, BNode)">
+        ${", ".join(redfoot.objects(o, RDFS.label))}      
+      </span>      
+    </li>
+  </ul>
+
+
+  <div kid:if="seeAlsoList">
+  <h2>See Also</h2>
+  <ul>
+    <li kid:for="seeAlso in seeAlsoList">${XML(format_uri(seeAlso))}</li>
+  </ul>
+  </div>    
+</div>
+]]>
+    </handler:kid>
+  </handler:Content>
+
+</rdf:RDF>  

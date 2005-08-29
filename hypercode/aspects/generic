@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:redfoot='http://redfoot.net/2005/redfoot#'
+   xmlns:server="http://redfoot.net/2005/server#"
+   xmlns:template='http://redfoot.net/2005/template#'
+>
+
+
+  <rdf:Description rdf:about="">
+    <template:section rdf:resource="/edit/"/>    
+  </rdf:Description>
+
+  <server:Page rdf:about="/edit/">
+    <rdfs:label>Edit</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <template:content rdf:resource="#add_resource"/>
+    <server:allow rdf:resource="#Admin"/>
+    <template:default_section_rank>70.0</template:default_section_rank>    
+  </server:Page>
+
+  <server:Page rdf:about="/edit/resource">
+    <rdfs:label>Edit Resource</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <template:content rdf:resource="#edit_resource"/>
+    <server:allow rdf:resource="#Admin"/>
+  </server:Page>
+
+  <server:Page rdf:about="/edit/triple">
+    <rdfs:label>View Triple</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <template:content rdf:resource="#edit_triple"/>
+    <server:allow rdf:resource="#Admin"/>
+  </server:Page>
+
+  <redfoot:Python rdf:ID="view_node">
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+from xml.sax.saxutils import quoteattr, escape    
+from urllib import quote
+
+# TODO: move this into a module generic uses
+if isinstance(node, Literal):
+    if len(node)>40:
+        s = escape(node[0:20]+"...")
+    else:
+        s = escape(node)
+    if node.language:
+        s += ("-%s" % node.language)    
+
+    response.write("""<pre>%s</pre>""" % s)
+else:
+    response.write("""<a href="resource?subject=%s" title="%s">""" %
+                   (quote(node.n3()), redfoot.comment(node)))
+    response.write("""%s</a>""" % redfoot.label(node, node))
+
+]]>
+    </rdf:value>
+  </redfoot:Python>
+
+
+  <redfoot:Python rdf:ID="view">
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+from rdflib.util import from_n3
+from xml.sax.saxutils import quoteattr, escape
+
+if not "subject" in locals() or not subject:
+    subject = from_n3(request.parameters.get('subject'))
+    if not subject:
+        subject = BNode()
+    
+if isinstance(subject, URIRef):
+    resource = """<a href="%s/;%s">%s</a>""" % (request.host, subject.concrete(), subject)
+else:
+    resource = subject
+
+response.write("""
+<table class="generic">
+  <caption>Subject: %s</caption>
+  <tr>
+    <th>Predicate</th>
+    <th>Object</th>    
+  </tr>  
+""" % resource)    
+
+
+view_node = URIRef("#view_node", base=redfoot_current)
+if (subject, None, None) in redfoot:
+    for s, p, o in redfoot.triples((subject, None, None)):
+        response.write("""<tr><td>""")
+        display(view_node, node=p)
+        response.write("""</td><td style="width: 30em">""")
+        display(view_node, node=o)
+        response.write("""</td><td>
+<form name="edit_triple_form" action="triple" method="POST">
+  <input name="subject" type="hidden" value=%s/>
+  <input name="predicate" type="hidden" value=%s/>
+  <input name="object" type="hidden" value=%s/>
+  <input type="submit" value="edit"/>                       
+</form>
+</td></tr>""" % (quoteattr(s.n3()), quoteattr(p.n3()), quoteattr(o.n3())))
+else:
+    response.write("""\
+ <tr>
+   <td>Resource not known of directly</td> 
+ </tr>
+""")    
+response.write("""</table>""")
+
+]]>
+    </rdf:value>
+  </redfoot:Python>
+
+  <redfoot:Python rdf:ID="add_resource">
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+from rdflib.util import from_n3
+type = request.parameters.get('type', '')
+if type != '':
+    type = from_n3(type)
+
+response.write("""\
+  <form name="edit_form" action="resource" method="get">
+    <table class="generic">
+      <tr>
+        <td valign="top">uri</td>
+        <td>
+          <input type="text" size="60" name="uri"/>
+        </td>
+      </tr>
+     </table>
+    <p>NOTE: Leave blank to create BNode.</P>
+    <input type="submit" value="add">
+  </form>
+""")  
+
+]]>               
+    </rdf:value>
+  </redfoot:Python>
+
+  <redfoot:Python rdf:ID="edit_resource">
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+from rdflib.util import from_n3
+from urllib import quote
+from xml.sax.saxutils import quoteattr, escape    
+
+uri = request.parameters.get("uri", None)
+if uri:
+    subject = URIRef(uri)
+else:
+    subject = from_n3(request.parameters.get("subject"), None)
+if not subject:
+    subject = BNode()
+
+processor = request.parameters.get("processor", None)
+if processor=="delete":
+    if subject:
+        redfoot.remove((subject, None, None))
+    else:
+        print "WARNING: delete with no subject"
+    
+display(URIRef("#view", base=redfoot_current), subject=subject)
+
+response.write("""
+<form name="edit_form" method="post">
+  <input type="button" value="Add Property" onclick="edit_form.action='triple'; edit_form.submit()"/>
+  <input type="hidden" name="subject" value=%s/>
+  <input type="hidden" name="processor"/>
+  <input type="hidden" name="copy" value=""/>  
+  <input disabled="true" type="button" value="Copy"
+         onclick="edit_form.copy.value='true'; edit_form.action='resource'; edit_form.submit()"/>
+         <!-- the onclick is being used to... -->
+  <input type="button" value="Delete" onclick="edit_form.processor.value='delete'; edit_form.submit()"/>  
+</form>
+""" % quoteattr(subject.n3()))
+
+]]>               
+    </rdf:value>
+  </redfoot:Python>
+
+
+  <redfoot:Python rdf:ID="edit_triple">
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+from rdflib.util import from_n3
+from xml.sax.saxutils import quoteattr, escape
+from urllib import quote
+
+SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+
+subject = from_n3(request.parameters.get("subject"))
+predicate = from_n3(request.parameters.get("predicate"))
+object = from_n3(request.parameters.get("object", None), None)
+
+if object is None:
+    o = request.parameters.get("object_literal") or ""
+    datatype = request.parameters.get("datatype")    
+    object = Literal(o, datatype=datatype)
+
+object_orig = from_n3(request.parameters.get("object_orig", None), None)
+    
+if object!=None:
+    processor = request.parameters.get("processor", None)
+    if processor=="delete":
+        redfoot.remove((subject, predicate, object))
+        predicate = None
+        object = None
+    elif processor=="update":
+        #derive context from subject
+        #context = redfoot.get_context(redfoot.context_id(subject))        
+        uid = redfoot.value(request.session_id, SESSION.uid)
+        if uid:
+            #use context associated with user id.
+            user_document = redfoot.value(uid, SESSION.context, None)
+            if user_document is None:
+                from time import gmtime
+                # 2005/04/06/09:45:22/
+                year, month, date, h, m, s, _, _, _ = gmtime()
+                name = "%04d/%02d/%02d/%02d:%02d:%02d" % (year, month, date, h, m, s)
+                uri = URIRef("%s/document/%s" % (request.host, name))
+                user_document = redfoot.context_id(uri)
+                c = redfoot.get_context(request.session_id)
+                c.add((uid, SESSION.context, user_document))
+                c.add((user_document, RDF.type, REDFOOT.Context))
+            context = redfoot.get_context(user_document)
+            if object_orig!=None and object_orig!=object:
+                redfoot.remove((subject, predicate, object_orig))
+            context.add((subject, predicate, object))
+        else:
+            response.write("<p>Did not update. Must be logged in to update.</p>")
+
+response.write("""
+<form name="edit_form" action="" method="post">
+""")
+response.write("""<input type="hidden" name="subject" value=%s/>""" % quoteattr(subject.n3()))
+response.write("""<input type="hidden" name="processor" value="update"/>""")
+
+if object!=None:
+    response.write("""<input type="hidden" name="object_orig" value=%s/>""" % quoteattr(object.n3()))
+
+response.write("""
+<table class="generic">
+  <tr>
+    <td>Subject</td>
+    <td>%s</td>    
+  </tr>
+""" % subject)
+
+response.write("""
+  <tr>
+    <td>predicate</td>
+    <td>
+      <select type="text" name="predicate" onChange="edit_form.submit()">
+        <option value="">Select a new Property to add</option>
+""")        
+
+def possible_properties(type):
+    for object in redfoot.transitive_objects(type, RDFS.subClassOf):
+	for subject in redfoot.subjects(RDFS.domain, object):
+            for property in redfoot.transitive_subjects(RDFS.subPropertyOf, subject): 
+                yield property
+
+from itertools import chain
+def possible_properties_for_subject(subject):
+    seen = set()
+    for type in chain([RDFS.Resource], redfoot.objects(subject, RDF.type)):
+	for property in possible_properties(type):
+            if not property in seen:
+                seen.add(property)
+                yield property
+
+def label(uri):
+    v = redfoot.label(uri)
+    if len(v)>20:
+        v = "%s..." % v
+    return "%s (%s)" % (v, uri)
+
+if predicate and not predicate in possible_properties_for_subject(subject):
+    response.write("""<option style="color: red;" selected="true" """)
+    response.write("""value=%s>%s</option>""" % (quoteattr(predicate.n3()), "%s" % (label(predicate))))
+
+possible = []
+for property in possible_properties_for_subject(subject):
+    possible.append((label(property), property))
+possible.sort()
+
+for label, property in possible:
+    if property==predicate:
+        response.write("""<option selected="true" """)
+    else:
+        response.write("""<option """)
+    response.write("""value=%s>%s</option>""" % (quoteattr(property.n3()), label))
+response.write("""            
+      </select>
+    </td>
+  </tr>
+""")
+
+response.write("""
+  <tr>
+    <td>Object</td>
+    <td>
+""")    
+if predicate:
+    response.write("""<select name="object">""")
+
+    values = {}
+    value_list = []
+    seen = set()
+    for range in redfoot.objects(predicate, RDFS.range):
+	for type in redfoot.transitive_subjects(RDFS.subClassOf, range):
+	    for value in redfoot.subjects(RDF.type, type):
+                if not value in seen:
+                    seen.add(value)
+                    label = "%s (%s)" % (redfoot.label(value), value)
+                    values[value] = label
+                    value_list.append((label, value))
+    if object and not isinstance(object, Literal) and not object in values:
+	response.write("""<option style="color: red;" selected='true' """)
+	response.write("""value=%s>%s</option>""" % (quoteattr(object.n3()), redfoot.label(object, object)))
+
+    #pairs = values.items()
+    #pairs.sort()
+    value_list.sort()
+    
+    response.write("""<option value=''></option>""")
+    #for value, label in pairs:
+    for label, value in value_list:        
+	if value==object:
+	    response.write("""<option selected='true' """)
+	else:
+	    response.write("""<option """)
+	response.write("""value=%s>%s</option>""" % (quoteattr(value.n3()), label))
+    response.write("""</select>""")
+
+    if True or (predicate, RDFS.range, RDFS.Literal) in redfoot or \
+       (predicate, RDFS.range, RDFS.Resource) in redfoot or \
+       (predicate, RDF.type, URIRef("http://www.w3.org/2002/07/owl#DatatypeProperty")) in redfoot:
+        if object and isinstance(object, Literal):
+            value = object
+        else:
+            value = ''
+        response.write("""or <br/>
+Datatype: <select name="datatype">
+  <option value=''></option>
+  <option value='http://redfoot.net/2005/redfoot#Python'>Python</option>  
+</select>
+<br/>
+Value:<textarea name="object_literal" rows="10" cols="60">%s</textarea>""" % value)
+
+        
+response.write("""      
+    </td>    
+  </tr>
+""")
+
+response.write("""
+</table>
+""")
+if object!=None:
+    response.write("""<input type="submit" value="Update"/>""")
+    response.write("""<input type="button" value="Delete" onclick="edit_form.processor.value='delete'; edit_form.submit()"/>""")
+else:
+    response.write("""<input type="submit" value="Add"/>""")
+response.write("""\
+<input type="button" value="Edit Resource" onclick="edit_form.action='resource'; edit_form.submit()"/>
+</form>
+""")
+
+#contexts = list(redfoot.contexts((subject, predicate, object)))
+#response.write("""
+#<p>Contexts: %s</p>
+#""" % ", ".join(contexts))
+
+]]>               
+    </rdf:value>
+  </redfoot:Python>
+
+</rdf:RDF>

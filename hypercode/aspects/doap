@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:commands="http://redfoot.net/2005/commands#"
+   xmlns:server="http://redfoot.net/2005/server#"
+   xmlns:session="http://redfoot.net/2005/session#"
+   xmlns:template='http://redfoot.net/2005/template#'
+>
+
+  <redfoot:Aspect rdf:ID="doap_aspect">
+    <rdfs:label>Doap aspect</rdfs:label>
+    <rdfs:comment>
+    </rdfs:comment>
+    <redfoot:todo>Look into http://kupu.oscom.org/</redfoot:todo>
+  </redfoot:Aspect>
+
+  <rdf:Description rdf:about="">
+    <template:section rdf:resource="/releases/"/>    
+    <template:section rdf:resource="/contributors/"/>    
+  </rdf:Description>
+
+  <rdf:Description rdf:about="/contributors#">
+    <rdfs:label>contributors</rdfs:label>
+  </rdf:Description>
+
+  <rdf:Description rdf:about="/contributors/">
+    <!-- Change page template to use abstract_uri's rdfs:label -->
+    <!-- and have this override if present  -->
+    <rdfs:label>Contributors</rdfs:label>
+    <template:default_section_rank>70.0</template:default_section_rank>
+    <template:content rdf:parseType="Resource">
+      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+<div xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:kid="http://purl.org/kid/ns#">
+<?python 
+DOAP = redfoot.namespace("http://usefulinc.com/ns/doap#")
+project = URIRef("%s#" % request.host)
+?>
+
+<dl>
+  <dt>Maintainer</dt>
+  <dd kid:for="maintainer in redfoot.objects(project, DOAP.maintainer)">
+    ${redfoot.label(maintainer)}
+  </dd>
+
+  <dt>Developers</dt>
+  <dd kid:for="developer in redfoot.objects(project, DOAP.developer)">
+    ${redfoot.label(developer)}
+  </dd>
+</dl>
+
+</div>
+]]>    
+      </rdf:value>      
+    </template:content>
+  </rdf:Description>
+
+
+  <rdf:Description rdf:about="/releases/">
+    <!-- Change page template to use abstract_uri's rdfs:label -->
+    <!-- and have this override if present  -->
+    <rdfs:label>Releases</rdfs:label>
+    <template:default_section_rank>50.0</template:default_section_rank>
+    <template:content rdf:parseType="Resource">
+      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+<div xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:kid="http://purl.org/kid/ns#">
+<?python 
+DOAP = redfoot.namespace("http://usefulinc.com/ns/doap#")
+format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot_program)).format
+format_uri = redfoot.module(URIRef("modules/simple_format#module", base=redfoot_program)).format_uri
+project = request.host.abstract()
+releases = []
+for release in redfoot.objects(project, DOAP.release):
+    created = redfoot.value(project, DOAP.created)
+    releases.append((created, release))
+releases.sort()
+releases.reverse()
+?>
+
+    <dl>
+     <span kid:strip="" kid:for="created, release in releases">
+      <dt>${XML(format_uri(release))}</dt>
+<?python
+content_value = redfoot.comment(release)
+content_type = content_value.datatype
+?>
+      <dd kid:if="content_type=='http://www.w3.org/1999/xhtml'">${XML(content_value)}</dd>
+      <dd kid:if="content_type!='http://www.w3.org/1999/xhtml'">${XML(format_uri(content_value))}</dd>
+     </span>
+    </dl>
+
+
+</div>
+]]>    
+      </rdf:value>      
+    </template:content>
+  </rdf:Description>
+
+
+  <rdf:Description rdf:about="http://usefulinc.com/ns/doap#Project">
+    <template:content rdf:parseType="Resource">
+      <rdfs:label>Default main for Redfoot</rdfs:label>      
+      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+<div xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:kid="http://purl.org/kid/ns#"
+>
+<?python
+DOAP = redfoot.namespace("http://usefulinc.com/ns/doap#")
+format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot_program)).format
+format_uri = redfoot.module(URIRef("modules/simple_format#module", base=redfoot_program)).format_uri
+# releases = []
+# for release in redfoot.objects(request.uri.abstract(), DOAP.release):
+#     created = redfoot.value(request.uri.abstract(), DOAP.created)
+#     releases.append((created, release))
+# releases.sort()
+# releases.reverse()
+seeAlsoList = redfoot.objects(request.uri.abstract(), RDFS.seeAlso)
+?>
+
+  <p>${XML(format_uri(request.uri.abstract(), DOAP.description))}</p>
+  
+
+
+  <div style="float: right; width: 40%">
+<!--
+  <div>Download:
+      <ul>
+      <li kid:for="download_page in redfoot.objects(request.uri.abstract(), getattr(DOAP, 'download-page'))">
+        ${XML(format_uri(download_page))}
+      </li>
+      </ul>
+  </div>
+-->
+  <div>Browse: ${XML(format_uri(request.uri.abstract(), DOAP.SVNRepository))}</div>
+  
+  <div>Send feedback to: ${XML(format_uri(request.uri.abstract(), DOAP.maintainer))}</div>
+  </div>
+
+<!--
+  <div class="recipe" style="width: 50%">
+  <h2>Releases</h2>  
+    <dl>
+     <span kid:strip="" kid:for="created, release in releases[0:3]">
+      <dt>${XML(format_uri(release))}</dt>
+<?python
+content_value = redfoot.comment(release)
+content_type = content_value.datatype
+?>
+      <dd kid:if="content_type=='http://www.w3.org/1999/xhtml'">${XML(content_value)}</dd>
+      <dd kid:if="content_type!='http://www.w3.org/1999/xhtml'">${XML(format_uri(content_value))}</dd>
+     </span>
+    </dl>
+  </div>
+-->  
+  
+  <div kid:if="seeAlsoList">
+  <h2>See Also</h2>
+  <ul>
+    <li kid:for="seeAlso in seeAlsoList">${XML(format_uri(seeAlso))}</li>
+  </ul>
+  </div>    
+
+  <br style="clear: both"/>
+
+</div>
+]]>
+      </rdf:value>
+    </template:content>
+  </rdf:Description>
+
+  <rdf:Description rdf:about="http://usefulinc.com/ns/doap#Version">
+    <template:content rdf:parseType="Resource">
+      <rdfs:label>Default main for Redfoot</rdfs:label>      
+      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+<div xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:kid="http://purl.org/kid/ns#"
+>
+<?python
+release = request.uri.abstract()
+
+DOAP = redfoot.namespace("http://usefulinc.com/ns/doap#")
+format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot_program)).format
+format_uri = redfoot.module(URIRef("modules/simple_format#module", base=redfoot_program)).format_uri
+
+content_value = redfoot.comment(release)
+content_type = content_value.datatype
+?>
+
+  <p kid:if="content_type=='http://www.w3.org/1999/xhtml'">${XML(content_value)}</p>
+  <p kid:if="content_type!='http://www.w3.org/1999/xhtml'">${content_value}</p>
+  
+
+</div>
+]]>
+      </rdf:value>
+    </template:content>
+  </rdf:Description>
+
+</rdf:RDF>  

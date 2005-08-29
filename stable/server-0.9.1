@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+>
+
+  <redfoot:Python rdf:about="#twisted">
+    <rdfs:label>twisted server for Redfoot</rdfs:label>      
+    <redfoot:codestr>
+<![CDATA[
+
+from twisted.web.server import Site, NOT_DONE_YET
+from twisted.web.resource import IResource
+from twisted.internet import reactor, threads
+
+from zope.interface import Attribute, implements
+
+from rdflib import URIRef, BNode, RDF, RDFS
+
+
+class Request(object):
+    def __init__(self, request):
+        self.__request = request
+        self.__parameters = None        
+        self.method = self.__request.method
+        #self.query_string = self.__request.request_data.query
+        hostname = self.getHeader("host")
+        self.path = path = self.__request.path
+        self.url = URIRef("http://%s%s" % (hostname, path))
+        self.host_url = URIRef("http://%s" % (hostname))
+
+        if hostname:
+            if ":" in hostname:
+                name, port = hostname.split(":", 1)
+                if port=="80":
+                    hostname = name
+        else:
+            print "warning: no hostname found"
+            hostname = ''
+        self.uri = URIRef("http://%s%s" % (hostname, path))
+        self.host = URIRef("http://%s" % (hostname))
+        
+    def getCookie(self, name, default=None):
+        return self.__request.received_cookies.get(name, default)
+
+    def getHeader(self, name, default=None):
+        return self.__request.received_headers.get(name, default)    
+
+    def _getHeaders(self):
+        return self.__request.received_headers
+    
+    headers = property(_getHeaders)
+
+    def _getParameters(self):
+        # TODO: make parameters read-only?
+        if self.__parameters == None:
+            self.__parameters = p =  {}
+            for k, v in self.__request.args.iteritems():
+                if len(v)>=0:
+                    p[k] = v[0]
+                else:
+                    p[k] = None
+        return self.__parameters
+
+    parameters = property(_getParameters)
+
+
+class Response(object):
+    def __init__(self, request):
+        self.__request = request
+
+    def setStatus(self, status, reason):
+        self.__request.setResponseCode(status, reason)
+
+    def write(self, data):
+        if isinstance(data, unicode):
+            data = data.encode("UTF-8")
+        self.__request.write(data)
+
+    def finish(self):
+        self.__request.finish()
+    
+    def setHeader(self, name, value):
+        # TODO: can the value be utf-8 encoded or just ascii or ?        
+        value = value.encode("utf-8")
+        self.__request.setHeader(name, value)
+
+    def addCookie(self, cookie):
+        self.__request.cookies.append(cookie)
+
+
+class _Resource(object):
+
+    implements(IResource)
+
+    isLeaf = True
+
+    def __init__(self, handler):
+        self.handler = handler
+
+    def getChildWithDefault(self, name, request):
+        raise Exception("NYI")
+
+    def putChild(self, path, child):
+        raise Exception("NYI")
+
+    def render(self, request):
+        #reactor.callInThread(self._render, request)
+        self._render(request)
+        return NOT_DONE_YET
+
+    def _render(self, twisted_request):
+        request = Request(twisted_request)
+        response = Response(twisted_request)
+        redfoot.execute(self.handler, request=request, response=response)
+        response.finish() # TODO: where should this go?
+        
+
+# TODO:    SERVER_IDENT = 'redfoot2005'
+class RedfootServer(object):
+
+    def __init__(self, handler, hostname='', port=9090):
+        self.handler = handler
+        self.hostname = hostname
+        self.port = port
+        
+    def run(self):
+        try:
+            reactor.listenTCP(self.port, Site(_Resource(self.handler)))
+            reactor.run()
+        except KeyboardInterrupt: # TODO: 
+            print 'shutting down...'
+            reactor.shutdown()
+        
+]]>
+    </redfoot:codestr>
+  </redfoot:Python>
+
+
+</rdf:RDF>  

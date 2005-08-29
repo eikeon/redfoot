@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:commands = "http://redfoot.net/2005/commands#"        
+   xmlns:server = "http://redfoot.net/2005/server#"        
+>
+
+  <redfoot:Kernel rdf:about="#">
+    <rdfs:label>Redfoot Kernel</rdfs:label>
+    <rdfs:comment>
+    </rdfs:comment> 
+    <redfoot:program rdf:resource="programs/command_runner#"/>
+    <commands:config rdf:resource="commands/manage#config"/>
+    <server:server rdf:resource="modules/server#twisted"/>
+    <server:handler rdf:resource="handlers/page#"/>
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+"""
+Redfoot an application for managing and running hypercode. And includes hypercode for building websites.
+
+For help on Redfoot see:
+
+   redfoot.py help
+
+"""
+
+import sys, getopt
+
+import traceback
+from types import ModuleType
+from urlparse import urljoin, urldefrag
+from urllib import pathname2url, url2pathname
+import os
+
+logging = redfoot_loader.log
+
+logging.basicConfig(level=logging.DEBUG, format='%(levelname)s %(message)s')
+
+
+from rdflib import RDF, RDFS
+from rdflib import Graph, URIRef, BNode, Literal
+from rdflib.util import first, date_time
+
+NAMESPACE = URIRef("http://redfoot.net/2005/redfoot#")
+
+DC_creator = URIRef("http://purl.org/dc/elements/1.1/creator")
+DC_created = URIRef("http://purl.org/dc/terms/created")
+
+class Redfoot(Graph):
+
+    def __init__(self, backend):
+        super(Redfoot, self).__init__(backend)
+        self.__log = None        
+        self.__index = None
+        self.__config = None
+        # Note: we are currently being passed an open backend        
+        global REDFOOT
+        # bootstraping REDFOOT namespace        
+        if not (NAMESPACE, None, None) in self:
+            context = Graph()
+            context.load(NAMESPACE)
+        else:
+            context = super(Redfoot, self).get_context(self.context_id(NAMESPACE))
+            #context = self.get_context(self.context_id(NAMESPACE))            
+        REDFOOT = self.namespace(NAMESPACE, context)
+        self.check(NAMESPACE)
+        
+        self.uri = redfoot_program # uri to the version of redfoot that's running
+        context = dict({"redfoot": self, "REDFOOT": REDFOOT, 
+                        "RDF": RDF, "RDFS": RDFS,
+                        "URIRef": URIRef, "BNode": BNode, "Literal": Literal
+                        })
+        self.__context = context
+	self.__base = None # default to CWD
+        
+    def absolutize(self, uri, defrag=1):
+        base = self.base
+        result = urljoin(base, uri, allow_fragments=not defrag)
+        if not defrag:
+            if uri and uri[-1]=="#" and result[-1]!="#":
+                result = "%s#" % result
+        return URIRef(result)
+
+    def __get_base(self):
+        if self.__base is None:
+            self.__base = self.value(REDFOOT.Globals, REDFOOT.base)
+            if self.__base is None:
+                self.__base = URIRef("%s/" % urljoin("file:", pathname2url(os.getcwd())))
+        return self.__base
+    def __set_base(self, base):
+	self.remove((REDFOOT.Globals, REDFOOT.base, None))
+	self.add((REDFOOT.Globals, REDFOOT.base, base))
+    base = property(__get_base, __set_base)
+
+    def _get_log(self):
+        if self.__log is None:
+            self.__log = logging
+        return self.__log
+    log = property(_get_log)
+
+    def __get_program(self):
+        # redfoot_program is defined by the BootLoader and is the boot program
+        program = self.value(redfoot_program, REDFOOT.program)
+        assert program, "No default program found"            
+        return program
+    # program resource redfoot will execute
+    program = property(__get_program)
+    
+    def __get_config(self):
+        config = self.__config
+        if config is None:
+           config =  self.__config = self.get_context(BNode("_config"), creator=redfoot_loader.program)
+        return config
+    # context where redfoot stores configuration data
+    config = property(__get_config)
+
+    def __get_index(self):
+        index = self.__index
+        if index is None:
+            id = BNode("_index")
+            # To avoid recursion we call get_context on super then
+            # call get_context on self
+            index = self.__index = super(Redfoot, self).get_context(id) 
+            self.get_context(id, creator=redfoot_loader.program)  
+        return index
+    # context where redfoot stores data about contexts
+    index = property(__get_index)
+            
+    def open(self, path):
+        super(Redfoot, self).open(path)
+
+    def check(self, uri, publicID=None):
+        """
+        Checks to see if redfoot knows anything about uri
+
+        Currently, if not, Redfoot will attempt to load from uri.
+        """
+        if isinstance(uri, URIRef):
+            context_uri = self.context_id(uri)
+            if not (uri, None, None) in self:
+                if not (REDFOOT.Checked, RDFS.member, context_uri) in self: 
+                    self.index.add((REDFOOT.Checked, RDFS.member, context_uri))
+                    self.log.info("loading: %s" % uri)
+                    try:
+                        context = self.load(context_uri, publicID=publicID, creator=redfoot_loader.program)
+                    except Exception, e:
+                        print "couldn't load %s while checking: %s\n" % (uri, e)
+
+        
+    def load(self, location, format="xml", publicID=None, context_id=None, creator=None):
+        location = URIRef(urldefrag(location)[0])
+        publicID = publicID or self.absolutize(location)
+        id = self.context_id(publicID, context_id=context_id)        
+        self.remove_context(id)
+        context = self.get_context(id, creator=creator)
+        context.load(location, publicID, format)
+        self.index.remove((id, REDFOOT.source, None))
+        self.index.add((id, REDFOOT.source, location))
+        self.index.remove((id, REDFOOT.context_id, None))        
+        self.index.add((id, REDFOOT.context_id, id))        
+        return context
+
+    def get_context(self, identifier, creator=None):
+        """ Returns a Context graph for the given identifier, which
+        must be a URIRef or BNode."""
+        result = super(Redfoot, self).get_context(identifier)
+        self.index.remove((identifier, RDF.type, REDFOOT.DeletedContext))
+        self.index.add((identifier, RDF.type, REDFOOT.Context))
+        if not (identifier, DC_created, None) in self.index:
+            self.index.add((identifier, DC_created, Literal(date_time())))
+        if creator and not (identifier, DC_creator, None) in self.index:
+            self.index.add((identifier, DC_creator, creator))
+        return result
+
+    def remove_context(self, identifier):
+        self.index.remove((identifier, RDF.type, REDFOOT.Context))
+        self.index.add((identifier, RDF.type, REDFOOT.DeletedContext))        
+        super(Redfoot, self).remove_context(identifier)
+
+    def module(self, subject):
+        subject = URIRef(subject)
+        if not (subject, None, None) in self:
+            self.log.info("importing: %s" % subject)
+            try:
+                self.load(subject, creator=redfoot_loader.program)
+            except Exception, e:
+                raise Exception("Error trying to load module for %s\n%s" % (subject, e))
+                
+        value = self.value(subject)
+        assert value!=None, "No objects found for %s, %s" % (subject, RDF.value)
+
+        module_name = subject
+        safe_module_name = "subject_%s" % hash(subject)
+
+        module = sys.modules.get(module_name, None)
+        if module:
+            return module
+
+        module = ModuleType(safe_module_name)
+        module.__name__ = module_name 
+        module.__file__ = subject
+        module.__ispkg__ = 0
+        sys.modules[module_name] = module
+        code = compile(value+"\n", subject, "exec")
+        for key, value in self.__context.items():
+            module.__dict__[key] = value
+        module.__dict__["__uri__"] = subject
+
+        exec code in module.__dict__
+        return sys.modules[module_name]
+
+    def execute(self, code, context=None, **args):
+        self.check(code)
+        value = self.value(code)
+        assert value, "%s has no RDF.value" % code
+        assert value.datatype==REDFOOT.Python, "%s RDF.value is not of datatype REDFOOT.Python. %s currently only supports REDFOOT.Python code values" % (code, redfoot_program)
+        if context==None:
+            context = dict(self.__context)
+        for k, v in args.items():
+            context[k] = v
+        context["redfoot_current"] = code
+        context["redfoot_program"] = redfoot_program
+
+        value = value.replace("\r\n", "\n")        
+        value = value.replace("\r", "\n")        
+        try:
+            c = compile(value+"\n", code, "exec")
+            exec c in context
+        except Exception, e:
+            self.log.info("\nWhile trying to exec %s the following exception occurred:\n" % code)
+            self.log.info(traceback.print_exc())
+        return context
+
+    def context_id(self, uri, context_id=None):
+        """ URI#context """
+        uri = uri.split("#", 1)[0]
+        if context_id is None:
+            context_id = "#context"
+        return URIRef(context_id, base=uri)
+        
+    def namespace(self, uri, context=None):
+        #if uri[-1]!="#":
+        #    self.log.warning("Namespace should end in #: '%s'" % uri)
+        uri = URIRef(uri)
+        if context is None:
+            self.check(uri)
+            context_uri = self.context_id(uri)            
+            context = self.get_context(context_uri, creator=redfoot_loader.program)            
+
+        module_name = uri
+        module = sys.modules.get(module_name, None)
+        if module:
+            return module
+
+        safe_module_name = "namespace_%s" % hash(module_name)
+        module = ModuleType(safe_module_name)
+        module.__name__ = module_name 
+        module.__file__ = module_name
+        module.__ispkg__ = 0
+
+        from rdflib.util import uniq
+
+        d = module.__dict__
+        d["NS"] = uri
+        # TODO: module.__getattribute__ = module.__dict__.__getitem__ 
+        for subject in uniq(context.subjects(None, None)):
+            if subject.startswith(uri):
+                ns, qname = subject.split(uri)
+                d[qname] = subject
+
+        sys.modules[module_name] = module
+        return sys.modules[module_name]
+
+    def bind(self, prefix, namespace, override=True):
+        """
+        Override Graphs bind to additionally declare the namespace to
+        be of RDF.type REDFOOT.Namespce. And to load it if it's not
+        already been loaded.
+        """
+        namespace = URIRef(namespace)
+        if not (namespace, RDF.type, REDFOOT.Namespace) in self.index:
+            self.check(namespace)             
+            self.index.add((namespace, RDF.type, REDFOOT.Namespace))
+        super(Redfoot, self).bind(prefix, namespace, override)
+
+
+    def subclasses(self, uri):
+        if uri==RDFS.Resource:
+            for subclass in self.subjects(RDF.type, RDFS.Class):
+                for c in self.objects(subclass, RDFS.subClassOf):
+                    if c==RDFS.Resource or not (c, RDF.type, RDFS.Class) in self:
+                        yield subclass
+                        break
+            return
+        for subclass in self.subjects(RDFS.subClassOf, uri):
+            yield subclass
+
+    def instances(self, uri):
+	for instance in self.subjects(RDF.type, uri):
+	    yield instance
+
+    def types(self, subject):
+	"""generator over the types of subject ordered from most specific to least."""
+	seen = set()
+	l = []
+	for type in self.objects(subject, RDF.type):
+	    for t in self.transitive_objects(type, RDFS.subClassOf):
+		num = len(list(self.transitive_objects(t, RDFS.subClassOf)))
+		if t not in seen:
+		    seen.add(t)
+		    l.append((num, t))
+	for type in self.objects(subject.abstract(), RDF.type):
+	    for t in self.transitive_objects(type, RDFS.subClassOf):
+		num = len(list(self.transitive_objects(t, RDFS.subClassOf)))
+		if t not in seen:
+		    seen.add(t)
+		    l.append((num, t))
+	l.sort()
+	l.reverse()
+	for num, type in l:
+	    yield type
+
+    def main(self, options, args):
+        program = self.program
+        try:
+            self.check(program)
+        except Exception, e:
+            self.log.warning("could not find program for '%s': %s" % (program, e))
+        else:
+            self.log.info("running: %s ( %s )" % (self.label(program), program))
+            self.execute(program, args=args)
+
+
+try:
+    redfoot = redfoot_loader.redfoot
+except:
+    redfoot = Redfoot(redfoot_loader.backend)
+    redfoot_loader.redfoot = redfoot 
+    # NOTE: redfoot_loader is already dealing with opening and closing the backend
+
+from optparse import OptionParser
+parser = OptionParser("usage: %prog")
+parser.allow_interspersed_args = False
+
+(options, args) = parser.parse_args(args)
+
+redfoot.main(options, args)
+
+]]>
+    </rdf:value>
+  </redfoot:Kernel>
+
+
+</rdf:RDF>  

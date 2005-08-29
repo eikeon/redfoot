@@ -1,0 +1,64 @@
+Redfoot.app
+
+Currently:
+- End-user installable application.
+- Bootstrap
+
+Planned:
+
+- Replace hand editing of RDF/XML with using redfoot.app 
+  - How are contexts determined for add / remove
+  - Can externally loaded contexts be edited?
+    - maybe have notion of patch for such a use case?
+  - keep track of the changes not just the end result?
+
+- publishing/pushing of contexts from one rednode to another
+  - introduce a dev.redfoot.net?
+
+- filesystem / database integration
+  - have journal be a database external entity... that uses files... and can keep version of contexts in file format to serve as backup etc.
+  - What to do with case of context loaded via local file URL?
+  a) treat as read-only
+  b) pull them into the database... aka delete the local file
+  c) keep timestamps an sync in direction accordingly?
+
+- Journal: create a journal from which database can be recreated.
+  - How does this relate to the concept of an index
+  - All load operations should generate as much metadata as possible... 
+    - time, who, why
+  - format for journal? 
+  - can current bootstrapping be replaced with loading a journal?
+    - EX: (load http://redfoot.net/2005/redfoot, run value(http://redfoot.net/2005/redfoot#Defaults, http://redfoot.net/2005/redfoot#program)
+
+- Can generic editor for redfoot.app be a bundle that gets loaded?
+- full backup?
+- crypto
+
+Use cases:
+
+- load, edit, then publish remote context
+  a) publish a new context
+  b) publish complete new version of existing context
+  c) publish a patch to an existing context
+
+a) would support some applications... posting blog entries and other such write once applications... although b) and c) still desirable for these applications
+b) would enable replacement of hand editing RDF/XML
+c) eventually needed to allow version control like qualities and provenance info
+
+Actions:
+
+- UI for adding a new resource
+  - start by allowing user to pick type, enter label and enter comment.
+- introduce capability of pushing a context
+  - could be used for DOAP Release creation
+  - blog item creation
+  - recipe submission could use this feature
+- introduce secure pushing of a context
+- introduce notion of read-only context (default for any context loaded via (remote?) URL)
+
+
+Hypercode:
+
+program
+codestr
+kid

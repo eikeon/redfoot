@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<rdf:RDF 
+        xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+        xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+        xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+        xmlns:program="http://redfoot.net/2005/program#"
+        xmlns:server = "http://redfoot.net/2005/01/server#"        
+        xmlns:doap="http://usefulinc.com/ns/doap#"
+>
+
+  <redfoot:Release rdf:about="#">
+    <rdfs:label>Redfoot 1.9.1</rdfs:label>
+    <rdfs:comment>Stable version of Redfoot</rdfs:comment>
+    <doap:created>2005-05-15</doap:created>
+    <redfoot:boot_loader rdf:resource="http://redfoot.net/stable/redfoot-0.9.1.py"/>
+    <redfoot:code rdf:resource="http://redfoot.net/stable/kernel-0.9.1#"/>
+    <redfoot:program>
+      <redfoot:Program rdf:ID="command_runner">
+        <rdfs:label>Command Runner</rdfs:label>  
+        <redfoot:code rdf:resource="http://redfoot.net/stable/command_runner-0.9.0#v1"/>
+        <program:config rdf:resource="http://redfoot.net/stable/commands-0.9.1#config"/>
+        <server:server rdf:resource="http://redfoot.net/stable/server-0.9.1#twisted"/>
+        <server:handler rdf:resource="http://redfoot.net/stable/default/handler-0.9.1#dispatcher"/>
+      </redfoot:Program>
+    </redfoot:program>    
+  </redfoot:Release>
+
+</rdf:RDF>  

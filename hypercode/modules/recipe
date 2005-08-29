@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+>
+
+  <redfoot:Module rdf:ID="module">
+    <rdfs:label>Recipe Parser</rdfs:label>      
+    <rdfs:comment>A module for parsing recipes into RDF</rdfs:comment>    
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+  
+import re
+
+from rdflib.URIRef import URIRef
+from rdflib.BNode import BNode
+from rdflib.Literal import Literal
+
+from rdflib import RDF, RDFS
+from datetime import datetime
+
+RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
+SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+
+def recipes(uri=None):
+    recipe_list = []
+    for recipe in redfoot.objects(uri, RECIPE.recipe):
+        date = redfoot.value(recipe, RECIPE.date, any=True)
+        recipe_list.append((date, recipe))
+    recipe_list.sort()
+    recipe_list.reverse()
+    for date, recipe in recipe_list:
+        yield recipe
+
+ingredient_parser = redfoot.module("http://eikco.com/2005/03/ingredient_parser#module").IngredientParser()
+
+cid = URIRef("http://donnafales.com/2005/ingredients#context")
+ingredient_context = redfoot.get_context(cid)
+
+
+def line_generator(s):
+    for l in s.split("\n"):
+        yield l.strip()
+
+def is_blank(line):
+    if line.strip()=="":
+        return 1
+    else:
+        return 0
+
+def non_blank(lines):
+    """Returns the next non blank line"""
+    while 1:
+        l = lines.next()
+        if not is_blank(l):
+            return l
+    
+def non_blank_lines(lines):
+    """Generates non blank lines until a blank line is reached"""
+    while 1:
+        l = lines.next()
+        if is_blank(l):
+            break
+        else:
+            yield l
+
+def para(lines):
+    s = non_blank(lines)
+    more = " ".join(non_blank_lines(lines))
+    if more:
+        s = " ".join((s, more))
+    return s
+
+def paras(lines):
+    while 1:
+        yield para(lines)
+
+
+def parse(string, redfoot, uri=None):
+    """Parse the recipe in string updating redfoot accordingly.
+
+    The redfoot is updated if recipe already exists -- creation time
+    does not change if recipe already exists.
+
+    uri - uri to use for recipe.
+    """
+
+    recipe = uri or BNode()
+    lines = line_generator(string)
+
+    # First paragraph is the name
+    name = para(lines)
+
+    # Second paragraph is the description
+    description = para(lines)
+    
+    while 1:
+        l = lines.next()
+        if "Ingredients" in l:
+            break
+
+    ingredients = list()
+    ingredients.append(non_blank(lines))
+    ingredients.extend(non_blank_lines(lines))
+
+    while 1:
+        l = lines.next()
+        if "Directions" in l:
+            break
+
+    directions = list(paras(lines))
+
+    
+    def remove_all(r):
+        if isinstance(r, Literal):
+            return
+        for s, p, o in redfoot.triples((r, None, None)):
+            redfoot.remove((s, p, o))
+            if not isinstance(o, Literal):
+                remove_all(o)
+    def remove(r):
+	for p in [RDFS.label, RDFS.comment, RECIPE.original,
+                  RECIPE.ingredients, RECIPE.directions, RECIPE.modified]:
+            for s, p, o in redfoot.triples((r, p, None)):
+                redfoot.remove((s, p, o))
+                remove_all(o)
+    remove(recipe)        
+
+    redfoot.bind("recipe", RECIPE.NS)
+    redfoot.add((recipe, RDF.type, RECIPE.Recipe))
+    redfoot.add((recipe, RECIPE.original, Literal(string)))
+    redfoot.add((recipe, RDFS.label, Literal(name)))
+    redfoot.add((recipe, RDFS.comment, Literal(description)))
+
+    orig = URIRef(recipe + "orig/")
+    redfoot.add((orig, RDF.type, RECIPE.RecipeOriginal))
+    redfoot.add((recipe, SERVER.alternate, orig))
+
+    now = datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
+    if not (recipe, RECIPE.date, None) in redfoot:
+        redfoot.add((recipe, RECIPE.date, Literal(now)))
+    redfoot.add((recipe, RECIPE.modified, Literal(now)))
+
+    def make_list(source, type):
+        items = list()
+        for item in source:
+            b = BNode()
+            redfoot.add((b, RDFS.label, Literal(item)))
+            redfoot.add((b, RDF.type, type))
+            items.append(b)
+        items.reverse()
+        rest = RDF.nil
+        for item in items:
+            l = BNode()
+            redfoot.add((l, RDF.type, RDF.List))
+            redfoot.add((l, RDF.first, item))
+            redfoot.add((l, RDF.rest, rest))
+            rest = l
+        return l
+        
+    ni = []
+    for line in ingredients:
+        l = []
+        for r in ingredient_parser.parse(line):
+            l.append((len(r), r))
+        l.sort()
+        l.reverse()
+        for _, r in l:
+            i = URIRef("http://donnafales.com/ingredients/%s/" % r.replace(" ", "_"))
+            if not (i, RDFS.label, None) in ingredient_context:
+                ingredient_context.add((i, RDF.type, RECIPE.Ingredient))
+                ingredient_context.add((i, RDFS.label, Literal(r)))
+            redfoot.add((recipe, RECIPE.ingredient, i))
+            pattern = r"(\s%s[\s,.]*)" % re.escape(r)
+            pattern = re.compile(pattern, re.IGNORECASE)            
+            line = pattern.sub(" %s " % i, line)
+            #line = line.replace(r, i)
+        ni.append(line)
+    ingredients = ni
+    
+    b = make_list(ingredients, RECIPE.IngredientListItem)
+    redfoot.add((recipe, RECIPE.ingredients, b))
+
+    l = make_list(directions, RECIPE.Step)
+    redfoot.add((recipe, RECIPE.directions, l))
+
+
+]]>
+    </rdf:value>
+  </redfoot:Module>
+
+</rdf:RDF>  

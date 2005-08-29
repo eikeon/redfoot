@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+>  
+
+  <redfoot:Namespace rdf:about="#">
+    <rdfs:label>Redfoot server namespace</rdfs:label>
+    <rdfs:comment>
+    </rdfs:comment>
+  </redfoot:Namespace>
+
+  <rdfs:Class rdf:ID="Server">
+    <rdfs:label>Server</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/redfoot#Resource"/>
+  </rdfs:Class>
+
+  <rdfs:Class rdf:ID="Handler">
+    <rdfs:label>Handler</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/redfoot#Resource"/>
+  </rdfs:Class>
+
+  <rdfs:Class rdf:ID="Site">
+    <rdfs:label>Site</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/redfoot#Resource"/>
+  </rdfs:Class>
+
+  <rdfs:Class rdf:ID="Page">
+    <rdfs:label>Page</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/redfoot#Resource"/>
+  </rdfs:Class>
+
+  <rdfs:Property rdf:ID="server">
+    <rdfs:label>server</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:domain rdf:resource="#Site"/>
+    <rdfs:range rdf:resource="http://redfoot.net/2005/01/handler#Handler"/>
+  </rdfs:Property>
+
+  <rdfs:Property rdf:ID="handler">
+    <rdfs:label>handler</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:domain rdf:resource="#Site"/>
+    <rdfs:range rdf:resource="http://redfoot.net/2005/01/handler#Handler"/>
+  </rdfs:Property>
+
+</rdf:RDF>  

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:main="http://redfoot.net/2005/01/main#"
+>
+
+  <rdfs:Property rdf:ID="config">
+    <rdfs:label>config</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <!--
+      <rdfs:domain rdf:resource=""/>
+      <rdfs:range rdf:resource=""/>
+      -->
+  </rdfs:Property> 
+
+   <rdfs:Property rdf:ID="command">
+    <rdfs:label>command</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <!--
+      <rdfs:domain rdf:resource=""/>
+      <rdfs:range rdf:resource=""/>
+      -->
+  </rdfs:Property> 
+
+
+  <redfoot:Python rdf:ID="code">
+    <rdfs:label>main for redfoot</rdfs:label>
+    <main:config rdf:resource="http://redfoot.net/2005/01/default#config"/>
+    <redfoot:codestr>
+<![CDATA[
+
+REDFOOT = redfoot.namespace("http://redfoot.net/2005/redfoot#")
+MAIN = redfoot.namespace("http://redfoot.net/2005/01/main#")
+
+commands = {}
+
+for config in redfoot.objects(redfoot.main, MAIN.config):
+    if not (config, None, None) in redfoot:
+        redfoot.load(config)
+
+    for command in store.objects(config, MAIN.command):
+        label = first(store.objects(command, RDFS.label))
+        code = first(store.objects(command, REDFOOT.code))
+        commands[label] = code
+
+if not args:
+    args = [""]
+    print "available commands:",
+    for command in commands.keys():
+        print command,
+    print ""
+else:
+    command = args[0]
+    code = commands.get(command, None)
+    redfoot.execute(code, args=args[1:])
+
+]]>
+    </redfoot:codestr>
+  </redfoot:Python>
+
+</rdf:RDF>

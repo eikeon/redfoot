@@ -1,0 +1,38 @@
+{
+    IBClasses = (
+        {CLASS = ContextsView; LANGUAGE = ObjC; SUPERCLASS = NSOutlineView; }, 
+        {
+            ACTIONS = {update = id; }; 
+            CLASS = EditorController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                comment = NSTextView; 
+                label = NSTextField; 
+                type = NSComboBox; 
+                uri = NSComboBox; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            CLASS = EditorTabViewItem; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {controller = EditorController; }; 
+            SUPERCLASS = NSTabViewItem; 
+        }, 
+        {
+            ACTIONS = {"" = id; }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {myAction = id; runCommand = id; }; 
+            CLASS = RedfootController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {console = NSTextView; tabView = NSTabView; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = redfootAppDelegate; LANGUAGE = ObjC; SUPERCLASS = NSObject; }
+    ); 
+    IBVersion = 1; 
+}

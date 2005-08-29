@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:handler="http://redfoot.net/2005/handler#"
+>  
+
+  <redfoot:Namespace rdf:about="#">
+    <rdfs:label>Redfoot blog namespace</rdfs:label>
+    <rdfs:comment>
+    </rdfs:comment>
+  </redfoot:Namespace>
+
+  <rdfs:Class rdf:ID="Entry">
+    <rdfs:label>Entry</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/server#Class"/>
+  </rdfs:Class>
+
+  <rdfs:Class rdf:ID="Content">
+    <rdfs:label>Content</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+  </rdfs:Class>
+
+  <rdfs:Property rdf:ID="content">
+    <rdfs:label>content</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:domain rdf:resource="#Entry"/>
+    <rdfs:range rdf:resource="#Content"/>
+  </rdfs:Property>
+
+  <rdfs:Property rdf:ID="content_type">
+    <rdfs:label>content</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:domain rdf:resource="#Content"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
+  </rdfs:Property>
+
+</rdf:RDF>  

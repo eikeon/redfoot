@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+>  
+
+  <redfoot:Namespace rdf:about="#">
+    <rdfs:label>Redfoot comment namespace</rdfs:label>
+    <rdfs:comment>
+    </rdfs:comment>
+  </redfoot:Namespace>
+
+  <rdfs:Class rdf:ID="Comment">
+    <rdfs:label>Comment</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/server#Class"/>
+  </rdfs:Class>
+
+  <rdfs:Property rdf:ID="comment">
+    <rdfs:label>comment</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:domain rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+    <rdfs:range rdf:resource="#Comment"/>
+  </rdfs:Property>
+
+  <redfoot:Resource rdf:ID="exclude">
+    <rdfs:label>exclude</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+  </redfoot:Resource>
+
+</rdf:RDF>  

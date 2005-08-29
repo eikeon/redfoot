@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:program="http://redfoot.net/2005/program#"
+   xmlns:handler="http://redfoot.net/2005/01/handler#"
+>
+
+  <redfoot:Configuration rdf:ID="config">
+    <rdfs:label>commands config</rdfs:label>
+    <rdfs:comment>A configuration with all the commands</rdfs:comment>
+    <program:command rdf:resource="#server"/>
+    <program:command rdf:resource="#load"/>
+    <program:command rdf:resource="#save"/>
+    <program:command rdf:resource="#print"/>
+    <program:command rdf:resource="#contexts"/>
+    <program:command rdf:resource="#remove_context"/>
+    <program:command rdf:resource="#reload_all"/>
+    <program:command rdf:resource="#save_all"/>
+    <program:command rdf:resource="#auto_reload"/>
+  </redfoot:Configuration>>
+
+  <program:Command rdf:ID="load">
+    <rdfs:label>load</rdfs:label>
+    <redfoot:code rdf:parseType="Resource">
+      <redfoot:codestr>
+<![CDATA[
+
+if len(args)==0 or len(args)>2:
+    print "usage: ./redfoot.py load <uri> [<publicID>]"
+else:
+    url = args[0]
+    if len(args)==2:
+        publicID = args[1]
+    else:
+        publicID = None
+
+    print "loading: %s" % url
+    if publicID:
+        print " with publicID: %s" % publicID
+    store.load(url, publicID=publicID)
+
+]]>
+      </redfoot:codestr>
+    </redfoot:code>      
+  </program:Command>
+
+  <program:Command rdf:ID="save">
+    <rdfs:label>save</rdfs:label>
+    <redfoot:code rdf:parseType="Resource">
+      <redfoot:codestr>
+<![CDATA[
+
+REDFOOT = redfoot.namespace("http://redfoot.net/2005/redfoot#")
+
+for arg in args:
+    print "saveing: %s" % arg
+    source = URIRef(store.absolutize(arg))
+    print "source:", source
+    for cid, _, source in store.triples((None, REDFOOT.source, source)):
+        context = store.get_context(cid)
+        context.save(source, format="pretty-xml")
+        print "saved:", source, len(context)
+
+]]>
+      </redfoot:codestr>
+    </redfoot:code>      
+  </program:Command>
+
+  <program:Command rdf:ID="print">
+    <rdfs:label>print</rdfs:label>
+    <redfoot:code rdf:parseType="Resource">
+      <redfoot:codestr>
+<![CDATA[
+
+import sys
+for arg in args:
+    cid = redfoot.absolutize(arg, defrag=0)
+    print cid
+    context = redfoot.get_context(cid)
+    context.serialize(format="pretty-xml", destination=sys.stdout)
+
+]]>
+      </redfoot:codestr>
+    </redfoot:code>      
+  </program:Command>
+
+  <program:Command rdf:ID="contexts">
+    <rdfs:label>contexts</rdfs:label>
+    <redfoot:code rdf:parseType="Resource">
+      <rdfs:label>Default program for Redfoot</rdfs:label>      
+      <redfoot:codestr>
+<![CDATA[
+
+REDFOOT = redfoot.namespace("http://redfoot.net/2005/redfoot#")
+
+for cid in store.contexts():
+    source = store.value(cid, REDFOOT.source)
+    print source, len(store.get_context(cid))
+
+]]>
+      </redfoot:codestr>
+    </redfoot:code>
+  </program:Command>
+
+  <program:Command rdf:ID="remove_context">
+    <rdfs:label>remove_context</rdfs:label>
+    <redfoot:code rdf:parseType="Resource">
+      <redfoot:codestr>
+<![CDATA[
+
+REDFOOT = redfoot.namespace("http://redfoot.net/2005/redfoot#")
+
+for arg in args:
+    uri = URIRef(redfoot.absolutize(arg, defrag=0))
+    redfoot.remove_context(uri) 
+    for cid in store.subjects(REDFOOT.source, uri):
+        print "removing:", cid, uri
+        redfoot.remove_context(cid)
+
+]]>
+      </redfoot:codestr>
+    </redfoot:code>
+  </program:Command>
+
+
+  <program:Command rdf:ID="reload_all">
+    <rdfs:label>reload_all</rdfs:label>
+    <redfoot:code rdf:parseType="Resource">
+      <rdfs:label>Default program for Redfoot</rdfs:label>      
+      <redfoot:codestr>
+<![CDATA[
+
+REDFOOT = redfoot.namespace("http://redfoot.net/2005/redfoot#")
+
+for cid, _, source in store.triples((None, RDF.type, REDFOOT.Context)):
+    source = redfoot.value(cid, REDFOOT.source, default=None)
+    if source:
+        print "loading %s" % source
+        try:
+            store.load(source, publicID=cid)
+        except Exception, e:
+            print e
+
+]]>
+      </redfoot:codestr>
+    </redfoot:code>
+  </program:Command>
+
+  <program:Command rdf:ID="save_all">
+    <rdfs:label>save_all</rdfs:label>
+    <redfoot:code rdf:parseType="Resource">
+      <rdfs:label>Default program for Redfoot</rdfs:label>      
+      <redfoot:codestr>
+<![CDATA[
+
+REDFOOT = redfoot.namespace("http://redfoot.net/2005/redfoot#")
+
+for cid, _, source in store.triples((None, REDFOOT.source, None)):
+    if source:
+        print "saving %s" % source
+        try:
+            context = store.get_context(cid)
+            context.save(source, format="pretty-xml")            
+        except Exception, e:
+            print e
+
+]]>
+      </redfoot:codestr>
+    </redfoot:code>
+  </program:Command>
+
+  <program:Command rdf:ID="server">
+    <rdfs:label>server</rdfs:label>
+    <redfoot:code rdf:parseType="Resource">
+      <rdfs:label>Default program for Redfoot</rdfs:label>      
+      <redfoot:codestr>
+<![CDATA[
+
+SERVER = redfoot.namespace("http://redfoot.net/2005/01/server#")
+
+port = 80
+if len(args)>0:
+    try:
+        port = int(args[0])
+    except:
+	print "invalid port of '%s'" % port
+    
+server = redfoot.value(redfoot.program, SERVER.server) 
+assert server, "%s does not have a %s" % (redfoot.program, SERVER.server)
+
+handler = redfoot.value(redfoot.program, SERVER.handler) 
+assert handler, "%s does not have a %s" % (redfoot.program, SERVER.handler)
+
+RedfootServer = redfoot.module(server).RedfootServer
+server = RedfootServer(handler, port=port)
+server.run()
+
+]]>
+      </redfoot:codestr>
+    </redfoot:code>
+  </program:Command>
+
+  <program:Command rdf:ID="auto_reload">
+            <rdfs:label>auto_reload</rdfs:label>
+            <redfoot:code>
+              <rdf:Description>
+                <rdfs:label>Default program for Redfoot</rdfs:label>
+                <redfoot:codestr>
+<![CDATA[
+    
+REDFOOT = redfoot.namespace("http://redfoot.net/2005/redfoot#")
+DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
+
+from time import sleep
+from urlparse import urlparse
+from os.path import getmtime, isfile
+
+while 1:
+    sleep(1)
+    for cid, _, source in store.triples((None, REDFOOT.source, None)):
+        if source:
+            scheme, netloc, path, params, query, fragment = urlparse(source)
+            if isfile(path):
+                ts = getmtime(path)                
+		LONG_AGO = 0
+                current_ts = int(redfoot.value(cid, DC.date, any=True, default=LONG_AGO))
+                if not current_ts or current_ts<ts:
+                    redfoot.remove((cid, DC.date, None))
+                    redfoot.index.add((cid, DC.date, Literal(ts)))
+                    print "loading: %s" % path, ts
+                    redfoot.load(source)
+
+
+]]>
+                </redfoot:codestr>
+              </rdf:Description>
+            </redfoot:code>
+  </program:Command>
+
+</rdf:RDF>  

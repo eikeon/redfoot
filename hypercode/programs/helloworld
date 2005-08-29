@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+>
+
+  <redfoot:Program rdf:about="">
+    <rdfs:label>A helloworld program</rdfs:label>
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+print "Hello World!"
+
+]]>
+    </rdf:value>
+  </redfoot:Program>>
+
+</rdf:RDF>  

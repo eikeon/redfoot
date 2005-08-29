@@ -1,0 +1,456 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:commands="http://redfoot.net/2005/commands#"
+>
+
+  <redfoot:Configuration rdf:ID="config">
+    <rdfs:label>commands config</rdfs:label>
+    <rdfs:comment>A configuration with all the commands</rdfs:comment>
+    <commands:command rdf:resource="#server"/>
+    <commands:command rdf:resource="#set_base"/>
+    <commands:command rdf:resource="#load"/>
+    <commands:command rdf:resource="#save"/>
+    <commands:command rdf:resource="#print"/>
+    <commands:command rdf:resource="#contexts"/>
+    <commands:command rdf:resource="#remove_context"/>
+    <commands:command rdf:resource="#reload_all"/>
+    <commands:command rdf:resource="#save_all"/>
+    <commands:command rdf:resource="#auto_reload"/>
+    <commands:command rdf:resource="#import"/>
+    <commands:command rdf:resource="#copy"/>    
+    <commands:command rdf:resource="#twistd"/>    
+    <commands:command rdf:resource="#editor"/>    
+  </redfoot:Configuration>>
+
+  <commands:Command rdf:ID="set_base">
+    <rdfs:label>set_base</rdfs:label>
+    <redfoot:code>
+     <redfoot:Python rdf:ID="set_base_code">
+        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+assert len(args)==1, "expecting one argument that is the base"
+redfoot.base = URIRef(args[0])
+
+]]>
+      </rdf:value>
+     </redfoot:Python>
+    </redfoot:code>      
+  </commands:Command>
+
+  <commands:Command rdf:ID="load">
+    <rdfs:label>load</rdfs:label>
+    <redfoot:code>
+     <redfoot:Python rdf:ID="load_code">
+      <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+if len(args)==0 or len(args)>3:
+    print "usage: ./redfoot.py load <uri> [<publicID>] [<context_id>]"
+else:
+    url = args[0]
+    try:
+        publicID = URIRef(args[1])
+    except:
+        publicID = None
+    try:
+        context_id = URIRef(args[2])
+    except:
+        context_id = None
+
+    print "loading: %s" % url
+    if publicID:
+        print " with publicID: %s" % publicID
+    if context_id:
+        print " with context_id: %s" % context_id
+    redfoot.load(url, publicID=publicID, context_id=context_id, creator=redfoot.uri)
+
+]]>
+      </rdf:value>
+     </redfoot:Python>
+    </redfoot:code>      
+  </commands:Command>
+
+  <commands:Command rdf:ID="save">
+    <rdfs:label>save</rdfs:label>
+    <redfoot:code>
+     <redfoot:Python rdf:ID="save_code">
+      <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+REDFOOT = redfoot.namespace("http://redfoot.net/2005/redfoot#")
+
+for arg in args:
+    print "saveing: %s" % arg
+    source = URIRef(redfoot.absolutize(arg))
+    print "source:", source
+    for cid, _, source in redfoot.triples((None, REDFOOT.source, source)):
+        context = redfoot.get_context(cid)
+        context.save(source, format="pretty-xml")
+        print "saved:", source, len(context)
+
+]]>
+      </rdf:value>
+     </redfoot:Python>
+    </redfoot:code>      
+  </commands:Command>
+
+  <commands:Command rdf:ID="print">
+    <rdfs:label>print</rdfs:label>
+    <redfoot:code>
+     <redfoot:Python rdf:ID="print_code">
+      <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+import sys
+for arg in args:
+    cid = redfoot.absolutize(arg, defrag=0)
+    print cid
+    context = redfoot.get_context(cid)
+    context.serialize(format="pretty-xml", destination=sys.stdout)
+
+]]>
+      </rdf:value>
+     </redfoot:Python>
+    </redfoot:code>      
+  </commands:Command>
+
+  <commands:Command rdf:ID="contexts">
+    <rdfs:label>contexts</rdfs:label>
+    <redfoot:code>
+     <redfoot:Python rdf:ID="contexts_code">
+      <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+REDFOOT = redfoot.namespace("http://redfoot.net/2005/redfoot#")
+
+for cid in redfoot.contexts():
+    try:
+        source = redfoot.value(cid, REDFOOT.source)
+        print cid, source #, len(redfoot.get_context(cid))
+    except Exception, e:
+        print cid, e
+
+]]>
+      </rdf:value>
+     </redfoot:Python>
+    </redfoot:code>
+  </commands:Command>
+
+  <commands:Command rdf:ID="remove_context">
+    <rdfs:label>remove_context</rdfs:label>
+    <redfoot:code>
+     <redfoot:Python rdf:ID="remove_contexts_code">
+      <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+REDFOOT = redfoot.namespace("http://redfoot.net/2005/redfoot#")
+
+for arg in args:
+    uri = URIRef(redfoot.absolutize(arg, defrag=0))
+    redfoot.remove_context(uri) 
+    for cid in redfoot.subjects(REDFOOT.source, uri):
+        print "removing:", cid, uri
+        redfoot.remove_context(cid)
+    redfoot.remove_context(BNode(arg))
+
+]]>
+      </rdf:value>
+     </redfoot:Python>
+    </redfoot:code>
+  </commands:Command>
+
+
+  <commands:Command rdf:ID="reload_all">
+    <rdfs:label>reload_all</rdfs:label>
+    <redfoot:code>
+     <redfoot:Python rdf:ID="reload_all_code">
+      <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+REDFOOT = redfoot.namespace("http://redfoot.net/2005/redfoot#")
+DC_creator = URIRef("http://purl.org/dc/elements/1.1/creator")
+
+for cid, _, source in redfoot.triples((None, RDF.type, REDFOOT.Context)):
+    source = redfoot.value(cid, REDFOOT.source, default=None)
+    context_id = redfoot.value(cid, REDFOOT.context_id, default=None)
+    creator = redfoot.value(cid, DC_creator, default=None) or redfoot.uri
+    if source:
+        print "loading %s" % source
+        try:
+            redfoot.load(source, publicID=cid, context_id=context_id, creator=creator)
+        except Exception, e:
+            print e
+
+]]>
+      </rdf:value>
+     </redfoot:Python>
+    </redfoot:code>
+  </commands:Command>
+
+  <commands:Command rdf:ID="save_all">
+    <rdfs:label>save_all</rdfs:label>
+    <redfoot:code>
+     <redfoot:Python rdf:ID="save_all_code">
+      <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+REDFOOT = redfoot.namespace("http://redfoot.net/2005/redfoot#")
+
+for cid, _, source in redfoot.triples((None, REDFOOT.source, None)):
+    if source:
+        print "saving %s" % source
+        try:
+            context = redfoot.get_context(cid)
+            context.save(source, format="pretty-xml")            
+        except Exception, e:
+            print e
+
+]]>
+      </rdf:value>
+     </redfoot:Python>
+    </redfoot:code>
+  </commands:Command>
+
+  <commands:Command rdf:ID="server">
+    <rdfs:label>server</rdfs:label>
+    <redfoot:code>
+     <redfoot:Python rdf:ID="server_code">
+      <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+
+port = 80
+if len(args)>0:
+    try:
+        port = int(args[0])
+    except:
+	print "invalid port of '%s'" % port
+    
+server = redfoot.value(redfoot.uri, SERVER.server) 
+assert server, "%s does not have a %s" % (redfoot.uri, SERVER.server)
+
+print "running server on port %s" % port
+redfoot.module(server).Server(port=port).run()
+
+]]>
+      </rdf:value>
+     </redfoot:Python>
+    </redfoot:code>
+  </commands:Command>
+
+  <commands:Command rdf:ID="auto_reload">
+    <rdfs:label>auto_reload</rdfs:label>
+    <redfoot:code>
+     <redfoot:Python rdf:ID="auto_reload_code">
+       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+    
+REDFOOT = redfoot.namespace("http://redfoot.net/2005/redfoot#")
+DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
+
+from time import sleep
+from urlparse import urlparse
+from os.path import getmtime, isfile
+
+while 1:
+    sleep(1)
+    for cid, _, source in redfoot.triples((None, REDFOOT.source, None)):
+        if source:
+            scheme, netloc, path, params, query, fragment = urlparse(source)
+            if isfile(path):
+                ts = getmtime(path)                
+		LONG_AGO = 0
+                current_ts = int(redfoot.value(cid, DC.date, any=True, default=LONG_AGO))
+                if not current_ts or current_ts<ts:
+                    redfoot.remove((cid, DC.date, None))
+                    redfoot.index.add((cid, DC.date, Literal(ts)))
+                    print "loading: %s" % path, ts
+                    redfoot.load(source, publicID=cid, creator=redfoot.uri)
+
+]]>
+       </rdf:value>
+     </redfoot:Python>
+    </redfoot:code>
+  </commands:Command>
+
+  <commands:Command rdf:ID="import">
+    <rdfs:label>import</rdfs:label>
+    <redfoot:code>
+     <redfoot:Python rdf:ID="import_code">
+       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+    
+from urllib import quote
+from rdflib import Graph
+
+uri = args[0]
+
+g = Graph()
+g.load(uri)
+
+for context in g.subjects(RDF.type, REDFOOT.Context):
+    print context
+    source = "%s?uri=%s" % (uri, quote(context))
+    try:
+        redfoot.load(source, publicID=context, creator=redfoot.uri)
+    except Exception, e:
+        print e
+
+]]>
+       </rdf:value>
+     </redfoot:Python>
+    </redfoot:code>
+  </commands:Command>
+
+  <commands:Command rdf:ID="copy">
+    <rdfs:label>copy</rdfs:label>
+    <redfoot:code>
+     <redfoot:Python rdf:ID="copy_code">
+       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+    
+from urllib import quote
+from rdflib import Graph
+
+uri = args[0]
+
+if len(args)>1:
+    startswith = args[1]
+else:
+    startswith = ''
+
+g = Graph()
+g.load(uri)
+
+for context_id in g.subjects(RDF.type, REDFOOT.Context):
+    if context_id.startswith(startswith):
+        print "Copying:", context_id    
+        for triple in g.triples((context_id, None, None)):
+            redfoot.index.add(triple)
+        source = "%s?uri=%s" % (uri, quote(context_id))
+        context = redfoot.get_context(context_id)
+        try:
+            context.load(source)
+        except Exception, e:
+            print e
+
+]]>
+       </rdf:value>
+     </redfoot:Python>
+    </redfoot:code>
+  </commands:Command>
+
+  <commands:Command rdf:ID="twistd">
+    <rdfs:label>twistd</rdfs:label>
+    <redfoot:code>
+     <redfoot:Python rdf:ID="twistd_code">
+       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+    
+port = 80
+if len(args)>0:
+    try:
+        port = int(args[0])
+    except:
+	print "invalid port of '%s'" % port
+
+###
+# TODO: can duplication with server command be avoided here
+SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+
+server_uri = redfoot.value(redfoot.uri, SERVER.server) 
+assert server_uri, "%s does not have a %s" % (redfoot.uri, SERVER.server)
+
+server = redfoot.module(server_uri)
+#
+###
+
+
+from twisted.application import service, internet
+from twisted.internet import reactor
+
+def onShutdown():
+    print "redfoot: closing" 
+    redfoot.close()
+    
+
+reactor.addSystemEventTrigger('after', 'shutdown', onShutdown)
+application = service.Application("redfoot")
+site = server.Site(server._Resource())
+
+internet.TCPServer(port, site).setServiceParent(application)
+
+def close():
+    print "NOOP"
+# TODO: how better to do this?
+redfoot.close = close
+
+redfoot.application = application
+
+]]>
+       </rdf:value>
+     </redfoot:Python>
+    </redfoot:code>
+  </commands:Command>
+
+  <commands:Command rdf:ID="editor">
+    <rdfs:label>editor</rdfs:label>
+    <redfoot:code>
+     <redfoot:Python rdf:ID="editor_code">
+       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+    
+def install_editor():
+    import logging
+    from tarfile import TarFile
+    from urllib2 import urlopen, Request
+    from StringIO import StringIO
+    import redfootlib
+
+    logging.info("downloading editor")
+    url = "http://redfoot.net/dev/editor.tgz"
+    headers = {'User-agent': 'redfoot.py (%s)' % redfootlib.__version__}
+    f = urlopen(Request(url, None, headers))
+    sio = StringIO(f.read())
+    sio.seek(0)
+    tar = TarFile.gzopen("editor.tgz", fileobj=sio)
+
+    logging.info("extracting editor")
+    for member in tar:
+	tar.extract(member)
+
+# TODO: think we just need NSBundle and NSTabViewItem
+from Foundation import *
+from AppKit import *
+
+controller = redfoot.controller
+try:
+    bundle = NSBundle.bundleWithPath_("~/Library/redfoot/editor.bundle")
+    assert bundle is not None
+except:
+    install_editor()
+    bundle = NSBundle.bundleWithPath_("~/Library/redfoot/editor.bundle")
+
+EditorController = bundle.classNamed_("EditorController")
+controller.editor = editor = EditorController.allocWithZone_(controller.zone()).init(redfoot)
+
+NSBundle.loadNibNamed_owner_("editor", editor)
+
+print bundle.objectForInfoDictionaryKey_("CFBundleVersion")
+
+tabViewItem = NSTabViewItem.alloc().init()
+tabViewItem.setLabel_("editor")
+tabViewItem.setView_(editor.editView)
+controller.tabView.addTabViewItem_(tabViewItem)
+
+]]>
+       </rdf:value>
+     </redfoot:Python>
+    </redfoot:code>
+  </commands:Command>
+</rdf:RDF>  

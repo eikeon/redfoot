@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
+  xmlns:rdfs='http://www.w3.org/2000/01/rdf-schema#'
+  xmlns:redfoot='http://redfoot.net/2005/redfoot#'
+  xmlns:template='http://redfoot.net/2005/template#'
+>
+  <rdfs:Class rdf:about="http://redfoot.net/2005/redfoot#Context">
+    <template:content>
+      <rdf:Description>
+        <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
+
+<span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
+<?python
+cid = request.uri.abstract()
+context = redfoot.get_context(cid)
+REDFOOT = redfoot.namespace("http://redfoot.net/2005/redfoot#")
+for t in redfoot.triples((cid, None, None)):
+    print t
+?>
+  <p>Length: ${len(context)}</p>
+  <p>Source: ${redfoot.index.value(cid, REDFOOT.source, default="unknown")}</p>
+</span>
+
+
+      ]]></rdf:value>
+      </rdf:Description>
+    </template:content>
+  </rdfs:Class>
+
+</rdf:RDF>

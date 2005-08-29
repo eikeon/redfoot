@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+>
+
+  <redfoot:Python rdf:ID="v1">
+    <rdfs:label>Command Runner (0.9.0)</rdfs:label>
+    <rdfs:comment>
+      TODO: print to stderr so that commands have full control over stdout
+    </rdfs:comment> 
+    <redfoot:codestr>
+<![CDATA[
+
+REDFOOT = redfoot.namespace("http://redfoot.net/2005/redfoot#")
+PROGRAM = redfoot.namespace("http://redfoot.net/2005/program#")
+
+commands = {}
+
+for config in redfoot.objects(redfoot.program, PROGRAM.config):
+    redfoot.check(config)
+
+    for command in store.objects(config, PROGRAM.command):
+        redfoot.check(command)
+        label = first(store.objects(command, RDFS.label))
+        code = first(store.objects(command, REDFOOT.code))
+        redfoot.check(code)
+        commands[label] = code
+
+if not args:
+    args = [""]
+
+command = args[0]
+code = commands.get(command, None)
+if code:
+    redfoot.execute(code, args=args[1:])
+else:
+    if command:
+        print "Command '%s' not found." % command
+    print ""
+    print "available commands:",
+    for command in commands.keys():
+        print command,
+    print ""
+
+]]>
+    </redfoot:codestr>
+  </redfoot:Python>
+
+
+</rdf:RDF>  

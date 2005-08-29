@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:handler="http://redfoot.net/2005/handler#"
+   xmlns:template='http://redfoot.net/2005/template#'   
+>
+
+   <rdf:Description rdf:ID="extract_aspect">
+    <rdfs:label>extract aspect</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+  </rdf:Description>
+
+  <rdf:Description rdf:about="">
+    <template:section rdf:resource="/highlight/"/>
+  </rdf:Description>
+
+ <server:Page rdf:about="/extract/">
+   <rdfs:label>Extract</rdfs:label>
+   <rdfs:comment></rdfs:comment>
+   <server:page_handler rdf:resource="#extract"/>
+ </server:Page>
+
+ <server:Page rdf:about="/highlight">
+   <rdfs:label>Extract processor</rdfs:label>
+   <rdfs:comment></rdfs:comment>
+   <server:content rdf:resource="#extract"/>
+ </server:Page>
+
+  <server:Page rdf:about="/highlight/">
+    <rdfs:label>Highlight</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <template:default_section_rank>38.0</template:default_section_rank>    
+    <server:content>
+      <server:Content>
+        <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
+
+  <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
+
+<p>
+<form action="/extract/" method="GET">
+  <p>URL:</p>
+  <input name="uri" type="text" value="" style="width: 100%"/>
+  <input type="submit" value="Highlight"/>
+</form>
+<p>or</p>
+<form action="/highlight" method="POST">
+  <p>Text:</p>
+  <textarea name="text" cols="" rows="30" style="width: 100%"></textarea>
+  <input type="submit" value="Highlight"/>
+</form>
+</p>
+
+  </span>
+
+
+      ]]></rdf:value>
+      </server:Content>
+    </server:content>
+  </server:Page>
+
+
+      <server:PagePartHandler rdf:ID="extract">
+        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+        <![CDATA[
+
+import re
+from urllib2 import urlopen
+from sgmllib import SGMLParser
+
+class HTMLParser(SGMLParser):
+
+    def __init__(self, write, base, host):
+        SGMLParser.__init__(self)
+        self.write = write
+	self.patterns = set()
+        self.base = base
+        self.host = host
+
+    def add_pattern(self, label, uri):
+	pattern = r"(\s%s[\s,.])" % re.escape(label)
+	pattern = re.compile(pattern, re.IGNORECASE)
+	self.patterns.add((label, uri, pattern))
+
+    def start_head(self, attrs):
+        self.unknown_starttag("head", attrs)
+        self.write('''<base href="%s"></head>''' % self.base)
+
+    def unknown_starttag(self, tag, attrs):
+        self.write("<%s" % tag)
+        for k, v in attrs:
+            self.write(' %s="%s"' % (k, v))
+        self.write(">")
+
+    def unknown_endtag(self, tag):
+        self.write("</%s>" % tag)
+
+    def unknown_charref(self, ref):
+        self.write("&%s;" % ref)
+
+    def unknown_entityref(self, ref):
+        self.write("&%s;" % ref)        
+
+    def handle_data(self, data):
+	data = self.add_links(data)
+        self.write(data)
+
+    def handle_comment(self, data):
+        self.write("<!-- %s -->" % data)
+
+    def handle_decl(self, decl):
+        self.write("<%s>" % decl)
+
+    def handle_pi(self, data):
+        self.write("<?%s?>" % data)
+
+    def add_links(self, data):
+	for label, uri, pattern in self.patterns:
+	    def _link(match):
+		word, = match.groups()
+		return ''' <span style="color: #000000; background: yellow; ">%s (<a href="%s/;%s">View</a>)</span> ''' % (label, self.host, uri.concrete())
+	    data = pattern.sub(_link, data)
+	return data
+
+
+
+
+import re
+from urllib2 import urlopen
+from urllib import quote
+
+from rdflib.URIRef import URIRef
+from rdflib.Namespace import Namespace
+from rdflib.util import uniq
+
+
+def comp(*sequences):
+    for seq in sequences:
+        for item in seq:
+            yield item
+            
+TERROR = redfoot.namespace("http://counterterror.mindswap.org/2005/terrorism.owl#")
+
+instances = set()
+
+def add(type):
+   for subclass in redfoot.transitive_subjects(RDFS.subClassOf, type):
+       for person in redfoot.subjects(RDF.type, subclass):
+           instances.add(person)
+add(TERROR.Person)
+add(TERROR.Event)
+add(TERROR.Location)
+
+uri = request.parameters.get("uri", None)
+text = request.parameters.get("text", None)
+if not uri and not text:
+    response.write("""
+      <h1></h1>    
+      <form>
+        URL: <input name="uri" type="text" size="60"></input>
+        <input type="submit"></input>
+      </form>        
+""")
+else:
+    if uri:
+        f = urlopen(uri)
+        page = unicode(f.read(), 'utf-8', 'replace')
+    else:
+        page = "<p>%s</p>" % text
+    p = HTMLParser(response.write, uri, request.host)
+    for s in instances:
+       for label in uniq(redfoot.objects(s, RDFS.label)):
+          if label:
+             label = URIRef(label.replace(".", "")) #??
+             p.add_pattern(label, s)
+    p.feed(page)
+
+]]>
+
+        </rdf:value>
+      </server:PagePartHandler>
+
+</rdf:RDF>  

@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:commands="http://redfoot.net/2005/commands#"
+   xmlns:server="http://redfoot.net/2005/server#"
+   xmlns:session="http://redfoot.net/2005/session#"
+   xmlns:template='http://redfoot.net/2005/template#'
+>
+
+  <redfoot:Aspect rdf:ID="contexts_aspect">
+    <rdfs:label>context listing support</rdfs:label>
+    <rdfs:comment>
+    </rdfs:comment>
+  </redfoot:Aspect>
+
+  <rdf:Description rdf:about="">
+    <template:section rdf:resource="/contexts/"/>    
+  </rdf:Description>
+
+  <server:Page rdf:about="/contexts/">
+    <rdfs:label>Contexts</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <server:allow rdf:resource="#Admin"/>
+    <template:default_section_rank>80.0</template:default_section_rank>
+    <template:content rdf:resource="#contexts"/>
+  </server:Page>
+
+  <server:PagePartHandler rdf:ID="contexts">
+    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+
+  <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
+<?python
+contexts = []
+for context in redfoot.contexts():
+    if isinstance(context, URIRef):
+        label = redfoot.label(context) or context
+        #if not label:
+        #    abstract = URIRef("%s#" % redfoot.context_id(context, context_id=""))
+        #    label = redfoot.label(abstract) or context
+        contexts.append((label, context))
+contexts.sort()
+
+# TODO: move to request object?
+def prefix(url, host=request.host):
+    if url.startswith(host):
+        return url.concrete()
+    else:
+        return "%s/;%s" % (host, url.concrete())
+   
+?>
+  <ul>
+    <li kid:for="label, context in contexts">
+      <a href="${prefix(context)}">
+        ${label}
+      </a>
+    </li>
+  </ul>
+  </span>
+]]>
+    </rdf:value>
+  </server:PagePartHandler>
+
+  <rdfs:Class rdf:about="http://redfoot.net/2005/redfoot#Context">
+    <rdfs:label>Context</rdfs:label>
+    <template:content>
+      <server:PagePartHandler>
+        <server:allow rdf:resource="#Admin"/>          
+        <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
+
+<span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
+<?python
+from urllib import quote
+
+cid = request.uri.abstract()
+context = redfoot.get_context(cid)
+REDFOOT = redfoot.namespace("http://redfoot.net/2005/redfoot#")
+DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
+DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
+action = request.parameters.get("action", None)
+if action=="reload":
+    source = redfoot.value(cid, REDFOOT.source)
+    if source:
+        print "reloading: %s" % source
+        redfoot.load(source, publicID=cid)
+if action=="delete":
+    print "Deleting:", cid
+    redfoot.remove_context(cid)   
+?>
+  <p>Creator: ${redfoot.value(cid, DC.creator, any=True)}</p>
+  <p>Length: ${len(context)}</p>
+  <p>Source: ${",".join(redfoot.objects(cid, REDFOOT.source))}</p>
+  <p>View: <a href="${request.host}/rdfxml?uri=${quote(cid)}">RDF/XML</a></p>
+
+<p>
+<form method="POST" action="">
+  <input type="submit" name="action" value="reload"/>
+</form>
+</p>
+
+<p>
+<form method="POST" action="">
+  <input type="submit" name="action" value="delete"/>
+</form>
+</p>
+
+</span>
+
+
+      ]]></rdf:value>
+      </server:PagePartHandler>
+    </template:content>
+  </rdfs:Class>
+
+  <server:Page rdf:about="/rdfxml">
+    <rdfs:label>rdfxml</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <server:page_handler>
+      <redfoot:Python rdf:about="rdfxml">
+        <template:content_type>application/rdf+xml</template:content_type>      
+        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python"><![CDATA[
+
+# Make sure all contexts have RDF.type of REDFOOT.Context
+for context in redfoot.contexts():
+    if not (context, RDF.type, REDFOOT.DeletedContext) in redfoot:
+        redfoot.index.add((context, RDF.type, REDFOOT.Context))
+
+cid = request.parameters.get("uri", None)
+print cid
+if cid:
+    cid = URIRef(cid)
+    cid = cid.abstract()
+else:
+    cid = request.parameters.get("bnode", None)
+    if cid:
+        cid = BNode(cid)
+    else:
+        print "no context specified... assuming index"
+        cid = redfoot.index.identifier
+        #TODO: 404
+g = redfoot.get_context(cid)
+g.serialize(destination=response, format="pretty-xml")
+
+      ]]></rdf:value>
+      </redfoot:Python>
+    </server:page_handler>
+  </server:Page>
+
+</rdf:RDF>  

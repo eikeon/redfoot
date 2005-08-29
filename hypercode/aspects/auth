@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
+  xmlns:rdfs='http://www.w3.org/2000/01/rdf-schema#'
+  xmlns:redfoot='http://redfoot.net/2005/redfoot#'
+  xmlns:server="http://redfoot.net/2005/server#"
+  xmlns:template='http://redfoot.net/2005/template#'
+>
+
+  <rdf:Description rdf:ID="auth_context">
+    <rdfs:label>authentication support</rdfs:label>
+    <rdfs:comment>
+    </rdfs:comment>
+    <!--
+need to load #auth with a command like:
+redfoot load http://redfoot.net/dev/content/auth http://localhost:8080 "#auth_context"
+
+in which case "" should be a server:Site
+      -->
+  </rdf:Description>
+
+  <rdf:Description rdf:about="">
+    <template:section rdf:resource="/account/"/>
+  </rdf:Description>
+
+  <rdfs:Class rdf:ID="Admin">
+    <rdfs:label>Admin</rdfs:label>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/session#User"/>
+  </rdfs:Class>
+
+  <server:Page rdf:about="/account/">
+    <rdfs:label>Account</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
+    <template:default_section_rank>90.0</template:default_section_rank>
+    <template:content rdf:resource="#account"/>
+  </server:Page>
+
+  <server:Page rdf:about="/login/">
+    <rdfs:label>Login</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
+    <template:content rdf:resource="#login"/>
+  </server:Page>
+
+  <server:Page rdf:about="/login/process/">
+    <rdfs:label>Login process</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <server:page_handler rdf:resource="#login_process"/>
+  </server:Page>
+
+  <server:Page rdf:about="/logout/">
+    <rdfs:label>Logout</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
+    <template:content rdf:resource="#logout"/>
+  </server:Page>
+
+  <server:Page rdf:about="/logout/process/">
+    <rdfs:label>Logout process</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <server:page_handler rdf:resource="#logout_process"/>
+  </server:Page>
+
+  <server:Page rdf:about="/login/create/">
+    <rdfs:label>Create Login</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
+    <template:content rdf:resource="#auth_create"/>
+  </server:Page>
+
+  <server:Page rdf:about="/login/create/process/">
+    <rdfs:label>Login create process</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <server:page_handler rdf:resource="#create_process"/>
+  </server:Page>
+
+  <server:PagePartHandler rdf:ID="account">
+    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
+
+ <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
+<?python
+SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+uid = redfoot.value(request.session_id, SESSION.uid)
+ ?>
+  <span kid:if="request.method=='GET'" kid:omit="">
+    <span kid:if="(request.session_id, SESSION.authenticated, Literal('True')) in redfoot" kid:omit="">
+      <p>Welcome, you are logged in as ${uid}</p>
+      <p>You may <a href="/logout/?return_uri=${request.uri}">Logout</a> at any time.</p>      
+    </span>
+    <span kid:if="(request.session_id, SESSION.authenticated, Literal('True')) not in redfoot" kid:omit="">
+      <p>
+        You are logged out. Would you like to <a href="/login/?return_uri=${request.uri}">Login</a> or <a href="/login/create/?return_uri=${request.uri}">Create new user</a>?
+      </p>
+    </span>
+  </span>
+ </span>
+      
+      ]]></rdf:value>
+  </server:PagePartHandler>
+
+
+  <server:PagePartHandler rdf:ID="login">
+    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
+
+ <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
+  <?python SESSION = redfoot.namespace("http://redfoot.net/2005/session#")?>
+  <span kid:if="request.method=='GET'" kid:omit="">
+    <span kid:if="(request.session_id, SESSION.authenticated, Literal('True')) in redfoot" kid:omit="">
+      <p>You are already logged in.</p>
+    </span>
+    <span kid:if="(request.session_id, SESSION.authenticated, Literal('True')) not in redfoot" kid:omit="">
+      <p>${redfoot.value(request.session_id, SESSION.message)}</p>
+      <form action="process/" method="POST">
+        <table>
+          <tr>
+            <th>Email Address</th>
+            <td><input type="text" name="uid" value=""/></td>
+          </tr>
+          <tr>
+           <th>Password</th>
+            <td><input type="password" name="password"/></td>
+          </tr>
+         <tr>    
+           <th>&#160;</th>
+           <td><input type="submit" value="login"/></td>
+         </tr>
+        </table>
+        <input type="hidden" name="return_uri" value="${request.parameters.get('return_uri', '/account/')}"/>
+        <input type="hidden" name="login_uri" value="${request.uri}"/>
+      </form>
+      <p>or <a href="create/">Create new user</a></p>
+    </span>
+  </span>
+ </span>
+      
+      ]]></rdf:value>
+  </server:PagePartHandler>
+
+  <server:Page rdf:ID="login_process">
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python"><![CDATA[
+
+assert request.method=='POST'
+
+from urllib import quote
+import md5
+
+SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+
+uid = request.parameters.get("uid", None)
+password = request.parameters.get("password", None)
+return_uri = URIRef(request.parameters.get("return_uri", "/account/")  )
+login_uri = URIRef(request.parameters.get("login_uri"))
+
+sid = request.session_id
+context = redfoot.get_context(redfoot.context_id(sid))
+
+if uid.startswith("http"):
+    from rdflib import Graph
+    print "UID:", uid
+    FOAF = redfoot.namespace("http://xmlns.com/foaf/0.1/")
+    uid = URIRef(uid)
+    g = Graph()
+    g.load(uid)
+    cid = redfoot.context_id(uid, context_id="#user")
+    redfoot.remove_context(cid)
+    c = redfoot.get_context(cid)
+    c.add((uid, RDF.type, SESSION.User))
+    for s, p, o in g.triples((uid, None, None)):
+        if p.startswith(RDF.RDFNS) or p.startswith(RDFS.RDFSNS) or p.startswith(FOAF.NS) or p.startswith(SESSION.NS):
+            if p==FOAF.name:
+                c.add((s, RDFS.label, o))
+            c.add((s, p, o))
+elif not uid.startswith("mailto:"):
+    uid = URIRef("mailto:%s" % uid)
+
+hexdigest = Literal(md5.new(password).hexdigest())
+
+if hexdigest and (uid, SESSION.hexdigest, hexdigest) in redfoot:
+   context.remove((sid, SESSION.authenticated, None))
+   context.add((sid, SESSION.authenticated, Literal("True")))
+   context.remove((sid, SESSION.uid, None))
+   context.add((sid, SESSION.uid, uid))
+   context.remove((sid, SESSION.message, None))
+   response.setStatus(302, 'found')
+   response.setHeader('Location', return_uri)
+else:
+   context.remove((sid, SESSION.authenticated, None))
+   context.remove((sid, SESSION.uid, None))
+   context.add((sid, SESSION.authenticated, Literal("False")))
+   context.remove((sid, SESSION.message, None))   
+   context.add((sid, SESSION.message, Literal("invalid email or password")))
+   login_uri += "?return_uri=%s" % quote(return_uri)
+   response.setStatus(302, 'found')   
+   response.setHeader('Location', login_uri)
+      
+]]></rdf:value>
+  </server:Page>
+
+  <server:PagePartHandler rdf:ID="logout">
+    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
+
+ <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
+  <?python SESSION = redfoot.namespace("http://redfoot.net/2005/session#")?>
+  <span kid:if="request.method=='GET'" kid:omit="">
+    <span kid:if="(request.session_id, SESSION.authenticated, Literal('True')) in redfoot" kid:omit="">
+      <form action="process/" method="POST">
+        <table>
+         <tr>    
+           <th>&#160;</th>
+           <td><input type="submit" value="logout"/></td>
+         </tr>
+        </table>
+        <input type="hidden" name="return_uri" value="${request.parameters.get('return_uri', '/account/')}"/>
+      </form>
+    </span>
+    <span kid:if="(request.session_id, SESSION.authenticated, Literal('True')) not in redfoot" kid:omit="">
+      <p>You are already logged out.</p>
+    </span>
+  </span>
+ </span>
+      
+      ]]></rdf:value>
+  </server:PagePartHandler>
+
+  <server:Page rdf:ID="logout_process">
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python"><![CDATA[
+
+assert request.method=='POST'
+
+SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+
+sid = request.session_id
+context = redfoot.get_context(redfoot.context_id(sid))
+redfoot.remove((sid, SESSION.authenticated, None))
+redfoot.remove((sid, SESSION.uid, None))
+context.add((sid, SESSION.authenticated, Literal("False")))
+
+return_uri = URIRef(request.parameters.get("return_uri", "/account/"))
+
+response.setStatus(302, 'found')
+response.setHeader('Location', return_uri)
+
+      
+      ]]></rdf:value>
+  </server:Page>
+
+  <server:PagePartHandler rdf:ID="auth_create">
+    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
+
+ <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
+  <?python SESSION = redfoot.namespace("http://redfoot.net/2005/session#")?>
+  <span kid:if="request.method=='GET'" kid:omit="">
+  <p>${redfoot.value(request.session_id, SESSION.message)}</p>  
+  <form action="process/" method="POST">
+    <table>
+      <tr>
+	<th>Email Address</th>
+	<td><input type="text" name="uid" value=""/></td>
+      </tr>
+      <tr>
+       <th>Password</th>
+	<td><input type="password" name="password"/></td>
+      </tr>
+      <tr>
+       <th>Verify</th>
+	<td><input type="password" name="verify"/></td>
+      </tr>
+     <tr>    
+       <th>&#160;</th>
+       <td><input type="submit" value="create"/></td>
+     </tr>
+    </table>
+    <input type="hidden" name="return_uri" value="${request.parameters.get('return_uri', '/account/')}"/>
+    <input type="hidden" name="create_uri" value="${request.uri}"/>    
+  </form>
+  </span>      
+ </span> 
+      ]]></rdf:value>
+  </server:PagePartHandler>
+
+  <server:Page rdf:ID="create_process">
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python"><![CDATA[
+
+assert request.method=='POST'
+
+import md5
+
+SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+
+uid = request.parameters.get("uid", None)
+password = request.parameters.get("password", None)
+verify = request.parameters.get("verify", None)
+return_uri = URIRef(request.parameters.get("return_uri", "/account/"))
+create_uri = URIRef(request.parameters.get("create_uri"))
+
+sid = request.session_id
+context = redfoot.get_context(redfoot.context_id(sid))
+users_context = redfoot.get_context(redfoot.context_id("%s/users" % request.host))
+
+if not uid.startswith("mailto:"):
+    uid = URIRef("mailto:%s" % uid)
+
+if password==verify:
+    if not (uid, SESSION.hexdigest, None) in redfoot:
+	hexdigest = Literal(md5.new(password).hexdigest())
+	redfoot.remove((sid, SESSION.authenticated, None))
+	redfoot.remove((sid, SESSION.uid, None))
+	context.add((sid, SESSION.authenticated, Literal("True")))
+	context.add((sid, SESSION.uid, uid))
+	users_context.add((uid, RDF.type, SESSION.User))
+	users_context.add((uid, SESSION.hexdigest, hexdigest))
+        #message = "Created new user: %s" % uid
+        context.remove((sid, SESSION.message, None))        
+        response.setStatus(302, 'found')
+        response.setHeader('Location', return_uri)
+    else:
+        message = "User already exists"
+        context.remove((sid, SESSION.message, None))
+        context.add((sid, SESSION.message, Literal(message)))
+        response.setStatus(302, 'found')   
+        response.setHeader('Location', create_uri)
+        
+else:
+    message = "password and verify mismatch"
+    context.remove((sid, SESSION.message, None))
+    context.add((sid, SESSION.message, Literal(message)))
+    response.setStatus(302, 'found')   
+    response.setHeader('Location', create_uri)
+    
+      ]]></rdf:value>
+  </server:Page>
+
+</rdf:RDF>

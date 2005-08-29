@@ -1,0 +1,8 @@
+prereq:
+
+    py2app
+
+
+To build redfoot.app run:
+
+    /usr/local/bin/python2.4 setup.py py2app

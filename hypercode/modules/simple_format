@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+>
+
+  <redfoot:Module rdf:ID="module">
+    <rdfs:label>Simple Formatter</rdfs:label>      
+    <rdfs:comment>A formatter that turns uris into links.</rdfs:comment>        
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+import re
+from urllib import quote
+from xml.sax.saxutils import escape
+
+_url = re.compile(r'((http://|https://|ftp://|news://|irc://)[^\s,]+)', re.IGNORECASE)
+
+
+def url(match):
+    url, scheme = match.groups()
+    url = URIRef(url)
+    label = redfoot.label(url, url)
+    return '<a href="%s">%s</a>' % (escape(url.concrete()), label)
+
+def format(text):
+    if text:
+        text = re.sub(_url, url, text)
+    return text or ''
+
+def format_uri(uri, predicate=None):
+    if predicate is None:
+        text = uri
+    else:
+        text = redfoot.value(uri, predicate)
+    if text:
+        text = re.sub(_url, url, text)
+    return text or ''
+
+
+#example = """
+#Perfect with http://donnafales.com/recipes/2002/07/28/
+#"""
+#print format(example)
+
+]]>
+    </rdf:value>
+  </redfoot:Module>
+
+</rdf:RDF>  

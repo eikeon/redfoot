@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:template="http://redfoot.net/2005/template#"
+   xmlns:server="http://redfoot.net/2005/server#"
+>
+
+  <template:Template rdf:ID="page">
+    <rdfs:label>Classic Template</rdfs:label>
+    <template:content rdf:resource="#content"/>
+    <template:background_color>#B0C9BE</template:background_color>
+    <template:css rdf:resource="#css"/>
+    <template:title rdf:resource="#title"/>
+    <template:shortcut_icon rdf:resource="http://redfoot.net/2002/11/25/favicon.ico"/>
+    <template:header rdf:resource="#header"/>
+    <template:navigation rdf:resource="#navigation"/>
+    <template:footer rdf:resource="#footer"/>
+
+    <server:content_type>application/xhtml+xml</server:content_type>
+    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:kid="http://purl.org/kid/ns#">
+<?python SERVER = redfoot.namespace("http://redfoot.net/2005/server#")?>
+<?python TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")?>
+  <head>
+    <title>${display(lookup(TEMPLATE.title))}</title>
+    <meta http-equiv="Content-Type" content="text/xhtml; charset=UTF-8"/>
+    <meta name="keywords" content=""/>
+    <link rel="shortcut icon" href="${lookup(TEMPLATE.shortcut_icon)}"/>
+    <style type="text/css">
+      ${display(lookup(TEMPLATE.css))}
+    </style>
+    <span kid:for="alternate in redfoot.objects(request.uri, SERVER.alternate)" kid:strip="" >
+    <link rel="alternate"
+      href="${alternate}" title="${redfoot.label(alternate)}"
+      type="${redfoot.value(alternate, SERVER.content_type)}" />
+    </span> 
+  </head>
+
+  <body>
+    <div class="header">
+      ${display(lookup(TEMPLATE.header))}
+    </div>
+
+    <div class="navigation">
+     ${display(lookup(TEMPLATE.navigation))}
+    </div>
+
+    <div class="content">
+
+<?python
+types = []
+for type in redfoot.objects(request.uri.abstract(), RDF.type):
+    label = redfoot.label(type)
+    if label:
+        types.append(label)
+if not types:
+    for type in redfoot.objects(request.uri, RDF.type):
+        label = redfoot.label(type)
+        if label:
+            types.append(label)
+types.sort()
+label = redfoot.label(request.uri.abstract(), None) or redfoot.label(request.uri, None)
+title = "%s (%s)" % (label, ", ".join(types))
+?> <h2><a href="${request.uri}">${label}</a></h2>
+
+      ${display(lookup_content(TEMPLATE.content))}
+
+
+      <?python COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")?>
+      <div class="comments"
+           kid:if="lookup(TEMPLATE.comments) and (request.uri, RDFS.member, COMMENT.exclude) not in redfoot">
+        ${display(lookup(TEMPLATE.comments))}
+        ${display(lookup(TEMPLATE.add_comment))}
+      </div>
+
+  <p kid:if="allow(URIRef('%s/edit/resource' % request.host))">
+   <?python from urllib import quote?>
+    <a kid:if="(request.uri, None, None) in redfoot" href="/edit/resource?uri=${quote(request.uri)}">Edit Resource</a>
+    <a kid:if="(request.uri.abstract(), None, None) in redfoot" href="/edit/resource?uri=${quote(request.uri.abstract())}">Edit Resource</a>
+  </p>
+
+    </div>
+
+    <div class="footer">
+      ${display(lookup(TEMPLATE.footer))}
+    </div>
+
+  </body>
+</html>
+]]>
+    </rdf:value>    
+  </template:Template>
+
+  <server:PagePartHandler rdf:ID="title">
+    <rdfs:label>classic title</rdfs:label>
+    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+<div xmlns="http://www.w3.org/1999/xhtml" xmlns:kid="http://purl.org/kid/ns#" kid:strip="">
+<?python
+types = []
+for type in redfoot.objects(request.uri, RDF.type):
+    label = redfoot.label(type)
+    if label:
+        types.append(label)
+if not types:
+    for type in redfoot.objects(request.uri, RDF.type):
+        label = redfoot.label(type)
+        if label:
+            types.append(label)
+types.sort()
+label = redfoot.label(request.uri.abstract(), None) or redfoot.label(request.uri, None)
+title = "%s: %s %s" % (redfoot.label(request.host), label, ", ".join(types))
+?>${title}</div>]]>
+    </rdf:value>    
+  </server:PagePartHandler>
+
+  <server:PagePartHandler rdf:ID="header">
+    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+<div xmlns:kid="http://purl.org/kid/ns#" kid:strip="">
+
+<h1><a href="${request.host}">${redfoot.label(request.host)}</a></h1></div>]]>
+    </rdf:value>    
+  </server:PagePartHandler>
+
+  <server:PagePartHandler rdf:ID="footer">
+    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
+      <div xmlns:kid="http://purl.org/kid/ns#" kid:strip="">
+        <a href="http://redfoot.net/">redfoot.net</a>
+      </div>
+      ]]></rdf:value>
+  </server:PagePartHandler>
+
+  <server:PagePartHandler rdf:ID="navigation">
+    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
+
+<div class="nav" xmlns:kid="http://purl.org/kid/ns#">
+<?python
+TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")
+sections = []
+for section in redfoot.objects(request.host, TEMPLATE.section):
+    label = redfoot.value(section, TEMPLATE.section_name) or redfoot.label(section)
+    try:
+        val = redfoot.value(section, TEMPLATE.section_rank)
+        if val is None:
+            val = redfoot.value(section, TEMPLATE.default_section_rank, any=True)            
+        rank = float(val)
+    except:
+        rank = 0.0
+    if allow(section):
+        sections.append((rank, label, section))
+sections.sort()
+?>
+  <ul>
+    <li kid:for="rank, label, section in sections">
+      <a href="${section}">${label}</a>
+    </li>
+  </ul>  
+</div>
+    
+      ]]></rdf:value>
+  </server:PagePartHandler>
+
+
+  <server:PagePartHandler rdf:ID="css">
+    <rdfs:label>Default css</rdfs:label>
+    <server:content_type>text/css</server:content_type>
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+
+TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")
+
+color = lookup(TEMPLATE.background_color) or "#cccccc"
+
+response.write("""
+
+html {
+    background-color: %(color)s;
+}
+
+body {
+    margin: 0.5em 1em;
+    padding: 0em;
+}
+
+div.navigation {
+    background-color: %(color)s;
+    margin: 0em 0em;
+    padding: 0em 0em 0em 0em;
+}
+
+h1 {
+  background-color: transparent;
+  margin: 0em 0em 0em 0em;
+  padding: 0em 0em 0.25em 10px;
+}       
+
+.nav ul {
+  padding: 3px 10px;
+  margin: 0px 0px 0px 0px;
+  font: bold 12px Verdana, sans-serif;
+}
+
+.nav li {
+  list-style: none;
+  margin: 0;
+  display: inline;
+}
+
+.nav li a {
+  padding: 3px 0.5em;
+  margin-left: 3px;
+  border: 1px solid #000;
+  border-bottom: none;
+  background: #DDE;
+  text-decoration: none;
+}
+
+.nav li a { color: #000; }
+
+.nav li a:hover {
+  color: #fc6305;
+  background: #ccc;
+  border-color: #227;
+}
+
+.nav li a#current {
+background: white;
+border-bottom: 1px solid white;
+}
+
+#nav a:active {
+  background: white;
+}
+
+
+div.content {
+    color: #000000;
+    background:#ffffff;
+    margin: 0em; 
+    padding: 0em 2em;
+    border: 1px solid black;
+    clear: both;
+}
+
+div.footer {
+    background-color: %(color)s;
+    margin: 0em 0em;
+    padding: 0em 0em 0em 10px;
+    vertical-align: middle;
+    font-size: small; 
+    font-style: italic;
+    clear: both;
+}
+
+div.footer img {
+  border: 0; 
+  vertical-align: middle;
+}
+
+h1, h2, h3, h4, b {
+  font-family: Arial;
+  color: #000000;
+}
+
+a {
+    color: #000000;
+    font-weight: bold;
+    text-decoration: none
+}
+
+div.content a {
+    border-bottom: 1px dotted #fc6305;
+}
+
+a:hover {
+    color: #fc6305;
+    font-weight: bold;
+    text-decoration: none
+}
+
+body, table, tr, td, p, a, b, ul, li, blockquote { 
+  font-family: Arial
+}
+
+img {
+  border: 0;
+}
+
+
+.recipe .ingredients {
+  width:48%%; float: left;
+}
+
+.recipe .directions {
+  width:48%%; float: left;
+}
+
+.recipe .footer {
+  clear: both;
+  border: 0px;
+}
+
+div.spacer {
+  clear: both;
+}
+
+dd {
+  margin: 0.5em 1em 1.5em 0em;
+}
+
+div.comments {
+    background-color: #ddddee;
+    margin: 0em;
+    padding: 0.25em 1em;
+}
+
+""" % {"color": color})
+
+    </rdf:value>
+  </server:PagePartHandler>
+
+  <server:PagePartHandler rdf:ID="unauthorized_page_handler">
+    <rdfs:label>Unauthorized page handler</rdfs:label>
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+response.setStatus(401, "Unauthorized")            
+response.write("""
+<h1>Unauthorized</h1>
+""")        
+    
+]]>
+    </rdf:value>
+  </server:PagePartHandler>
+
+  <server:PagePartHandler rdf:ID="unauthorized_content_handler">
+    <rdfs:label>Unauthorized page handler</rdfs:label>
+    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+<div xmlns:kid="http://purl.org/kid/ns#"
+     kid:strip="">
+<h2>Unauthorized Content</h2>
+</div>
+]]>
+    </rdf:value>
+  </server:PagePartHandler>
+
+  <server:PagePartHandler rdf:ID="content">
+    <rdfs:label>Generic Display of Resource</rdfs:label>
+    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+<div xmlns:kid="http://purl.org/kid/ns#"
+     kid:strip=""
+>
+<?python
+if (request.uri.abstract(), None, None) in redfoot:
+    uri = request.uri.abstract()
+elif (request.uri, None, None) in redfoot:
+    uri = request.uri
+else:
+    uri = request.uri.abstract()
+    
+simple_format = URIRef("modules/simple_format#module", base=redfoot_program)
+format_uri = redfoot.module(simple_format).format_uri
+seeAlsoList = list(redfoot.objects(uri, RDFS.seeAlso))
+
+?>
+
+  <h2 kid:if="(uri, None, None) not in redfoot">Not Found</h2>
+
+  <h2>Instance: ${redfoot.label(uri)}</h2>
+  <p>${XML(format_uri(redfoot.comment(uri)))}</p>
+  
+  <ul>
+    <li kid:for="p, o in redfoot.predicate_objects(uri)">${redfoot.label(p) or p},
+      <span kid:strip="" kid:if="isinstance(o, Literal)">
+        <pre>${o}</pre>
+      </span>
+      <span kid:strip="" kid:if="isinstance(o, URIRef)">      
+        <a href="${request.host}/;${o.concrete()}">
+          ${", ".join(redfoot.objects(o, RDFS.label)) or o}
+        </a>
+      </span>
+      <span kid:strip="" kid:if="isinstance(o, BNode)">
+        ${", ".join(redfoot.objects(o, RDFS.label))}      
+      </span>      
+    </li>
+  </ul>
+
+
+  <div kid:if="seeAlsoList">
+  <h2>See Also</h2>
+  <ul>
+    <li kid:for="seeAlso in seeAlsoList">${XML(format_uri(seeAlso))}</li>
+  </ul>
+  </div>    
+</div>
+]]>
+    </rdf:value>
+  </server:PagePartHandler>
+
+</rdf:RDF>  

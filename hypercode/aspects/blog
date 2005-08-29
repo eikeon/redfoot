@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:commands="http://redfoot.net/2005/commands#"
+   xmlns:server="http://redfoot.net/2005/server#"
+   xmlns:session="http://redfoot.net/2005/session#"
+   xmlns:template='http://redfoot.net/2005/template#'
+>
+
+  <redfoot:Aspect rdf:ID="blog_aspect">
+    <rdfs:label>Blog aspect</rdfs:label>
+    <rdfs:comment>
+    </rdfs:comment>
+    <redfoot:todo>Look into http://kupu.oscom.org/</redfoot:todo>
+  </redfoot:Aspect>
+
+  <rdf:Description rdf:about="">
+    <template:section rdf:resource="/blog/"/>    
+  </rdf:Description>
+
+  <rdf:Description rdf:about="http://redfoot.net/2005/blog#Entry">
+    <template:content>
+     <server:PagePartHandler rdf:ID="EntryContent">
+      <rdfs:label>Entry</rdfs:label>
+      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+<div xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:kid="http://purl.org/kid/ns#"
+     class="entry"
+>
+<?python
+import time
+from rdflib.util import parse_date_time
+
+BLOG = redfoot.namespace("http://redfoot.net/2005/blog#")
+DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
+DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
+
+markdown = redfoot.module(URIRef("modules/markdown#module", base=redfoot_program)).markdown
+
+entry = request.uri.abstract()
+date = redfoot.value(entry, DCTERMS.created)
+
+content = redfoot.value(entry, BLOG.content)
+if content:
+    content_value = redfoot.value(content, RDF.value)
+    content_type = redfoot.value(content, BLOG.content_type)
+else:
+    content_value = redfoot.comment(entry)
+    content_type = content_value.datatype
+
+?>
+
+<p>by ${redfoot.label(redfoot.value(entry, DC.creator))} on 
+   ${time.strftime("%A %d %B, %Y", time.gmtime(parse_date_time(date)))}:</p>
+<p kid:if="content_type=='http://www.w3.org/1999/xhtml'">${XML(content_value)}</p>
+<p kid:if="content_type!='http://www.w3.org/1999/xhtml'">${XML(markdown(content_value))}</p>
+
+</div>
+]]>
+      </rdf:value>
+     </server:PagePartHandler>
+    </template:content>
+  </rdf:Description>
+
+  <server:Page rdf:about="/blog/">
+    <rdfs:label>Blog</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <server:alternate rdf:resource="/blog/atom/"/>
+    <template:section rdf:resource="/blog/add_entry/"/>
+    <template:default_section_rank>10.0</template:default_section_rank>
+    <template:content>
+     <server:PagePartHandler  rdf:ID="blog">
+      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+<div xmlns:kid="http://purl.org/kid/ns#" 
+     kid:strip="">
+
+<?python
+import time
+from rdflib.util import parse_date_time
+
+SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+BLOG = redfoot.namespace("http://redfoot.net/2005/blog#")
+DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
+DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
+
+markdown = redfoot.module(URIRef("modules/markdown#module", base=redfoot_program)).markdown
+
+blog = []
+for entry in redfoot.subjects(RDF.type, BLOG.Entry):
+    date = redfoot.value(entry, DCTERMS.created)
+    content = redfoot.value(entry, BLOG.content)
+    if content:
+        content_value = redfoot.value(content, RDF.value)
+        content_type = redfoot.value(content, BLOG.content_type)
+        if content_type=="xhtml":
+            content_type = "http://www.w3.org/1999/xhtml"
+    else:
+        content_value = redfoot.comment(entry)
+        content_type = content_value.datatype
+    blog.append((date, entry, content_value, content_type))
+blog.sort()
+blog.reverse()
+?>
+
+<a kid:if="allow(URIRef('%s/blog/add_entry/' % request.host))"
+   href="/blog/add_entry/">add entry</a>
+
+  <dl>
+   <span kid:strip="" kid:for="date, entry, content_value, content_type in blog">
+    <dt><a href="${entry.concrete()}">${redfoot.label(entry)}</a> <div style="font-size: small; border-top: 1px solid black">by ${redfoot.label(redfoot.value(entry, DC.creator))} on 
+      ${time.strftime("%A %d %B, %Y", time.gmtime(parse_date_time(date)))}:</div></dt>
+    <dd kid:if="content_type=='http://www.w3.org/1999/xhtml'">${XML(content_value)}</dd>
+    <dd kid:if="content_type!='http://www.w3.org/1999/xhtml'">${XML(markdown(content_value))}</dd>
+   </span>
+  </dl>
+
+</div>
+]]>    
+      </rdf:value>      
+     </server:PagePartHandler>
+    </template:content>
+  </server:Page>
+
+  <server:Page rdf:about="/blog/add_entry/">
+    <rdfs:label>Add Entry</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>    
+
+    <!-- TODO: allow how?-->
+    <server:allow rdf:resource="http://redfoot.net/2005/session#User"/>
+    
+    <template:content>
+     <server:PagePartHandler rdf:ID="add_entry_content">
+      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+  <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
+
+  <?python allowed = allow(URIRef("%s/put_entry/" % request.host))?>  
+  <div kid:if="allowed" kid:strip="">
+    <form action="/put_entry/" method="post">
+      <p>Title: <input type="text" name="title" value="" style="width: 100%"/></p>
+      <p>Format: <select name="format"><option value="http://www.w3.org/1999/xhtml">xhtml</option><option value="" selected="True">text</option></select></p>
+      <p>Content:<textarea name="content" cols="" rows="30" style="width: 100%"></textarea></p>
+      <p><input name="submit" type="submit" value="Submit Entry" /></p>
+    </form>    
+  </div>
+
+  <div kid:if="not allowed" kid:strip="">
+    <p kid:if="allow(URIRef('%s/login/'% request.host))">
+      <a href="/login/?return_uri=${request.host}/;${request.uri}">Login</a> in order to submit a entry.
+    </p>
+  </div>
+
+  </span>
+]]>
+      </rdf:value>
+     </server:PagePartHandler> 
+    </template:content>
+  </server:Page>
+
+
+  <server:Page rdf:about="/put_entry/">
+    <rdfs:label>Put Entry</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <server:allow rdf:resource="http://redfoot.net/2005/session#User"/>
+    <template:content>
+     <server:PagePartHandler rdf:ID="put_entry_content">
+      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+  <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
+<?python
+from rdflib.util import date_time
+from urlparse import urljoin
+from urllib import quote
+from time import gmtime
+    
+BLOG = redfoot.namespace("http://redfoot.net/2005/blog#")
+DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
+DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
+SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+
+title = request.parameters.get("title")
+if title is not None:
+    path = title.replace(" ", "_")
+    path = quote(path)
+    year, month, date, h, m, s, _, _, _ = gmtime()
+    uri = URIRef(urljoin(request.host, "blog/%04d/%02d/%02d/%s" % (year, month, date, path)) + "#")
+    
+format = request.parameters.get("format") or ""
+content = Literal(request.parameters.get("content"))
+policy = URIRef(request.parameters.get("policy"))
+message = "Error: No entry submitted"
+try:
+    for item in XML(content):
+        pass
+except Exception, e:
+    message = str(e)
+    content = None
+    
+if uri is not None and content is not None:
+    uid = redfoot.value(request.session_id, SESSION.uid)    
+    context_uri = redfoot.context_id(uri)
+    redfoot.index.add((context_uri, RDFS.label, Literal("blog entry: %s" % title)))
+    context = redfoot.get_context(context_uri)
+    context.add((uri, RDF.type, BLOG.Entry))
+    context.add((uri, RDFS.label, Literal(title)))
+    context.add((uri, RDFS.comment, Literal(content, datatype=format)))
+    context.add((uri, DCTERMS.created, Literal(date_time())))
+    context.add((uri, DC.date, Literal(date_time()[0:10])))    
+    context.add((uri, DC.creator, uid))
+    
+?>
+
+<div kid:if="uri is None or content is None">
+<h2>${message}</h2>
+</div>
+
+
+<div kid:if="uri is not None and content is not None">
+
+<h2>Thank you for your entry:
+    <a href="${uri.concrete()}">${redfoot.label(uri, uri)}</a>
+</h2>
+
+</div>
+
+  </span>
+
+]]>
+      </rdf:value>
+     </server:PagePartHandler> 
+    </template:content>
+  </server:Page>
+
+  <server:Page rdf:about="/blog/atom/">
+    <rdfs:label>Blog Atom Feed</rdfs:label>
+    <server:page_handler rdf:resource="#atom_0.3"/>
+    <!-- TODO: infer from page eventually... currently both are needed explicitly. -->
+    <server:content_type>application/x.atom+xml</server:content_type>    
+  </server:Page>
+
+  <server:PageHandler rdf:ID="atom_0.3">
+    <rdfs:label>blog feed (atom 0.3)</rdfs:label>
+    <server:content_type>application/x.atom+xml</server:content_type>    
+    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+
+<feed version="0.3"
+      xmlns="http://purl.org/atom/ns#"
+      xmlns:dc="http://purl.org/dc/elements/1.1/"
+      xmlns:kid="http://purl.org/kid/ns#">
+<?python
+#
+from datetime import datetime
+BLOG = redfoot.namespace("http://redfoot.net/2005/blog#")
+DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
+DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
+SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+
+format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot_program)).format
+
+resources = []
+for resource in redfoot.subjects(RDF.type, BLOG.Entry):
+    created = redfoot.value(resource, DCTERMS.created)
+    if resource.startswith(request.host):
+        content = redfoot.value(resource, BLOG.content)        
+        if content:
+            content_value = redfoot.value(content, RDF.value)
+            content_type = redfoot.value(content, BLOG.content_type)
+            if content_type=="xhtml":
+                content_type = "http://www.w3.org/1999/xhtml"
+        else:
+            content_value = redfoot.comment(resource)
+            content_type = content_value.datatype
+        resources.append((created, resource, content_value))    
+resources.sort()
+resources.reverse()
+
+# TODO: sync blog's atom with comments atom support.
+html_page = redfoot.value(None, SERVER.alternate, request.uri, any=True)
+
+now = datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
+
+?>
+  <title>${"%s: %s" % (redfoot.label(request.host), redfoot.label(request.uri))}</title>
+  <link rel="alternate" type="text/html" href="${html_page}"/>
+  <modified>${now}</modified>
+  <author>
+    <name>${redfoot.label(request.host)}</name>
+    <url>${"%s/" % request.host}</url> 
+  </author>
+  <dc:subject>resources</dc:subject>
+ <span kid:for="created, resource, content_value in resources" kid:omit="">
+  <entry>
+    <title>${redfoot.label(resource, resource)}</title>
+    <link rel="alternate" type="text/html" href="${resource.concrete()}"/>
+    <id>${resource}</id>
+    <issued>${created}</issued>
+    <modified>${created}</modified>
+    <content type="text/html" mode="escaped">
+      ${content_value}
+    </content>
+    <dc:subject>resource</dc:subject>
+  </entry>
+ </span>
+</feed>                      
+
+]]>
+    </rdf:value>
+  </server:PageHandler>
+
+</rdf:RDF>  

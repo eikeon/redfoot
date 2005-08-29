@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+>
+
+  <redfoot:Python rdf:ID="prereqs">
+    <rdfs:label>Redfoot 2005/04/24</rdfs:label>
+    <rdfs:comment rdf:datatype="http://www.w3.org/1999/xhtml">
+<![CDATA[
+<pre>
+    - twisted 2.0.0 ( http://twistedmatrix.com/projects/core/ )
+      
+      Windows: 
+        http://tmrc.mit.edu/mirror/twisted/Twisted/2.0/Twisted_NoDocs-2.0.0.win32-py2.4.exe
+
+      Source:
+        http://tmrc.mit.edu/mirror/twisted/Twisted/2.0/TwistedSumo-2005-05-25.tar.bz2
+        - ZopeInterface (included in twisted distro)
+        NOTE: on Tiger... need to do an export CC=/usr/bin/gcc-3.3
+
+    - kid 0.6.3 ( http://www.python.org/pypi/kid/ )
+
+      Source: 
+        http://lesscode.org/dist/kid/kid-0.6.3.tar.gz
+
+      - elementtree 1.2.6 ( http://effbot.org/zone/element-index.htm )
+
+        Windows: 
+          http://effbot.org/downloads/elementtree-1.2.6-20050316.win32.exe
+
+        Source: 
+          http://effbot.org/downloads/elementtree-1.2.6-20050316.tar.gz
+</pre>
+]]>
+    </rdfs:comment> 
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+import os, sys
+from subprocess import Popen
+from tarfile import TarFile, open
+from urllib2 import urlopen, Request
+from StringIO import StringIO
+
+logging = redfoot.log
+
+def install(url):
+    logging.info("downloading %s" % url)
+    headers = {'User-agent': 'redfoot'}
+    f = urlopen(Request(url, None, headers))
+    _, filename = url.rsplit("/", 1)
+    out = file(filename, "w")
+    out.write(f.read())
+    out.close()
+    tar = open(name=filename)
+    logging.info("extracting")
+    for member in tar:
+        if member.name.endswith("setup.py"):
+            setup = member.name
+        tar.extract(member)
+    dir, filename = os.path.split(setup)
+    os.chdir(dir)
+
+    logging.info("installing")
+    p = Popen([sys.executable, "setup.py", "install"])
+    p.wait()
+    logging.info("done installing")    
+
+cwd = os.getcwd()
+for url in ["http://www.zope.org/Products/ZopeInterface/3.0.1final/ZopeInterface-3.0.1.tgz", "http://tmrc.mit.edu/mirror/twisted/Twisted/2.0/TwistedSumo-2005-03-22.tar.bz2", "http://effbot.org/downloads/elementtree-1.2.6-20050316.tar.gz", "http://lesscode.org/dist/kid/kid-0.6.3.tar.gz"]:
+    os.chdir(cwd)        
+    install(url)
+
+]]>
+    </rdf:value>
+  </redfoot:Python>
+
+
+</rdf:RDF>  

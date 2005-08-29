@@ -1,0 +1,246 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXBuildStyle section */
+		C4D29FE207FF53B000EDA198 /* Development */ = {
+			isa = PBXBuildStyle;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+			};
+			name = Development;
+		};
+		C4D29FE307FF53B000EDA198 /* Deployment */ = {
+			isa = PBXBuildStyle;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+			};
+			name = Deployment;
+		};
+/* End PBXBuildStyle section */
+
+/* Begin PBXFileReference section */
+		C4D2A00A07FF563C00EDA198 /* setup.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = setup.py; sourceTree = "<group>"; };
+		C4D2A00E07FF576900EDA198 /* redfoot_app.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = redfoot_app.py; sourceTree = "<group>"; };
+		C4D2A01307FF5B0900EDA198 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/MainMenu.nib; sourceTree = "<group>"; };
+		C4D2A03507FF5BF800EDA198 /* redfootAppDelegate.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = redfootAppDelegate.py; sourceTree = "<group>"; };
+		C4E30E3107FFA7A90043E6B0 /* Info.plist */ = {isa = PBXFileReference; explicitFileType = text.plist; fileEncoding = 4; path = Info.plist; sourceTree = "<group>"; };
+		D506B8CF086A8FB8009497E3 /* redfoot.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = redfoot.gif; sourceTree = "<group>"; };
+		D5D9104D086CDCFA00B9E309 /* redfoot.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = redfoot.icns; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		C4D29FE007FF53B000EDA198 = {
+			isa = PBXGroup;
+			children = (
+				C4D2A00607FF55F400EDA198 /* Classes */,
+				C4D2A00507FF55D000EDA198 /* Main Script */,
+				C4D2A00407FF55C400EDA198 /* Resources */,
+				C4D2A01507FF5B3B00EDA198 /* Other Source */,
+			);
+			sourceTree = "<group>";
+		};
+		C4D2A00407FF55C400EDA198 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				D5D9104D086CDCFA00B9E309 /* redfoot.icns */,
+				D506B8CF086A8FB8009497E3 /* redfoot.gif */,
+				C4D2A01407FF5B1C00EDA198 /* MainMenu.nib */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		C4D2A00507FF55D000EDA198 /* Main Script */ = {
+			isa = PBXGroup;
+			children = (
+				C4D2A00E07FF576900EDA198 /* redfoot_app.py */,
+			);
+			name = "Main Script";
+			sourceTree = "<group>";
+		};
+		C4D2A00607FF55F400EDA198 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				C4D2A03507FF5BF800EDA198 /* redfootAppDelegate.py */,
+			);
+			name = Classes;
+			sourceTree = "<group>";
+		};
+		C4D2A01507FF5B3B00EDA198 /* Other Source */ = {
+			isa = PBXGroup;
+			children = (
+				C4D2A00A07FF563C00EDA198 /* setup.py */,
+				C4E30E3107FFA7A90043E6B0 /* Info.plist */,
+			);
+			name = "Other Source";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXLegacyTarget section */
+		C430F00A07FFB82B00A1CD60 /* Deployment */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "\"$(SOURCE_ROOT)/setup.py\" py2app";
+			buildConfigurationList = D57C8121086A5C6C00CAC4D7 /* Build configuration list for PBXLegacyTarget "Deployment" */;
+			buildPhases = (
+			);
+			buildSettings = {
+			};
+			buildToolPath = /usr/bin/env;
+			buildWorkingDirectory = "$(SOURCE_ROOT)";
+			dependencies = (
+			);
+			name = Deployment;
+			passBuildSettingsInEnvironment = 1;
+			productName = Deployment;
+		};
+		C49FE1AD07FFBCAA005B49ED /* Development */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "\"$(SOURCE_ROOT)/setup.py\" py2app --alias";
+			buildConfigurationList = D57C811D086A5C6C00CAC4D7 /* Build configuration list for PBXLegacyTarget "Development" */;
+			buildPhases = (
+			);
+			buildSettings = {
+			};
+			buildToolPath = /usr/bin/env;
+			buildWorkingDirectory = /;
+			dependencies = (
+			);
+			name = Development;
+			passBuildSettingsInEnvironment = 1;
+			productName = Development;
+		};
+/* End PBXLegacyTarget section */
+
+/* Begin PBXProject section */
+		C4D29FE407FF53B000EDA198 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = D57C8125086A5C6C00CAC4D7 /* Build configuration list for PBXProject "redfoot" */;
+			buildSettings = {
+			};
+			buildStyles = (
+				C4D29FE207FF53B000EDA198 /* Development */,
+				C4D29FE307FF53B000EDA198 /* Deployment */,
+			);
+			hasScannedForEncodings = 0;
+			mainGroup = C4D29FE007FF53B000EDA198;
+			productRefGroup = C4D29FE007FF53B000EDA198;
+			projectDirPath = "";
+			targets = (
+				C49FE1AD07FFBCAA005B49ED /* Development */,
+				C430F00A07FFB82B00A1CD60 /* Deployment */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXVariantGroup section */
+		C4D2A01407FF5B1C00EDA198 /* MainMenu.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C4D2A01307FF5B0900EDA198 /* English */,
+			);
+			name = MainMenu.nib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		D57C811E086A5C6C00CAC4D7 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+			};
+			name = Development;
+		};
+		D57C811F086A5C6C00CAC4D7 /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+			};
+			name = Deployment;
+		};
+		D57C8120086A5C6C00CAC4D7 /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Default;
+		};
+		D57C8122086A5C6C00CAC4D7 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+			};
+			name = Development;
+		};
+		D57C8123086A5C6C00CAC4D7 /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+			};
+			name = Deployment;
+		};
+		D57C8124086A5C6C00CAC4D7 /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Default;
+		};
+		D57C8126086A5C6C00CAC4D7 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Development;
+		};
+		D57C8127086A5C6C00CAC4D7 /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Deployment;
+		};
+		D57C8128086A5C6C00CAC4D7 /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Default;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D57C811D086A5C6C00CAC4D7 /* Build configuration list for PBXLegacyTarget "Development" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D57C811E086A5C6C00CAC4D7 /* Development */,
+				D57C811F086A5C6C00CAC4D7 /* Deployment */,
+				D57C8120086A5C6C00CAC4D7 /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+		D57C8121086A5C6C00CAC4D7 /* Build configuration list for PBXLegacyTarget "Deployment" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D57C8122086A5C6C00CAC4D7 /* Development */,
+				D57C8123086A5C6C00CAC4D7 /* Deployment */,
+				D57C8124086A5C6C00CAC4D7 /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+		D57C8125086A5C6C00CAC4D7 /* Build configuration list for PBXProject "redfoot" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D57C8126086A5C6C00CAC4D7 /* Development */,
+				D57C8127086A5C6C00CAC4D7 /* Deployment */,
+				D57C8128086A5C6C00CAC4D7 /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = C4D29FE407FF53B000EDA198 /* Project object */;
+}

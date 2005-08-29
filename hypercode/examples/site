@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
+  xmlns:rdfs='http://www.w3.org/2000/01/rdf-schema#'
+  xmlns:redfoot='http://redfoot.net/2005/redfoot#'
+  xmlns:server='http://redfoot.net/2005/server#'
+  xmlns:template='http://redfoot.net/2005/template#'  
+  xmlns:session='http://redfoot.net/2005/session#'
+>
+
+  <server:Site rdf:about="">
+    <rdfs:label>Example Site</rdfs:label>
+    <template:section rdf:resource="/"/>
+  </server:Site>
+
+  <server:Page rdf:about="/">
+    <rdfs:label>Home</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <template:content>
+      <server:Handler>
+        <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
+
+  <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
+
+  <h2>Welcome</h2>
+
+  <p>You are running: ${redfoot.uri}</p>
+
+  </span>
+
+      ]]></rdf:value>
+      </server:Handler>
+    </template:content>
+  </server:Page>
+
+  <session:User rdf:about="mailto:eikeon@eikeon.com">
+    <rdf:type rdf:resource="#Admin"/>
+  </session:User>
+
+</rdf:RDF>

@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<rdf:RDF 
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+    xmlns:server="http://redfoot.net/2005/server#"        
+    xmlns:handler="http://redfoot.net/2005/handler#"        
+    xmlns:commands="http://redfoot.net/2005/commands#"
+    xmlns:doap="http://usefulinc.com/ns/doap#"
+>
+
+  <redfoot:Release rdf:about="#">
+    <rdfs:label>Release</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <doap:created>2005-08-20</doap:created>
+    <redfoot:code rdf:resource="programs/kernel#"/>
+    <redfoot:program rdf:resource="programs/command_runner#"/>
+    <commands:config rdf:resource="commands/manage#config"/>
+    <server:server rdf:resource="modules/server#twisted"/>
+    <handler:handler rdf:resource="handlers/page#"/>
+  </redfoot:Release>
+
+</rdf:RDF>  

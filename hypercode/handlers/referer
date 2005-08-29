@@ -1,0 +1,13 @@
+if False:
+    REFERER = redfoot.namespace("http://redfoot.net/2005/referer#")
+
+    referer = request.headers.get("referer") # TODO: case (might it be REFERER sometimes)
+    if referer is not None and not referer.startswith(request.host):
+        referer = URIRef(referer)
+        c = redfoot.get_context(URIRef("%s/referer#context" % request.host))
+        if not (referer, REDFOOT.created, None) in c:
+            #c.add((referer, RDF.type, REFERER.Referer))
+            c.add((referer, REDFOOT.created, Literal(date_time())))
+        if not (request.uri, REFERER.referer, referer) in c:
+            c.add((request.uri, REFERER.referer, referer))
+

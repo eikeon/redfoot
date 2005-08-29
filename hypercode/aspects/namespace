@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:commands="http://redfoot.net/2005/commands#"
+   xmlns:handler="http://redfoot.net/2005/handler#"
+>
+
+  <server:Content rdf:ID="v1">
+    <rdfs:label>Namespace</rdfs:label>
+    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+<div xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:kid="http://purl.org/kid/ns#"
+>
+<?python
+DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
+
+if (request.uri.abstract(), None, None) in redfoot:
+    uri = request.uri.abstract()
+elif (request.uri, None, None) in redfoot:
+    uri = request.uri
+else:
+    print "warning: didn't find either request.uri or request.uri_abstract in redfoot"
+    uri = request.uri_abstract
+    
+format_uri = redfoot.module("http://eikco.com/2005/03/simple_format#module").format_uri
+seeAlsoList = list(redfoot.objects(uri, RDFS.seeAlso))
+
+miscList = [t for t in redfoot.predicate_objects(uri) if t[0] not in [RDFS.label, RDFS.comment, RDF.type, RDFS.seeAlso]]
+
+ONTOLOGY = redfoot.namespace(uri)
+?>
+
+  <h2>${redfoot.label(uri, None) or redfoot.value(uri, DC.title)} ( ${uri} )</h2>
+  <p>${XML(format_uri(redfoot.comment(uri)))}</p>
+  
+<h3>Terms</h3>
+<?python
+terms = set()
+
+for term in [getattr(ONTOLOGY, term) for term in dir(ONTOLOGY)]:
+    if term and isinstance(term, URIRef) and term!=ONTOLOGY.NS:
+        terms.add(term)
+terms = list(terms)
+terms.sort()
+?>
+
+<ul>
+  <li kid:for="term in terms">
+    <a href="${request.host}/;${term.concrete()}">${redfoot.label(term, term)}</a>
+  </li>
+</ul>
+
+<div kid:if="miscList">
+<h3>Misc predicate/objects</h3>
+  <ul>
+    <li kid:for="p, o in miscList">
+      <a href="${request.host}/;${p.concrete()}">${redfoot.label(p) or p}</a>,
+      <span kid:strip="" kid:if="isinstance(o, Literal)">
+        <pre>${o}</pre>
+      </span>
+      <span kid:strip="" kid:if="isinstance(o, URIRef)">      
+        <a href="${request.host}/;${o.concrete()}">
+          ${", ".join(redfoot.objects(o, RDFS.label)) or o}
+        </a>
+      </span>
+      <span kid:strip="" kid:if="isinstance(o, BNode)">
+        ${", ".join(redfoot.objects(o, RDFS.label))}      
+      </span>      
+    </li>
+  </ul>
+</div>
+
+  <div kid:if="seeAlsoList">
+  <h2>See Also</h2>
+  <ul>
+    <li kid:for="seeAlso in seeAlsoList">${XML(format_uri(seeAlso))}</li>
+  </ul>
+  </div>    
+
+</div>
+]]>
+    </rdf:value>
+  </server:Content>        
+
+</rdf:RDF>  

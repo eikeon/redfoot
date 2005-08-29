@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:commands="http://redfoot.net/2005/commands#"
+   xmlns:server="http://redfoot.net/2005/server#"
+   xmlns:session="http://redfoot.net/2005/session#"
+   xmlns:template='http://redfoot.net/2005/template#'
+>
+
+  <redfoot:Aspect rdf:ID="comments_aspect">
+    <rdfs:label>Comments aspect</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+  </redfoot:Aspect>
+
+  <rdf:Description rdf:about="">
+    <template:comments rdf:resource="#comments"/>
+    <template:add_comment rdf:resource="#add_comment"/>    
+    <template:section rdf:resource="/comments/"/>    
+  </rdf:Description>
+
+  <rdf:Description rdf:about="http://redfoot.net/2005/comment#Comment">
+    <template:content>
+     <server:PagePartHandler rdf:ID="RecipeContent">
+      <rdfs:label>Recipe</rdfs:label>
+      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+<div xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:kid="http://purl.org/kid/ns#"
+     class="comment"
+>
+<?python
+import time
+from rdflib.util import parse_date_time
+
+COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")
+DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
+DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
+
+comment = request.uri.abstract()
+resource = redfoot.value(None, COMMENT.comment, comment)
+date = redfoot.value(comment, DCTERMS.created)
+
+creator =  redfoot.value(comment, DC.creator)
+creator_label = redfoot.label(creator) or creator.split('@')[0]
+?>
+
+<p>
+by ${creator_label}
+<span kid:if="date">on ${time.strftime("%A %d %B, %Y", time.gmtime(parse_date_time(date)))}</span> 
+regarding <a href="${resource}">${redfoot.label(resource, resource)}</a>:</p>
+<p>${redfoot.value(comment, RDFS.comment)}</p>
+
+</div>
+]]>
+      </rdf:value>
+     </server:PagePartHandler>
+    </template:content>
+  </rdf:Description>
+
+  <server:Page rdf:about="/add_comment/">
+    <rdfs:label>Add Comment</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <server:allow rdf:resource="http://redfoot.net/2005/session#User"/>
+    <template:content>
+     <server:PagePartHandler rdf:ID="add_comment_content">
+      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+  <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
+<?python
+from rdflib.util import date_time
+from urlparse import urljoin
+from time import gmtime
+
+SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")
+DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
+DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
+
+uri = request.parameters.get("uri")
+if not uri is None:
+    uri = URIRef(uri)
+comment = Literal(request.parameters.get("comment"))
+if uri is not None:
+    year, month, date, h, m, s, _, _, _ = gmtime()
+    name = "%04d-%02d-%02dT%02d:%02d:%02d" % (year, month, date, h, m, s)
+    uid = redfoot.value(request.session_id, SESSION.uid)    
+    c_uri = URIRef("%s/%s#comment" % (request.host, name))
+    assert (c_uri, None, None) not in redfoot, "context created for comment already in use"
+    context_uri = redfoot.context_id(c_uri)
+    context = redfoot.get_context(context_uri)# TODO:
+    label = Literal("Comment by %s regarding %s on %s" % (uid, uri, name))
+    redfoot.index.add((context_uri, RDFS.label, label))
+    context.add((uri, COMMENT.comment, c_uri))
+    context.add((c_uri, RDF.type, COMMENT.Comment))
+    context.add((c_uri, DCTERMS.created, Literal(date_time())))
+    label = Literal("%s..." % comment.strip()[0:20])
+    context.add((c_uri, RDFS.label, label))
+    context.add((c_uri, RDFS.comment, comment))
+    context.add((c_uri, DC.creator, uid))
+    
+?>
+
+<div kid:if="uri is None">
+<h2>Error: No comment submitted</h2>
+</div>
+
+<div kid:if="uri is not None">
+
+<h2>Thank you for your comment</h2>
+
+<p>${comment}</p>
+
+<p>Return to <a href="${uri}">${redfoot.label(uri.abstract()) or redfoot.label(uri) or  uri}</a></p>
+
+</div>
+
+  </span>
+
+]]>
+      </rdf:value>
+     </server:PagePartHandler> 
+    </template:content>
+  </server:Page>
+
+  <server:PagePartHandler rdf:ID="add_comment">
+    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+<div xmlns:kid="http://purl.org/kid/ns#" 
+     class="add_comment">
+
+  <?python allowed = allow(URIRef("%s/add_comment/" % request.host))?>
+
+  <div kid:if="allowed" kid:strip="">
+    <form action="/add_comment/" method="post">
+      <input type="hidden" name="uri" value="${request.uri}"/>
+      <p><textarea name="comment" cols="" rows="10" style="width: 100%"></textarea></p>
+      <p><input name="submit" type="submit" value="Submit Comment" /></p>
+    </form>    
+  </div>
+
+  <div kid:if="not allowed" kid:strip="">
+    <p kid:if="allow(URIRef('%s/login/'% request.host))">
+      <a href="/login/?return_uri=${request.host}/;${request.uri}">Login</a> in order to submit a comment.
+    </p>
+  </div>
+</div>
+]]>    
+    </rdf:value>      
+  </server:PagePartHandler>
+
+
+  <server:PagePartHandler rdf:ID="comments">
+    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+<div xmlns:kid="http://purl.org/kid/ns#" 
+     class="comment_list">
+
+  <h3>Comments</h3>
+
+<?python
+import time
+from rdflib.util import parse_date_time
+
+COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")
+DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
+DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
+
+comments = []
+for comment in redfoot.objects(request.uri, COMMENT.comment):
+    date = redfoot.value(comment, DCTERMS.created)
+    comments.append((date, comment))
+comments.sort()
+comments.reverse()
+?>
+
+  <dl>
+   <span kid:strip="" kid:for="date, comment in comments">
+<?python
+creator =  redfoot.value(comment, DC.creator)
+creator_label = redfoot.label(creator) or creator.split('@')[0]
+?>
+    <dt style="border-top: 1px solid black">by ${creator_label} 
+    <span kid:if="date">on ${time.strftime("%A %d %B, %Y", time.gmtime(parse_date_time(date)))}</span>:</dt>
+
+    <dd>${redfoot.value(comment, RDFS.comment)}</dd>
+   </span>
+  </dl>
+
+</div>
+]]>    
+    </rdf:value>      
+  </server:PagePartHandler>
+
+  <server:Page rdf:about="/comments/">
+    <rdfs:label>Comments</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <server:alternate rdf:resource="/comments/atom/"/>    
+    <template:default_section_rank>20.0</template:default_section_rank>
+    <template:content>
+      <server:PagePartHandler rdf:ID="all_comments">
+        <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+<div xmlns:kid="http://purl.org/kid/ns#" 
+     class="comment_list">
+
+<?python
+import time
+from rdflib.util import parse_date_time
+
+COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")
+DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
+DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
+
+comments = []
+for resource, _, comment in redfoot.triples((None, COMMENT.comment, None)):
+    date = redfoot.value(comment, DCTERMS.created)
+    comments.append((date, comment, resource))
+comments.sort()
+comments.reverse()
+?>
+
+  <dl>
+   <span kid:strip="" kid:for="date, comment, resource in comments">
+<?python
+creator =  redfoot.value(comment, DC.creator)
+if creator:
+    creator_label = redfoot.label(creator) or creator.split('@')[0]
+else:
+    creator_label = ''
+?>
+
+    <dt style="border-top: 1px solid black">
+ <span kid:strip="" kid:if="creator_label">by ${creator_label}</span>
+ <span kid:if="date"> on ${time.strftime("%A %d %B, %Y", time.gmtime(parse_date_time(date)))}</span> regarding <a href="${resource}">${redfoot.label(resource.abstract()) or redfoot.label(resource) or resource}</a>:</dt>
+    <dd>${redfoot.value(comment, RDFS.comment)}</dd>
+   </span>
+  </dl>
+
+</div>
+]]>    
+        </rdf:value>      
+      </server:PagePartHandler>
+    </template:content>  
+    
+    <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>    
+  </server:Page>
+
+  <server:Page rdf:about="/comments/atom/">
+    <rdfs:label>Comments Atom Feed</rdfs:label>
+    <server:page_handler rdf:resource="#comments_atom_0.3"/>
+    <!-- TODO: infer from page eventually... currently both are needed explicitly. -->
+    <server:content_type>application/x.atom+xml</server:content_type>    
+  </server:Page>
+
+  <server:PageHandler rdf:ID="comments_atom_0.3">
+    <rdfs:label>comments feed (atom 0.3)</rdfs:label>
+    <server:content_type>application/x.atom+xml</server:content_type>    
+    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+
+<feed version="0.3"
+      xmlns="http://purl.org/atom/ns#"
+      xmlns:dc="http://purl.org/dc/elements/1.1/"
+      xmlns:kid="http://purl.org/kid/ns#">
+<?python
+#
+from datetime import datetime
+BLOG = redfoot.namespace("http://redfoot.net/2005/blog#")
+DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
+DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
+COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")
+
+format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot_program)).format
+
+resources = []
+for resource in redfoot.subjects(RDF.type, COMMENT.Comment):
+    created = redfoot.value(resource, DCTERMS.created)
+    if resource.startswith(request.host):
+        content_value = redfoot.comment(resource)
+        resources.append((created, resource, content_value))    
+resources.sort()
+resources.reverse()
+
+html_page = redfoot.value(None, SERVER.alternate, request.uri, any=True)
+
+now = datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
+
+?>
+  <title>${"%s: %s" % (redfoot.label(request.host), redfoot.label(request.uri))}</title>
+  <link rel="alternate" type="text/html" href="${html_page}"/>
+  <modified>${now}</modified>
+  <author>
+    <name>${redfoot.label(request.host)}</name>
+    <url>${"%s/" % request.host}</url> 
+  </author>
+  <dc:subject>resources</dc:subject>
+ <span kid:for="created, resource, content_value in resources" kid:omit="">
+  <entry>
+    <title>${redfoot.label(resource, resource)}</title>
+    <link rel="alternate" type="text/html" href="${resource.concrete()}"/>
+    <id>${resource}</id>
+    <issued>${created}</issued>
+    <modified>${created}</modified>
+    <content type="text/html" mode="escaped">
+      ${content_value}
+    </content>
+    <dc:subject>resource</dc:subject>
+  </entry>
+ </span>
+</feed>                      
+
+]]>
+    </rdf:value>
+  </server:PageHandler>
+
+</rdf:RDF>  

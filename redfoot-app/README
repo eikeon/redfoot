@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
+  xmlns:rdfs='http://www.w3.org/2000/01/rdf-schema#'
+  xmlns:doap='http://usefulinc.com/ns/doap#'
+  xmlns:blog='http://redfoot.net/2005/blog#'
+  xmlns:dc='http://purl.org/dc/elements/1.1/'
+  xmlns:dcterms='http://purl.org/dc/terms/'
+>
+
+  <rdf:Description rdf:about="http://redfoot.net#">
+    <doap:release rdf:resource="#"/>
+  </rdf:Description>
+
+  <doap:Version rdf:about="#">
+    <rdfs:label>redfoot-2.0.0</rdfs:label>
+    <rdfs:comment rdf:datatype="http://www.w3.org/1999/xhtml">
+<![CDATA[
+<div>
+    <p>
+      This release is a stable release of Redfoot.
+    </p>
+    
+<h3>Prerequisites</h3>
+
+  <ul>
+
+  <li><a href="http://python.org/">Python</a> 2.4 with BerkleyDB support (which is most often the case if you already have a python2.4 around)
+    <ul>
+      <li>Source:  <a href="http://python.org/ftp/python/2.4.1/Python-2.4.1.tgz">Python-2.4.1.tgz</a> 
+      <br/>NOTE: On a system without BerkleyDB
+      <pre>
+           install BerkleyDB
+         ./configure; make; sudo make install
+      </pre>
+      </li>
+      <li>OSX: <a href="http://python.org/ftp/python/2.4.1/MacPython-OSX-2.4.1-1.dmg">MacPython-OSX-2.4.1-1.dmg</a></li>
+      <li>Windows: <a href="http://python.org/ftp/python/2.4.1/python-2.4.1.msi">python-2.4.1.msi</a></li>
+    </ul>
+  </li>    
+  </ul>
+
+<h3>Installation</h3>
+
+<ul>
+  <li>download the release from <a href="http://redfoot.net/2005/08/20/redfoot-2.0.0.tar.gz">redfoot-2.0.0.tar.gz</a></li>
+  <li>unpack</li>
+  <li>then from the redfoot-2.0.0 directory run: <pre>python setup.py install</pre></li>
+
+  <li>You should now have a script called redfoot installed where python
+installs scripts on your platform. On unix and OS X for me it gets put
+in /usr/local/bin/ and so I can just type redfoot to run it.
+
+On windows I think it goes in something like C:\Python24\Scripts\ and so you may need to do something like C:\Python24\bin\python C:\Python24\Scripts redfoot
+  </li>
+</ul>
+
+<h3>Additional prereqs</h3>
+
+<ul>
+  <li>for rdflib run: <pre>redfoot --install-rdflib</pre></li>
+  <li>for twisted and kid run: <pre>redfoot --program=http://redfoot.net/2005/08/20/hypercode/programs/install#prereqs</pre>
+      NOTE: see <a href="http://redfoot.net/2005/08/20/hypercode/programs/install#prereqs">install#prereqs</a> for details if you want to install the twisted and kid prereqs by hand.
+  </li>
+</ul>
+
+<h3>To see a list of available commands</h3>
+<ul>
+  <li><pre>redfoot</pre> or <pre>redfoot --help</pre></li>
+</ul>
+
+</div>
+]]>
+    </rdfs:comment>
+    <doap:revision>2.0.0</doap:revision>
+    <doap:created>2005-08-20</doap:created>
+  </doap:Version>
+
+  <blog:Entry rdf:ID="entry">
+    <rdfs:label>redfoot-2.0.0 released</rdfs:label>
+    <rdfs:comment rdf:datatype="http://www.w3.org/1999/xhtml">
+<![CDATA[
+
+    <p>
+      <a href="http://redfoot.net/2005/08/20/redfoot-2.0.0/README/">redfoot-2.0.0 release</a>
+    </p> 
+
+]]>
+    </rdfs:comment>
+    <dcterms:created>2005-08-20</dcterms:created>
+    <dc:creator rdf:resource="mailto:eikeon@eikeon.com"/>
+  </blog:Entry>
+
+  <rdf:Description rdf:about="CHANGELOG">
+    <rdfs:label>CHANGELOG</rdfs:label>
+  </rdf:Description>
+
+</rdf:RDF>

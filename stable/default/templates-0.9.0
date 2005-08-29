@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:program="http://redfoot.net/2005/program#"
+   xmlns:handler="http://redfoot.net/2005/01/handler#"
+>
+
+  <handler:Page rdf:ID="page">
+    <rdfs:label>Default Page Template (0.9.0)</rdfs:label>
+    <handler:content_type>application/xhtml+xml</handler:content_type>
+    <handler:kid>
+<![CDATA[
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:kid="http://purl.org/kid/ns#">
+  <head>
+    <!-- Default Page Template-0.9.0  -->
+<?kid
+#
+title = store.label(request.uri.abstract(), None) or store.label(request.uri, None)
+type = first(store.objects(request.uri.abstract(), RDF.type)) or first(store.objects(request.uri, RDF.type))
+if type:
+    title = "%s %s" % (title, store.label(type, ''))
+?>
+
+  <title>${store.label(request.host)}: ${title}</title>
+    <meta name="keywords" content=""/>
+    <meta http-equiv="Content-Type" content="text/xhtml; charset=UTF-8"/>
+    <link rel="shortcut icon" href="http://redfoot.net/2002/11/25/favicon.ico"/>
+    <style type="text/css">@import "${lookup(HANDLER.css, 'http://redfoot.net/2005/03/18/css')}";</style>
+    
+   <span kid:omit="" kid:for="alternate in store.objects(request.uri, HANDLER.alternate)">
+    <link rel="alternate"
+      href="${alternate}" title="${store.label(alternate)}"
+      type="${first(store.objects(alternate, HANDLER.content_type))}" />
+   </span> 
+  </head>
+  <body>
+    <h1><a href="${request.host}/">${store.label(request.host)}</a></h1>
+
+    <div class="header">
+${display(lookup(HANDLER.header))}
+    </div>
+
+   <span kid:strip="" kid:for="uri, content in contents">
+<?python
+request.uri = uri
+request.uri_abstract = uri.abstract()
+?>
+    <div class="content">
+${display(content)}
+    </div>
+   </span> 
+
+    <div class="footer">
+${display(lookup(HANDLER.footer))}
+    </div>
+  </body>
+</html>
+]]>
+    </handler:kid>    
+  </handler:Page>
+
+  <handler:Content rdf:ID="not_found">
+    <rdfs:label>Not Found</rdfs:label>
+    <redfoot:codestr>
+<![CDATA[
+
+response.write("""
+<h1>Not Found</h1>
+""")        
+    
+]]>
+    </redfoot:codestr>
+  </handler:Content>
+
+  <handler:Page rdf:ID="content">
+    <rdfs:label>Generic Display of Resource</rdfs:label>
+    <handler:kid>
+<![CDATA[
+<div xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:kid="http://purl.org/kid/ns#"
+     kid:strip=""
+>
+<?python
+if (request.uri_abstract, None, None) in store:
+    uri = request.uri_abstract
+elif (request.uri, None, None) in store:
+    uri = request.uri
+else:
+    print "warning: didn't find either request.uri or request.uri_abstract in store"
+    uri = request.uri_abstract
+    
+format_uri = redfoot.module("http://eikco.com/2005/03/simple_format#module").format_uri
+seeAlsoList = list(redfoot.objects(uri, RDFS.seeAlso))
+
+?>
+
+  <h2 kid:if="(uri, None, None) not in store">Not Found</h2>
+
+  <h2>${redfoot.label(uri)}</h2>
+  <p>${XML(format_uri(redfoot.comment(uri)))}</p>
+  
+  <ul>
+    <li kid:for="p, o in store.predicate_objects(uri)">${store.label(p) or p},
+      <span kid:strip="" kid:if="isinstance(o, Literal)">
+        <pre>${o}</pre>
+      </span>
+      <span kid:strip="" kid:if="isinstance(o, URIRef)">      
+        <a href="${request.host}/;${o.concrete()}">
+          ${", ".join(redfoot.objects(o, RDFS.label)) or o}
+        </a>
+      </span>
+      <span kid:strip="" kid:if="isinstance(o, BNode)">
+        ${", ".join(redfoot.objects(o, RDFS.label))}      
+      </span>      
+    </li>
+  </ul>
+
+
+  <div kid:if="seeAlsoList">
+  <h2>See Also</h2>
+  <ul>
+    <li kid:for="seeAlso in seeAlsoList">${XML(format_uri(seeAlso))}</li>
+  </ul>
+  </div>    
+
+  <div>
+  <h2>Instances</h2>
+  <ul> 
+    <li kid:for="instance in redfoot.instances(uri)">
+      <span kid:strip="" kid:if="isinstance(instance, URIRef)">      
+        <a href="${request.host}/;${instance.concrete()}">
+          ${", ".join(redfoot.objects(instance, RDFS.label)) or instance}
+        </a>
+      </span>
+      <span kid:strip="" kid:if="isinstance(instance, BNode)">
+        ${", ".join(redfoot.objects(instance, RDFS.label))}      
+      </span>      
+    </li>
+  </ul> 
+  </div> 
+
+</div>
+]]>
+    </handler:kid>
+  </handler:Page>
+
+
+
+
+  <redfoot:Page rdf:ID="Page"> <!-- anything using this?? -->
+    <handler:content rdf:parseType="Resource">
+      <rdfs:label>Default main for Redfoot</rdfs:label>      
+      <handler:kid>
+<![CDATA[
+<div xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:kid="http://purl.org/kid/ns#"
+>
+<?python
+format_uri = redfoot.module("http://eikco.com/2005/03/simple_format#module").format_uri
+seeAlsoList = redfoot.objects(request.uri_abstract, RDFS.seeAlso)
+?>
+
+  <h2>${redfoot.label(request.uri_abstract)}</h2>
+  <p>${XML(format_uri(redfoot.comment(request.uri_abstract)))}</p>
+  
+  <div kid:if="seeAlsoList">
+  <h2>See Also</h2>
+  <ul>
+    <li kid:for="seeAlso in seeAlsoList">${XML(format_uri(seeAlso))}</li>
+  </ul>
+  </div>    
+
+</div>
+]]>
+      </handler:kid>
+    </handler:content>
+  </redfoot:Page>
+
+</rdf:RDF>  

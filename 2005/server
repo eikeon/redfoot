@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+>  
+
+  <redfoot:Namespace rdf:about="#">
+    <rdfs:label>Redfoot server namespace</rdfs:label>
+    <rdfs:comment>
+    </rdfs:comment>
+  </redfoot:Namespace>
+
+  <rdfs:Class rdf:ID="Server">
+    <rdfs:label>Server</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/redfoot#Module"/>
+  </rdfs:Class>
+
+  <rdfs:Property rdf:ID="server">
+    <rdfs:label>server</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:domain rdf:resource="http://redfoot.net/2005/redfoot#Kernel"/>
+    <rdfs:range rdf:resource="#Server"/>
+  </rdfs:Property>
+
+  <rdfs:Class rdf:ID="Handler">
+    <rdfs:label>Server Handler</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/redfoot#Code"/>
+  </rdfs:Class>
+
+  <rdfs:Property rdf:ID="handler">
+    <rdfs:label>server handler</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:domain rdf:resource="http://redfoot.net/2005/redfoot#Kernel"/>
+    <rdfs:domain rdf:resource="#Server"/>
+    <rdfs:range rdf:resource="#Handler"/>
+  </rdfs:Property>
+
+  <rdfs:Class rdf:ID="Site">
+    <rdfs:label>Site</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/redfoot#Resource"/>
+  </rdfs:Class>
+
+  <rdfs:Class rdf:ID="Page">
+    <rdfs:label>Page</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/redfoot#Resource"/>
+  </rdfs:Class>
+
+  <rdfs:Class rdf:ID="PageHandler">
+    <rdfs:label>Page Handler</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/redfoot#Code"/>
+  </rdfs:Class>
+
+  <rdfs:Class rdf:ID="PagePartHandler">
+    <rdfs:label>Page Part Handler</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/redfoot#Code"/>
+  </rdfs:Class>
+
+  <rdfs:Property rdf:ID="page_handler">
+    <rdfs:label>page handler</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:domain rdf:resource="#Site"/>
+    <rdfs:domain rdf:resource="#Page"/>
+    <rdfs:range rdf:resource="#Handler"/>
+  </rdfs:Property>
+
+  <rdfs:Property rdf:ID="unauthorized_page_handler">
+    <rdfs:label>unauthorized page handler</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:domain rdf:resource="#Site"/>
+    <rdfs:domain rdf:resource="#Page"/>
+    <rdfs:range rdf:resource="#Handler"/>
+  </rdfs:Property>
+
+  <rdfs:Property rdf:ID="unauthorized_content_handler">
+    <rdfs:label>unauthorized content handler</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:domain rdf:resource="#Site"/>
+    <rdfs:domain rdf:resource="#Page"/>
+    <rdfs:range rdf:resource="#Handler"/>
+  </rdfs:Property>
+
+  <rdfs:Property rdf:ID="allow">
+    <rdfs:label>allow</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:domain rdf:resource="http://redfoot.net/2005/redfoot#Kernel"/>
+    <rdfs:domain rdf:resource="http://redfoot.net/2005/server#Site"/>
+    <rdfs:domain rdf:resource="http://redfoot.net/2005/server#Page"/>
+  </rdfs:Property>
+
+  <rdfs:Property rdf:ID="session_support">
+    <rdfs:label>session support</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:domain rdf:resource="http://redfoot.net/2005/server#Handler"/>
+    <rdfs:domain rdf:resource="http://redfoot.net/2005/redfoot#Kernel"/>
+    <rdfs:domain rdf:resource="http://redfoot.net/2005/server#Site"/>
+    <rdfs:domain rdf:resource="http://redfoot.net/2005/server#Page"/>
+  </rdfs:Property>
+
+  <rdfs:Property rdf:ID="display_support">
+    <rdfs:label>display support</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:domain rdf:resource="http://redfoot.net/2005/redfoot#Kernel"/>
+    <rdfs:domain rdf:resource="http://redfoot.net/2005/server#Site"/>
+    <rdfs:domain rdf:resource="http://redfoot.net/2005/server#Page"/>
+  </rdfs:Property>
+
+  <rdfs:Datatype rdf:ID="Kid">
+    <rdfs:label>Kid</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+  </rdfs:Datatype>
+
+  <rdfs:Property rdf:ID="content_type">
+    <rdfs:label>content_type</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+  </rdfs:Property>
+
+  <rdfs:Property rdf:ID="alternate">
+    <rdfs:label>alternate</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:domain rdf:resource="http://redfoot.net/2005/server#Page"/>
+    <rdfs:range rdf:resource="http://redfoot.net/2005/server#Page"/>
+  </rdfs:Property>
+
+</rdf:RDF>  

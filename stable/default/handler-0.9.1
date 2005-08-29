@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:program="http://redfoot.net/2005/program#"
+   xmlns:handler="http://redfoot.net/2005/01/handler#"
+>
+
+  <redfoot:Namespace rdf:about="#">
+    <rdfs:label>Default handler namespace</rdfs:label>
+    <rdfs:comment>
+    </rdfs:comment>
+  </redfoot:Namespace>
+
+  <handler:Handler rdf:ID="dispatcher">
+    <rdfs:label>dispatch handler (0.9.1)</rdfs:label>      
+    <redfoot:codestr>
+<![CDATA[
+
+SERVER = redfoot.namespace("http://redfoot.net/2005/01/server#")
+SESSION = redfoot.namespace("http://redfoot.net/2005/01/session#")
+
+from rdflib.util import date_time
+
+# add request.session_id
+sid = request.getCookie("session_id", None)
+if sid is None:
+
+    from string import ascii_letters
+    from random import choice
+    import md5, time
+    m = md5.new()
+    m.update(str([choice(ascii_letters) for i in xrange(0, 8)]))
+    m.update(str(time.time()))
+    #m.update(request.getClientIP())
+    sid = m.hexdigest()
+    response.addCookie('session_id=%s;path=/' % sid)
+request.session_id = session_id = URIRef("%s/sessions#%s" % (request.host, sid))
+if (session_id, RDF.type, SESSION.Session) not in redfoot:
+    context = redfoot.get_context(redfoot.context_id(session_id))
+    context.add((session_id, RDF.type, SESSION.Session))
+    context.add((session_id, SESSION.created, Literal(date_time())))
+
+request.uri = URIRef(request.uri.split(";", 1)[-1])
+
+if not "://" in request.uri:
+    request.uri = URIRef(request.uri.replace(":/", "://"))
+
+request.uris = uris = []
+for uri in request.uri.split("+"):
+    uris.append(URIRef(uri))
+
+handler = redfoot.value(request.uri, SERVER.handler)
+if not handler:
+    handler = redfoot.value(request.host, SERVER.handler)    
+if handler:
+    redfoot.execute(handler, request=request, response=response)
+else:
+    response.setHeader('Content-Type', 'text/html; charset=UTF-8')            
+    # TODO: rename to setStatus
+    response.setStatus(404, "Handler Not Found")
+    response.write("""
+<html>
+<head>
+<title>Handler Not Found</title>
+</head>
+<h1>Handler Not Found</h1>
+</html>
+""")
+]]>
+    </redfoot:codestr>
+  </handler:Handler>
+
+
+  <handler:Handler rdf:ID="v1">
+    <rdfs:label>Default handler (0.9.1)</rdfs:label>      
+    <redfoot:todo>need to do dispatching for different formats (use datatypes?)</redfoot:todo>
+    <redfoot:codestr>
+<![CDATA[
+
+HANDLER = redfoot.namespace("http://redfoot.net/2005/01/handler#")
+
+import kid
+from StringIO import StringIO
+    
+def lookup(property, default=None):
+    p = store.value(request.uri, property)
+    if not p:
+        for type in redfoot.types(request.uri):
+            p = store.value(type, property)
+            if p:
+                return p
+    if not p:
+        p = store.value(request.host, property)
+    return p or default
+    
+
+def display(uri, fragment=True, output=None, **args):
+    if not uri:
+        return
+    if output is None:
+        output = "xml"
+    assert(isinstance(uri, URIRef), "uri not URIRef as expected")
+    redfoot.check(uri)
+    context = globals()
+    for k, v in args.items():
+        context[k] = v
+    
+#     for type in redfoot.types(uri):
+#         display = redfoot.value(type, HANDLER.display)
+#         if display:
+#             break
+#     redfoot.execute(display, uri=uri)
+
+#     module = redfoot.module(display)
+#     redfoot.eval(module.display())
+#     redfoot.eval(function())
+
+    global write_to_response
+    type = first(redfoot.objects(uri, RDF.type))
+    if type and type==URIRef("http://redfoot.net/dev/content/wiki#Format"):
+        redfoot.execute(type, resource=uri, **context)
+    else:
+        s = store.value(uri, HANDLER.kid)
+        if s:
+            t_mod = kid.load_template(StringIO(s))
+            t = t_mod.Template(**context)                  
+            if write_to_response:
+                write_to_response = False
+                t.write(response, encoding="utf-8", fragment=fragment, output=output)
+            else:
+                return t            
+        else:
+            write_to_response = True
+            redfoot.execute(uri, **context)
+
+def not_found(s):
+    response.setStatus(404, s)
+    response.write("""
+<html>
+<head>
+<title>%s</title>
+</head>
+<h1>%s</h1>
+</html>
+""" % (s, s))
+
+
+redfoot.log.info(request.uri)
+
+if not (request.uri, None, None) in store and not (request.uri.abstract(), None, None) in store:
+    response.setStatus(404, "Not Found")            
+
+page = lookup(HANDLER.page)
+if page is None:
+    not_found("Page Not Found")
+else:
+    write_to_response = True
+    redfoot.check(page)
+    content_type = store.value(page, HANDLER.content_type) or 'text/html; charset=UTF-8'
+    if "application/xhtml+xml" in content_type:
+        # Check if we need to fall back to text/html
+        accept = request.headers.get("ACCEPT")
+        if accept and "application/xhtml+xml" in accept:
+            output = "xhtml-strict"
+        else:
+            output = "html-strict"
+            content_type = "text/html; charset=UTF-8"
+    else:
+        output = "xml"
+    response.setHeader('Content-Type', content_type)
+    display(page, fragment=False, output=output)
+
+]]>
+    </redfoot:codestr>
+  </handler:Handler>
+
+</rdf:RDF>  

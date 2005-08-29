@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:server="http://redfoot.net/2005/server#"
+   xmlns:template="http://redfoot.net/2005/template#"
+>
+
+  <template:Template rdf:ID="page">
+    <rdfs:label>Jubilation Template</rdfs:label>
+    <template:content rdf:resource="classic#content"/>
+    <template:background_color>#B0C9BE</template:background_color>
+    <template:css rdf:resource="#css"/>
+    <template:title rdf:resource="classic#title"/>
+    <template:shortcut_icon rdf:resource="http://redfoot.net/2002/11/25/favicon.ico"/>
+    <template:header rdf:resource="#header"/>
+    <template:navigation rdf:resource="classic#navigation"/>
+    <template:footer rdf:resource="classic#footer"/>
+    <server:content_type>application/xhtml+xml</server:content_type>
+    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:kid="http://purl.org/kid/ns#">
+<?python 
+TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")
+SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+?>
+  <head>
+    <title>${display(lookup(TEMPLATE.title))}</title>
+    <meta http-equiv="Content-Type" content="text/xhtml; charset=UTF-8"/>
+    <meta name="keywords" content=""/>
+    <link rel="shortcut icon" href="${lookup(TEMPLATE.shortcut_icon)}"/>
+    <style type="text/css">
+      ${display(lookup(TEMPLATE.css))}
+    </style>
+    <span kid:for="alternate in redfoot.objects(request.uri, SERVER.alternate)" kid:strip="" >
+    <link rel="alternate"
+      href="${alternate}" title="${redfoot.label(alternate)}"
+      type="${redfoot.value(alternate, SERVER.content_type)}" />
+    </span> 
+  </head>
+
+  <body>
+    <div class="header">
+      ${display(lookup(TEMPLATE.header))}
+    </div>
+
+    <div class="content">
+<?python from itertools import chain?>    
+
+      ${display(lookup_content(TEMPLATE.content))}
+
+      <?python COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")?>
+      <div class="comments"
+           kid:if="lookup(TEMPLATE.comments) and (request.uri, RDFS.member, COMMENT.exclude) not in redfoot">
+        ${display(lookup(TEMPLATE.comments))}
+        ${display(lookup(TEMPLATE.add_comment))}
+      </div>
+    </div>
+
+    <div class="navigation">
+     ${display(lookup(TEMPLATE.navigation))}
+    </div>
+
+    <div class="footer">
+      ${display(lookup(TEMPLATE.footer))}
+    </div>
+
+  </body>
+</html>
+]]>
+    </rdf:value>    
+  </template:Template>
+
+  <server:PagePartHandler rdf:ID="header">
+    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
+      <div xmlns:kid="http://purl.org/kid/ns#" kid:strip="">
+        <h1>${redfoot.label(request.uri)}</h1>
+      </div>
+      ]]></rdf:value>
+  </server:PagePartHandler>
+
+  <server:PagePartHandler rdf:ID="css">
+    <rdfs:label>Default css</rdfs:label>
+    <server:content_type>text/css</server:content_type>
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+
+TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")
+
+color = lookup(TEMPLATE.background_color) or "#cccccc"
+
+response.write("""
+
+html {
+    background-color: %(color)s;
+}
+
+body {
+    margin-left: 5%%;
+    margin-right: 5%%;
+}
+
+h1, h2, h3, h4 { text-align: center } 
+h1, h2, h3 { margin-bottom: 0em}
+
+.navigation { 
+  text-align: center; 
+  clear: both;
+  xpadding-top: 1em;
+}
+
+.navigation ul {
+  padding: 1em 0em;
+  margin: 3em 0px 0px 0px;
+  border-top: 1px solid #000;
+  font: bold 12px Verdana, sans-serif;
+}
+
+.navigation li {
+  list-style: none;
+  line-height: 2em;
+  margin: 0;
+  display: inline;
+}
+
+.navigation li a {
+  padding: 3px 0.5em;
+  margin-top: 1em;
+  margin-left: 3px;
+  border: 1px solid #000;
+  background: #DDE;
+  text-decoration: none;
+}
+
+.navigation li a { color: #000; }
+
+.navigation li a:hover {
+  color: #fc6305;
+  background: #ccc;
+  border-color: #227;
+}
+
+.navigation li a#current {
+  background: white;
+  border-bottom: 1px solid white;
+}
+
+p.footer {   
+  clear: both; 
+  text-align: center;
+  font-size: small; 
+  font-style: italic;
+  color: #333;
+  clear: both;
+}
+
+p.question {
+  font-weight: bold;  
+}
+
+div.centered 
+{
+  text-align: center;
+}
+
+div.centered table 
+{
+  margin: 0 auto; 
+  text-align: left;
+}
+
+a {
+    font-weight: bold;
+    color: #000;
+    xtext-decoration: none
+}
+
+a:hover {
+    font-weight: bold;
+    color: #000;
+    background-color: #ddd;
+    text-decoration: none
+}
+
+img.image {
+  float: right; 
+  padding: 1em;
+}
+
+.recipe .ingredients {
+  width:48%%; float: left;
+}
+
+.recipe .directions {
+  width:48%%; float: left;
+}
+
+.recipe {
+  clear: both;
+  border: 0px;
+}
+
+div.spacer {
+  clear: both;
+}
+
+div.comments {
+    background-color: #ddddee;
+    margin: 0em;
+    padding: 0.25em 1em;
+}
+
+""" % {"color": color})
+
+    </rdf:value>
+  </server:PagePartHandler>
+
+</rdf:RDF>  

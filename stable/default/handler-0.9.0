@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:program="http://redfoot.net/2005/program#"
+   xmlns:handler="http://redfoot.net/2005/01/handler#"
+>
+
+  <redfoot:Namespace rdf:about="#">
+    <rdfs:label>Default handler namespace</rdfs:label>
+    <rdfs:comment>
+    </rdfs:comment>
+  </redfoot:Namespace>
+
+  <redfoot:Python rdf:ID="dispatcher">
+    <rdfs:label>dispatch handler</rdfs:label>      
+    <redfoot:codestr>
+<![CDATA[
+
+SERVER = redfoot.namespace("http://redfoot.net/2005/01/server#")
+
+request.uri = URIRef(request.uri.split(";", 1)[-1])
+
+if not "://" in request.uri:
+    request.uri = URIRef(request.uri.replace(":/", "://"))
+
+request.uri_abstract = request.uri.abstract()
+
+request.uris = uris = []
+for uri in request.uri.split("+"):
+    uris.append(URIRef(uri))
+
+#from urlparse import urlparse
+#scheme, netloc, path, params, query, fragment = urlparse(request.uri)
+#request.host = URIRef("http://%s" % netloc)
+
+handlers = list(redfoot.objects(request.uri, SERVER.handler))
+assert(len(handlers)<=1, "Shouldn't be more than one handler")
+if not handlers:
+    handlers = list(redfoot.objects(request.host, SERVER.handler))
+assert(len(handlers)<=1, "Shouldn't be more than one handler")
+if handlers:
+    handler = handlers[0]
+    redfoot.execute(handler, request=request, response=response)
+else:
+    response.setHeader('Content-Type', 'text/html; charset=UTF-8')            
+    # TODO: rename to setStatus
+    response.setStatus(404, "Not Found")
+    response.write("""
+<html>
+<head>
+<title>Not found</title>
+</head>
+<h1>Not Found</h1>
+</html>
+""")
+]]>
+    </redfoot:codestr>
+  </redfoot:Python>
+
+
+  <redfoot:Python rdf:ID="v1">
+    <rdfs:label>Default handler</rdfs:label>      
+    <redfoot:todo>need to do dispatching for different formats (use datatypes?)</redfoot:todo>
+    <redfoot:codestr>
+<![CDATA[
+
+HANDLER = redfoot.namespace("http://redfoot.net/2005/01/handler#")
+
+import kid
+from StringIO import StringIO
+
+def lookup(property, default=None):
+    # TODO: generalize... with bit of looking at type like content currently does.
+    p = first(store.objects(request.uri, property))
+    if not p:
+        p = first(store.objects(request.host, property))
+    return p or default
+    
+
+write_to_response = True
+def display_page(uri, **args):
+    redfoot.check(uri)
+    content_type = first(store.objects(uri, HANDLER.content_type)) or 'text/html; charset=UTF-8'
+    if "application/xhtml+xml" in content_type:
+        # Check if we need to fall back to text/html
+        accept = request.headers.get("ACCEPT")
+        if accept and "application/xhtml+xml" in accept:
+            output = "xhtml-strict"
+        else:
+            output = "html-strict"
+            content_type = "text/html; charset=UTF-8"
+    else:
+        output = "xml"
+    response.setHeader('Content-Type', content_type)
+
+    display(uri, fragment=False, output=output, **args)
+
+
+def display(uri, fragment=True, output=None, **args):
+    # TODO: display could do lookup if uri is of python property
+    if not uri:
+        return
+    if output is None:
+        output = "xml"
+    assert(isinstance(uri, URIRef), "uri not URIRef as expected")
+    redfoot.check(uri)
+    context = globals()
+    for k, v in args.items():
+        context[k] = v
+    
+    global write_to_response
+    type = first(redfoot.objects(uri, RDF.type))
+    if type and type==URIRef("http://redfoot.net/dev/content/wiki#Format"):
+        redfoot.execute(type, resource=uri, **context)
+        #response.write(redfoot.value(uri, RDFS.label))
+    else:
+        s = first(store.objects(uri, HANDLER.kid))
+        if s:
+            t_mod = kid.load_template(StringIO(s))
+            t = t_mod.Template(**context)                  
+            if write_to_response:
+                write_to_response = False
+                t.write(response, encoding="utf-8", fragment=fragment, output=output)
+            else:
+                return t            
+        else:
+            write_to_response = True
+            redfoot.execute(uri, **context) # TODO: is **globals still needed?
+
+print "v1:", request.uri#, request.headers
+
+# TODO: I'm assuming the status is initialized to a 200 already?    
+if not (request.uri, None, None) in store and not (request.uri.abstract(), None, None) in store:
+    response.setStatus(404, "Not Found")            
+
+content_type = request.parameters.get("content_type", None)
+if content_type=="text":
+    text = first(store.objects(request.uri, HANDLER.text))
+    if not text:
+        print "???", request.uri            
+        type = first(store.objects(request.uri, RDF.type))
+        if type:
+            text = first(store.objects(type, HANDLER.text))
+    assert text, "No text found"
+    response.setHeader('Content-Type', "text/plain")    
+    #redfoot.execute(text, request=request, response=response)
+    redfoot.execute(text, context=globals())        
+else:
+
+    page = first(store.objects(request.uri, HANDLER.page))
+    if not page:
+        type = first(store.objects(request.uri, RDF.type))
+        if type:
+            page = first(store.objects(type, HANDLER.page))
+        if not page:
+            page = first(store.objects(request.host, HANDLER.page))
+
+    # TODO: ??
+    assert page, "No page found"
+
+    contents = []
+    for u in request.uris:
+        content = first(store.objects(u, HANDLER.content))
+        if not content:
+            type = first(store.objects(u.abstract(), RDF.type))
+            if type:
+                content = first(store.objects(type, HANDLER.content))
+            if not content:
+                type = first(store.objects(u, RDF.type))
+                if type:
+                    content = first(store.objects(type, HANDLER.content))
+
+        if not content:
+            content = first(store.objects(request.host, HANDLER.content))
+        contents.append((u, content))
+
+    display_page(page, contents=contents)
+
+]]>
+    </redfoot:codestr>
+  </redfoot:Python>
+
+</rdf:RDF>  

@@ -1,0 +1,67 @@
+{
+    IBClasses = (
+        {
+            CLASS = ContextsController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                contextsOutline = NSOutlineView; 
+                editorController = EditorController; 
+                editorMenu = NSMenu; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            CLASS = ContextsView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {contextsController = ContextsController; }; 
+            SUPERCLASS = NSOutlineView; 
+        }, 
+        {
+            ACTIONS = {cancel = id; save = id; }; 
+            CLASS = EditTripleController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                editTripleWindow = NSWindow; 
+                editorController = EditorController; 
+                object = NSTextView; 
+                objectChoices = NSTableView; 
+                objectChoicesScrollView = NSScrollView; 
+                objectScrollView = NSScrollView; 
+                predicate = NSTextField; 
+                subject = NSTextField; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            CLASS = EditView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {editorController = EditorController; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            CLASS = EditorController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                editTripleController = EditTripleController; 
+                editView = EditView; 
+                resourceController = ResourceController; 
+                resourcesTable = NSTableView; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {newContext = id; }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {editResource = id; }; 
+            CLASS = ResourceController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {editorController = EditorController; resourceTable = NSTableView; }; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}

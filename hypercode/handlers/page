@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:server="http://redfoot.net/2005/server#"
+>
+
+  <server:Handler rdf:about="#">
+    <rdfs:label>Default handler</rdfs:label>      
+    <server:page_handler rdf:resource="../templates/classic#page"/>
+    <server:unauthorized_page_handler rdf:resource="../templates/classic#unauthorized_page"/>
+    <server:unauthorized_content_handler rdf:resource="../templates/classic#unauthorized_content"/>
+    <server:session_support rdf:resource="#session_support"/>
+    <server:display_support rdf:resource="#display_support"/>
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+
+redfoot.log.info(request.uri)
+
+# Support tunneling requests for any resource through a server
+request.uri = URIRef(request.uri.split(";", 1)[-1]) 
+
+# This was needed to fix a bug that happens fronting redfoot with apache via mod_proxy
+if not "://" in request.uri:
+    request.uri = URIRef(request.uri.replace(":/", "://"))
+
+def lookup(property, default=None):
+    return request.lookup(property) or redfoot.value(redfoot_current, property) or default
+
+session_support = lookup(SERVER.session_support)
+assert session_support, "no session support found"
+redfoot.execute(session_support, request=request, response=response)
+
+page_handler = lookup(SERVER.page_handler)
+assert page_handler, "no page handler found"
+
+redfoot.execute(lookup(SERVER.display_support), context=globals())
+
+if page_handler is None:
+    response.setStatus(404, "Not Found")            
+    response.write("No page handler found")
+
+if not (request.uri, None, None) in redfoot and not (request.uri.abstract(), None, None) in redfoot:
+    # we need to set the status to 404 if that's the case before we call display on page_handler
+    response.setStatus(404, "Not Found")            
+
+accept = request.headers.get("accept")
+if accept and "application/rdf+xml" in accept:  # TODO: will need to check that this is best match.
+    cid = request.uri.abstract()
+    if not (cid, RDF.type, REDFOOT.Context) in redfoot:
+        cid = redfoot.context_id(cid) # default context
+    context = redfoot.get_context(cid)
+    base = redfoot.context_id(cid, context_id="") # TODO: basically defrag... need better way.
+    context.serialize(destination=response, format="pretty-xml", base=base)
+else:
+    display(page_handler, fragment=False)
+
+]]>
+    </rdf:value>
+  </server:Handler>
+
+  <redfoot:Code rdf:ID="session_support">
+    <rdfs:label>Session Support</rdfs:label>      
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+
+from rdflib.util import date_time
+
+# add request.session_id
+sid = request.getCookie("session_id", None)
+if sid is None:
+
+    from string import ascii_letters
+    from random import choice
+    import md5, time
+    m = md5.new()
+    m.update(str([choice(ascii_letters) for i in xrange(0, 8)]))
+    m.update(str(time.time()))
+    #m.update(request.getClientIP())
+    sid = m.hexdigest()
+    response.addCookie('session_id=%s;path=/' % sid)
+request.session_id = session_id = URIRef("%s/sessions#%s" % (request.host, sid))
+if (session_id, RDF.type, SESSION.Session) not in redfoot:
+    context = redfoot.get_context(redfoot.context_id(session_id))
+    context.add((session_id, RDF.type, SESSION.Session))
+    context.add((session_id, SESSION.created, Literal(date_time())))
+
+]]>
+    </rdf:value>
+  </redfoot:Code>
+
+
+  <rdf:Description rdf:ID="display_support"> <!-- TODO: type-->
+    <rdfs:label>display support</rdfs:label>      
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+# TODO: this is a bit out of hand :(
+#allow = redfoot.execute(lookup(SERVER.allow_support), request=request, response=response)["allow"]
+SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+
+def allow(uri):
+    if (uri, SERVER.allow, None) in redfoot:
+        uid = redfoot.value(request.session_id, SESSION.uid)
+        if uid is None:
+            return False
+        for allow in redfoot.objects(uri, SERVER.allow):
+            if allow==uid:
+                return True
+            elif (uid, RDF.type, allow) in redfoot:
+                return True
+        return False
+    else:
+        return True
+
+import kid
+from StringIO import StringIO
+from itertools import chain
+
+# redefine lookup
+def lookup(property, default=None):
+    return request.lookup(property) or redfoot.value(page_handler, property) or default
+
+# special lookup for content
+def lookup_content(property, default=None): 
+    for source in chain([request.uri], redfoot.types(request.uri), [request.host, redfoot.uri, page_handler]): 
+        p = redfoot.value(source, property)
+        if p:
+	    return p
+    return default
+
+def display(uri, fragment=True, output=None, **args):
+    if not uri:
+        return
+    request.sources.append(uri)
+    assert(isinstance(uri, URIRef), "uri not URIRef as expected")
+    context = globals()
+    for k, v in args.items():
+        context[k] = v
+    redfoot.check(uri)
+    global write_to_response
+    if fragment==False:
+        if not allow(uri):
+            uri = lookup(SERVER.unauthorized_page_handler)
+            assert uri, "No 'unauthorized_page' found for: %s" % uri
+	write_to_response = True
+	content_type = redfoot.value(uri, SERVER.content_type) or 'text/html; charset=UTF-8'
+	if "application/xhtml+xml" in content_type:
+	    # Check if we need to fall back to text/html
+	    accept = request.headers.get("accept")
+            # stick with html-strict
+	    if False and accept and "application/xhtml+xml" in accept:
+		output = "xhtml-strict"
+	    else:
+		output = "html-strict"
+		content_type = "text/html; charset=UTF-8"
+	else:
+            if "text/html" in content_type:
+                output = "html-strict"
+            else:
+                output = "xml"
+	response.setHeader('Content-Type', content_type)
+    else:
+        if not allow(uri):
+            uri = lookup(SERVER.unauthorized_content_handler)
+            assert uri, "No 'unauthorized_content' found for: %s" % uri
+    value = redfoot.value(uri)
+    if value and value.datatype==SERVER.Kid:
+	t_mod = kid.load_template(StringIO(value))
+	t = t_mod.Template(**context)                  
+	if write_to_response:
+	    write_to_response = False
+            try:
+                t.write(response, encoding="utf-8", fragment=fragment, output=output or "xml")
+            except Exception, e:
+                import traceback                
+                redfoot.log.info("\nWhile trying to display %s (%s) the following exception occurred:\n" % (redfoot.label(uri), uri))
+                redfoot.log.info(traceback.print_exc())
+                
+            request.sources.pop()
+	else:
+            def pop():
+                request.sources.pop()
+                if False:
+                    yield None
+	    return chain(t, pop())
+    else:
+	write_to_response = True
+	redfoot.execute(uri, **context)
+        request.sources.pop()
+]]>
+    </rdf:value>
+  </rdf:Description>
+
+</rdf:RDF>  

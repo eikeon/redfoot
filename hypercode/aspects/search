@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:commands="http://redfoot.net/2005/commands#"
+   xmlns:server="http://redfoot.net/2005/server#"
+>
+
+  <server:PagePartHandler rdf:ID="v1">
+    <rdfs:label>Search</rdfs:label>
+    <rdfs:comment>
+Searches through all the labels and literals in the database for ones containing at least one of the search terms... returning the instances corresponding to assertions containing these matching terms. Instances with BNode identifiers are excluded from the search result as are instances of type RDFS.Class and RDF.Property (and http://owl.mindswap.org/2003/ont/owlweb.rdf#ProgramData).
+    </rdfs:comment>
+    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
+<?python
+from rdflib import Literal
+
+def ismatch(object, value, redfoot):
+    if isinstance(object, Literal):
+        v = object.lower()
+    else:
+        v = "".join(redfoot.label(object)).lower()
+    if v.find(value)>=0:
+        return 1
+    else:
+        return 0
+
+?>
+<span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
+<?python
+from rdflib.util import uniq
+
+search_string = request.parameters.get("q", None)
+if search_string:
+    q = search_string.lower()
+    terms = q.split(" ")        
+    instances = uniq(redfoot.subjects())
+    filtered_instances = []
+    for instance in instances:
+        if isinstance(instance, BNode):
+            continue
+        if isinstance(instance, Literal):
+            continue
+        if (instance, RDF.type, RDFS.Class) in redfoot:
+            continue
+        if (instance, RDF.type, RDF.Property) in redfoot:
+            continue
+        if not (instance, RDF.type, URIRef("http://owl.mindswap.org/2003/ont/owlweb.rdf#ProgramData")) in redfoot:
+            filtered_instances.append(instance)
+    instances = filtered_instances 
+    for term in terms:
+        filtered_instances = []
+        for instance in instances:
+            for p, o in redfoot.predicate_objects(instance):
+                if ismatch(p, term, redfoot) or ismatch(o, term, redfoot):
+                    types = []
+                    for type in redfoot.objects(instance, RDF.type):
+                        label = redfoot.label(type)
+                        if label:
+                            types.append(label)
+                    filtered_instances.append((instance, types))
+                    break
+        instances = filtered_instances
+    
+?>
+
+
+
+<div style='align:center'>
+ <form name="search_form" action="" method="get">
+  <p>
+    Search:
+  </p>
+  <p>
+    <input name="q" type="text"/>
+  </p>
+  <p>
+    <input type="submit" value="search"/>
+  </p>
+ </form>
+</div>
+
+<div kid:if="search_string is not None and instances">
+<p>Search Results:</p>
+  <ul>
+    <li kid:for="instance, types in instances">
+      <a href="${request.host}/;${instance.concrete()}">${redfoot.label(instance, instance)} (${", ".join(types)})</a>
+<div kid:if="False" kid:strip="">
+      (
+      <div kid:for="type in redfoot.objects(instance, RDF.type)" kid:strip="">
+        <a title="${type}">${redfoot.label(type, "--")}</a>
+      </div>
+      )
+</div>
+    </li>
+  </ul>
+</div>
+
+  </span>
+
+
+      ]]></rdf:value>
+  </server:PagePartHandler>
+
+</rdf:RDF>  

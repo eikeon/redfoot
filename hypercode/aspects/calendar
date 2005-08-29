@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
+  xmlns:rdfs='http://www.w3.org/2000/01/rdf-schema#'
+  xmlns:redfoot='http://redfoot.net/2005/redfoot#'
+  xmlns:commands='http://redfoot.net/2005/commands#'
+  xmlns:server='http://redfoot.net/2005/server#'
+  xmlns:template='http://redfoot.net/2005/template#'  
+>
+
+  <redfoot:Aspect rdf:ID="calendar_aspect">
+    <rdfs:label>Calendar aspect</rdfs:label>
+    <rdfs:comment>
+    </rdfs:comment>
+    <redfoot:todo>Look into http://kupu.oscom.org/</redfoot:todo>
+  </redfoot:Aspect>
+
+  <rdf:Description rdf:about="">
+    <template:section rdf:resource="/calendar/month/"/>    
+  </rdf:Description>
+
+  <server:Page rdf:about="/calendar/month/">
+    <rdfs:label>Month</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <template:default_section_rank>5.0</template:default_section_rank>
+    <template:content rdf:resource="#month"/>
+  </server:Page>
+
+  <server:PagePartHandler rdf:ID="month">
+    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
+
+  <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
+
+<?python
+import calendar, time
+
+DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
+
+date = request.parameters.get("date", None)
+if date is None:
+   year, month = time.gmtime()[0:2]
+else:
+   year, month = map(int, date.split("-")[0:2])
+
+prev_month = month - 1
+next_month = month + 1
+prev_year = next_year = year
+if prev_month==0:
+   prev_month = 12
+   prev_year = year - 1
+if next_month==13:
+   next_month = 1
+   next_year = year + 1
+previous = "%04d-%02d" % (prev_year, prev_month)
+next = "%04d-%02d" % (next_year, next_month)
+
+matrix=calendar.monthcalendar(year,month)
+
+?>
+
+<div style="padding: 1em 0em">
+<table style="border: 1px #A1A5A9 solid; background-color: #cccccc; xmargin: 1em;" cellspacing="1">
+  <tr>
+    <th align="center" colspan="7"><a href="?date=${previous}">&lt;&lt;</a> ${calendar.month_name[month]} ${year} <a href="?date=${next}">&gt;&gt;</a></th>
+  </tr>
+  <tr>
+    <td align="center" kid:for="day in ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su']">${day}</td>
+  </tr>
+  <tr kid:for="week in matrix">
+    <td kid:for="day in week" valign="top" align="left" style="background-color: ${day==0 and '#eeeeee' or '#ffffff'}">
+      <span kid:if="day!=0" kid:strip="">
+        <div align="right">${day}</div>
+        <div align="left">
+          <ul style="font-size: x-small; padding: 1em; margin: 0em 1em;">
+            <li kid:for="resource in redfoot.subjects(DC.date, Literal('%04d-%02d-%02d' % (year, month, day), datatype=None))">
+              <a href="${request.host}/;${resource.concrete()}">
+                ${redfoot.label(resource, None) or redfoot.value(resource, DC.description, any=True) or resource}
+              </a>
+            </li>
+          </ul>
+        </div>
+      </span>
+    </td>
+  </tr>
+</table>
+</div>
+  </span>
+
+
+      ]]></rdf:value>
+  </server:PagePartHandler>
+
+</rdf:RDF>
