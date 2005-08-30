@@ -23,7 +23,8 @@
     <commands:command rdf:resource="#copy"/>    
     <commands:command rdf:resource="#twistd"/>    
     <commands:command rdf:resource="#editor"/>
-    <commands:command rdf:resource="#backup"/>        
+    <commands:command rdf:resource="#backup"/>
+    <commands:command rdf:resource="#restore"/>            
   </redfoot:Configuration>>
 
   <commands:Command rdf:ID="set_base">
@@ -501,6 +502,81 @@ for cid in redfoot.contexts():
     tar.addfile(ti, sio)
 tar.close()
 
+
+]]>
+       </rdf:value>
+     </redfoot:Python>
+    </redfoot:code>
+  </commands:Command>
+
+  <commands:Command rdf:ID="restore">
+    <rdfs:label>restore</rdfs:label>
+    <redfoot:code>
+     <redfoot:Python rdf:ID="restore_code">
+       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+    
+import time, logging
+from tarfile import open, TarInfo
+try:
+    from cStringIO import StringIO
+except:
+    from StringIO import StringIO
+from urlparse import urlunparse
+from urllib import url2pathname
+
+try:
+    filename = args[0]
+except:
+    filename = None
+    print "Usage: redfoot restore <filename>"
+
+if filename is not None:
+    tar = open(filename, "r:gz")
+
+    for tarinfo in tar:
+        if tarinfo.isreg():
+            root, scheme, netloc, path = tarinfo.name.split("/", 3)
+            if scheme=="_":
+                scheme = ""
+            if netloc=="_":
+                netloc = ""
+            params = ""
+            query = ""
+            if "#" in path:
+                path, fragment = path.split("#")
+            else:
+                fragment = ""
+            url = urlunparse((scheme, netloc, path, params, query, fragment))
+            if url.startswith("_"):
+                context_id = BNode(url)
+            else:
+                if "#" in url:
+                    publicID, frag = url.split("#")
+                    frag = "#%s" % frag
+                else:
+                    publicID = url
+                    frag = None
+                context_id = redfoot.context_id(url, frag)
+            context = redfoot.get_context(context_id)
+            context.parse(tar.extractfile(tarinfo), publicID=publicID)
+        elif tarinfo.isdir():
+            print "a directory."
+        else:
+            print "something else."
+    tar.close()
+
+
+    
+#     sio = StringIO(context.serialize(format="pretty-xml"))
+#     scheme, netloc, url, params, query, fragment = urlparse(cid)
+#     scheme = scheme or "_"
+#     netloc = netloc or "_"    
+#     if params or query:
+#         print "WARNING: params and query are being ignored"
+#     if fragment:
+#         url = "%s#%s" % (url, fragment)
+#     ti = TarInfo("%s/%s/%s/%s" % (root, scheme, netloc, url2pathname(url)))
 
 ]]>
        </rdf:value>
