@@ -22,7 +22,8 @@
     <commands:command rdf:resource="#import"/>
     <commands:command rdf:resource="#copy"/>    
     <commands:command rdf:resource="#twistd"/>    
-    <commands:command rdf:resource="#editor"/>    
+    <commands:command rdf:resource="#editor"/>
+    <commands:command rdf:resource="#backup"/>        
   </redfoot:Configuration>>
 
   <commands:Command rdf:ID="set_base">
@@ -459,4 +460,52 @@ controller.tabView.addTabViewItem_(tabViewItem)
      </redfoot:Python>
     </redfoot:code>
   </commands:Command>
+
+  <commands:Command rdf:ID="backup">
+    <rdfs:label>backup</rdfs:label>
+    <redfoot:code>
+     <redfoot:Python rdf:ID="backup_code">
+       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+    
+import time, logging
+from tarfile import open, TarInfo
+try:
+    from cStringIO import StringIO
+except:
+    from StringIO import StringIO
+from urlparse import urlparse
+from urllib import url2pathname
+from rdflib.util import date_time
+root = "backup-%s" % url2pathname(date_time().replace(":", "-"))
+# one backup per day
+#year, month, date, h, m, s, _, _, _ = time.gmtime()
+#root = "backup-%04d-%02d-%02d" % (year, month, date)
+tar = open("%s.tgz" % root, "w:gz")
+
+DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
+
+for cid in redfoot.contexts():
+    context = redfoot.get_context(cid)
+    sio = StringIO(context.serialize(format="pretty-xml"))
+    scheme, netloc, url, params, query, fragment = urlparse(cid)
+    scheme = scheme or "_"
+    netloc = netloc or "_"    
+    if params or query:
+        print "WARNING: params and query are being ignored"
+    if fragment:
+        url = "%s#%s" % (url, fragment)
+    ti = TarInfo("%s/%s/%s/%s" % (root, scheme, netloc, url2pathname(url)))
+    ti.size = len(sio.getvalue())
+    ti.mtime = int(time.time())#redfoot.value(cid, DCTERMS.created)
+    tar.addfile(ti, sio)
+tar.close()
+
+
+]]>
+       </rdf:value>
+     </redfoot:Python>
+    </redfoot:code>
+  </commands:Command>
+
 </rdf:RDF>  
