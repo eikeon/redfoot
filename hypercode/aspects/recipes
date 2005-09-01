@@ -285,7 +285,7 @@ context.load("ingredients-backup.rdf")
 
 RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
 
-email = redfoot.module("http://eikco.com/2005/email#module")
+email = redfoot.module(URIRef("modules/email#module", base=redfoot_program))
 message = email.parse()
 
 if "@eikeon.com" in message.email_address:

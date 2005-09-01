@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+>
+
+  <redfoot:Code rdf:ID="module">
+    <rdfs:label>parse an email message</rdfs:label>      
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+import email
+from email.Utils import parseaddr
+from sys import stdin
+
+# Map from various charsets (culled from inbox) to Python's
+charset_table = {
+     "window-1252": "cp1252",
+     "windows-1252": "cp1252",
+     "nil": "Latin-1",
+     "default_charset": "Latin-1",
+     "x-unknown": "Latin-1",
+}
+
+class Message(object):
+    pass
+
+def parse(s=None):
+    if s==None:
+        s = stdin.read()        
+    message = Message()    
+    message.msg = msg = email.message_from_string(s)
+    message.real_name, message.email_address = parseaddr(msg['To'])
+    message.subject = msg['subject']
+
+    payloads = []
+    for part in msg.walk():
+        if part.get_content_maintype() == 'multipart':
+            continue
+        content_type = part.get_content_type()
+        if content_type=="text/plain":
+            p = part.get_payload(decode=1)
+            charset = msg.get_param("charset")
+            if charset is None:
+                charset = "Latin-1"
+            charset = charset.lower()
+            charset = charset_table.get(charset, charset)
+            payloads.append(unicode(p, charset))
+
+    message.payload = "".join(payloads)
+    return message
+
+]]>
+    </rdf:value>
+  </redfoot:Code>
+
+</rdf:RDF>  
