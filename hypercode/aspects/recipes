@@ -206,7 +206,7 @@ context.remove((None, RECIPE.recipe, recipe_uri))
 context.add((recipes, RECIPE.recipe, recipe_uri))
 
 recipe_module = redfoot.module(URIRef("modules/recipe#module", base=redfoot_program))
-recipe.parse(message.payload, context, recipe_uri)
+recipe_module.parse(message.payload, context, recipe_uri)
 
 
 # Backup
