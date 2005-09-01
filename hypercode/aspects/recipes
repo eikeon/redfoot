@@ -168,112 +168,15 @@ now = datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
     <commands:config rdf:resource="#recipe_config"/>  
   </rdf:Description>
 
+<!--
   <redfoot:Redfoot rdf:ID="submit_recipe">
     <rdfs:label>submit recipe</rdfs:label>
     <redfoot:code rdf:resource="kernel#"/>
     <redfoot:program rdf:resource="#submit_recipe_program"/>
   </redfoot:Redfoot>  
+-->
 
   <redfoot:Configuration rdf:ID="recipe_config">
-    <commands:command>
-      <commands:Command rdf:ID="recipes_missing">
-      <rdfs:label>recipes_missing</rdfs:label>
-      <redfoot:code rdf:parseType="Resource">
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
-<![CDATA[
-
-RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
-
-for recipe in redfoot.subjects(RDF.type, RECIPE.Recipe):
-    if not (recipe, RECIPE.original, None) in redfoot:
-        print recipe
-
-]]>
-        </rdf:value>
-      </redfoot:code>
-      </commands:Command>
-    </commands:command>
-
-    <commands:command>
-      <commands:Command rdf:ID="ingredients">
-      <rdfs:label>ingredients</rdfs:label>
-      <redfoot:code rdf:parseType="Resource">
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
-<![CDATA[
-
-RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
-
-for i in redfoot.subjects(RDF.type, RECIPE.Ingredient):
-    print redfoot.label(i).encode("ascii", "replace")
-
-]]>
-        </rdf:value>
-      </redfoot:code>
-      </commands:Command>
-    </commands:command>
-
-    <commands:command>
-      <commands:Command rdf:ID="backup_recipes">
-      <rdfs:label>backup_recipes</rdfs:label>
-      <redfoot:code rdf:parseType="Resource">
-        <rdfs:label>Default program for Redfoot</rdfs:label>      
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
-<![CDATA[
-
-context = redfoot.get_context(URIRef("http://donnafales.com/recipes/submitted_recipes"))
-context.save("recipes-backup.rdf", format="pretty-xml")
-
-context = redfoot.get_context(URIRef("http://donnafales.com/2005/ingredients#context"))
-context.save("ingredients-backup.rdf", format="pretty-xml")
-
-]]>
-        </rdf:value>
-      </redfoot:code>
-      </commands:Command>
-    </commands:command>
-
-    <commands:command rdf:parseType="Resource">
-      <rdfs:label>backup_ingredients</rdfs:label>
-      <redfoot:code rdf:parseType="Resource">
-        <rdfs:label>Default program for Redfoot</rdfs:label>      
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
-<![CDATA[
-
-RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
-
-#context = redfoot.get_context(URIRef("http://donnafales.com/ingredients#context"))
-#context.remove((None, None, None))
-from rdflib.TripleStore import TripleStore
-context = TripleStore()
-for ingredient in redfoot.subjects(RDF.type, RECIPE.Ingredient):
-    for s, p, o in redfoot.triples((ingredient, None, None)):
-        context.add((s, p, o))
-
-context.save("ingredients.rdf")
-
-]]>
-        </rdf:value>
-      </redfoot:code>
-    </commands:command>
-    <commands:command rdf:parseType="Resource">
-      <rdfs:label>load_recipes</rdfs:label>
-      <redfoot:code rdf:parseType="Resource">
-        <rdfs:label>Default program for Redfoot</rdfs:label>      
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
-<![CDATA[
-
-context = redfoot.get_context(URIRef("http://donnafales.com/recipes/submitted_recipes"))
-context.remove((None, None, None))
-context.load("recipes-backup.rdf")
-
-context = redfoot.get_context(URIRef("http://donnafales.com/2005/ingredients#context"))
-context.remove((None, None, None))
-context.load("ingredients-backup.rdf")
-
-]]>
-        </rdf:value>
-      </redfoot:code>
-    </commands:command>
 
     <commands:command rdf:parseType="Resource">
       <rdfs:label>submit_recipe</rdfs:label>
@@ -296,7 +199,8 @@ else:
 recipe_uri = URIRef("%s%s/" % (recipes, message.subject))
 
 # currently context where all recipes are stored
-context = redfoot.get_context(URIRef("http://donnafales.com/recipes/submitted_recipes"))
+#context = redfoot.get_context(URIRef("http://donnafales.com/recipes/submitted_recipes"))
+context = redfoot.get_context(redfoot.context_id(recipe_uri.abstract()))
 
 context.remove((None, RECIPE.recipe, recipe_uri))
 context.add((recipes, RECIPE.recipe, recipe_uri))
@@ -312,6 +216,69 @@ context.save("/var/www/redfoot2005/recipes-%s.rdf" % datetime.now().date())
 ]]>
         </rdf:value>
        </redfoot:Program>
+      </redfoot:code>
+    </commands:command>
+
+    <commands:command>
+      <commands:Command rdf:ID="ingredients">
+      <rdfs:label>ingredients</rdfs:label>
+      <redfoot:code rdf:parseType="Resource">
+        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
+
+for i in redfoot.subjects(RDF.type, RECIPE.Ingredient):
+    print redfoot.label(i).encode("ascii", "replace")
+
+]]>
+        </rdf:value>
+      </redfoot:code>
+      </commands:Command>
+    </commands:command>
+
+    <commands:command rdf:parseType="Resource">
+      <rdfs:label>update_recipes</rdfs:label>
+      <redfoot:code rdf:parseType="Resource">
+        <rdfs:label>update recipes</rdfs:label>      
+        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
+
+# currently context where all recipes are stored
+#context = redfoot.get_context(URIRef("http://donnafales.com/recipes/submitted_recipes"))
+#ingredient_context = redfoot.get_context(URIRef("http://donnafales.com/2005/ingredients#context"))
+
+recipe = redfoot.module(URIRef("modules/recipe#module", base=redfoot_program))
+
+l = []
+for r in redfoot.subjects(RDF.type, RECIPE.Recipe):
+    print "updating:", r    
+    date = redfoot.value(r, RECIPE.date, any=True)
+    orig = redfoot.value(r, RECIPE.original, any=True)
+    recipes = redfoot.value(None, RECIPE.recipe, object=r, any=True)
+    l.append((r, date, orig, recipes))
+
+#context.remove((None, None, None))
+for r, date, orig, recipes in l:
+    context = redfoot.get_context(redfoot.context_id(r.abstract()))
+    context.add((r, RECIPE.date, date))
+    context.add((recipes, RECIPE.recipe, r))
+    recipe.parse(orig, context, r)
+
+
+f = file("out", "wb")
+parser = recipe.ingredient_parser
+if parser.unknown_tokens:
+    for unknown in parser.unknown_tokens:
+        f.write("%s\n" % unknown.encode("utf-8"))
+f.close()
+
+
+
+]]>
+        </rdf:value>
       </redfoot:code>
     </commands:command>
 
@@ -337,51 +304,6 @@ for arg in args:
         print context.serialize()
     else:
         print "No %s found for %s" % (RECIPE.original, recipe)
-
-]]>
-        </rdf:value>
-      </redfoot:code>
-    </commands:command>
-
-    <commands:command rdf:parseType="Resource">
-      <rdfs:label>update_recipes</rdfs:label>
-      <redfoot:code rdf:parseType="Resource">
-        <rdfs:label>update recipes</rdfs:label>      
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
-<![CDATA[
-
-RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
-
-# currently context where all recipes are stored
-context = redfoot.get_context(URIRef("http://donnafales.com/recipes/submitted_recipes"))
-#ingredient_context = redfoot.get_context(URIRef("http://donnafales.com/2005/ingredients#context"))
-
-recipe = redfoot.module(URIRef("modules/recipe#module", base=redfoot_program))
-
-l = []
-for r in redfoot.subjects(RDF.type, RECIPE.Recipe):
-    print "updating:", r    
-    date = redfoot.value(r, RECIPE.date, any=True)
-    orig = redfoot.value(r, RECIPE.original, any=True)
-    recipes = redfoot.value(None, RECIPE.recipe, object=r, any=True)
-    l.append((r, date, orig, recipes))
-
-context.remove((None, None, None))
-for r, date, orig, recipes in l:
-    context = redfoot.get_context(redfoot.context_id(r.abstract()))
-    context.add((r, RECIPE.date, date))
-    context.add((recipes, RECIPE.recipe, r))
-    recipe.parse(orig, context, r)
-
-
-f = file("out", "wb")
-parser = recipe.ingredient_parser
-if parser.unknown_tokens:
-    for unknown in parser.unknown_tokens:
-        f.write("%s\n" % unknown.encode("utf-8"))
-f.close()
-
-
 
 ]]>
         </rdf:value>
@@ -445,6 +367,25 @@ for arg in args:
         </rdf:value>
       </redfoot:code>
 
+    </commands:command>
+
+    <commands:command>
+      <commands:Command rdf:ID="recipes_missing">
+      <rdfs:label>recipes_missing</rdfs:label>
+      <redfoot:code rdf:parseType="Resource">
+        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
+
+for recipe in redfoot.subjects(RDF.type, RECIPE.Recipe):
+    if not (recipe, RECIPE.original, None) in redfoot:
+        print recipe
+
+]]>
+        </rdf:value>
+      </redfoot:code>
+      </commands:Command>
     </commands:command>
 
   </redfoot:Configuration>>
