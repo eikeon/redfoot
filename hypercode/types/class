@@ -47,7 +47,6 @@ superclasses = list(redfoot.objects(uri, RDFS.subClassOf)) # TODO:
 
   <h2 kid:if="(uri, None, None) not in redfoot">Not Found</h2>
 
-  <h2>${redfoot.label(uri)} (Class)</h2>
   <p>${XML(format_uri(redfoot.comment(uri)))}</p>
   
   <div kid:if="superclasses">superclasses: <span kid:strip="" kid:for="superclass in superclasses"><a href="${request.host}/;${superclass.concrete()}">${redfoot.label(superclass, superclass)}</a> </span></div>
