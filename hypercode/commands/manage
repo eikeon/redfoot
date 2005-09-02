@@ -490,19 +490,24 @@ DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
 
 for cid in redfoot.contexts():
     context = redfoot.get_context(cid)
-    sio = StringIO(context.serialize(format="pretty-xml"))
-    scheme, netloc, url, params, query, fragment = urlparse(cid)
-    scheme = scheme or "_"
-    netloc = netloc or "_"    
-    if params or query:
-        print "WARNING: params and query are being ignored"
-    if fragment:
-        url = "%s#%s" % (url, fragment)
-    ti = TarInfo("%s/%s/%s/%s" % (root, scheme, netloc, url2pathname(url)))
-    ti.size = len(sio.getvalue())
-    # TODO: real last modified time
-    ti.mtime = int(time.time())#redfoot.value(cid, DCTERMS.created)
-    tar.addfile(ti, sio)
+    try:
+        sio = StringIO(context.serialize(format="pretty-xml"))
+    except Exception, e:
+        sio = None
+        print "Could not serialize %s: %s" % (cid, e)
+    if sio:
+        scheme, netloc, url, params, query, fragment = urlparse(cid)
+        scheme = scheme or "_"
+        netloc = netloc or "_"    
+        if params or query:
+            print "WARNING: params and query are being ignored"
+        if fragment:
+            url = "%s#%s" % (url, fragment)
+        ti = TarInfo("%s/%s/%s/%s" % (root, scheme, netloc, url2pathname(url)))
+        ti.size = len(sio.getvalue())
+        # TODO: real last modified time
+        ti.mtime = int(time.time())#redfoot.value(cid, DCTERMS.created)
+        tar.addfile(ti, sio)
 tar.close()
 
 
