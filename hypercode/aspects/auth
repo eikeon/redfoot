@@ -269,6 +269,10 @@ response.setHeader('Location', return_uri)
   <form action="process/" method="POST">
     <table>
       <tr>
+	<th>Name</th>
+	<td><input type="text" name="name" value=""/></td>
+      </tr>
+      <tr>
 	<th>Email Address</th>
 	<td><input type="text" name="uid" value=""/></td>
       </tr>
@@ -302,6 +306,7 @@ import md5
 
 SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
 
+name = request.parameters.get("name", None)
 uid = request.parameters.get("uid", None)
 password = request.parameters.get("password", None)
 verify = request.parameters.get("verify", None)
@@ -322,6 +327,8 @@ if password==verify:
 	redfoot.remove((sid, SESSION.uid, None))
 	context.add((sid, SESSION.authenticated, Literal("True")))
 	context.add((sid, SESSION.uid, uid))
+        if name:
+            users_context.add((uid, RDFS.label, Literal(name)))
 	users_context.add((uid, RDF.type, SESSION.User))
 	users_context.add((uid, SESSION.hexdigest, hexdigest))
         #message = "Created new user: %s" % uid

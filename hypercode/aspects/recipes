@@ -211,7 +211,7 @@ recipe_module.parse(message.payload, context, recipe_uri)
 
 # Backup
 from datetime import datetime
-context.save("/var/www/redfoot2005/recipes-%s.rdf" % datetime.now().date())
+context.save("/var/www/redfoot2005/recipe-%s.rdf" % datetime.now().date())
 
 ]]>
         </rdf:value>

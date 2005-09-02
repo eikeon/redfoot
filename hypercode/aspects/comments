@@ -82,7 +82,7 @@ uri = request.parameters.get("uri")
 if not uri is None:
     uri = URIRef(uri)
 comment = Literal(request.parameters.get("comment"))
-if uri is not None:
+if uri is not None and comment:
     year, month, date, h, m, s, _, _, _ = gmtime()
     name = "%04d-%02d-%02dT%02d:%02d:%02d" % (year, month, date, h, m, s)
     uid = redfoot.value(request.session_id, SESSION.uid)    
