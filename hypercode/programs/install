@@ -44,7 +44,7 @@ from tarfile import TarFile, open
 from urllib2 import urlopen, Request
 from StringIO import StringIO
 
-logging = redfoot.log
+import logging
 
 def install(url):
     logging.info("downloading %s" % url)
@@ -57,8 +57,10 @@ def install(url):
     tar = open(name=filename)
     logging.info("extracting")
     for member in tar:
+        print member.name
         if member.name.endswith("setup.py"):
-            setup = member.name
+            if len(member.name.split("/"))==2: # and is the top level setup.py
+                setup = member.name
         tar.extract(member)
     dir, filename = os.path.split(setup)
     os.chdir(dir)
@@ -69,7 +71,7 @@ def install(url):
     logging.info("done installing")    
 
 cwd = os.getcwd()
-for url in ["http://www.zope.org/Products/ZopeInterface/3.0.1final/ZopeInterface-3.0.1.tgz", "http://tmrc.mit.edu/mirror/twisted/Twisted/2.0/TwistedSumo-2005-03-22.tar.bz2", "http://effbot.org/downloads/elementtree-1.2.6-20050316.tar.gz", "http://lesscode.org/dist/kid/kid-0.6.3.tar.gz"]:
+for url in ["http://www.zope.org/Products/ZopeInterface/3.0.1final/ZopeInterface-3.0.1.tgz", "http://tmrc.mit.edu/mirror/twisted/Twisted/2.0/TwistedSumo-2005-05-25.tar.bz2", "http://effbot.org/downloads/elementtree-1.2.6-20050316.tar.gz", "http://lesscode.org/dist/kid/kid-0.6.3.tar.gz"]:
     os.chdir(cwd)        
     install(url)
 
