@@ -190,28 +190,27 @@ if title is not None:
     year, month, date, h, m, s, _, _, _ = gmtime()
     uri = URIRef(urljoin(request.host, "blog/%04d/%02d/%02d/%s" % (year, month, date, path)) + "#")
     
-format = request.parameters.get("format") or ""
-content = Literal(request.parameters.get("content"))
-policy = URIRef(request.parameters.get("policy"))
-message = "Error: No entry submitted"
-try:
-    for item in XML(content):
-        pass
-except Exception, e:
-    message = str(e)
-    content = None
-    
-if uri is not None and content is not None:
-    uid = redfoot.value(request.session_id, SESSION.uid)    
-    context_uri = redfoot.context_id(uri)
-    redfoot.index.add((context_uri, RDFS.label, Literal("blog entry: %s" % title)))
-    context = redfoot.get_context(context_uri)
-    context.add((uri, RDF.type, BLOG.Entry))
-    context.add((uri, RDFS.label, Literal(title)))
-    context.add((uri, RDFS.comment, Literal(content, datatype=format)))
-    context.add((uri, DCTERMS.created, Literal(date_time())))
-    context.add((uri, DC.date, Literal(date_time()[0:10])))    
-    context.add((uri, DC.creator, uid))
+    format = request.parameters.get("format") or ""
+    content = Literal(request.parameters.get("content"))
+    message = "Error: No entry submitted"
+    try:
+        for item in XML(content):
+            pass
+    except Exception, e:
+        message = str(e)
+        content = None
+
+    if content is not None:
+        uid = redfoot.value(request.session_id, SESSION.uid)    
+        context_uri = redfoot.context_id(uri)
+        redfoot.index.add((context_uri, RDFS.label, Literal("blog entry: %s" % title)))
+        context = redfoot.get_context(context_uri)
+        context.add((uri, RDF.type, BLOG.Entry))
+        context.add((uri, RDFS.label, Literal(title)))
+        context.add((uri, RDFS.comment, Literal(content, datatype=format)))
+        context.add((uri, DCTERMS.created, Literal(date_time())))
+        context.add((uri, DC.date, Literal(date_time()[0:10])))    
+        context.add((uri, DC.creator, uid))
     
 ?>
 
