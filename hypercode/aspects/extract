@@ -25,15 +25,15 @@
  <server:Page rdf:about="/highlight">
    <rdfs:label>Extract processor</rdfs:label>
    <rdfs:comment></rdfs:comment>
-   <server:content rdf:resource="#extract"/>
+   <template:content rdf:resource="#extract"/>
  </server:Page>
 
   <server:Page rdf:about="/highlight/">
     <rdfs:label>Highlight</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <template:default_section_rank>38.0</template:default_section_rank>    
-    <server:content>
-      <server:Content>
+    <template:content>
+      <server:PagePartHandler>
         <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
 
   <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
@@ -56,8 +56,8 @@
 
 
       ]]></rdf:value>
-      </server:Content>
-    </server:content>
+      </server:PagePartHandler>
+    </template:content>
   </server:Page>
 
 
