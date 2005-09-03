@@ -372,15 +372,16 @@ simple_format = URIRef("modules/simple_format#module", base=redfoot_program)
 format_uri = redfoot.module(simple_format).format_uri
 seeAlsoList = list(redfoot.objects(uri, RDFS.seeAlso))
 
+miscList = [t for t in redfoot.predicate_objects(uri) if t[0] not in [RDFS.label, RDFS.comment, RDF.type, RDFS.seeAlso]]
+
 ?>
 
   <h2 kid:if="(uri, None, None) not in redfoot">Not Found</h2>
 
-  <h2>Instance: ${redfoot.label(uri)}</h2>
   <p>${XML(format_uri(redfoot.comment(uri)))}</p>
   
   <ul>
-    <li kid:for="p, o in redfoot.predicate_objects(uri)">${redfoot.label(p) or p},
+    <li kid:for="p, o in miscList">${redfoot.label(p) or p},
       <span kid:strip="" kid:if="isinstance(o, Literal)">
         <pre>${o}</pre>
       </span>
