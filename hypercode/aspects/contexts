@@ -119,7 +119,7 @@ if action=="delete":
     <rdfs:comment></rdfs:comment>
     <server:page_handler>
       <redfoot:Python rdf:about="rdfxml">
-        <template:content_type>application/rdf+xml</template:content_type>      
+        <server:content_type>application/rdf+xml</server:content_type>      
         <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python"><![CDATA[
 
 # Make sure all contexts have RDF.type of REDFOOT.Context
