@@ -338,12 +338,9 @@ g.load(uri)
 for context_id in g.subjects(RDF.type, REDFOOT.Context):
     if context_id.startswith(startswith):
         print "Copying:", context_id    
-        for triple in g.triples((context_id, None, None)):
-            redfoot.index.add(triple)
-        source = "%s?uri=%s" % (uri, quote(context_id))
-        context = redfoot.get_context(context_id)
+        context = redfoot.get_context(context_id, creator=redfoot_current)
         try:
-            context.load(source)
+            context.load(context_id)
         except Exception, e:
             print e
 
