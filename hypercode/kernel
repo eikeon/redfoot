@@ -33,6 +33,7 @@ import traceback
 from types import ModuleType
 from urlparse import urljoin, urldefrag
 from urllib import pathname2url, url2pathname
+from itertools import chain
 import os
 
 logging = redfoot_loader.log
@@ -322,6 +323,20 @@ class Redfoot(Graph):
 	l.reverse()
 	for num, type in l:
 	    yield type
+
+    def possible_properties(self, type):
+	for object in self.transitive_objects(type, RDFS.subClassOf):
+	    for subject in self.subjects(RDFS.domain, object):
+		for property in self.transitive_subjects(RDFS.subPropertyOf, subject): 
+		    yield property
+
+    def possible_properties_for_subject(self, subject):
+	seen = set()
+	for type in chain([RDFS.Resource], self.objects(subject, RDF.type)):
+	    for property in self.possible_properties(type):
+		if not property in seen:
+		    seen.add(property)
+		    yield property
 
     def main(self, options, args):
         program = self.program
