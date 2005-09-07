@@ -94,9 +94,12 @@ superclasses = list(redfoot.objects(uri, RDFS.subClassOf)) # TODO:
   
   </div>
 
-<?python from urllib import quote?>
-
-  <p><a href="/create/?type=${quote(request.uri.abstract())}">Create Instance</a></p>
+  <p>
+    <form name="create_form" action="/create/" method="POST">
+      <input name="type" type="hidden" value="${request.uri.abstract()}"/>
+      <input type="submit" value="Create Instance"/>                       
+    </form>
+  </p>
 
 </div>
 ]]>
