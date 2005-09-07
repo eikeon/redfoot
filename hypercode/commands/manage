@@ -25,6 +25,7 @@
     <commands:command rdf:resource="#editor"/>
     <commands:command rdf:resource="#backup"/>
     <commands:command rdf:resource="#restore"/>            
+    <commands:command rdf:resource="#remove"/>            
   </redfoot:Configuration>>
 
   <commands:Command rdf:ID="set_base">
@@ -325,24 +326,29 @@ for context in g.subjects(RDF.type, REDFOOT.Context):
 from urllib import quote
 from rdflib import Graph
 
-uri = args[0]
+try:
+    uri = args[0]
+except:
+    uri = None
+    print "usage: <uri> [<prefix>]" # [<new_prefix>]
 
-if len(args)>1:
-    startswith = args[1]
-else:
-    startswith = ''
+if uri:
+      if len(args)>1:
+          startswith = args[1]
+      else:
+          startswith = ''
 
-g = Graph()
-g.load(uri)
+      g = Graph()
+      g.load(uri)
 
-for context_id in g.subjects(RDF.type, REDFOOT.Context):
-    if context_id.startswith(startswith):
-        print "Copying:", context_id    
-        context = redfoot.get_context(context_id, creator=redfoot_current)
-        try:
-            context.load(context_id)
-        except Exception, e:
-            print e
+      for context_id in g.subjects(RDF.type, REDFOOT.Context):
+          if context_id.startswith(startswith):
+              print "Copying:", context_id    
+              context = redfoot.get_context(context_id, creator=redfoot_current)
+              try:
+                  context.load(context_id.concrete())
+              except Exception, e:
+                  print e
 
 ]]>
        </rdf:value>
@@ -573,6 +579,34 @@ if filename is not None:
         else:
             print "something else."
     tar.close()
+
+]]>
+       </rdf:value>
+     </redfoot:Python>
+    </redfoot:code>
+  </commands:Command>
+
+  <commands:Command rdf:ID="remove">
+    <rdfs:label>remove</rdfs:label>
+    <redfoot:code>
+     <redfoot:Python rdf:ID="remove_code">
+       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+    
+from urllib import quote
+from rdflib import Graph
+
+try:
+    startswith = args[0]
+except:
+    startswith = None
+    print "usage: <startswith> [<prefix>]" # [<new_prefix>]
+
+if startswith:
+    for context_id in redfoot.contexts():
+        if context_id.startswith(startswith):
+            print "Removing:", context_id    
+            redfoot.remove_context(context_id)
 
 ]]>
        </rdf:value>
