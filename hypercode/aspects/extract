@@ -167,7 +167,7 @@ else:
         f = urlopen(uri)
         page = unicode(f.read(), 'utf-8', 'replace')
     else:
-        page = "<p>%s</p>" % text
+        page = unicode("<p>%s</p>" % text, 'utf-8', 'replace')
     p = HTMLParser(response.write, uri, request.host)
     for s in instances:
        for label in uniq(redfoot.objects(s, RDFS.label)):
