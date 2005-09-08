@@ -94,7 +94,7 @@ superclasses = list(redfoot.objects(uri, RDFS.subClassOf)) # TODO:
   
   </div>
 
-  <p>
+  <p kid:if="allow(URIRef('%s/create/' % request.host))">
     <form name="create_form" action="/create/" method="POST">
       <input name="type" type="hidden" value="${request.uri.abstract()}"/>
       <input type="submit" value="Create Instance"/>                       
