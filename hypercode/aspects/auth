@@ -157,7 +157,7 @@ context = redfoot.get_context(redfoot.context_id(sid))
 
 if not uid:
     uid = BNode()
-elif uid.startswith("http") and "." in uid and not "@" in uid:
+elif uid.startswith("http") or ("." in uid and not "@" in uid):
     if not uid.startswith("http"):
         uid = "http://%s" % uid
     from rdflib import Graph
