@@ -9,8 +9,8 @@
   <server:Handler rdf:about="#">
     <rdfs:label>Default handler</rdfs:label>      
     <server:page_handler rdf:resource="../templates/classic#page"/>
-    <server:unauthorized_page_handler rdf:resource="../templates/classic#unauthorized_page"/>
-    <server:unauthorized_content_handler rdf:resource="../templates/classic#unauthorized_content"/>
+    <server:unauthorized_page_handler rdf:resource="../templates/classic#unauthorized_page_handler"/>
+    <server:unauthorized_content_handler rdf:resource="../templates/classic#unauthorized_content_handler"/>
     <server:session_support rdf:resource="#session_support"/>
     <server:display_support rdf:resource="#display_support"/>
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
