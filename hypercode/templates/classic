@@ -17,7 +17,7 @@
     <template:header rdf:resource="#header"/>
     <template:navigation rdf:resource="#navigation"/>
     <template:footer rdf:resource="#footer"/>
-
+    <server:unauthorized_content_handler rdf:resource="#unauthorized_content_handler"/>
     <server:content_type>application/xhtml+xml</server:content_type>
     <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
 <![CDATA[
