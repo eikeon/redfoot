@@ -133,6 +133,16 @@ class Redfoot(Graph):
     def open(self, path):
         super(Redfoot, self).open(path)
 
+    def label(self, subject, default=''):
+        # TODO: push this subproperty support back down into rdflib
+        label = super(Redfoot, self).label(subject, None)
+        if label is None:
+            for subproperty in self.transitive_subjects(RDFS.subPropertyOf, RDFS.label):
+                label = self.value(subject, subproperty, default=None, any=True)        
+                if label is not None:
+                    return label
+        return label or default
+
     def check(self, uri, publicID=None):
         """
         Checks to see if redfoot knows anything about uri
