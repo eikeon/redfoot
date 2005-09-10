@@ -43,12 +43,16 @@ project = URIRef("%s#" % request.host)
 <dl>
   <dt>Maintainer</dt>
   <dd kid:for="maintainer in redfoot.objects(project, DOAP.maintainer)">
-    ${redfoot.label(maintainer) or maintainer}
+    <a href="redfoot.value(maintainer, DOAP.homepage) or '#no_homepage'">
+      ${redfoot.label(maintainer) or maintainer}
+    </a>
   </dd>
 
   <dt>Developers</dt>
   <dd kid:for="developer in redfoot.objects(project, DOAP.developer)">
-    ${redfoot.label(developer) or developer}
+    <a href="redfoot.value(developer, DOAP.homepage) or '#no_homepage'">
+      ${redfoot.label(developer) or developer}
+    </a>
   </dd>
 </dl>
 
