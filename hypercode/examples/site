@@ -33,7 +33,7 @@
     </template:content>
   </server:Page>
 
-  <session:User rdf:about="mailto:eikeon@eikeon.com">
+  <session:User rdf:about="http://eikeon.com#">
     <rdf:type rdf:resource="#Admin"/>
   </session:User>
 
