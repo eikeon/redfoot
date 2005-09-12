@@ -129,7 +129,11 @@ def lookup(property, default=None):
 
 # special lookup for content
 def lookup_content(property, default=None): 
-    for source in chain([request.uri], redfoot.types(request.uri), [request.host, redfoot.uri, page_handler]): 
+    if (request.uri, RDF.type, RDFS.Class) in redfoot:
+        sources = chain(redfoot.types(request.uri), [request.host, redfoot.uri, page_handler])
+    else:
+        sources = chain([request.uri], redfoot.types(request.uri), [request.host, redfoot.uri, page_handler])
+    for source in sources: 
         p = redfoot.value(source, property)
         if p:
 	    return p
