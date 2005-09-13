@@ -67,6 +67,13 @@ SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
       ${display(lookup(TEMPLATE.footer))}
     </div>
 
+  <div kid:if="allow(URIRef('%s/edit/resource' % request.host))"
+       class="content_nav">
+   <?python from urllib import quote?>
+    <a kid:if="(request.uri, None, None) in redfoot" href="/edit/resource?uri=${quote(request.uri)}">Edit</a>
+    <a kid:if="(request.uri.abstract(), None, None) in redfoot" href="/edit/resource?uri=${quote(request.uri.abstract())}">Edit</a>
+  </div>
+
   </body>
 </html>
 ]]>
