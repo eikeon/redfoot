@@ -17,7 +17,7 @@
     <rdfs:label>Home</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <template:content>
-      <server:Handler>
+      <server:PagePartHandler>
         <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
 
   <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
@@ -29,7 +29,7 @@
   </span>
 
       ]]></rdf:value>
-      </server:Handler>
+      </server:PagePartHandler>
     </template:content>
   </server:Page>
 
