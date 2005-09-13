@@ -21,10 +21,6 @@
     <template:section rdf:resource="/contributors/"/>    
   </rdf:Description>
 
-  <rdf:Description rdf:about="/contributors#">
-    <rdfs:label>contributors</rdfs:label>
-  </rdf:Description>
-
   <rdf:Description rdf:about="/contributors/">
     <!-- Change page template to use abstract_uri's rdfs:label -->
     <!-- and have this override if present  -->
@@ -36,25 +32,31 @@
 <div xmlns="http://www.w3.org/1999/xhtml"
      xmlns:kid="http://purl.org/kid/ns#">
 <?python 
+FOAF = redfoot.namespace("http://xmlns.com/foaf/0.1/")
 DOAP = redfoot.namespace("http://usefulinc.com/ns/doap#")
 project = URIRef("%s#" % request.host)
+people = []
+seen = set()
+for property in [DOAP.maintainer, DOAP.developer, DOAP.documenter, DOAP.translator, DOAP.tester, DOAP.helper]:
+    for person in redfoot.objects(project, property):
+        if person not in seen:
+            seen.add(person)
+            label = redfoot.label(person) or person
+            relationships = set()
+            for relationship in redfoot.predicates(project, person):
+                relationships.add(redfoot.label(relationship))
+            people.append((label, person, relationships))
+
+people.sort()
 ?>
 
-<dl>
-  <dt>Maintainer</dt>
-  <dd kid:for="maintainer in redfoot.objects(project, DOAP.maintainer)">
-    <a href="redfoot.value(maintainer, DOAP.homepage) or '#no_homepage'">
-      ${redfoot.label(maintainer) or maintainer}
-    </a>
-  </dd>
-
-  <dt>Developers</dt>
-  <dd kid:for="developer in redfoot.objects(project, DOAP.developer)">
-    <a href="redfoot.value(developer, DOAP.homepage) or '#no_homepage'">
-      ${redfoot.label(developer) or developer}
-    </a>
-  </dd>
-</dl>
+<ul>
+  <li kid:for="label, person, relationships in people">
+    <a href="${redfoot.value(person, FOAF.homepage)}">${label}</a>, 
+    ${redfoot.value(person, FOAF.nick)},
+    (${", ".join(relationships)})
+  </li>
+</ul>
 
 </div>
 ]]>    
