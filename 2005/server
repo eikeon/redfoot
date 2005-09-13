@@ -128,4 +128,11 @@
     <rdfs:range rdf:resource="http://redfoot.net/2005/server#Page"/>
   </rdfs:Property>
 
+  <rdfs:Property rdf:ID="long_running">
+    <rdfs:label>long running</rdfs:label>
+    <rdfs:comment>Used to indicate that the caculation of the page may take some time</rdfs:comment>
+    <rdfs:domain rdf:resource="#Page"/>
+    <!--<rdfs:range rdf:resource="#Handler"/>-->
+  </rdfs:Property>
+
 </rdf:RDF>  

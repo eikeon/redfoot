@@ -127,8 +127,8 @@ class _Resource(object):
         handler = redfoot.value(request.uri, SERVER.handler) or redfoot.value(request.host, SERVER.handler) or redfoot.value(redfoot.uri, SERVER.handler)
 
         redfoot.execute(handler, request=request, response=response)
-        response.finish()
-        
+        # Note: it is the handler's job to call response.finish()
+
 
 # TODO:    SERVER_IDENT = 'redfoot2005'
 class Server(object):
