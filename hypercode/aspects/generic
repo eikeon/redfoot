@@ -297,9 +297,10 @@ possible.sort()
 
 <?python
 isDatatype = (predicate, RDFS.range, RDFS.Literal) in redfoot or (predicate, RDFS.range, RDFS.Resource) in redfoot or (predicate, RDF.type, URIRef('http://www.w3.org/2002/07/owl#DatatypeProperty')) in redfoot
+isObject = (predicate, RDFS.range, RDFS.Resource) in redfoot or (predicate, RDF.type, URIRef('http://www.w3.org/2002/07/owl#ObjectProperty')) in redfoot
 ?>
 
-    <span kid:if="not isDatatype" kid:strip="">
+    <span kid:if="isObject" kid:strip="">
       <select name="object" kid:if="predicate">
 <?python
 values = {}
