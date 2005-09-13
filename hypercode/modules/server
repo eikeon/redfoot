@@ -18,6 +18,7 @@ from twisted.internet import reactor, threads
 from zope.interface import Attribute, implements
 
 from rdflib import URIRef, BNode, RDF, RDFS
+from urllib import unquote
 
 SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
 
@@ -29,7 +30,7 @@ class Request(object):
         self.method = self.__request.method
         #self.query_string = self.__request.request_data.query
         hostname = self.getHeader("host")
-        self.path = path = self.__request.path
+        self.path = path = unquote(self.__request.path)
         self.url = URIRef("http://%s%s" % (hostname, path))
         self.host_url = URIRef("http://%s" % (hostname))
 

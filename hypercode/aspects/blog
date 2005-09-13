@@ -111,7 +111,8 @@ blog.reverse()
 
   <dl>
    <span kid:strip="" kid:for="date, entry, content_value, content_type in blog">
-    <dt><a href="${entry.concrete()}">${redfoot.label(entry)}</a> <div style="font-size: small; border-top: 1px solid black">by ${redfoot.label(redfoot.value(entry, DC.creator))} on 
+<?python from urllib import quote?>
+    <dt><a href="${quote(entry.concrete(), ':/')}">${redfoot.label(entry)}</a> <div style="font-size: small; border-top: 1px solid black">by ${redfoot.label(redfoot.value(entry, DC.creator))} on 
       ${time.strftime("%A %d %B, %Y", time.gmtime(parse_date_time(date)))}:</div></dt>
     <dd kid:if="content_type=='http://www.w3.org/1999/xhtml'">${XML(content_value)}</dd>
     <dd kid:if="content_type!='http://www.w3.org/1999/xhtml'">${XML(markdown(content_value))}</dd>
@@ -186,7 +187,7 @@ SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
 title = request.parameters.get("title")
 if title is not None:
     path = title.replace(" ", "_")
-    path = quote(path)
+    #path = quote(path)
     year, month, date, h, m, s, _, _, _ = gmtime()
     uri = URIRef(urljoin(request.host, "blog/%04d/%02d/%02d/%s" % (year, month, date, path)) + "#")
     
@@ -222,7 +223,8 @@ if title is not None:
 <div kid:if="uri is not None and content is not None">
 
 <h2>Thank you for your entry:
-    <a href="${uri.concrete()}">${redfoot.label(uri, uri)}</a>
+<?python from urllib import quote?>
+    <a href="${quote(uri.concrete(), ':/')}">${redfoot.label(uri, uri)}</a>
 </h2>
 
 </div>
