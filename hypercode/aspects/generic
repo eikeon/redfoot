@@ -212,7 +212,7 @@ object = from_n3(request.parameters.get("object", None), None)
 datatype = request.parameters.get("datatype")    
 if datatype:
     datatype = URIRef(datatype)
-if object and datatype:
+if object and datatype and isinstance(object, Literal):
     object.datatype = datatype
 if object is None:
     o = request.parameters.get("object_literal") or ""
@@ -266,7 +266,7 @@ possible.sort()
   <input type="hidden" name="subject" value="${subject.n3()}"/>
   <input type="hidden" name="processor" value="update"/>
   <input kid:if="object!=None" type="hidden" name="object_orig" value="${object.n3()}"/>
-  <input kid:if="object!=None" type="hidden" name="object_orig_datatype" value="${object.datatype}"/>
+  <input kid:if="object!=None and isinstance(object, Literal)" type="hidden" name="object_orig_datatype" value="${object.datatype}"/>
 
 <table class="generic">
   <tr>
