@@ -187,7 +187,7 @@ SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
 title = request.parameters.get("title")
 if title is not None:
     path = title.replace(" ", "_")
-    path = title.replace("#", "_")
+    path = path.replace("#", "_")
     year, month, date, h, m, s, _, _, _ = gmtime()
     uri = URIRef(urljoin(request.host, "blog/%04d/%02d/%02d/%s" % (year, month, date, path)) + "#")
     
