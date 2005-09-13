@@ -218,7 +218,7 @@ if object is None:
     o = request.parameters.get("object_literal") or ""
     object = Literal(o, datatype=datatype)
 object_orig = from_n3(request.parameters.get("object_orig", None), None)
-if object_orig:
+if object_orig and isinstance(object_orig, Literal):
     dt = request.parameters.get("object_orig_datatype")
     if dt:
         object_orig.datatype = URIRef(dt)
@@ -301,6 +301,9 @@ isDatatype = (predicate, RDFS.range, RDFS.Literal) in redfoot or (predicate, RDF
 values = {}
 value_list = []
 seen = set()
+if not isinstance(object, Literal):
+    seen.add(object)
+    value_list.append((redfoot.label(object) or object, object))
 for range in redfoot.objects(predicate, RDFS.range):
     for type in redfoot.transitive_subjects(RDFS.subClassOf, range):
 	for value in redfoot.subjects(RDF.type, type):
@@ -310,12 +313,11 @@ for range in redfoot.objects(predicate, RDFS.range):
                 label = redfoot.label(value) or value
 		values[value] = label
 		value_list.append((label, value))
-if not isinstance(object, Literal):
-    value_list.append((redfoot.label(object) or object, object))
 value_list.sort()
+isObject = bool(value_list)
 ?>
 
-    <span kid:if="value_list" kid:strip="">
+  <span kid:if="isObject" kid:strip="">
       <select name="object" kid:if="predicate">
 
         <option value=''></option>
@@ -339,11 +341,14 @@ for datatype in redfoot.subjects(RDF.type, RDFS.Datatype):
     possible.append((label, datatype))
 possible.sort()
 ?>
+
+<span kid:if="isDatatype and isObject" kid:strip=""><br/>or<br/></span>
+
 Datatype: <select name="datatype">
   <option value=''></option>
   <span kid:for="label, datatype in possible" kid:strip="">
-    <option kid:if="datatype==object.datatype" value="${datatype}" selected="true" >${label}</option>
-    <option kid:if="datatype!=object.datatype" value="${datatype}">${label}</option>
+    <option kid:if="isinstance(object, Literal) and datatype==object.datatype" value="${datatype}" selected="true" >${label}</option>
+    <option kid:if="not isinstance(object, Literal) or datatype!=object.datatype" value="${datatype}">${label}</option>
   </span>
 </select>
 <br/>
