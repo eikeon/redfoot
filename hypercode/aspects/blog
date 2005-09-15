@@ -80,12 +80,15 @@ else:
 
 <?python
 import time
+from urllib import quote
 from rdflib.util import parse_date_time
 
 SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
 BLOG = redfoot.namespace("http://redfoot.net/2005/blog#")
 DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
+
+COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")
 
 markdown = redfoot.module(URIRef("modules/markdown#module", base=redfoot_program)).markdown
 
@@ -109,17 +112,16 @@ blog.reverse()
 <a kid:if="allow(URIRef('%s/blog/add_entry/' % request.host))"
    href="/blog/add_entry/">add entry</a>
 
-  <dl>
-   <span kid:strip="" kid:for="date, entry, content_value, content_type in blog">
-<?python from urllib import quote?>
-    <dt><a href="${quote(entry.concrete(), ':/')}">${redfoot.label(entry)}</a> <div style="font-size: small; border-top: 1px solid black">by ${redfoot.label(redfoot.value(entry, DC.creator))} on 
-      ${time.strftime("%A %d %B, %Y", time.gmtime(parse_date_time(date)))}:</div></dt>
-    <dd kid:if="content_type=='http://www.w3.org/1999/xhtml'">${XML(content_value)}</dd>
-    <dd kid:if="content_type!='http://www.w3.org/1999/xhtml'">${XML(markdown(content_value))}</dd>
-    <?python comments = list(redfoot.objects(entry, COMMENT.comment))?> 
-    <dd kid:if="comments"><a href="${quote(entry.concrete(), ':/')}#comments">(${len(comments)}) comments</a></dd>
-   </span>
-  </dl>
+  <div class="blog" kid:for="date, entry, content_value, content_type in blog">
+    <h3><a href="${quote(entry.concrete(), ':/')}">${redfoot.label(entry)}</a></h3>
+    <p class="blog_by_line">by ${redfoot.label(redfoot.value(entry, DC.creator))} on 
+      ${time.strftime("%A %d %B, %Y", time.gmtime(parse_date_time(date)))}:</p>
+    <p kid:strip="" kid:if="content_type=='http://www.w3.org/1999/xhtml'">${XML(content_value)}</p>
+    <p kid:strip="" kid:if="content_type!='http://www.w3.org/1999/xhtml'">${XML(markdown(content_value))}</p>
+    <?python comments = list(redfoot.objects(entry.concrete(), COMMENT.comment))?> 
+    <p kid:if="comments" style="font-size: small;"><a href="${quote(entry.concrete(), ':/')}#comments">(${len(comments)}) comments</a></p>
+    <div class="hr"/>
+  </div>
 
 </div>
 ]]>    

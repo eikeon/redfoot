@@ -157,7 +157,7 @@ if uri is not None and comment:
 <div xmlns:kid="http://purl.org/kid/ns#" 
      class="comment_list">
 
-  <h3>Comments regarding ${redoot.label(request.uri.abstract()) or redfoot.label(request.uri) or request.uri}</h3>
+  <h3>Comments regarding ${redfoot.label(request.uri.abstract()) or redfoot.label(request.uri) or request.uri}</h3>
 
 <?python
 import time

@@ -326,8 +326,36 @@ dd {
 
 div.comments {
     background-color: #ddddee;
-    margin: 0em;
+    border: 1px solid black;
     padding: 0.25em 1em;
+    margin: 1em;
+}
+
+div.blog {
+    border-bottom: 1px solid black;
+    margin-bottom: 1.5em;
+}
+
+pre {
+  background-color: #eeeeee;
+  border: 1px solid black;
+  padding: 0.5em 1em;
+}
+
+.blog h3 {
+    margin-bottom: 0em;
+    padding-bottom: 0em;
+}
+
+.blog_by_line {
+    margin-top: 0em;
+    padding-top: 0em;
+    font-size: small; 
+    border-top: 1px solid black;
+}
+
+.blog .hr {
+    margin-bottom: 0em;
 }
 
 """ % {"color": color})
