@@ -70,6 +70,7 @@ if accept and "application/rdf+xml" in accept:  # TODO: will need to check that 
 	context = redfoot.get_context(cid)
 	base = redfoot.context_id(cid, context_id="") # TODO: basically defrag... need better way.
 	context.serialize(destination=response, format="pretty-xml", base=base)
+	response.finish()
 else:
     display_page(page_handler)
 
