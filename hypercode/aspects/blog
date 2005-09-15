@@ -116,6 +116,8 @@ blog.reverse()
       ${time.strftime("%A %d %B, %Y", time.gmtime(parse_date_time(date)))}:</div></dt>
     <dd kid:if="content_type=='http://www.w3.org/1999/xhtml'">${XML(content_value)}</dd>
     <dd kid:if="content_type!='http://www.w3.org/1999/xhtml'">${XML(markdown(content_value))}</dd>
+    <?python comments = list(redfoot.objects(entry, COMMENT.comment))?> 
+    <dd kid:if="comments"><a href="${quote(entry.concrete(), ':/')}#comments">(${len(comments)}) comments</a></dd>
    </span>
   </dl>
 
