@@ -81,7 +81,7 @@ else:
 ?> <h2><a href="${href}">${label}</a></h2>
 
 
-      ${display(lookup_content(TEMPLATE.content))}
+      ${display(lookup(TEMPLATE.content))}
 
       <?python COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")?>
       <div class="comments"

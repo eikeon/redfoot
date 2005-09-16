@@ -20,6 +20,8 @@ from zope.interface import Attribute, implements
 from rdflib import URIRef, BNode, RDF, RDFS
 from urllib import unquote
 
+from itertools import chain
+
 SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
 
 
@@ -71,7 +73,10 @@ class Request(object):
     parameters = property(_getParameters)
 
     def lookup(self, property, default=None): # TODO: generalize to value?
-        for source in self.sources: # TODO: what's redfoot_current 
+        sources = chain([self.uri], redfoot.types(self.uri), [self.host, redfoot.uri]) # add self.sources as additional sources; first, let's see if we can find what's depending on them and make a test case
+        if (self.uri, RDF.type, RDFS.Class) in redfoot:
+            sources.next() # ignore self.uri
+        for source in sources: 
             p = redfoot.value(source, property)
 	    if p:
 		return p

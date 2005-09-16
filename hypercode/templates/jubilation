@@ -49,7 +49,7 @@ SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
     <div class="content">
 <?python from itertools import chain?>    
 
-      ${display(lookup_content(TEMPLATE.content))}
+      ${display(lookup(TEMPLATE.content))}
 
       <?python COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")?>
       <div class="comments"
