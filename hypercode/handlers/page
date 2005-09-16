@@ -42,37 +42,38 @@ redfoot.execute(lookup(SERVER.display_support), context=globals())
 if page_handler is None:
     response.setStatus(404, "Not Found")            
     response.write("No page handler found")
-
-if not (request.uri, None, None) in redfoot and not (request.uri.abstract(), None, None) in redfoot:
-    # we need to set the status to 404 if that's the case before we call display on page_handler
-    response.setStatus(404, "Not Found")            
-
-def display_page(page_handler):
-    # TODO allow the long running assertion to be on the page_handler or page_part_handler as well?
-    long_running = redfoot.value(request.uri, SERVER.long_running)
-    if str(long_running)=="true": # TODO:
-	def finish(_):
-	    response.finish()
-	d = deferToThread(display, page_handler, fragment=False)
-	d.addCallbacks(callback=finish, errback=finish)
-    else:
-	display(page_handler, fragment=False)
-	response.finish()
-
-accept = request.headers.get("accept")
-if accept and "application/rdf+xml" in accept:  # TODO: will need to check that this is best match.
-    if page_handler and (page_handler, SERVER.content_type, Literal("application/rdf+xml")) in redfoot:
-        display_page(page_handler)
-    else:
-	cid = request.uri.abstract()
-	if not (cid, RDF.type, REDFOOT.Context) in redfoot:
-	    cid = redfoot.context_id(cid) # default context
-	context = redfoot.get_context(cid)
-	base = redfoot.context_id(cid, context_id="") # TODO: basically defrag... need better way.
-	context.serialize(destination=response, format="pretty-xml", base=base)
-	response.finish()
+    response.finish()
 else:
-    display_page(page_handler)
+    if not (request.uri, None, None) in redfoot and not (request.uri.abstract(), None, None) in redfoot:
+        # we need to set the status to 404 if that's the case before we call display on page_handler
+        response.setStatus(404, "Not Found")            
+
+    def display_page(page_handler):
+        # TODO allow the long running assertion to be on the page_handler or page_part_handler as well?
+        long_running = redfoot.value(request.uri, SERVER.long_running)
+        if str(long_running)=="true": # TODO:
+            def finish(_):
+                response.finish()
+            d = deferToThread(display, page_handler, fragment=False)
+            d.addCallbacks(callback=finish, errback=finish)
+        else:
+            display(page_handler, fragment=False)
+            response.finish()
+
+    accept = request.headers.get("accept")
+    if accept and "application/rdf+xml" in accept:  # TODO: will need to check that this is best match.
+        if page_handler and (page_handler, SERVER.content_type, Literal("application/rdf+xml")) in redfoot:
+            display_page(page_handler)
+        else:
+            cid = request.uri.abstract()
+            if not (cid, RDF.type, REDFOOT.Context) in redfoot:
+                cid = redfoot.context_id(cid) # default context
+            context = redfoot.get_context(cid)
+            base = redfoot.context_id(cid, context_id="") # TODO: basically defrag... need better way.
+            context.serialize(destination=response, format="pretty-xml", base=base)
+            response.finish()
+    else:
+        display_page(page_handler)
 
 ]]>
     </rdf:value>
