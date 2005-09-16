@@ -25,7 +25,8 @@
     <commands:command rdf:resource="#editor"/>
     <commands:command rdf:resource="#backup"/>
     <commands:command rdf:resource="#restore"/>            
-    <commands:command rdf:resource="#remove"/>            
+    <commands:command rdf:resource="#remove"/>
+    <commands:command rdf:resource="#clear"/>                
   </redfoot:Configuration>>
 
   <commands:Command rdf:ID="set_base">
@@ -601,6 +602,7 @@ if filename is not None:
     
 from urllib import quote
 from rdflib import Graph
+from itertools import chain
 
 try:
     startswith = args[0]
@@ -609,11 +611,34 @@ except:
     print "usage: <startswith> [<prefix>]" # [<new_prefix>]
 
 if startswith:
-    for context_id in redfoot.contexts():
+    # list is currently needed else not all will get removed due to
+    # concurrency issues (removing while iterating over)
+    for context_id in list(chain(redfoot.contexts(), redfoot.subjects(RDF.type, REDFOOT.Context))):
         if context_id.startswith(startswith):
             print "Removing:", context_id    
             redfoot.remove_context(context_id)
+            redfoot.index.remove((REDFOOT.Checked, RDFS.member, context_id))
+    
 
+]]>
+       </rdf:value>
+     </redfoot:Python>
+    </redfoot:code>
+  </commands:Command>
+
+  <commands:Command rdf:ID="clear">
+    <rdfs:label>clear</rdfs:label>
+    <redfoot:code>
+     <redfoot:Python rdf:ID="clear_code">
+       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+    
+from urllib import quote
+from rdflib import Graph
+from itertools import chain
+
+redfoot.index.remove((REDFOOT.Checked, RDFS.member, None))
+    
 ]]>
        </rdf:value>
      </redfoot:Python>
