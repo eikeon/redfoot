@@ -81,8 +81,8 @@ else:
 
     page_handler = lookup(SERVER.page_handler)
     assert page_handler, "no page handler found"
-    response.finish()
-else:
+    #response.finish()
+
     if not (request.uri, None, None) in redfoot and not (request.uri.abstract(), None, None) in redfoot:
         # we need to set the status to 404 if that's the case before we call display on page_handler
         response.setStatus(404, "Not Found")            
