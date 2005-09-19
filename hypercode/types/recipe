@@ -132,7 +132,7 @@ recipes.sort()
 <![CDATA[
 RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
 SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
-recipe = redfoot.value(predicate=SERVER.alternate, object=request.uri)
+recipe = redfoot.value(None, SERVER.alternate, request.uri)
 response.write(redfoot.value(recipe, RECIPE.original))
 ]]>
       </rdf:value>
