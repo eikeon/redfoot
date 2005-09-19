@@ -27,53 +27,102 @@ request.uri = URIRef(request.uri.split(";", 1)[-1])
 if not "://" in request.uri:
     request.uri = URIRef(request.uri.replace(":/", "://"))
 
-def lookup(property, default=None):
-    return request.lookup(property) or redfoot.value(redfoot_current, property) or default
+if request.method.lower()=="put":
+    uid = request.user
+    password = request.password
+    if uid and password:
+        import md5
+        SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
 
-session_support = lookup(SERVER.session_support)
-assert session_support, "no session support found"
-redfoot.execute(session_support, request=request, response=response)
+        # read in foaf -- TODO: remove this copy paste from auth
+	if not uid.startswith("http"):
+	    uid = "http://%s" % uid
+	from rdflib import Graph
+	FOAF = redfoot.namespace("http://xmlns.com/foaf/0.1/")
+	if not "#" in uid:
+	    uid = "%s#" % uid
+	uid = URIRef(uid)
+	g = Graph()
+	if not uid.startswith(request.host): # more checks localhost, server IP, etc.
+	    g.load(uid)
+	    cid = redfoot.context_id(uid, context_id="#user")
+	    #redfoot.remove_context(cid)
+	    c = redfoot.get_context(cid)
+	    c.add((uid, RDF.type, SESSION.User))
+	    c.remove((uid, SESSION.hexdigest, None))
+	    for hexdigest in g.objects(uid, SESSION.hexdigest):
+		c.add((uid, SESSION.hexdigest, hexdigest))
+	    label = g.label(uid) or g.value(uid, FOAF.name)
+	    if label:
+		c.remove((uid, RDFS.label, None))            
+		c.add((uid, RDFS.label, label))
+        # end read in foaf
 
-page_handler = lookup(SERVER.page_handler)
-assert page_handler, "no page handler found"
+        hexdigest = Literal(md5.new(password).hexdigest())
+        if hexdigest and (uid, SESSION.hexdigest, hexdigest) in redfoot:
+            # TODO: exact matching of request.uri to context
+            cid = redfoot.context_id(request.uri)
+            c = redfoot.get_context(cid)
+            c.parse(request.content, publicID=request.uri)
+        else:
+       	    response.setStatus(401, "Not Authorized")            
+            response.setHeader("WWW-Authenticate", "Basic realm='default'")
+    else:
+        response.setStatus(401, "Not Authorized")            
+        response.setHeader("WWW-Authenticate", "Basic realm='default'")
+    response.finish()
+else:
+    def lookup(property, default=None):
+	return request.lookup(property) or redfoot.value(redfoot_current, property) or default
 
-redfoot.execute(lookup(SERVER.display_support), context=globals())
+    session_support = lookup(SERVER.session_support)
+    assert session_support, "no session support found"
+    redfoot.execute(session_support, request=request, response=response)
 
-if page_handler is None:
-    response.setStatus(404, "Not Found")            
-    response.write("No page handler found")
+    page_handler = lookup(SERVER.page_handler)
+    assert page_handler, "no page handler found"
     response.finish()
 else:
     if not (request.uri, None, None) in redfoot and not (request.uri.abstract(), None, None) in redfoot:
         # we need to set the status to 404 if that's the case before we call display on page_handler
         response.setStatus(404, "Not Found")            
 
+    redfoot.execute(lookup(SERVER.display_support), context=globals())
+
+    if page_handler is None:
+	response.setStatus(404, "Not Found")            
+	response.write("No page handler found")
+
+    if not (request.uri, None, None) in redfoot and not (request.uri.abstract(), None, None) in redfoot:
+	# we need to set the status to 404 if that's the case before we call display on page_handler
+	response.setStatus(404, "Not Found")            
+
     def display_page(page_handler):
-        # TODO allow the long running assertion to be on the page_handler or page_part_handler as well?
-        long_running = redfoot.value(request.uri, SERVER.long_running)
-        if str(long_running)=="true": # TODO:
-            def finish(_):
-                response.finish()
-            d = deferToThread(display, page_handler, fragment=False)
-            d.addCallbacks(callback=finish, errback=finish)
-        else:
-            display(page_handler, fragment=False)
-            response.finish()
+	# TODO allow the long running assertion to be on the page_handler or page_part_handler as well?
+	long_running = redfoot.value(request.uri, SERVER.long_running)
+	if str(long_running)=="true": # TODO:
+	    def finish(_):
+		response.finish()
+	    d = deferToThread(display, page_handler, fragment=False)
+	    d.addCallbacks(callback=finish, errback=finish)
+	else:
+	    display(page_handler, fragment=False)
+	    response.finish()
 
     accept = request.headers.get("accept")
     if accept and "application/rdf+xml" in accept:  # TODO: will need to check that this is best match.
-        if page_handler and (page_handler, SERVER.content_type, Literal("application/rdf+xml")) in redfoot:
-            display_page(page_handler)
-        else:
-            cid = request.uri.abstract()
-            if not (cid, RDF.type, REDFOOT.Context) in redfoot:
-                cid = redfoot.context_id(cid) # default context
-            context = redfoot.get_context(cid)
-            base = redfoot.context_id(cid, context_id="") # TODO: basically defrag... need better way.
-            context.serialize(destination=response, format="pretty-xml", base=base)
-            response.finish()
+	if page_handler and (page_handler, SERVER.content_type, Literal("application/rdf+xml")) in redfoot:
+	    display_page(page_handler)
+	else:
+	    cid = request.uri.abstract()
+	    if not (cid, RDF.type, REDFOOT.Context) in redfoot:
+		cid = redfoot.context_id(cid) # default context
+	    context = redfoot.get_context(cid)
+	    base = redfoot.context_id(cid, context_id="") # TODO: basically defrag... need better way.
+	    context.serialize(destination=response, format="pretty-xml", base=base)
+	    response.finish()
     else:
-        display_page(page_handler)
+	display_page(page_handler)
 
 ]]>
     </rdf:value>

@@ -72,6 +72,17 @@ class Request(object):
 
     parameters = property(_getParameters)
 
+    def __getUser(self):
+        return self.__request.getUser()
+    user = property(__getUser)
+    def __getPassword(self):
+        return self.__request.getPassword()
+    password = property(__getPassword)
+
+    def __getContent(self):
+       return self.__request.content
+    content = property(__getContent)
+
     def lookup(self, property, default=None): # TODO: generalize to value?
         sources = chain([self.uri], redfoot.types(self.uri), [self.host, redfoot.uri]) # add self.sources as additional sources; first, let's see if we can find what's depending on them and make a test case
         if (self.uri, RDF.type, RDFS.Class) in redfoot:
