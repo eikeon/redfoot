@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+>
+
+  <rdfs:Class rdf:about="http://redfoot.net/2005/server#StaticPage">
+    <server:page_handler>
+  <server:PageHandler rdf:ID="file_handler">
+    <rdfs:label>file handler</rdfs:label>
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+content_type = redfoot.value(request.uri, SERVER.content_type)
+response.setHeader('Content-Type', content_type)
+
+html_root = "html"
+path = request.uri.replace(request.host, '')
+#url2pathname
+#os.path.join(html_root, path)
+#check for ".." etc re: security
+f = file("%s%s" % (html_root, path))
+response.write(f.read())
+f.close()
+
+]]>
+    </rdf:value>
+  </server:PageHandler>
+    </server:page_handler>
+  </rdfs:Class>
+
+</rdf:RDF>  
