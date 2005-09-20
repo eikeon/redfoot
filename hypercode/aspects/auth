@@ -145,65 +145,17 @@ assert request.method=='POST'
 from urllib import quote
 import md5
 
-SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
-
 uid = request.parameters.get("uid", None)
 password = request.parameters.get("password", None)
 return_uri = URIRef(request.parameters.get("return_uri", "/account/")  )
 login_uri = URIRef(request.parameters.get("login_uri"))
 
-sid = request.session_id
-context = redfoot.get_context(redfoot.context_id(sid))
+auth = redfoot.module(URIRef("modules/auth#module", base=redfoot_program))
 
-if not uid:
-    uid = BNode()
-elif uid.startswith("http") or ("." in uid and not "@" in uid):
-    if not uid.startswith("http"):
-        uid = "http://%s" % uid
-    from rdflib import Graph
-    FOAF = redfoot.namespace("http://xmlns.com/foaf/0.1/")
-    if not "#" in uid:
-        uid = "%s#" % uid
-    uid = URIRef(uid)
-    g = Graph()
-    if not uid.startswith(request.host): # more checks localhost, server IP, etc.
-        g.load(uid)
-        cid = redfoot.context_id(uid, context_id="#user")
-        #redfoot.remove_context(cid)
-        c = redfoot.get_context(cid)
-        c.add((uid, RDF.type, SESSION.User))
-        c.remove((uid, SESSION.hexdigest, None))
-        for hexdigest in g.objects(uid, SESSION.hexdigest):
-            c.add((uid, SESSION.hexdigest, hexdigest))
-        label = g.label(uid) or g.value(uid, FOAF.name)
-        if label:
-            c.remove((uid, RDFS.label, None))            
-            c.add((uid, RDFS.label, label))
-
-#         for s, p, o in g.triples((uid, None, None)):
-#             if p.startswith(RDF.RDFNS) or p.startswith(RDFS.RDFSNS) or p.startswith(FOAF.NS) or p.startswith(SESSION.NS):
-#                 if p==FOAF.name:
-#                     c.add((s, RDFS.label, o))
-#                 c.add((s, p, o))
-elif not uid.startswith("mailto:"):
-    uid = URIRef("mailto:%s" % uid)
-
-hexdigest = Literal(md5.new(password).hexdigest())
-
-if hexdigest and (uid, SESSION.hexdigest, hexdigest) in redfoot:
-   context.remove((sid, SESSION.authenticated, None))
-   context.add((sid, SESSION.authenticated, Literal("True")))
-   context.remove((sid, SESSION.uid, None))
-   context.add((sid, SESSION.uid, uid))
-   context.remove((sid, SESSION.message, None))
+if auth.authenticate(request, username=uid, password=password):
    response.setStatus(302, 'found')
    response.setHeader('Location', return_uri)
 else:
-   context.remove((sid, SESSION.authenticated, None))
-   context.remove((sid, SESSION.uid, None))
-   context.add((sid, SESSION.authenticated, Literal("False")))
-   context.remove((sid, SESSION.message, None))   
-   context.add((sid, SESSION.message, Literal("invalid email or password")))
    login_uri += "?return_uri=%s" % quote(return_uri)
    response.setStatus(302, 'found')   
    response.setHeader('Location', login_uri)
