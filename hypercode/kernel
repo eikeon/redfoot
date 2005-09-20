@@ -187,7 +187,10 @@ class Redfoot(Graph):
         return result
 
     def remove_context(self, identifier):
-        self.index.remove((identifier, RDF.type, REDFOOT.Context))
+        """removes both the context and metadata about the context."""
+        #self.index.remove((identifier, RDF.type, REDFOOT.Context))
+        self.index.remove((identifier, None, None))
+        self.index.remove((REDFOOT.Checked, RDFS.member, identifier))
         self.index.add((identifier, RDF.type, REDFOOT.DeletedContext))        
         super(Redfoot, self).remove_context(identifier)
 
