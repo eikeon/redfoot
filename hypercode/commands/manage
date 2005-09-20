@@ -363,47 +363,58 @@ if uri:
      <redfoot:Python rdf:ID="twistd_code">
        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
-    
+import logging, sys
+
+handler = logging.FileHandler("redfoot.log")
+logging.getLogger().addHandler(handler)
+
 port = 80
 if len(args)>0:
     try:
         port = int(args[0])
     except:
-	print "invalid port of '%s'" % port
+	print "invalid port of '%s'" % args[0]
 
-###
-# TODO: can duplication with server command be avoided here
+sys.argv = args # twistd below ignores first arg, which we're using for port number above anyway.
+sys.argv += ["-o"] #twistd defaults to --help is there's no options, plus we want this option.
+
+### TODO: can duplication with server command be avoided here
 SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
-
 server_uri = redfoot.value(redfoot.uri, SERVER.server) 
 assert server_uri, "%s does not have a %s" % (redfoot.uri, SERVER.server)
-
 server = redfoot.module(server_uri)
-#
 ###
 
-
 from twisted.application import service, internet
-from twisted.internet import reactor
 
-def onShutdown():
-    print "redfoot: closing" 
-    redfoot.close()
-    
-
-reactor.addSystemEventTrigger('after', 'shutdown', onShutdown)
 application = service.Application("redfoot")
 site = server.Site(server._Resource())
-
 internet.TCPServer(port, site).setServiceParent(application)
 
-def close():
-    print "NOOP"
-# TODO: how better to do this?
-redfoot.close = close
 
-redfoot.application = application
+from twisted.scripts.twistd import checkPID, startLogging, startApplication, removePID, ServerOptions
+from twisted.application import app, service
+from twisted.python import log
 
+def runApp(config):
+    checkPID(config['pidfile'])
+    passphrase = app.getPassphrase(config['encrypted'])
+    app.installReactor(config['reactor'])
+    config['nodaemon'] = config['nodaemon'] or config['debug']
+    oldstdout = sys.stdout
+    oldstderr = sys.stderr
+    startLogging(config['logfile'], config['syslog'], config['prefix'],
+                 config['nodaemon'])
+    app.initialLog()
+    #application = app.getApplication(config, passphrase)
+    startApplication(config, application)
+    app.runReactorWithLogging(config, oldstdout, oldstderr)
+    removePID(config['pidfile'])
+    app.reportProfile(config['report-profile'],
+                      service.IProcess(application).processName)
+    log.msg("Server Shut Down.")
+
+app.run(runApp, ServerOptions)
 ]]>
        </rdf:value>
      </redfoot:Python>
