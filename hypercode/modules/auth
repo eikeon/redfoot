@@ -17,10 +17,7 @@ SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
 
 def authenticate(request, username=None, password=None):
     "Returns uid if authentication succeeds or None otherwise"
-    try:
-        session_id = request.sid
-    except:
-        session_id = None
+    session_id = request.session_id
     if username is None:
         username = request.user
     if password is None:
