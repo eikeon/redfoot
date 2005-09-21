@@ -81,8 +81,9 @@ in which case "" should be a server:Site
  <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
 <?python
 SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
-uid = redfoot.value(request.session_id, SESSION.uid)
 authenticated = request.session_id and (request.session_id, SESSION.authenticated, Literal('True')) in redfoot
+if authenticated:
+    uid = redfoot.value(request.session_id, SESSION.uid)
  ?>
   <span kid:if="request.method=='GET'" kid:omit="">
     <span kid:if="authenticated" kid:omit="">
