@@ -197,7 +197,7 @@ if title is not None:
     
     format = request.parameters.get("format") or ""
     content = Literal(request.parameters.get("content"))
-    message = "Error: No entry submitted"
+    message = ""
     try:
         for item in XML(content):
             pass
@@ -205,33 +205,36 @@ if title is not None:
         message = str(e)
         content = None
 
-    if content is not None:
+    if content is not None and uri is not None:
         uid = redfoot.value(request.session_id, SESSION.uid)    
         context_uri = redfoot.context_id(uri)
         redfoot.index.add((context_uri, RDFS.label, Literal("blog entry: %s" % title)))
-        context = redfoot.get_context(context_uri)
-        context.add((uri, RDF.type, BLOG.Entry))
-        context.add((uri, RDFS.label, Literal(title)))
-        context.add((uri, RDFS.comment, Literal(content, datatype=format)))
-        context.add((uri, DCTERMS.created, Literal(date_time())))
-        context.add((uri, DC.date, Literal(date_time()[0:10])))    
-        context.add((uri, DC.creator, uid))
-    
+        context = redfoot.get_context(context_uri, creator=uid)
+        current = redfoot.value(uri, DC.creator)
+        if current==uid:
+            context.remove((None, None, None))
+        if not current or current==uid:
+              context.add((uri, RDF.type, BLOG.Entry))
+              context.add((uri, RDFS.label, Literal(title)))
+              context.add((uri, RDFS.comment, Literal(content, datatype=format)))
+              context.add((uri, DCTERMS.created, Literal(date_time())))
+              context.add((uri, DC.date, Literal(date_time()[0:10])))    
+              context.add((uri, DC.creator, uid))
+              blog = URIRef("/blog/", base=request.host)
+              context.add((blog, BLOG.entry, uri))
+        else:
+            message = "Another user already submitted an entry for: %s" % uri
+    else:
+        message = "Error: No entry submitted"
+
+from urllib import quote    
 ?>
 
-<div kid:if="uri is None or content is None">
-<h2>${message}</h2>
-</div>
+<h2 kid:if="message">${message}</h2>
 
-
-<div kid:if="uri is not None and content is not None">
-
-<h2>Thank you for your entry:
-<?python from urllib import quote?>
-    <a href="${quote(uri.concrete(), ':/')}">${redfoot.label(uri, uri)}</a>
+<h2 kid:if="not message">Thank you for your entry:
+  <a href="${quote(uri.concrete(), ':/')}">${redfoot.label(uri, uri)}</a>
 </h2>
-
-</div>
 
   </span>
 

@@ -37,4 +37,11 @@
     <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
   </rdfs:Property>
 
+  <rdfs:Property rdf:ID="entry">
+    <rdfs:label>entry</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:domain rdf:resource="server#Page"/>
+    <rdfs:range rdf:resource="#Entry"/>
+  </rdfs:Property>
+
 </rdf:RDF>  

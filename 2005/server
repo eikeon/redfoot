@@ -50,6 +50,12 @@
     <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/redfoot#Resource"/>
   </rdfs:Class>
 
+  <rdfs:Class rdf:ID="StaticPage">
+    <rdfs:label>Static Page</rdfs:label>
+    <rdfs:comment>A page that is served from the filesystem or somesuch.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/redfoot#Resource"/>
+  </rdfs:Class>
+
   <rdfs:Class rdf:ID="PageHandler">
     <rdfs:label>Page Handler</rdfs:label>
     <rdfs:comment></rdfs:comment>
