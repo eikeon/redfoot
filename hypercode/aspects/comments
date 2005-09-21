@@ -130,7 +130,10 @@ if uri is not None and comment:
 <div xmlns:kid="http://purl.org/kid/ns#" 
      class="add_comment">
 
-  <?python allowed = allow(URIRef("%s/add_comment/" % request.host))?>
+<?python 
+allowed = allow(URIRef("%s/add_comment/" % request.host))
+from urllib import quote
+?>
 
   <div kid:if="allowed" kid:strip="">
     <form action="/add_comment/" method="post">
@@ -142,7 +145,7 @@ if uri is not None and comment:
 
   <div kid:if="not allowed" kid:strip="">
     <p kid:if="allow(URIRef('%s/login/'% request.host))">
-      <a href="/login/?return_uri=${request.host}/;${request.uri}">Login</a> in order to submit a comment.
+      <a href="/login/?return_uri=${quote(request.uri)}">Login</a> in order to submit a comment.
     </p>
   </div>
 </div>

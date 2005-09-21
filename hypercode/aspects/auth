@@ -162,12 +162,14 @@ login_uri = URIRef(request.parameters.get("login_uri"))
 auth = redfoot.module(URIRef("modules/auth#module", base=redfoot_program))
 request.create_session()
 if auth.authenticate(request, username=uid, password=password):
-   response.setStatus(302, 'found')
-   response.setHeader('Location', return_uri)
+    response.setStatus(302, 'found')
+    if not return_uri.startswith(request.host):
+        return_uri = URIRef("%s/;%s" % (request.host, return_uri))           
+    response.setHeader('Location', return_uri)
 else:
-   login_uri += "?return_uri=%s" % quote(return_uri)
-   response.setStatus(302, 'found')   
-   response.setHeader('Location', login_uri)
+    login_uri += "?return_uri=%s" % quote(return_uri)
+    response.setStatus(302, 'found')   
+    response.setHeader('Location', login_uri)
       
 ]]></rdf:value>
   </server:Page>

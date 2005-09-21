@@ -107,10 +107,18 @@ for entry in redfoot.subjects(RDF.type, BLOG.Entry):
     blog.append((date, entry, content_value, content_type))
 blog.sort()
 blog.reverse()
+allowed = allow(URIRef('%s/blog/add_entry/' % request.host))
+from urllib import quote
 ?>
 
-<a kid:if="allow(URIRef('%s/blog/add_entry/' % request.host))"
-   href="/blog/add_entry/">add entry</a>
+<p><a kid:if="allowed" href="/blog/add_entry/">add entry</a></p>
+
+<div kid:if="not allowed" kid:strip="">
+  <p kid:if="allow(URIRef('%s/login/'% request.host))">
+    <a href="/login/?return_uri=${quote(request.uri)}">Login</a> in order to submit a blog entry.
+  </p>
+</div>
+
 
   <div class="blog" kid:for="date, entry, content_value, content_type in blog">
     <h3><a href="${quote(entry.concrete(), ':/')}">${redfoot.label(entry)}</a></h3>
@@ -144,7 +152,10 @@ blog.reverse()
 <![CDATA[
   <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
 
-  <?python allowed = allow(URIRef("%s/put_entry/" % request.host))?>  
+<?python 
+allowed = allow(URIRef("%s/put_entry/" % request.host))
+from urllib import quote
+?>  
   <div kid:if="allowed" kid:strip="">
     <form action="/put_entry/" method="post">
       <p>Title: <input type="text" name="title" value="" style="width: 100%"/></p>
@@ -156,7 +167,7 @@ blog.reverse()
 
   <div kid:if="not allowed" kid:strip="">
     <p kid:if="allow(URIRef('%s/login/'% request.host))">
-      <a href="/login/?return_uri=${request.host}/;${request.uri}">Login</a> in order to submit a entry.
+      <a href="/login/?return_uri=${quote(request.uri)}">Login</a> in order to submit a entry.
     </p>
   </div>
 
