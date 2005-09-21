@@ -18,17 +18,25 @@ from twisted.internet import reactor, threads
 from zope.interface import Attribute, implements
 
 from rdflib import URIRef, BNode, RDF, RDFS
+from rdflib.util import date_time
+
 from urllib import unquote
 
 from itertools import chain
 
+from string import ascii_letters
+from random import choice
+import md5, time
+
 SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
 
 
 class Request(object):
     def __init__(self, request):
         self.__request = request
         self.__parameters = None        
+        self.__sid = None
         self.method = self.__request.method
         #self.query_string = self.__request.request_data.query
         hostname = self.getHeader("host")
@@ -42,7 +50,7 @@ class Request(object):
                 if port=="80":
                     hostname = name
         else:
-            print "warning: no hostname found"
+            redfoot.log.warning("warning: no hostname found")
             hostname = ''
         self.uri = URIRef("http://%s%s" % (hostname, path))
         self.host = URIRef("http://%s" % (hostname))
@@ -93,6 +101,28 @@ class Request(object):
 		return p
 	return default
 
+    def __getSessionID(self):
+	sid = self.__sid or self.getCookie("session_id", None)
+	if sid is None:
+	    return None
+	else:
+	    self.__session_id = URIRef("%s/sessions#%s" % (self.host, sid))
+	    return self.__session_id
+    session_id = property(__getSessionID)
+
+    def create_session(self):
+	m = md5.new()
+	m.update(str([choice(ascii_letters) for i in xrange(0, 8)]))
+	m.update(str(time.time()))
+	#m.update(self.getClientIP())
+	sid = m.hexdigest()
+        self.__sid = sid
+	self.__request.cookies.append('session_id=%s;path=/' % sid)
+        session_id = self.session_id
+        assert session_id
+        context = redfoot.get_context(redfoot.context_id(session_id))
+	context.add((session_id, RDF.type, SESSION.Session))
+	context.add((session_id, SESSION.created, Literal(date_time())))
 
 
 class Response(object):
@@ -161,7 +191,7 @@ class Server(object):
             except ValueError:
                 reactor.run(installSignalHandlers=0)
         except KeyboardInterrupt: # TODO: 
-            print 'shutting down...'
+            redfoot.log.info('shutting down...')
             reactor.shutdown()
         
 ]]>
