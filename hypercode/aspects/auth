@@ -270,61 +270,60 @@ else:
       ]]></rdf:value>
   </server:PagePartHandler>
 
-  <server:Page rdf:ID="create_process">
+  <server:PageHandler rdf:ID="create_process">
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python"><![CDATA[
 
-assert request.method=='POST'
+if request.method=='POST':
+    import md5
 
-import md5
+    SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
 
-SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+    name = request.parameters.get("name", None)
+    uid = request.parameters.get("uid", None)
+    password = request.parameters.get("password", None)
+    verify = request.parameters.get("verify", None)
+    return_uri = URIRef(request.parameters.get("return_uri", "/account/"))
+    create_uri = URIRef(request.parameters.get("create_uri"))
 
-name = request.parameters.get("name", None)
-uid = request.parameters.get("uid", None)
-password = request.parameters.get("password", None)
-verify = request.parameters.get("verify", None)
-return_uri = URIRef(request.parameters.get("return_uri", "/account/"))
-create_uri = URIRef(request.parameters.get("create_uri"))
+    sid = request.session_id
+    assert sid
 
-sid = request.session_id
-assert sid
+    context = redfoot.get_context(redfoot.context_id(sid))
+    users_context = redfoot.get_context(redfoot.context_id("%s/users" % request.host))
 
-context = redfoot.get_context(redfoot.context_id(sid))
-users_context = redfoot.get_context(redfoot.context_id("%s/users" % request.host))
+    if not uid.startswith("mailto:"):
+	uid = URIRef("mailto:%s" % uid)
 
-if not uid.startswith("mailto:"):
-    uid = URIRef("mailto:%s" % uid)
+    if password==verify:
+	if not (uid, SESSION.hexdigest, None) in redfoot:
+	    hexdigest = Literal(md5.new(password).hexdigest())
+	    redfoot.remove((sid, SESSION.authenticated, None))
+	    redfoot.remove((sid, SESSION.uid, None))
+	    context.add((sid, SESSION.authenticated, Literal("True")))
+	    context.add((sid, SESSION.uid, uid))
+	    if name:
+		users_context.add((uid, RDFS.label, Literal(name)))
+	    users_context.add((uid, RDF.type, SESSION.User))
+	    users_context.add((uid, SESSION.hexdigest, hexdigest))
+	    #message = "Created new user: %s" % uid
+	    context.remove((sid, SESSION.message, None))        
+	    response.setStatus(302, 'found')
+	    response.setHeader('Location', return_uri)
+	else:
+	    message = "User already exists"
+	    context.remove((sid, SESSION.message, None))
+	    context.add((sid, SESSION.message, Literal(message)))
+	    response.setStatus(302, 'found')   
+	    response.setHeader('Location', create_uri)
 
-if password==verify:
-    if not (uid, SESSION.hexdigest, None) in redfoot:
-	hexdigest = Literal(md5.new(password).hexdigest())
-	redfoot.remove((sid, SESSION.authenticated, None))
-	redfoot.remove((sid, SESSION.uid, None))
-	context.add((sid, SESSION.authenticated, Literal("True")))
-	context.add((sid, SESSION.uid, uid))
-        if name:
-            users_context.add((uid, RDFS.label, Literal(name)))
-	users_context.add((uid, RDF.type, SESSION.User))
-	users_context.add((uid, SESSION.hexdigest, hexdigest))
-        #message = "Created new user: %s" % uid
-        context.remove((sid, SESSION.message, None))        
-        response.setStatus(302, 'found')
-        response.setHeader('Location', return_uri)
     else:
-        message = "User already exists"
-        context.remove((sid, SESSION.message, None))
-        context.add((sid, SESSION.message, Literal(message)))
-        response.setStatus(302, 'found')   
-        response.setHeader('Location', create_uri)
-        
-else:
-    message = "password and verify mismatch"
-    context.remove((sid, SESSION.message, None))
-    context.add((sid, SESSION.message, Literal(message)))
-    response.setStatus(302, 'found')   
-    response.setHeader('Location', create_uri)
+	message = "password and verify mismatch"
+	context.remove((sid, SESSION.message, None))
+	context.add((sid, SESSION.message, Literal(message)))
+	response.setStatus(302, 'found')   
+	response.setHeader('Location', create_uri)
     
       ]]></rdf:value>
-  </server:Page>
+  </server:PageHandler>
 
 </rdf:RDF>
