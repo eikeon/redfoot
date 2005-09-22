@@ -115,7 +115,7 @@ from urllib import quote
 
 <div kid:if="not allowed" kid:strip="">
   <p kid:if="allow(URIRef('%s/login/'% request.host))">
-    <a href="/login/?return_uri=${quote(request.uri)}">Login</a> in order to submit a blog entry.
+    <a href="/login/?return_uri=${quote(request.uri)}">Login</a> to submit a blog entry.
   </p>
 </div>
 
@@ -167,7 +167,7 @@ from urllib import quote
 
   <div kid:if="not allowed" kid:strip="">
     <p kid:if="allow(URIRef('%s/login/'% request.host))">
-      <a href="/login/?return_uri=${quote(request.uri)}">Login</a> in order to submit a entry.
+      <a href="/login/?return_uri=${quote(request.uri)}">Login</a> to submit a blog entry.
     </p>
   </div>
 

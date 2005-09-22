@@ -145,7 +145,7 @@ from urllib import quote
 
   <div kid:if="not allowed" kid:strip="">
     <p kid:if="allow(URIRef('%s/login/'% request.host))">
-      <a href="/login/?return_uri=${quote(request.uri)}">Login</a> in order to submit a comment.
+      <a href="/login/?return_uri=${quote(request.uri)}">Login</a> to submit a comment.
     </p>
   </div>
 </div>
