@@ -50,7 +50,7 @@ creator_label = redfoot.label(creator) or creator.split('@')[0]
 by ${creator_label}
 <span kid:if="date">on ${time.strftime("%A %d %B, %Y", time.gmtime(parse_date_time(date)))}</span> 
 regarding <a href="${request.host}/;${resource}">${redfoot.label(resource, resource)}</a>:</p>
-<p>${redfoot.value(comment, RDFS.comment)}</p>
+<pre>${redfoot.value(comment, RDFS.comment)}</pre>
 
 </div>
 ]]>
@@ -110,7 +110,7 @@ if uri is not None and comment:
 
 <h2>Thank you for your comment</h2>
 
-<p>${comment}</p>
+<pre>${comment}</pre>
 
 <p>Return to <a href="${request.host}/;${uri}">${redfoot.label(uri.abstract()) or redfoot.label(uri) or  uri}</a></p>
 
@@ -178,17 +178,16 @@ comments.sort()
 comments.reverse()
 ?>
 
-  <dl kid:if="comments" kid:for="date, comment in comments">
+  <span kid:if="comments" kid:for="date, comment in comments" kid:strip="">
 <?python
 creator =  redfoot.value(comment, DC.creator)
 creator_label = redfoot.label(creator) or creator.split('@')[0]
 ?>
-    <dt style="border-top: 1px solid black">by ${creator_label} 
-    <span kid:if="date">on ${time.strftime("%A %d %B, %Y", time.gmtime(parse_date_time(date)))}</span>:</dt>
+    <p style="border-top: 1px solid black">by ${creator_label} 
+    <span kid:if="date">on ${time.strftime("%A %d %B, %Y", time.gmtime(parse_date_time(date)))}</span>:</p>
 
-    <dd>${redfoot.value(comment, RDFS.comment)}</dd>
-  </dl>
-
+    <pre>${redfoot.value(comment, RDFS.comment)}</pre>
+  </span>
 </div>
 ]]>    
     </rdf:value>      
@@ -222,7 +221,7 @@ comments.sort()
 comments.reverse()
 ?>
 
-  <dl kid:if="comments" kid:for="date, comment, resource in comments">
+  <span kid:if="comments" kid:for="date, comment, resource in comments" kid:strip="">
 <?python
 creator =  redfoot.value(comment, DC.creator)
 if creator:
@@ -231,12 +230,12 @@ else:
     creator_label = ''
 ?>
 
-    <dt style="border-top: 1px solid black">
+    <p style="border-top: 1px solid black">
  <span kid:strip="" kid:if="creator_label">by ${creator_label}</span>
- <span kid:if="date"> on ${time.strftime("%A %d %B, %Y", time.gmtime(parse_date_time(date)))}</span> regarding <a href="${request.host}/;${resource}">${redfoot.label(resource.abstract()) or redfoot.label(resource) or resource}</a>:</dt>
-    <dd>${redfoot.value(comment, RDFS.comment)}</dd>
-  </dl>
-
+ <span kid:if="date"> on ${time.strftime("%A %d %B, %Y", time.gmtime(parse_date_time(date)))}</span> regarding <a href="${request.host}/;${resource}">${redfoot.label(resource.abstract()) or redfoot.label(resource) or resource}</a>:</p>
+    <pre>${redfoot.value(comment, RDFS.comment)}</pre>
+   
+  </span>
 </div>
 ]]>    
         </rdf:value>      
