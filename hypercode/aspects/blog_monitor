@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:commands="http://redfoot.net/2005/commands#"
+   xmlns:server="http://redfoot.net/2005/server#"
+   xmlns:session="http://redfoot.net/2005/session#"
+   xmlns:template='http://redfoot.net/2005/template#'
+>
+
+  <redfoot:Aspect rdf:ID="blog_monitor_aspect">
+    <rdfs:label>Blog Monitor aspect</rdfs:label>
+    <rdfs:comment>
+    </rdfs:comment>
+    <redfoot:todo>Look into http://kupu.oscom.org/</redfoot:todo>
+  </redfoot:Aspect>
+
+  <rdf:Description rdf:about="">
+    <template:section rdf:resource="/blog_monitor/"/>    
+  </rdf:Description>
+
+  <server:Page rdf:about="/blog_monitor/">
+    <rdfs:label>Blog Monitor</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <template:default_section_rank>12.0</template:default_section_rank>
+    <template:content>
+     <server:PagePartHandler  rdf:ID="blog_monitor">
+      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+<div xmlns:kid="http://purl.org/kid/ns#" kid:strip="">
+
+<?python
+import time
+from urllib import quote
+from rdflib.util import parse_date_time
+
+SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+BLOG = redfoot.namespace("http://redfoot.net/2005/blog#")
+DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
+DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
+
+COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")
+
+markdown = redfoot.module(URIRef("modules/markdown#module", base=redfoot_program)).markdown
+
+blog = []
+for entry in redfoot.subjects(RDF.type, BLOG.Entry):
+    date = redfoot.value(entry, DCTERMS.created)
+    content = redfoot.value(entry, BLOG.content)
+    if content:
+        content_value = redfoot.value(content, RDF.value)
+        content_type = redfoot.value(content, BLOG.content_type)
+        if content_type=="xhtml":
+            content_type = "http://www.w3.org/1999/xhtml"
+    else:
+        content_value = redfoot.comment(entry, Literal(""))
+        content_type = content_value.datatype
+    blog.append((date, entry, content_value, content_type))
+blog.sort()
+blog.reverse()
+allowed = allow(URIRef('%s/blog/add_entry/' % request.host))
+from urllib import quote
+
+allowed = allow(URIRef('%sfeeds/' % request.uri))
+?>
+
+<p kid:if="allowed"><a href="feeds/">Feeds</a></p>
+
+  <div class="blog" kid:for="date, entry, content_value, content_type in blog">
+    <h3><a href="${request.host}/;${quote(entry.concrete(), ':/')}">${redfoot.label(entry)}</a></h3>
+    <p class="blog_by_line">by ${redfoot.label(redfoot.value(entry, DC.creator) or BNode())} on 
+      ${time.strftime("%A %d %B, %Y", time.gmtime(parse_date_time(date)))}:</p>
+  </div>
+
+</div>
+]]>    
+      </rdf:value>      
+     </server:PagePartHandler>
+    </template:content>
+  </server:Page>
+
+
+  <server:Page rdf:about="/blog_monitor/feeds/">
+    <rdfs:label>Blog Monitor Feeds</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <server:allow rdf:resource="http://redfoot.net/2005/session#User"/>
+    <template:content>
+     <server:PagePartHandler  rdf:ID="blog_monitor_feeds">
+      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+<div xmlns:kid="http://purl.org/kid/ns#" kid:strip="">
+
+<?python
+BLOG = redfoot.namespace("http://redfoot.net/2005/blog#")
+
+update = redfoot.module(URIRef("modules/blog#update", base=redfoot_program))
+blog_feed = redfoot.module(URIRef("modules/blog#feed", base=redfoot_program))
+
+feed = request.parameters.get("feed")
+if feed:
+    feed = URIRef(feed)
+    action = request.parameters.get("action")
+    print action
+    if action and action=="Remove":
+        redfoot.remove((feed, RDF.type, BLOG.Feed))
+    else:
+        context = redfoot.get_context(BNode("feed"))
+        context.add((feed, RDF.type, BLOG.Feed))
+        blog_feed.update(feed)
+
+feeds = []
+for feed in redfoot.subjects(RDF.type, BLOG.Feed):
+    label = redfoot.label(feed) or feed
+    feeds.append((label, feed))
+feeds.sort()
+?>
+    <form action="" method="post">
+      <p>Feed URL: <input type="text" name="feed" value="" style="width: 100%"/></p>
+      <p><input name="submit" type="submit" value="Add" /></p>
+    </form>    
+
+  <div kid:for="label, feed in feeds" kid:strip="">
+   <form action="" method="post">
+     <p>
+       <input type="hidden" name="feed" value="${feed}"/>
+       <a href="feed">${label}</a> <input name="action" type="submit" value="Remove" />
+     </p>
+   </form>    
+  </div>
+
+</div>
+]]>    
+      </rdf:value>      
+     </server:PagePartHandler>
+    </template:content>
+  </server:Page>
+
+</rdf:RDF>  
