@@ -55,4 +55,21 @@ def parse(s=None):
     </rdf:value>
   </redfoot:Code>
 
+<!--
+  <redfoot:Python rdf:ID="email_errors">
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+from logging.handlers import SMTPHandler
+
+import logging
+
+handler = SMTPHandler("eikeon.com", "redfoot@eikeon.com", "eikeon@eikeon.com", "ERROR")
+handler.setLevel(logging.ERROR)
+logging.getLogger().addHandler(handler)
+
+]]>
+    </rdf:value>
+  </redfoot:Python>
+-->
+
 </rdf:RDF>  
