@@ -158,7 +158,7 @@ class Redfoot(Graph):
                     try:
                         context = self.load(context_uri, publicID=publicID, creator=redfoot_loader.program)
                     except Exception, e:
-                        self.warning("couldn't load %s while checking: %s\n" % (uri, e))
+                        self.log.warning("couldn't load %s while checking: %s\n" % (uri, e))
 
         
     def load(self, location, format="xml", publicID=None, context_id=None, creator=None):
