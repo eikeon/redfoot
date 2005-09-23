@@ -75,16 +75,20 @@ else:
 	    display(page_handler, fragment=False)
 	    response.finish()
 
+    #print "HEADERS:", request.headers
     accept = request.headers.get("accept")
     if accept and "application/rdf+xml" in accept:  # TODO: will need to check that this is best match.
 	if page_handler and (page_handler, SERVER.content_type, Literal("application/rdf+xml")) in redfoot:
 	    display_page(page_handler)
 	else:
+            response.setHeader('Content-Type', 'application/rdf+xml')            
 	    cid = request.uri.abstract()
-	    if not (cid, RDF.type, REDFOOT.Context) in redfoot:
+	    if (cid, RDF.type, REDFOOT.Context) in redfoot:
+                base = None
+            else:
 		cid = redfoot.context_id(cid) # default context
+                base = redfoot.context_id(cid, context_id="") # TODO: basically defrag... need better way
 	    context = redfoot.get_context(cid)
-	    base = redfoot.context_id(cid, context_id="") # TODO: basically defrag... need better way.
 	    context.serialize(destination=response, format="pretty-xml", base=base)
 	    response.finish()
     else:
