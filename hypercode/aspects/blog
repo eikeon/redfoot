@@ -322,7 +322,8 @@ for resource in redfoot.subjects(RDF.type, BLOG.Entry):
                 content_type = "http://www.w3.org/1999/xhtml"
         else:
             content_value = redfoot.comment(resource)
-            content_type = content_value.datatype
+            if content_value:
+                content_type = content_value.datatype
         resources.append((created, resource, content_value))    
 resources.sort()
 resources.reverse()
@@ -348,7 +349,7 @@ now = datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
     <id>${resource}</id>
     <issued>${created}</issued>
     <modified>${created}</modified>
-    <content type="text/html" mode="escaped">
+    <content kid:if="content_value" type="text/html" mode="escaped">
       ${content_value}
     </content>
     <dc:subject>resource</dc:subject>
