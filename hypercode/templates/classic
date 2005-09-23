@@ -73,13 +73,9 @@ if not types:
 types.sort()
 label = redfoot.label(request.uri.abstract(), None) or redfoot.label(request.uri, None)
 title = "%s (%s)" % (label, ", ".join(types))
-if request.uri.startswith(request.host):
-    href = request.uri
-else:
-    href = "%s;%s" % (request.host, request.uri)
-
-?> <h2><a href="${href}">${label}</a></h2>
-
+href = request.uri
+?>
+   <h2><a href="${href}">${label}</a></h2>
 
       ${display(lookup(TEMPLATE.content))}
 
