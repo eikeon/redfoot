@@ -12,6 +12,12 @@
     </rdfs:comment>
   </redfoot:Namespace>
 
+  <rdfs:Class rdf:ID="Feed">
+    <rdfs:label>Feed</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/server#Class"/>
+  </rdfs:Class>
+
   <rdfs:Class rdf:ID="Entry">
     <rdfs:label>Entry</rdfs:label>
     <rdfs:comment></rdfs:comment>
