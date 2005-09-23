@@ -311,7 +311,8 @@ SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
 format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot_program)).format
 
 resources = []
-for resource in redfoot.subjects(RDF.type, BLOG.Entry):
+blog_page = URIRef("/blog/", base=request.host)
+for resource in redfoot.objects(blog_page, BLOG.entry):
     created = redfoot.value(resource, DCTERMS.created)
     if resource.startswith(request.host):
         content = redfoot.value(resource, BLOG.content)        
