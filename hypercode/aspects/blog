@@ -26,6 +26,22 @@
       <rdfs:label>Entry</rdfs:label>
       <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
 <![CDATA[
+<?python
+from kid import XML
+from elementtree.HTMLTreeBuilder import parse
+from StringIO import StringIO
+
+def HTML(text, fragment=1, encoding=None):
+    """Element generator that reads from a string"""
+    if fragment:
+          text = '<div>%s</div>' % text # allow XML fragments
+          e = parse(StringIO(text))
+          sio = StringIO()
+          e.write(sio)
+          return XML(sio.getvalue()) # TODO: strip off the div
+    else:
+        assert False, "Not implemented"
+?>
 <div xmlns="http://www.w3.org/1999/xhtml"
      xmlns:kid="http://purl.org/kid/ns#"
      class="entry"
@@ -38,9 +54,14 @@ BLOG = redfoot.namespace("http://redfoot.net/2005/blog#")
 DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
 
+COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")
+
 markdown = redfoot.module(URIRef("modules/markdown#module", base=redfoot_program)).markdown
 
 entry = request.uri.abstract()
+if (entry, RDF.type, BLOG.Entry) not in redfoot:
+    entry = request.uri
+
 date = redfoot.value(entry, DCTERMS.created)
 
 content = redfoot.value(entry, BLOG.content)
@@ -49,14 +70,20 @@ if content:
     content_type = redfoot.value(content, BLOG.content_type)
 else:
     content_value = redfoot.comment(entry)
-    content_type = content_value.datatype
+    if content_value:
+        content_type = content_value.datatype
 
+creator = redfoot.value(entry, DC.creator)
 ?>
 
-<p>by ${redfoot.label(redfoot.value(entry, DC.creator))} on 
+<p><span kid:if="creator" kid:strip="">by ${redfoot.label(creator)}</span> on 
    ${time.strftime("%A %d %B, %Y", time.gmtime(parse_date_time(date)))}:</p>
-<p kid:if="content_type=='http://www.w3.org/1999/xhtml'">${XML(content_value)}</p>
-<p kid:if="content_type!='http://www.w3.org/1999/xhtml'">${XML(markdown(content_value))}</p>
+
+  <span kid:if="content_value" kid:strip="">
+    <p kid:strip="" kid:if="content_type=='http://www.w3.org/TR/REC-html40'">${HTML(content_value)}</p>
+    <p kid:strip="" kid:if="content_type=='http://www.w3.org/1999/xhtml'">${XML(content_value)}</p>
+    <p kid:strip="" kid:if="content_type==''">${XML(markdown(content_value))}</p>
+  </span>
 
 </div>
 ]]>
@@ -93,7 +120,8 @@ COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")
 markdown = redfoot.module(URIRef("modules/markdown#module", base=redfoot_program)).markdown
 
 blog = []
-for entry in redfoot.subjects(RDF.type, BLOG.Entry):
+blog_page = URIRef("/blog/", base=request.host)
+for entry in redfoot.objects(blog_page, BLOG.entry):
     date = redfoot.value(entry, DCTERMS.created)
     content = redfoot.value(entry, BLOG.content)
     if content:
