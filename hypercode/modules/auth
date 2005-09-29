@@ -11,7 +11,7 @@
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
-import md5
+import md5, sha
 
 SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
 
@@ -49,8 +49,15 @@ def authenticate(request, username=None, password=None):
     elif not username.startswith("mailto:"):
         username = URIRef("mailto:%s" % username)
     if password:
-        hexdigest = Literal(md5.new(password).hexdigest())
-    if password and (username, SESSION.hexdigest, hexdigest) in redfoot:
+        hexdigest = Literal(sha.new(password).hexdigest())
+        md5_hexdigest = Literal(md5.new(password).hexdigest())
+        if (username, SESSION.hexdigest, hexdigest) in redfoot:
+            match = True
+        elif (username, SESSION.hexdigest, md5_hexdigest) in redfoot:
+            match = True
+        else:
+            match = False
+    if password and match:
         if session_id:
 	    c = redfoot.get_context(redfoot.context_id(session_id))
 	    redfoot.remove((session_id, SESSION.authenticated, None))
