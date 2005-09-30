@@ -287,12 +287,12 @@ from urllib import quote
     <rdfs:label>Blog Atom Feed</rdfs:label>
     <server:page_handler rdf:resource="#atom_0.3"/>
     <!-- TODO: infer from page eventually... currently both are needed explicitly. -->
-    <server:content_type>application/x.atom+xml</server:content_type>    
+    <server:content_type>application/atom+xml</server:content_type>    
   </server:Page>
 
   <server:PageHandler rdf:ID="atom_0.3">
     <rdfs:label>blog feed (atom 0.3)</rdfs:label>
-    <server:content_type>application/x.atom+xml</server:content_type>    
+    <server:content_type>application/atom+xml</server:content_type>    
     <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
 <![CDATA[
 
