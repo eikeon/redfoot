@@ -46,7 +46,7 @@
 
   <rdfs:Property rdf:ID="hexdigest">
     <rdfs:label>hexdigest</rdfs:label>
-    <rdfs:comment></rdfs:comment>
+    <rdfs:comment>The md5 hexdigest of a secret. For example to generate from Python: md5.new(secret).hexdigest()</rdfs:comment>
     <rdfs:domain rdf:resource="#User"/>
     <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
   </rdfs:Property>
