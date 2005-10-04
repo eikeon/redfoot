@@ -69,7 +69,12 @@ allowed = allow(URIRef('%sfeeds/' % request.uri))
 
   <div class="blog" kid:for="date, entry, content_value, content_type in blog">
     <h3><a href="${request.host}/;${quote(entry.concrete(), ':/')}">${redfoot.label(entry)}</a></h3>
-    <p class="blog_by_line">by ${redfoot.label(redfoot.value(entry, DC.creator) or BNode())} on 
+<?python
+feed = redfoot.value(entry, BLOG.via, any=True)
+?>
+    <p class="blog_by_line">
+      <span kid:if="feed">via ${redfoot.label(feed) or feed}</span>
+      by ${redfoot.label(redfoot.value(entry, DC.creator) or BNode())} on 
       ${time.strftime("%A %d %B, %Y", time.gmtime(parse_date_time(date)))}:</p>
   </div>
 

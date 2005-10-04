@@ -25,8 +25,7 @@ def runEverySecond():
     feed.update()
 
 l = task.LoopingCall(runEverySecond)
-l.start(20*minute, now=True) # call every n seconds
-
+l.start(1*day, now=True) # call every
 # l.stop() will stop the looping calls
 
 ]]>
@@ -76,6 +75,12 @@ def update(feed=None):
 
       for item in data['items']:
           entry = URIRef(item['link'])
+          # Track the feed we got the item from... the entry is also
+          # related to the feed through BLOG.entry, but this is to
+          # keep track of the single feed we got the entry
+          # from... since there can be more than on in the other
+          # direction.
+          context.add((entry, BLOG.via, feed))
           if (entry, RDF.type, BLOG.Entry) not in redfoot:
 	      context.add((entry, RDF.type, BLOG.Entry))
 	      try:
@@ -136,6 +141,30 @@ def update(feed=None):
 		  context.add((feed, BLOG.entry, entry))
     except Exception, e:
         redfoot.log.exception(e)
+]]>
+    </rdf:value>
+  </redfoot:Module>
+
+  <redfoot:Module rdf:ID="html">
+    <rdfs:label>update feeds</rdfs:label>      
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+from kid import XML
+from elementtree.HTMLTreeBuilder import parse
+from StringIO import StringIO
+
+def HTML(text, fragment=1, encoding=None):
+    """Element generator that reads from a string"""
+    if fragment:
+          text = '<div>%s</div>' % text # allow XML fragments
+          e = parse(StringIO(text))
+          sio = StringIO()
+          e.write(sio)
+          return XML(sio.getvalue()) # TODO: strip off the div
+    else:
+        assert False, "Not implemented"
+
 ]]>
     </rdf:value>
   </redfoot:Module>

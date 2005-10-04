@@ -26,22 +26,6 @@
       <rdfs:label>Entry</rdfs:label>
       <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
 <![CDATA[
-<?python
-from kid import XML
-from elementtree.HTMLTreeBuilder import parse
-from StringIO import StringIO
-
-def HTML(text, fragment=1, encoding=None):
-    """Element generator that reads from a string"""
-    if fragment:
-          text = '<div>%s</div>' % text # allow XML fragments
-          e = parse(StringIO(text))
-          sio = StringIO()
-          e.write(sio)
-          return XML(sio.getvalue()) # TODO: strip off the div
-    else:
-        assert False, "Not implemented"
-?>
 <div xmlns="http://www.w3.org/1999/xhtml"
      xmlns:kid="http://purl.org/kid/ns#"
      class="entry"
@@ -56,11 +40,13 @@ DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
 
 COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")
 
+HTML = redfoot.module(URIRef("modules/blog#html", base=redfoot_program)).HTML
 markdown = redfoot.module(URIRef("modules/markdown#module", base=redfoot_program)).markdown
 
 entry = request.uri.abstract()
 if (entry, RDF.type, BLOG.Entry) not in redfoot:
     entry = request.uri
+print entry
 
 date = redfoot.value(entry, DCTERMS.created)
 
@@ -82,7 +68,7 @@ creator = redfoot.value(entry, DC.creator)
   <span kid:if="content_value" kid:strip="">
     <p kid:strip="" kid:if="content_type=='http://www.w3.org/TR/REC-html40'">${HTML(content_value)}</p>
     <p kid:strip="" kid:if="content_type=='http://www.w3.org/1999/xhtml'">${XML(content_value)}</p>
-    <p kid:strip="" kid:if="content_type==''">${XML(markdown(content_value))}</p>
+    <pre kid:if="not content_type">${content_value}</pre>
   </span>
 
 </div>
@@ -95,6 +81,7 @@ creator = redfoot.value(entry, DC.creator)
   <server:Page rdf:about="/blog/">
     <rdfs:label>Blog</rdfs:label>
     <rdfs:comment></rdfs:comment>
+    <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>    
     <server:alternate rdf:resource="/blog/atom/"/>
     <template:section rdf:resource="/blog/add_entry/"/>
     <template:default_section_rank>10.0</template:default_section_rank>
@@ -117,6 +104,7 @@ DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
 
 COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")
 
+HTML = redfoot.module(URIRef("modules/blog#html", base=redfoot_program)).HTML
 markdown = redfoot.module(URIRef("modules/markdown#module", base=redfoot_program)).markdown
 
 blog = []
@@ -149,15 +137,23 @@ from urllib import quote
 
 
   <div class="blog" kid:for="date, entry, content_value, content_type in blog">
-    <h3><a href="${quote(entry.concrete(), ':/')}">${redfoot.label(entry)}</a></h3>
+<?python
+href = quote(entry.concrete(), ':/')
+if not entry.startswith(request.host):
+    href = "%s/;%s" % (request.host, href)
+?>
+    <h3><a href="${href}">${redfoot.label(entry)}</a></h3>
     <p class="blog_by_line">by ${redfoot.label(redfoot.value(entry, DC.creator))} on 
       ${time.strftime("%A %d %B, %Y", time.gmtime(parse_date_time(date)))}:</p>
+    <p kid:strip="" kid:if="content_type=='http://www.w3.org/TR/REC-html40'">${HTML(content_value)}</p>
     <p kid:strip="" kid:if="content_type=='http://www.w3.org/1999/xhtml'">${XML(content_value)}</p>
-    <p kid:strip="" kid:if="content_type!='http://www.w3.org/1999/xhtml'">${XML(markdown(content_value))}</p>
+    <pre kid:if="not content_type">${content_value}</pre>
     <?python comments = list(redfoot.objects(entry.concrete(), COMMENT.comment))?> 
     <p kid:if="comments" style="font-size: small;"><a href="${quote(entry.concrete(), ':/')}#comments">(${len(comments)}) comments</a></p>
     <div class="hr"/>
   </div>
+
+  <p>Subscribe: <a href="/blog/atom/">Atom</a></p>
 
 </div>
 ]]>    
@@ -285,10 +281,84 @@ from urllib import quote
 
   <server:Page rdf:about="/blog/atom/">
     <rdfs:label>Blog Atom Feed</rdfs:label>
-    <server:page_handler rdf:resource="#atom_0.3"/>
+    <server:page_handler rdf:resource="#atom_1.0"/>
     <!-- TODO: infer from page eventually... currently both are needed explicitly. -->
     <server:content_type>application/atom+xml</server:content_type>    
   </server:Page>
+
+  <server:PageHandler rdf:ID="atom_1.0">
+    <rdfs:label>Redfoot Atom 1.0 Page Handler</rdfs:label>
+    <server:content_type>application/atom+xml</server:content_type>    
+    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en-US"
+      xmlns:dc="http://purl.org/dc/elements/1.1/"
+      xmlns:kid="http://purl.org/kid/ns#">
+<?python
+#
+from datetime import datetime
+BLOG = redfoot.namespace("http://redfoot.net/2005/blog#")
+DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
+DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
+SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+
+format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot_program)).format
+
+resources = []
+blog_page = URIRef("/blog/", base=request.host)
+for resource in redfoot.objects(blog_page, BLOG.entry):
+    created = redfoot.value(resource, DCTERMS.created)
+    if resource.startswith(request.host):
+        content = redfoot.value(resource, BLOG.content)        
+        if content:
+            content_value = redfoot.value(content, RDF.value)
+            content_type = redfoot.value(content, BLOG.content_type)
+            if content_type=="xhtml":
+                content_type = "http://www.w3.org/1999/xhtml"
+        else:
+            content_value = redfoot.comment(resource)
+            if content_value:
+                content_type = content_value.datatype
+        resources.append((created, resource, content_value))    
+resources.sort()
+resources.reverse()
+
+# TODO: sync blog's atom with comments atom support.
+html_page = redfoot.value(None, SERVER.alternate, request.uri, any=True)
+
+now = datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
+
+?>
+  <generator uri="${redfoot_program}">${redfoot.label(redfoot_program)}</generator>
+  <id>${request.uri}</id>
+  <title>${"%s: %s" % (redfoot.label(request.host), redfoot.label(request.uri))}</title>
+  <link href="${request.uri}" rel="self"/>
+  <link rel="alternate" type="text/html" href="${html_page}"/>
+  <updated>${now}</updated>
+  <author>
+    <name>${redfoot.label(request.host)}</name>
+    <uri>${"%s/" % request.host}</uri>
+  </author>
+  <dc:subject>resources</dc:subject>
+ <span kid:for="created, resource, content_value in resources" kid:omit="">
+  <entry>
+    <title>${redfoot.label(resource, resource)}</title>
+    <link rel="alternate" type="text/html" href="${resource.concrete()}"/>
+    <id>${resource}</id>
+    <published>${created}</published>
+    <updated>${created}</updated>
+    <content kid:if="content_value" type="html">
+      ${content_value}
+    </content>
+    <dc:subject>resource</dc:subject>
+  </entry>
+ </span>
+</feed>                      
+
+]]>
+    </rdf:value>
+  </server:PageHandler>
 
   <server:PageHandler rdf:ID="atom_0.3">
     <rdfs:label>blog feed (atom 0.3)</rdfs:label>

@@ -50,4 +50,11 @@
     <rdfs:range rdf:resource="#Entry"/>
   </rdfs:Property>
 
+  <rdfs:Property rdf:ID="via">
+    <rdfs:label>via</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:domain rdf:resource="#Entry"/>
+    <rdfs:range rdf:resource="#Feed"/>
+  </rdfs:Property>
+
 </rdf:RDF>  
