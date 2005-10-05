@@ -301,7 +301,7 @@ isDatatype = (predicate, RDFS.range, RDFS.Literal) in redfoot or (predicate, RDF
 values = {}
 value_list = []
 seen = set()
-if not isinstance(object, Literal):
+if object and not isinstance(object, Literal):
     seen.add(object)
     value_list.append((redfoot.label(object) or object, object))
 for range in redfoot.objects(predicate, RDFS.range):
