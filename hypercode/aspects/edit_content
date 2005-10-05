@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:commands="http://redfoot.net/2005/commands#"
+   xmlns:server="http://redfoot.net/2005/server#"
+   xmlns:session="http://redfoot.net/2005/session#"
+   xmlns:template='http://redfoot.net/2005/template#'
+>
+
+  <redfoot:Aspect rdf:ID="edit_content_aspect">
+    <rdfs:label>Edit Content aspect</rdfs:label>
+    <rdfs:comment>
+    </rdfs:comment>
+  </redfoot:Aspect>
+
+  <server:Page rdf:about="/edit/content/">
+    <rdfs:label>Edit Content</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>    
+
+    <!-- TODO: define a class specifically for those who can edit content -->
+    <server:allow rdf:resource="#Admin"/>
+    
+    <template:content>
+     <server:PagePartHandler rdf:ID="edit_content_content">
+      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+  <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
+
+<?python 
+
+TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")
+
+allowed = allow(URIRef("%s/edit/put_content/" % request.host))
+from urllib import quote
+
+uri = request.parameters.get("uri")
+if uri:
+    uri = URIRef(uri)
+    label = redfoot.label(uri)
+    content = redfoot.value(uri, TEMPLATE.content)
+    if content:
+        content_value = redfoot.value(content, RDF.value)
+    else: 
+        content_value = None
+
+    if content_value is None:
+        content_value = Literal("", datatype=URIRef("http://redfoot.net/2005/server#Kid"))
+
+    value_list = [("Kid", URIRef("http://redfoot.net/2005/server#Kid")), 
+                  ("Python", URIRef("http://redfoot.net/2005/redfoot#Python"))]
+    selected = content_value.datatype
+
+?>  
+  <div kid:if="uri and allowed" kid:strip="">
+    <form action="/edit/put_content/" method="post">
+      <input name="uri" type="hidden" value="${uri}"/>
+      <p>Title: <input type="text" name="title" value="${label}" style="width: 80%"/></p>
+      <textarea name="content" cols="" rows="40" style="width: 100%">${content_value}</textarea>
+      <p>Format: 
+       <select name="format">
+        <span kid:for="option_label, option_value in value_list" kid:strip="">
+          <option kid:if="option_value==selected" value="${option_value}" selected="true" >${option_label}</option>
+          <option kid:if="option_value!=selected" value="${option_value}">${option_label}</option>
+        </span>
+       </select>
+       <input name="submit" type="submit" value="Submit Content" />
+      </p>
+    </form>    
+  </div>
+
+  <div kid:if="not allowed" kid:strip="">
+    <p kid:if="allow(URIRef('%s/login/'% request.host))">
+      <a href="/login/?return_uri=${quote(request.uri)}">Login</a> to submit a edit_content content.
+    </p>
+  </div>
+
+  </span>
+]]>
+      </rdf:value>
+     </server:PagePartHandler> 
+    </template:content>
+  </server:Page>
+
+
+  <server:Page rdf:about="/edit/put_content/">
+    <rdfs:label>Put Content</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <server:allow rdf:resource="http://redfoot.net/2005/session#User"/>
+    <template:content>
+     <server:PagePartHandler rdf:ID="put_content_content">
+      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+  <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
+<?python
+from rdflib.util import date_time
+from urlparse import urljoin
+from urllib import quote
+from time import gmtime
+    
+from kid import XML
+
+TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")
+DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
+DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
+SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+
+uri = request.parameters.get("uri")
+title = request.parameters.get("title")
+content_value = request.parameters.get("content") or ""
+datatype = URIRef(request.parameters.get("format") or "")
+content_value = Literal(content_value, datatype=datatype)
+if uri:
+    uri = URIRef(uri)
+    context = redfoot.get_context(uri)
+    if title:
+        label = URIRef(title)
+        redfoot.remove((uri, RDFS.label, None))
+        context.add((uri, RDFS.label, label))
+    content = redfoot.value(uri, TEMPLATE.content)
+    if not content:
+        content = BNode()
+        context.add((uri, TEMPLATE.content, content))
+    redfoot.remove((content, RDF.value, None))
+    context.add((content, RDF.value, content_value))
+
+    message = ""
+    if content_value.datatype==URIRef("http://redfoot.net/2005/server#Kid"):
+        try:
+            for item in XML(content_value, fragment=False):
+                pass
+        except Exception, e:
+            message = str(e)
+            content = None
+
+from urllib import quote
+?>
+
+<h2 kid:if="message">${message} <a href="/edit/content/?uri=${quote(uri)}">Edit again</a></h2>
+
+<h2 kid:if="not message">Thank you for your content:
+  <a href="${quote(uri.concrete(), ':/')}">${redfoot.label(uri, uri)}</a>
+</h2>
+
+  </span>
+
+]]>
+      </rdf:value>
+     </server:PagePartHandler> 
+    </template:content>
+  </server:Page>
+
+</rdf:RDF>  
