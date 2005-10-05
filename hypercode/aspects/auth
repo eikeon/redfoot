@@ -282,6 +282,7 @@ if request.method=='POST':
     return_uri = URIRef(request.parameters.get("return_uri", "/account/"))
     create_uri = URIRef(request.parameters.get("create_uri"))
 
+    request.create_session()
     sid = request.session_id
     assert sid
 
