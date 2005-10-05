@@ -366,7 +366,8 @@ Datatype: <select name="datatype">
 <span kid:if="object==None">
   <input type="submit" value="Add"/>
 </span>
-<input type="button" value="Edit Resource" onclick="edit_form.action='resource'; edit_form.submit()"/>
+<input type="button" value="Edit Resource" 
+       onclick="edit_form.processor.value='update';edit_form.action='resource'; edit_form.submit()"/>
 </form>
 
 <?python
