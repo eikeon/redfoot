@@ -116,7 +116,7 @@ if uri:
     uri = URIRef(uri)
     context = redfoot.get_context(redfoot.context_id(uri.abstract()))
     if title:
-        label = URIRef(title)
+        label = Literal(title)
         redfoot.remove((uri, RDFS.label, None))
         context.add((uri, RDFS.label, label))
     content = redfoot.value(uri, TEMPLATE.content)
