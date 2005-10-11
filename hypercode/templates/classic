@@ -46,8 +46,8 @@
   <div kid:if="(edit_uri, None, None) in redfoot and allow(URIRef('%s/edit/resource' % request.host))"
        class="content_nav">
    <?python from urllib import quote?>
-    <a kid:if="(request.uri, None, None) in redfoot" href="/edit/resource?uri=${quote(request.uri)}">Edit</a>
-    <a kid:if="(request.uri.abstract(), None, None) in redfoot" href="/edit/resource?uri=${quote(request.uri.abstract())}">Edit</a>
+    <a kid:if="(request.uri, None, None) in redfoot" href="/edit/resource?uri=${quote(request.uri)}">Edit Page</a>
+    <a kid:if="(request.uri.abstract(), None, None) in redfoot" href="/edit/resource?uri=${quote(request.uri.abstract())}">Edit Page (abstract)</a>
   </div>
 
     <div class="header">
@@ -64,8 +64,7 @@
   <div kid:if="(edit_content_uri, None, None) in redfoot and allow(edit_content_uri)"
        class="content_nav">
    <?python from urllib import quote?>
-    <a kid:if="(request.uri, None, None) in redfoot" href="/edit/content/?uri=${quote(request.uri)}">Edit</a>
-    <a kid:if="(request.uri.abstract(), None, None) in redfoot" href="/edit/content/?uri=${quote(request.uri.abstract())}">Edit Abstract</a>
+    <a kid:if="(request.uri, None, None) in redfoot" href="/edit/content/?uri=${quote(request.uri)}">Edit Content</a>
     <a kid:if="(request.uri, None, None) not in redfoot" href="/edit/content/?uri=${quote(request.uri)}">Create</a>
   </div>
 
