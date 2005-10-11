@@ -47,6 +47,16 @@ SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
     </div>
 
     <div class="content">
+
+  <?python edit_content_uri = URIRef('%s/edit/content/' % request.host)?>
+  <div kid:if="(edit_content_uri, None, None) in redfoot and allow(edit_content_uri)"
+       class="content_nav">
+   <?python from urllib import quote?>
+    <a kid:if="(request.uri, None, None) in redfoot" href="/edit/content/?uri=${quote(request.uri)}">Edit</a>
+    <a kid:if="(request.uri.abstract(), None, None) in redfoot" href="/edit/content/?uri=${quote(request.uri.abstract())}">Edit Abstract</a>
+    <a kid:if="(request.uri, None, None) not in redfoot" href="/edit/content/?uri=${quote(request.uri)}">Create</a>
+  </div>
+
 <?python from itertools import chain?>    
 
       ${display(lookup(TEMPLATE.content))}
@@ -67,7 +77,8 @@ SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
       ${display(lookup(TEMPLATE.footer))}
     </div>
 
-  <div kid:if="allow(URIRef('%s/edit/resource' % request.host))"
+  <?python edit_uri = URIRef('%s/edit/content/' % request.host)?>
+  <div kid:if="(edit_uri, None, None) in redfoot and allow(URIRef('%s/edit/resource' % request.host))"
        class="content_nav">
    <?python from urllib import quote?>
     <a kid:if="(request.uri, None, None) in redfoot" href="/edit/resource?uri=${quote(request.uri)}">Edit</a>
