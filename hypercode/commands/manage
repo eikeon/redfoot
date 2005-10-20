@@ -185,12 +185,16 @@ REDFOOT = redfoot.namespace("http://redfoot.net/2005/redfoot#")
 DC_creator = URIRef("http://purl.org/dc/elements/1.1/creator")
 
 for cid, _, source in redfoot.triples((None, RDF.type, REDFOOT.Context)):
-    source = redfoot.value(cid, REDFOOT.source, default=None)
-    context_id = redfoot.value(cid, REDFOOT.context_id, default=None)
-    creator = redfoot.value(cid, DC_creator, default=None) or redfoot.uri
+    try:
+        source = redfoot.value(cid, REDFOOT.source, default=None)
+    except Exception, e:
+        source = None
+        print e
     if source and cid.startswith(prefix):
         print "loading %s" % source
         try:
+            context_id = redfoot.value(cid, REDFOOT.context_id, default=None)
+            creator = redfoot.value(cid, DC_creator, default=None) or redfoot.uri
             redfoot.load(source, publicID=cid, context_id=context_id, creator=creator)
         except Exception, e:
             print e
