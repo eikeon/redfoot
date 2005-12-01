@@ -163,6 +163,10 @@ if not uri and not text:
       </form>        
 """)
 else:
+    from twisted.web.http import datetimeToString
+    DAY = 60 * 60 * 24
+    response.setHeader("Expires", datetimeToString(time.time() + DAY))
+
     if uri:
         f = urlopen(uri)
         page = unicode(f.read(), 'utf-8', 'replace')
