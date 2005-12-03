@@ -163,6 +163,7 @@ if not uri and not text:
       </form>        
 """)
 else:
+    import time
     from twisted.web.http import datetimeToString
     DAY = 60 * 60 * 24
     response.setHeader("Expires", datetimeToString(time.time() + DAY))
@@ -173,11 +174,15 @@ else:
     else:
         page = unicode("<p>%s</p>" % text, 'utf-8', 'replace')
     p = HTMLParser(response.write, uri, request.host)
+    seen = set()
     for s in instances:
        for label in uniq(redfoot.objects(s, RDFS.label)):
-          if label:
+          if label: 
              label = URIRef(label.replace(".", "")) #??
-             p.add_pattern(label, s)
+             if label not in seen:
+                 seen.add(label)
+                 if label in page:
+                     p.add_pattern(label, s)
     p.feed(page)
 
 ]]>
