@@ -114,7 +114,7 @@ datatype = URIRef(request.parameters.get("format") or "")
 content_value = Literal(content_value, datatype=datatype)
 if uri:
     uri = URIRef(uri)
-    context = redfoot.get_context(redfoot.context_id(uri.abstract()))
+    context = redfoot.get_context(redfoot.context_id(uri.abstract(), context_id="#edit_content"))
     if title:
         label = Literal(title)
         redfoot.remove((uri, RDFS.label, None))
