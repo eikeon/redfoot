@@ -73,7 +73,7 @@
     <rdfs:comment></rdfs:comment>
     <rdfs:domain rdf:resource="#Site"/>
     <rdfs:domain rdf:resource="#Page"/>
-    <rdfs:range rdf:resource="#Handler"/>
+    <rdfs:range rdf:resource="#PageHandler"/>
   </rdfs:Property>
 
   <rdfs:Property rdf:ID="unauthorized_page_handler">
