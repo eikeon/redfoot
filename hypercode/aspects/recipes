@@ -18,7 +18,7 @@
     <template:section_rank>5.0</template:section_rank>    
     <server:alternate rdf:resource="/recipes/atom/" />
     <!--<server:alternate rdf:resource="/recipes/rdfxml/" />-->
-    <template:content rdf:resource="#recipe_xhtml_dl"/>
+    <!--<template:content rdf:resource="#recipe_xhtml_dl"/>-->
   </rdf:Description>
 
   <rdf:Description rdf:about="/recipes/atom/">
@@ -128,6 +128,8 @@ format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot_prog
 recipe_module = redfoot.module(URIRef("modules/recipe#module", base=redfoot_program))
 
 recipe_list = redfoot.value(None, SERVER.alternate, request.uri)
+if recipe_list:
+    recipe_list = recipe_list.abstract()
 recipes = recipe_module.recipes(recipe_list)
 
 now = datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
@@ -198,20 +200,12 @@ else:
 
 recipe_uri = URIRef("%s%s/" % (recipes, message.subject))
 
-# currently context where all recipes are stored
-#context = redfoot.get_context(URIRef("http://donnafales.com/recipes/submitted_recipes"))
 context = redfoot.get_context(redfoot.context_id(recipe_uri.abstract()))
 
-context.remove((None, RECIPE.recipe, recipe_uri))
-context.add((recipes, RECIPE.recipe, recipe_uri))
+context.add((recipe_uri, RDF.type, recipes.abstract()))
 
 recipe_module = redfoot.module(URIRef("modules/recipe#module", base=redfoot_program))
 recipe_module.parse(message.payload, context, recipe_uri)
-
-
-# Backup
-from datetime import datetime
-context.save("/var/www/redfoot2005/recipe-%s.rdf" % datetime.now().date())
 
 ]]>
         </rdf:value>
@@ -246,10 +240,6 @@ for i in redfoot.subjects(RDF.type, RECIPE.Ingredient):
 
 RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
 
-# currently context where all recipes are stored
-#context = redfoot.get_context(URIRef("http://donnafales.com/recipes/submitted_recipes"))
-#ingredient_context = redfoot.get_context(URIRef("http://donnafales.com/2005/ingredients#context"))
-
 recipe = redfoot.module(URIRef("modules/recipe#module", base=redfoot_program))
 
 l = []
@@ -257,25 +247,26 @@ for r in redfoot.subjects(RDF.type, RECIPE.Recipe):
     print "updating:", r    
     date = redfoot.value(r, RECIPE.date, any=True)
     orig = redfoot.value(r, RECIPE.original, any=True)
-    recipes = redfoot.value(None, RECIPE.recipe, object=r, any=True)
-    l.append((r, date, orig, recipes))
+    l.append((r, date, orig))
 
-#context.remove((None, None, None))
-for r, date, orig, recipes in l:
+for r, date, orig in l:
     context = redfoot.get_context(redfoot.context_id(r.abstract()))
     context.add((r, RECIPE.date, date))
-    context.add((recipes, RECIPE.recipe, r))
     recipe.parse(orig, context, r)
 
 
-f = file("out", "wb")
+f = file("unknown_ingredients", "wb")
 parser = recipe.ingredient_parser
 if parser.unknown_tokens:
     for unknown in parser.unknown_tokens:
         f.write("%s\n" % unknown.encode("utf-8"))
 f.close()
 
-
+# NOTE: tmp. converts (recipes, RECIPE.recipe, recipe) -> (recipe, RDF.type, recipes)
+for recipes, _, r in redfoot.triples((None, RECIPE.recipe, None)):
+    context = redfoot.get_context(redfoot.context_id(r.abstract()))
+    context.add((r, RDF.type, recipes.abstract()))
+    print "converting to type for %s" % r
 
 ]]>
         </rdf:value>
