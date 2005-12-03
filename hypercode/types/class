@@ -25,7 +25,9 @@ elif (request.uri, None, None) in redfoot:
 else:
     uri = request.uri.abstract()
     
+format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot_program)).format
 format_uri = redfoot.module(URIRef("modules/simple_format#module", base=redfoot_program)).format_uri
+
 seeAlsoList = list(redfoot.objects(uri, RDFS.seeAlso))
 
 miscList = [t for t in redfoot.predicate_objects(uri) if t[0] not in [RDFS.label, RDFS.comment, RDF.type, RDFS.subClassOf, RDFS.seeAlso]]
@@ -49,17 +51,17 @@ superclasses = list(redfoot.objects(uri, RDFS.subClassOf)) # TODO:
 
   <p>${XML(format_uri(redfoot.comment(uri)))}</p>
   
-  <div kid:if="superclasses">superclasses: <span kid:strip="" kid:for="superclass in superclasses"><a href="${request.host}/;${superclass.concrete()}">${redfoot.label(superclass, superclass)}</a> </span></div>
-  <div kid:if="subclasses">subclasses: <span kid:strip="" kid:for="subclass in subclasses"><a href="${request.host}/;${subclass.concrete()}">${redfoot.label(subclass, subclass)}</a> </span></div>
+  <div kid:if="superclasses">superclasses: <span kid:strip="" kid:for="superclass in superclasses"><a href="${request.relative(superclass.concrete())}">${redfoot.label(superclass, superclass)}</a> </span></div>
+  <div kid:if="subclasses">subclasses: <span kid:strip="" kid:for="subclass in subclasses"><a href="${request.relative(subclass.concrete())}">${redfoot.label(subclass, subclass)}</a> </span></div>
 
   
-  <ul>
+  <ul kid:if="miscList">
     <li kid:for="p, o in miscList">${redfoot.label(p) or p},
       <span kid:strip="" kid:if="isinstance(o, Literal)">
         <pre>${o}</pre>
       </span>
       <span kid:strip="" kid:if="isinstance(o, URIRef)">      
-        <a href="${request.host}/;${o.concrete()}">
+        <a href="${request.relative(o.concrete())}">
           ${", ".join(redfoot.objects(o, RDFS.label)) or o}
         </a>
       </span>
@@ -78,19 +80,22 @@ superclasses = list(redfoot.objects(uri, RDFS.subClassOf)) # TODO:
   </div>    
 
   <div kid:if="instances">
-  <h2>Instances</h2>
-  <ul> 
-    <li kid:for="label, instance in instances">
-      <span kid:strip="" kid:if="isinstance(instance, URIRef)">      
-        <a href="${request.host}/;${instance.concrete()}">
+  <dl> 
+    <span kid:strip="" 
+          kid:for="label, instance in instances">
+      <dt kid:if="isinstance(instance, URIRef)">      
+        <a href="${request.relative(instance.concrete())}">
           ${label}
         </a>
-      </span>
-      <span kid:strip="" kid:if="isinstance(instance, BNode)">
+      </dt>
+      <dt kid:if="isinstance(instance, BNode)">
         ${label}      
-      </span>      
-    </li>
-  </ul>
+      </dt>      
+      <dd>
+        ${XML(format(redfoot.comment(instance)))}
+      </dd>
+    </span>
+  </dl>
   
   </div>
 
