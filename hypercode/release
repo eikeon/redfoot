@@ -12,7 +12,7 @@
   <redfoot:Release rdf:about="#">
     <rdfs:label>Release</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <doap:created>2005-08-20</doap:created>
+    <doap:created>2005-12-03</doap:created>
     <redfoot:code rdf:resource="programs/kernel#"/>
     <redfoot:program rdf:resource="programs/command_runner#"/>
     <commands:config rdf:resource="commands/manage#config"/>
