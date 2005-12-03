@@ -24,8 +24,9 @@ RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
 SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
 
 def recipes(uri=None):
+    type = uri or RECIPE.Recipe
     recipe_list = []
-    for recipe in redfoot.objects(uri, RECIPE.recipe):
+    for recipe in redfoot.instances(type):
         date = redfoot.value(recipe, RECIPE.date, any=True)
         recipe_list.append((date, recipe))
     recipe_list.sort()
