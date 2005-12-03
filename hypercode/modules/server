@@ -101,6 +101,11 @@ class Request(object):
 		return p
 	return default
 
+    def relative(self, uri):
+        if not uri.startswith(self.host):
+            return "%s;%s" % (self.host, uri)
+        return uri
+
     def __getSessionID(self):
 	sid = self.__sid or self.getCookie("session_id", None)
 	if sid is None:
