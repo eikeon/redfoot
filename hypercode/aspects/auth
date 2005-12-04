@@ -208,53 +208,61 @@ if request.method=='POST':
     SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
     FOAF = redfoot.namespace("http://xmlns.com/foaf/0.1/")
 
+    return_uri = URIRef(request.parameters.get("return_uri", "%s/" % request.host))
+    register_uri = URIRef(request.parameters.get("register_uri", "%s/register/" % request.host))
+
     uid = request.parameters.get("uid", None)
-    name = request.parameters.get("name", None)
-    username = request.parameters.get("username", None) or uid.split("@")[0]
-    password = request.parameters.get("password", None)
-    verify = request.parameters.get("verify", None)
-    return_uri = URIRef(request.parameters.get("return_uri", "/account/"))
-    register_uri = URIRef(request.parameters.get("register_uri"))
+    if uid:
+        username = request.parameters.get("username", None) or uid.split("@")[0]
+        name = request.parameters.get("name", None)
+        password = request.parameters.get("password", None)
+        verify = request.parameters.get("verify", None)
 
-    request.create_session()
-    sid = request.session_id
-    assert sid
+        request.create_session()
+        sid = request.session_id
+        assert sid
 
-    context = redfoot.get_context(redfoot.context_id(sid))
-    users_context = redfoot.get_context(redfoot.context_id("%s/users" % request.host))
+        context = redfoot.get_context(redfoot.context_id(sid))
+        users_context = redfoot.get_context(redfoot.context_id("%s/users" % request.host))
 
-    if not uid.startswith("mailto:"):
-	uid = URIRef("mailto:%s" % uid)
+        if not uid.startswith("mailto:"):
+            uid = URIRef("mailto:%s" % uid)
 
-    if password==verify:
-	if not (uid, SESSION.hexdigest, None) in redfoot:
-	    hexdigest = Literal(md5.new(password).hexdigest())
-	    redfoot.remove((sid, SESSION.authenticated, None))
-	    redfoot.remove((sid, SESSION.uid, None))
-	    context.add((sid, SESSION.authenticated, Literal("True")))
-	    context.add((sid, SESSION.uid, uid))
-	    if name:
-		users_context.add((uid, RDFS.label, Literal(name)))
-	    users_context.add((uid, RDF.type, SESSION.User))
-	    users_context.add((uid, SESSION.hexdigest, hexdigest))
-            users_context.add((uid, FOAF.nick, Literal(username)))
-	    #message = "Registered new user: %s" % uid
-	    context.remove((sid, SESSION.message, None))        
-	    response.setStatus(302, 'found')
-	    response.setHeader('Location', return_uri)
-	else:
-	    message = "User already exists"
-	    context.remove((sid, SESSION.message, None))
-	    context.add((sid, SESSION.message, Literal(message)))
-	    response.setStatus(302, 'found')   
-	    response.setHeader('Location', register_uri)
+        if password==verify:
+            if not (uid, SESSION.hexdigest, None) in redfoot:
+                hexdigest = Literal(md5.new(password).hexdigest())
+                redfoot.remove((sid, SESSION.authenticated, None))
+                redfoot.remove((sid, SESSION.uid, None))
+                context.add((sid, SESSION.authenticated, Literal("True")))
+                context.add((sid, SESSION.uid, uid))
+                if name:
+                    users_context.add((uid, RDFS.label, Literal(name)))
+                users_context.add((uid, RDF.type, SESSION.User))
+                users_context.add((uid, SESSION.hexdigest, hexdigest))
+                users_context.add((uid, FOAF.nick, Literal(username)))
+                #message = "Registered new user: %s" % uid
+                context.remove((sid, SESSION.message, None))        
+                response.setStatus(302, 'found')
+                response.setHeader('Location', return_uri)
+            else:
+                message = "User already exists"
+                context.remove((sid, SESSION.message, None))
+                context.add((sid, SESSION.message, Literal(message)))
+                response.setStatus(302, 'found')   
+                response.setHeader('Location', register_uri)
 
+        else:
+            message = "password and verify mismatch"
+            context.remove((sid, SESSION.message, None))
+            context.add((sid, SESSION.message, Literal(message)))
+            response.setStatus(302, 'found')   
+            response.setHeader('Location', register_uri)
     else:
-	message = "password and verify mismatch"
-	context.remove((sid, SESSION.message, None))
-	context.add((sid, SESSION.message, Literal(message)))
-	response.setStatus(302, 'found')   
-	response.setHeader('Location', register_uri)
+        message = "must specify an email address"
+        context.remove((sid, SESSION.message, None))
+        context.add((sid, SESSION.message, Literal(message)))
+        response.setStatus(302, 'found')   
+        response.setHeader('Location', register_uri)
     
       ]]></rdf:value>
   </server:PageHandler>
