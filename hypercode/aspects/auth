@@ -53,7 +53,7 @@ in which case "" should be a server:Site
     <rdfs:label>Logout</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
-    <template:content rdf:resource="#logout_process"/>
+    <server:page_handler rdf:resource="#logout_process"/>
   </server:Page>
 
   <server:Page rdf:about="/logout/process/">
