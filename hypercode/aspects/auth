@@ -189,7 +189,7 @@ else:
        <td><input type="submit" value="register"/></td>
      </tr>
     </table>
-    <input type="hidden" name="return_uri" value="${request.parameters.get('return_uri', '/account/')}"/>
+    <input type="hidden" name="return_uri" value="${request.headers.get('referer', '%s/' % request.host)}"/>
     <input type="hidden" name="register_uri" value="${request.uri}"/>    
   </form>
 
