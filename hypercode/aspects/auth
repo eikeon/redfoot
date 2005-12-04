@@ -143,7 +143,7 @@ if sid:
 
 return_uri = URIRef(request.headers.get("referer", "%s/" % request.host))
 
-Response.setStatus(302, 'found')
+response.setStatus(302, 'found')
 response.setHeader('Location', return_uri)
       
       ]]></rdf:value>
