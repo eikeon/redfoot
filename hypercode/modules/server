@@ -111,7 +111,7 @@ class Request(object):
 
     def relative(self, uri):
         if not uri.startswith(self.host):
-            return "%s;%s" % (self.host, uri)
+            return "%s/;%s" % (self.host, uri)
         return uri
 
     def __getSessionID(self):
