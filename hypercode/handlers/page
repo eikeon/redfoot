@@ -29,7 +29,7 @@ if not "://" in request.uri:
 if request.method.lower()=="put":
     auth = redfoot.module(URIRef("modules/auth#module", base=redfoot_program))
     uid = auth.authenticate(request)
-    if uid:
+    if uid and uid in request.objects(REDFOOT.admin):
 	cid = request.uri.abstract()
 	if not (cid, RDF.type, REDFOOT.Context) in redfoot:
 	    cid = redfoot.context_id(cid) # default context
@@ -43,7 +43,7 @@ if request.method.lower()=="put":
     response.finish()
 else:
     def lookup(property, default=None):
-	return request.lookup(property) or redfoot.value(redfoot_current, property) or default
+        return request.lookup(property) or redfoot.value(redfoot_current, property) or default
 
     page_handler = lookup(SERVER.page_handler)
     assert page_handler, "no page handler found"
