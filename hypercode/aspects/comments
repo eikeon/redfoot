@@ -49,7 +49,7 @@ creator_label = redfoot.label(creator) or creator.split('@')[0]
 <p>
 by ${creator_label}
 <span kid:if="date">on ${time.strftime("%A %d %B, %Y", time.gmtime(parse_date_time(date)))}</span> 
-regarding <a href="${request.host}/;${resource}">${redfoot.label(resource, resource)}</a>:</p>
+regarding <a href="${request.relative(resource)}">${redfoot.label(resource, resource)}</a>:</p>
 <pre>${redfoot.value(comment, RDFS.comment)}</pre>
 
 </div>
@@ -112,7 +112,7 @@ if uri is not None and comment:
 
 <pre>${comment}</pre>
 
-<p>Return to <a href="${request.host}/;${uri}">${redfoot.label(uri.abstract()) or redfoot.label(uri) or  uri}</a></p>
+<p>Return to <a href="${request.relative(uri)}">${redfoot.label(uri.abstract()) or redfoot.label(uri) or  uri}</a></p>
 
 </div>
 
@@ -232,7 +232,7 @@ else:
 
     <p style="border-top: 1px solid black">
  <span kid:strip="" kid:if="creator_label">by ${creator_label}</span>
- <span kid:if="date"> on ${time.strftime("%A %d %B, %Y", time.gmtime(parse_date_time(date)))}</span> regarding <a href="${request.host}/;${resource}">${redfoot.label(resource.abstract()) or redfoot.label(resource) or resource}</a>:</p>
+ <span kid:if="date"> on ${time.strftime("%A %d %B, %Y", time.gmtime(parse_date_time(date)))}</span> regarding <a href="${request.relative(resource)}">${redfoot.label(resource.abstract()) or redfoot.label(resource) or resource}</a>:</p>
     <pre>${redfoot.value(comment, RDFS.comment)}</pre>
    
   </span>

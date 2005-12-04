@@ -29,13 +29,13 @@ seen.add(uri)
 ?>
       <li kid:for="subclass in redfoot.subclasses(uri)">
         <a kid:if="isinstance(subclass, URIRef)" 
-           href="${request.host}/;${subclass.concrete()}">${redfoot.label(subclass, subclass)}</a>
+           href="${request.relative(subclass.concrete())}">${redfoot.label(subclass, subclass)}</a>
         <span kid:strip="" kid:if="isinstance(subclass, BNode)">${redfoot.label(subclass, subclass)}</span>
         ${display_class(subclass, seen=set(seen))}
       </li>
       <li kid:for="instance in redfoot.instances(uri)">
         <a kid:if="isinstance(instance, URIRef)"
-           href="${request.host}/;${instance.concrete()}">${redfoot.label(instance, instance)}</a>
+           href="${request.relative(instance.concrete())}">${redfoot.label(instance, instance)}</a>
         <span kid:strip="" kid:if="isinstance(instance, BNode)">${redfoot.label(instance, instance)}</span>
       </li>
   </span>      
@@ -72,7 +72,7 @@ seen.add(uri)
 ?>
 <li>
     <a kid:if="isinstance(uri, URIRef)" 
-       href="${request.host}/;${uri.concrete()}">${redfoot.label(uri, uri)}</a>
+       href="${request.relative(uri.concrete())}">${redfoot.label(uri, uri)}</a>
     <span kid:strip="" kid:if="isinstance(uri, BNode)">${redfoot.label(uri, uri)}</span>
 </li>    
 
@@ -110,7 +110,7 @@ for subject in uniq(redfoot.subjects()):
   <ul>
     <li kid:for="uri in typeless">
       <a kid:if="isinstance(uri, URIRef)"
-         href="${request.host}/;${uri.concrete()}">${uri}</a>
+         href="${request.relative(uri.concrete())}">${uri}</a>
          
       <span kid:if="isinstance(uri, BNode)" kid:strip="">${uri}
       <ul>

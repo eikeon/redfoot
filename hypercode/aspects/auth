@@ -118,7 +118,7 @@ if request.method=='POST':
     if auth.authenticate(request, username=uid, password=password):
 	response.setStatus(302, 'found')
 	if not return_uri.startswith(request.host):
-	    return_uri = URIRef("%s/;%s" % (request.host, return_uri))           
+	    return_uri = URIRef(request.relative(return_uri))
 	response.setHeader('Location', return_uri)
     else:
 	login_uri += "?return_uri=%s" % quote(return_uri)

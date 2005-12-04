@@ -48,7 +48,7 @@ def prefix(url, host=request.host):
     if url.startswith(host):
         return url.concrete()
     else:
-        return "%s/;%s" % (host, url.concrete())
+        return request.relative(url.concrete())
    
 ?>
   <ul>

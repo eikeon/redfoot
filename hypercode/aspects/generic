@@ -119,7 +119,7 @@ if processor=="delete":
 ?>    
   <table class="generic">
       <caption>Subject: 
-	<a kid:if="isinstance(subject, URIRef)" href="${request.host}/;${subject.concrete()}">${redfoot.label(subject) or subject}</a>
+	<a kid:if="isinstance(subject, URIRef)" href="${request.relative(subject.concrete())}">${redfoot.label(subject) or subject}</a>
 	<span kid:strip="" kid:if="not isinstance(subject, URIRef)">${subject}</span>
       </caption>
       <tr>

@@ -68,7 +68,7 @@ allowed = allow(URIRef('%sfeeds/' % request.uri))
 <p kid:if="allowed"><a href="feeds/">Feeds</a></p>
 
   <div class="blog" kid:for="date, entry, content_value, content_type in blog">
-    <h3><a href="${request.host}/;${quote(entry.concrete(), ':/')}">${redfoot.label(entry)}</a></h3>
+    <h3><a href="${request.relative(quote(entry.concrete(), ':/'))}">${redfoot.label(entry)}</a></h3>
 <?python
 feed = redfoot.value(entry, BLOG.via, any=True)
 ?>

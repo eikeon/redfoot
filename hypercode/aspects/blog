@@ -139,8 +139,7 @@ from urllib import quote
   <div class="blog" kid:for="date, entry, content_value, content_type in blog">
 <?python
 href = quote(entry.concrete(), ':/')
-if not entry.startswith(request.host):
-    href = "%s/;%s" % (request.host, href)
+href = request.relative(href)
 ?>
     <h3><a href="${href}">${redfoot.label(entry)}</a></h3>
     <p class="blog_by_line">by ${redfoot.label(redfoot.value(entry, DC.creator))} on 

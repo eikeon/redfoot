@@ -73,7 +73,7 @@ matrix=calendar.monthcalendar(year,month)
         <div align="left">
           <ul style="font-size: x-small; padding: 1em; margin: 0em 1em;">
             <li kid:for="resource in redfoot.subjects(DC.date, Literal('%04d-%02d-%02d' % (year, month, day), datatype=None))">
-              <a href="${request.host}/;${resource.concrete()}">
+              <a href="${request.relative(resource.concrete())}">
                 ${redfoot.label(resource, None) or redfoot.value(resource, DC.description, any=True) or resource}
               </a>
             </li>
