@@ -49,6 +49,10 @@ def authenticate(request, username=None, password=None):
 	    if label:
 		c.remove((username, RDFS.label, None))            
 		c.add((username, RDFS.label, label))
+            if not (username, FOAF.nick, None) in redfoot:
+                for nick in g.objects(username, FOAF.nick):
+                    if not (None, FOAF.nick, nick) in redfoot: # TODO: sort from shortest to longest? or let user pick somehow.
+                        c.add((username, FOAF.nick, nick))
     elif not username.startswith("mailto:"):
         username = URIRef("mailto:%s" % username)
     if password:
