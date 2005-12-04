@@ -169,10 +169,6 @@ else:
 	<td><input type="text" name="uid" value=""/></td>
       </tr>
       <tr>
-	<th>Username</th>
-	<td><input type="text" name="username" value=""/></td>
-      </tr>
-      <tr>
 	<th>Name</th>
 	<td><input type="text" name="name" value=""/></td>
       </tr>
@@ -212,8 +208,13 @@ if request.method=='POST':
 
     uid = request.parameters.get("uid", None)
     if uid:
-        username = request.parameters.get("username", None) or uid.split("@")[0]
-        name = request.parameters.get("name", None)
+        name = request.parameters.get("name", None) or uid.split("@")[0]
+        if "@" in uid:
+            if not uid.startswith("mailto:"):
+                uid = URIRef("mailto:%s" % uid)
+        else:
+            uid = URIRef("%s/users/%s#" % (request.host, uid))
+
         password = request.parameters.get("password", None)
         verify = request.parameters.get("verify", None)
 
@@ -223,9 +224,6 @@ if request.method=='POST':
 
         context = redfoot.get_context(redfoot.context_id(sid))
         users_context = redfoot.get_context(redfoot.context_id("%s/users" % request.host))
-
-        if not uid.startswith("mailto:"):
-            uid = URIRef("mailto:%s" % uid)
 
         if password==verify:
             if not (uid, SESSION.hexdigest, None) in redfoot:
