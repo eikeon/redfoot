@@ -206,7 +206,6 @@ if request.method=='POST':
     import md5
 
     SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
-    FOAF = redfoot.namespace("http://xmlns.com/foaf/0.1/")
 
     return_uri = URIRef(request.parameters.get("return_uri", "%s/" % request.host))
     register_uri = URIRef(request.parameters.get("register_uri", "%s/register/" % request.host))
@@ -239,7 +238,6 @@ if request.method=='POST':
                     users_context.add((uid, RDFS.label, Literal(name)))
                 users_context.add((uid, RDF.type, SESSION.User))
                 users_context.add((uid, SESSION.hexdigest, hexdigest))
-                users_context.add((uid, FOAF.nick, Literal(username)))
                 #message = "Registered new user: %s" % uid
                 context.remove((sid, SESSION.message, None))        
                 response.setStatus(302, 'found')
