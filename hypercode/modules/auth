@@ -17,6 +17,9 @@ SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
 
 def authenticate(request, username=None, password=None):
     "Returns uid if authentication succeeds or None otherwise"
+
+    message = ""
+
     session_id = request.session_id
     if username is None:
         username = request.user
