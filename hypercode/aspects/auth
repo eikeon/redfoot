@@ -165,12 +165,16 @@ else:
   <form action="process/" method="POST">
     <table>
       <tr>
-	<th>Name</th>
-	<td><input type="text" name="name" value=""/></td>
-      </tr>
-      <tr>
 	<th>Email Address</th>
 	<td><input type="text" name="uid" value=""/></td>
+      </tr>
+      <tr>
+	<th>Username</th>
+	<td><input type="text" name="username" value=""/></td>
+      </tr>
+      <tr>
+	<th>Name</th>
+	<td><input type="text" name="name" value=""/></td>
       </tr>
       <tr>
        <th>Password</th>
@@ -202,9 +206,11 @@ if request.method=='POST':
     import md5
 
     SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+    FOAF = redfoot.namespace("http://xmlns.com/foaf/0.1/")
 
-    name = request.parameters.get("name", None)
     uid = request.parameters.get("uid", None)
+    name = request.parameters.get("name", None)
+    username = request.parameters.get("username", None) or uid.split("@")[0]
     password = request.parameters.get("password", None)
     verify = request.parameters.get("verify", None)
     return_uri = URIRef(request.parameters.get("return_uri", "/account/"))
@@ -231,6 +237,7 @@ if request.method=='POST':
 		users_context.add((uid, RDFS.label, Literal(name)))
 	    users_context.add((uid, RDF.type, SESSION.User))
 	    users_context.add((uid, SESSION.hexdigest, hexdigest))
+            users_context.add((uid, FOAF.nick, Literal(username)))
 	    #message = "Registered new user: %s" % uid
 	    context.remove((sid, SESSION.message, None))        
 	    response.setStatus(302, 'found')
