@@ -17,6 +17,7 @@
     <template:content rdf:resource="#add_resource"/>
     <server:allow rdf:resource="#Admin"/>
     <template:default_section_rank>70.0</template:default_section_rank>    
+    <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>    
   </server:Page>
 
   <server:Page rdf:about="/edit/resource">
@@ -24,6 +25,7 @@
     <rdfs:comment></rdfs:comment>
     <template:content rdf:resource="#edit_resource"/>
     <server:allow rdf:resource="#Admin"/>
+    <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
   </server:Page>
 
   <server:Page rdf:about="/edit/triple">
@@ -31,6 +33,7 @@
     <rdfs:comment></rdfs:comment>
     <template:content rdf:resource="#edit_triple"/>
     <server:allow rdf:resource="#Admin"/>
+    <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
   </server:Page>
 
   <rdf:Description rdf:about="/create/"> <!-- TODO: incorporate into generic-->
@@ -67,6 +70,7 @@ else:
       ]]></rdf:value>
       </rdf:Description>
     </server:page_handler>
+    <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>    
   </rdf:Description>
 
 
