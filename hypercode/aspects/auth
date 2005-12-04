@@ -53,7 +53,7 @@ in which case "" should be a server:Site
     <rdfs:label>Logout</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
-    <template:content rdf:resource="#logout"/>
+    <template:content rdf:resource="#logout_process"/>
   </server:Page>
 
   <server:Page rdf:about="/logout/process/">
@@ -205,20 +205,20 @@ authenticated = request.session_id and (request.session_id, SESSION.authenticate
   <server:PageHandler rdf:ID="logout_process">
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python"><![CDATA[
 
-if request.method=='POST':
-    SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+authenticated = request.session_id and (request.session_id, SESSION.authenticated, Literal('True')) in redfoot
 
-    sid = request.session_id
-    if sid:
-	context = redfoot.get_context(redfoot.context_id(sid))
-	redfoot.remove((sid, SESSION.authenticated, None))
-	redfoot.remove((sid, SESSION.uid, None))
-	context.add((sid, SESSION.authenticated, Literal("False")))
+sid = request.session_id
+if sid:
+    context = redfoot.get_context(redfoot.context_id(sid))
+    redfoot.remove((sid, SESSION.authenticated, None))
+    redfoot.remove((sid, SESSION.uid, None))
+    context.add((sid, SESSION.authenticated, Literal("False")))
 
-    return_uri = URIRef(request.parameters.get("return_uri", "/account/"))
+return_uri = URIRef(request.parameters.get("return_uri", "%s/" % request.host))
 
-    response.setStatus(302, 'found')
-    response.setHeader('Location', return_uri)
+response.setStatus(302, 'found')
+response.setHeader('Location', return_uri)
       
       ]]></rdf:value>
   </server:PageHandler>
