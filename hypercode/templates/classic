@@ -71,7 +71,7 @@ else:
   <li><a href="/register/">Register</a></li>
  </span>
  <span kid:if="uid" kid:strip="">
-  <li><a href="${request.relative(uid.concrete)}">${redfoot.label(uid) or uid}'s profile</a></li>
+  <li><a href="${request.relative(uid.concrete())}">${redfoot.label(uid) or uid}'s profile</a></li>
   <li><a href="/logout/">logout</a></li>
  </span>
 </ul>
