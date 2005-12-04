@@ -19,22 +19,10 @@ in which case "" should be a server:Site
       -->
   </rdf:Description>
 
-  <rdf:Description rdf:about="">
-    <template:section rdf:resource="/account/"/>
-  </rdf:Description>
-
   <rdfs:Class rdf:ID="Admin">
     <rdfs:label>Admin</rdfs:label>
     <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/session#User"/>
   </rdfs:Class>
-
-  <server:Page rdf:about="/account/">
-    <rdfs:label>Account</rdfs:label>
-    <rdfs:comment></rdfs:comment>
-    <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
-    <template:default_section_rank>90.0</template:default_section_rank>
-    <template:content rdf:resource="#account"/>
-  </server:Page>
 
   <server:Page rdf:about="/login/">
     <rdfs:label>Login</rdfs:label>
@@ -56,51 +44,18 @@ in which case "" should be a server:Site
     <server:page_handler rdf:resource="#logout_process"/>
   </server:Page>
 
-  <server:Page rdf:about="/logout/process/">
-    <rdfs:label>Logout process</rdfs:label>
-    <rdfs:comment></rdfs:comment>
-    <server:page_handler rdf:resource="#logout_process"/>
-  </server:Page>
-
-  <server:Page rdf:about="/login/create/">
-    <rdfs:label>Create Login</rdfs:label>
+  <server:Page rdf:about="/register/">
+    <rdfs:label>Register</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
-    <template:content rdf:resource="#auth_create"/>
+    <template:content rdf:resource="#auth_register"/>
   </server:Page>
 
-  <server:Page rdf:about="/login/create/process/">
-    <rdfs:label>Login create process</rdfs:label>
+  <server:Page rdf:about="/register/process/">
+    <rdfs:label>Register Process</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <server:page_handler rdf:resource="#create_process"/>
+    <server:page_handler rdf:resource="#register_process"/>
   </server:Page>
-
-  <server:PagePartHandler rdf:ID="account">
-    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
-
- <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
-<?python
-SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
-authenticated = request.session_id and (request.session_id, SESSION.authenticated, Literal('True')) in redfoot
-if authenticated:
-    uid = redfoot.value(request.session_id, SESSION.uid)
- ?>
-  <span kid:if="request.method=='GET'" kid:omit="">
-    <span kid:if="authenticated" kid:omit="">
-      <p>Welcome, you are logged in as ${redfoot.label(uid) or uid}</p>
-      <p>You may <a href="/logout/?return_uri=${request.uri}">Logout</a> at any time.</p>      
-    </span>
-    <span kid:if="not authenticated" kid:omit="">
-      <p>
-        You are logged out. Would you like to <a href="/login/?return_uri=${request.uri}">Login</a> or <a href="/login/create/?return_uri=${request.uri}">Create new user</a>?
-      </p>
-    </span>
-  </span>
- </span>
-      
-      ]]></rdf:value>
-  </server:PagePartHandler>
-
 
   <server:PagePartHandler rdf:ID="login">
     <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
@@ -135,10 +90,10 @@ else:
            <td><input type="submit" value="login"/></td>
          </tr>
         </table>
-        <input type="hidden" name="return_uri" value="${request.parameters.get('return_uri', '/account/')}"/>
+        <input type="hidden" name="return_uri" value="${request.headers.get('referer', '%s/login/' % request.host)}"/>
         <input type="hidden" name="login_uri" value="${request.uri}"/>
       </form>
-      <p>or <a href="create/">Create new user</a></p>
+      <p>or <a href="/register/">register new user</a></p>
     </span>
   </span>
  </span>
@@ -155,7 +110,7 @@ if request.method=='POST':
 
     uid = request.parameters.get("uid", None)
     password = request.parameters.get("password", None)
-    return_uri = URIRef(request.parameters.get("return_uri", "/account/")  )
+    return_uri = URIRef(request.parameters.get("return_uri", "%s/" % request.host))
     login_uri = URIRef(request.parameters.get("login_uri"))
 
     auth = redfoot.module(URIRef("modules/auth#module", base=redfoot_program))
@@ -173,35 +128,6 @@ if request.method=='POST':
 ]]></rdf:value>
   </server:PageHandler>
 
-  <server:PagePartHandler rdf:ID="logout">
-    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
-
- <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
-<?python 
-SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
-authenticated = request.session_id and (request.session_id, SESSION.authenticated, Literal('True')) in redfoot
-?>
-  <span kid:if="request.method=='GET'" kid:omit="">
-    <span kid:if="authenticated" kid:omit="">
-      <form action="process/" method="POST">
-        <table>
-         <tr>    
-           <th>&#160;</th>
-           <td><input type="submit" value="logout"/></td>
-         </tr>
-        </table>
-        <input type="hidden" name="return_uri" value="${request.parameters.get('return_uri', '/account/')}"/>
-      </form>
-    </span>
-    <span kid:if="not authenticated" kid:omit="">
-      <p>You are already logged out.</p>
-    </span>
-  </span>
- </span>
-      
-      ]]></rdf:value>
-  </server:PagePartHandler>
-
   <server:PageHandler rdf:ID="logout_process">
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python"><![CDATA[
 
@@ -215,15 +141,15 @@ if sid:
     redfoot.remove((sid, SESSION.uid, None))
     context.add((sid, SESSION.authenticated, Literal("False")))
 
-return_uri = URIRef(request.parameters.get("return_uri", "%s/" % request.host))
+return_uri = URIRef(request.headers.get("referer", "%s/" % request.host))
 
-response.setStatus(302, 'found')
+Response.setStatus(302, 'found')
 response.setHeader('Location', return_uri)
       
       ]]></rdf:value>
   </server:PageHandler>
 
-  <server:PagePartHandler rdf:ID="auth_create">
+  <server:PagePartHandler rdf:ID="auth_register">
     <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
 
  <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
@@ -234,7 +160,7 @@ if request.session_id:
 else:
     message = ""
 ?>
-  <span kid:if="request.method=='GET'" kid:omit="">
+
   <p>${message}</p>  
   <form action="process/" method="POST">
     <table>
@@ -256,18 +182,20 @@ else:
       </tr>
      <tr>    
        <th>&#160;</th>
-       <td><input type="submit" value="create"/></td>
+       <td><input type="submit" value="register"/></td>
      </tr>
     </table>
     <input type="hidden" name="return_uri" value="${request.parameters.get('return_uri', '/account/')}"/>
-    <input type="hidden" name="create_uri" value="${request.uri}"/>    
+    <input type="hidden" name="register_uri" value="${request.uri}"/>    
   </form>
-  </span>      
+
+  <p>or TODO: via FOAF identifier</p>
+
  </span> 
       ]]></rdf:value>
   </server:PagePartHandler>
 
-  <server:PageHandler rdf:ID="create_process">
+  <server:PageHandler rdf:ID="register_process">
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python"><![CDATA[
 
 if request.method=='POST':
@@ -280,7 +208,7 @@ if request.method=='POST':
     password = request.parameters.get("password", None)
     verify = request.parameters.get("verify", None)
     return_uri = URIRef(request.parameters.get("return_uri", "/account/"))
-    create_uri = URIRef(request.parameters.get("create_uri"))
+    register_uri = URIRef(request.parameters.get("register_uri"))
 
     request.create_session()
     sid = request.session_id
@@ -303,7 +231,7 @@ if request.method=='POST':
 		users_context.add((uid, RDFS.label, Literal(name)))
 	    users_context.add((uid, RDF.type, SESSION.User))
 	    users_context.add((uid, SESSION.hexdigest, hexdigest))
-	    #message = "Created new user: %s" % uid
+	    #message = "Registered new user: %s" % uid
 	    context.remove((sid, SESSION.message, None))        
 	    response.setStatus(302, 'found')
 	    response.setHeader('Location', return_uri)
@@ -312,14 +240,14 @@ if request.method=='POST':
 	    context.remove((sid, SESSION.message, None))
 	    context.add((sid, SESSION.message, Literal(message)))
 	    response.setStatus(302, 'found')   
-	    response.setHeader('Location', create_uri)
+	    response.setHeader('Location', register_uri)
 
     else:
 	message = "password and verify mismatch"
 	context.remove((sid, SESSION.message, None))
 	context.add((sid, SESSION.message, Literal(message)))
 	response.setStatus(302, 'found')   
-	response.setHeader('Location', create_uri)
+	response.setHeader('Location', register_uri)
     
       ]]></rdf:value>
   </server:PageHandler>
