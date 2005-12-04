@@ -20,13 +20,12 @@
     <server:unauthorized_content_handler rdf:resource="#unauthorized_content_handler"/>
     <server:content_type>application/xhtml+xml</server:content_type>
     <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
-<![CDATA[
-<html xmlns="http://www.w3.org/1999/xhtml"
+<![CDATA[<html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:kid="http://purl.org/kid/ns#">
 <?python SERVER = redfoot.namespace("http://redfoot.net/2005/server#")?>
 <?python TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")?>
   <head>
-    <title>${display(lookup(TEMPLATE.title))}</title>
+    <title>${redfoot.label(request.host)}: ${display(lookup(TEMPLATE.title))}</title>
     <meta http-equiv="Content-Type" content="text/xhtml; charset=UTF-8"/>
     <meta name="keywords" content=""/>
     <link rel="shortcut icon" href="${lookup(TEMPLATE.shortcut_icon)}"/>
@@ -42,49 +41,63 @@
 
   <body>
 
+
+<div id="container">
+
+  <div id="top">
+    ${display(lookup(TEMPLATE.header))}
+
+<ul>
+  <!-- TODO: -->
   <?python edit_uri = URIRef('%s/edit/content/' % request.host)?>
-  <div kid:if="(edit_uri, None, None) in redfoot and allow(URIRef('%s/edit/resource' % request.host))"
-       class="content_nav">
+  <li kid:if="(edit_uri, None, None) in redfoot and allow(URIRef('%s/edit/resource' % request.host))"
+       id="edit_page">
    <?python from urllib import quote?>
     <a kid:if="(request.uri, None, None) in redfoot" href="/edit/resource?uri=${quote(request.uri)}">Edit Page</a>
     <a kid:if="(request.uri.abstract(), None, None) in redfoot" href="/edit/resource?uri=${quote(request.uri.abstract())}">Edit Page (abstract)</a>
-  </div>
-
-    <div class="header">
-      ${display(lookup(TEMPLATE.header))}
-    </div>
-
-    <div class="navigation">
-     ${display(lookup(TEMPLATE.navigation))}
-    </div>
-
-    <div class="content">
-
-  <?python edit_content_uri = URIRef('%s/edit/content/' % request.host)?>
-  <div kid:if="(edit_content_uri, None, None) in redfoot and allow(edit_content_uri)"
-       class="content_nav">
-   <?python from urllib import quote?>
-    <a kid:if="(request.uri, None, None) in redfoot" href="/edit/content/?uri=${quote(request.uri)}">Edit Content</a>
-    <a kid:if="(request.uri, None, None) not in redfoot" href="/edit/content/?uri=${quote(request.uri)}">Create</a>
-  </div>
+  </li>
 
 <?python
-types = []
-for type in redfoot.objects(request.uri.abstract(), RDF.type):
-    label = redfoot.label(type)
-    if label:
-        types.append(label)
-if not types:
-    for type in redfoot.objects(request.uri, RDF.type):
-        label = redfoot.label(type)
-        if label:
-            types.append(label)
-types.sort()
-label = redfoot.label(request.uri.abstract(), None) or redfoot.label(request.uri, None)
-title = "%s (%s)" % (label, ", ".join(types))
-href = request.uri
+SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+FOAF = redfoot.namespace("http://xmlns.com/foaf/0.1/")
+authenticated = request.session_id and (request.session_id, SESSION.authenticated, Literal('True')) in redfoot
+if authenticated:
+    uid = redfoot.value(request.session_id, SESSION.uid)
+    nick = redfoot.value(uid, FOAF.nick) or "unknown"
+else:
+    uid = None
 ?>
-   <h2><a href="${href}">${label}</a></h2>
+ <span kid:if="uid is None" kid:strip="">
+  <li><a href="/login/">Login</a></li>
+  <li><a href="/register/">Register</a></li>
+ </span>
+ <span kid:if="uid" kid:strip="">
+  <li><a href="/users/${nick}/">${nick}'s profile</a></li>
+  <li><a href="/logout/">logout</a></li>
+ </span>
+</ul>
+
+  </div>
+<!--
+  <div id="leftnav">
+  </div>
+-->
+  <div id="rightnav">
+    ${display(lookup(TEMPLATE.navigation))}
+  </div>
+
+  <div id="content">
+
+      <!-- TODO: -->
+      <?python edit_content_uri = URIRef('%s/edit/content/' % request.host)?>
+      <div kid:if="(edit_content_uri, None, None) in redfoot and allow(edit_content_uri)"
+           id="edit_content">
+       <?python from urllib import quote?>
+        <a kid:if="(request.uri, None, None) in redfoot" href="/edit/content/?uri=${quote(request.uri)}">Edit Content</a>
+        <a kid:if="(request.uri, None, None) not in redfoot" href="/edit/content/?uri=${quote(request.uri)}">Create</a>
+      </div>
+
+      <h2><a href="${request.uri}">${display(lookup(TEMPLATE.title))}</a></h2>
 
       ${display(lookup(TEMPLATE.content))}
 
@@ -95,11 +108,11 @@ href = request.uri
         ${display(lookup(TEMPLATE.add_comment))}
       </div>
 
-    </div>
-
-    <div class="footer">
-      ${display(lookup(TEMPLATE.footer))}
-    </div>
+  </div>
+  <div id="footer">
+    ${display(lookup(TEMPLATE.footer))}
+  </div>
+</div>
 
   </body>
 </html>
@@ -125,7 +138,7 @@ if not types:
             types.append(label)
 types.sort()
 label = redfoot.label(request.uri.abstract(), None) or redfoot.label(request.uri, None)
-title = "%s: %s %s" % (redfoot.label(request.host), label, ", ".join(types))
+title = "%s %s" % (label, ", ".join(types))
 ?>${title}</div>]]>
     </rdf:value>    
   </server:PagePartHandler>
@@ -191,154 +204,13 @@ response.write("""
 
 html {
     background-color: %(color)s;
+    background: %(color)s url("http://redfoot.net/2005/fade-in-light.png") top left repeat-x;
+
 }
 
 body {
     margin: 0.5em 1em;
     padding: 0em;
-}
-
-div.navigation {
-    background-color: %(color)s;
-    margin: 0em 0em;
-    padding: 0em 0em 0em 0em;
-}
-
-h1 {
-  background-color: transparent;
-  margin: 0em 0em 0em 0em;
-  padding: 0em 0em 0.25em 10px;
-}       
-
-.content_nav {
-  float: right;
-  padding: 0.5em;
-}
-
-.nav ul {
-  padding: 3px 10px;
-  margin: 0px 0px 0px 0px;
-  font: bold 12px Verdana, sans-serif;
-}
-
-.nav li {
-  list-style: none;
-  margin: 0;
-  display: inline;
-}
-
-.nav li a {
-  padding: 3px 0.5em;
-  margin-left: 3px;
-  border: 1px solid #000;
-  border-bottom: none;
-  background: #DDE;
-  text-decoration: none;
-}
-
-.nav li a { color: #000; }
-
-.nav li a:hover {
-  color: #fc6305;
-  background: #ccc;
-  border-color: #227;
-}
-
-.nav li a#current {
-background: white;
-border-bottom: 1px solid white;
-}
-
-#nav a:active {
-  background: white;
-}
-
-
-div.content {
-    color: #000000;
-    background:#ffffff;
-    margin: 0em; 
-    padding: 0em 2em;
-    border: 1px solid black;
-    clear: both;
-}
-
-div.footer {
-    background-color: %(color)s;
-    margin: 0em 0em;
-    padding: 0em 0em 0em 10px;
-    vertical-align: middle;
-    font-size: small; 
-    font-style: italic;
-    clear: both;
-}
-
-div.footer img {
-  border: 0; 
-  vertical-align: middle;
-}
-
-h1, h2, h3, h4, b {
-  font-family: Arial;
-  color: #000000;
-}
-
-a {
-    color: #000000;
-    font-weight: bold;
-    text-decoration: none
-}
-
-div.content a {
-    border-bottom: 1px dotted #fc6305;
-}
-
-a:hover {
-    color: #fc6305;
-    font-weight: bold;
-    text-decoration: none
-}
-
-body, table, tr, td, p, a, b, ul, li, blockquote { 
-  font-family: Arial
-}
-
-img {
-  border: 0;
-}
-
-
-.recipe .ingredients {
-  width:48%%; float: left;
-}
-
-.recipe .directions {
-  width:48%%; float: left;
-}
-
-.recipe .footer {
-  clear: both;
-  border: 0px;
-}
-
-div.spacer {
-  clear: both;
-}
-
-dd {
-  margin: 0.5em 1em 1.5em 0em;
-}
-
-div.comments {
-    background-color: #ddddee;
-    border: 1px solid black;
-    padding: 0.25em 1em;
-    margin: 1em;
-}
-
-div.blog {
-    border-bottom: 1px solid black;
-    margin-bottom: 1.5em;
 }
 
 pre {
@@ -355,24 +227,173 @@ pre {
   word-wrap: break-word; /* IE */
 }
 
-.blog h3 {
-    margin-bottom: 0em;
-    padding-bottom: 0em;
+#container
+{
+	width: 100%%;
+	margin: 10px auto;
+	background-color: transparent;
+	color: #333;
+	//border: 1px solid gray;
+	//line-height: 130%%;
 }
 
-.blog_by_line {
-    margin-top: 0em;
-    padding-top: 0em;
-    font-size: small; 
-    border-top: 1px solid black;
+#top
+{
+	padding: .5em;
+	background-color: transparent;
+	//border-bottom: 1px solid gray;
+
+	height: 47px;
+	color: #fff;
+	position: relative;
+	margin-right: 1%%;
+	padding-right: 3px;
 }
 
-.blog .hr {
-    margin-bottom: 0em;
+#top h1
+{
+	padding: 0;
+	margin: 0;
+        display: inline;
 }
+
+#leftnav
+{
+	float: left;
+	width: 160px;
+	margin: 0;
+	padding: 1em;
+}
+
+#rightnav
+{
+	float: right;
+	width: 160px;
+	margin: 0px;
+	padding: 0em;
+        background-color: transparent;
+}
+
+#content
+{
+	margin-left: 0px;//200px;
+        border: 1px solid black;
+	//border-left: 1px solid gray;
+        background-color: #ffffff;
+        background: #ffffff url("http://redfoot.net/2005/fade-out.png") bottom left repeat-x;
+
+	margin-right: 160px;
+	//border-right: 1px solid gray;
+	padding: 1em;
+        min-height: 400px;
+        min-width: 200px;
+	//max-width: 36em;
+}
+
+#footer
+{
+	clear: both;
+	margin: 0;
+	padding: .5em;
+	color: #333;
+	background-color: transparent;
+	//border-top: 1px solid gray;
+}
+
+#leftnav p, #rightnav p { margin: 0 0 1em 0; }
+#content h2 { margin: 0 0 .5em 0; }
+
+#edit_page {}
+#edit_content {float: right;}
+
+#top ul {
+	margin: 0;
+	padding: 0;
+        display: inline;
+	list-style: none;
+        float: right;
+}
+
+#top li {
+        display: inline;
+	xfloat: right;
+	margin: 0;
+	padding: 0;
+}
+
+#top li a, #header li a:visited, #header form {
+	display: inline;
+	xfloat: left;
+	font-weight: bold;
+	padding: 14px 1.5em 0 1.5em;
+	height: 27px;
+	font-size: 0.75em;
+}
+
+a {
+    color: #000000;
+    font-weight: bold;
+    text-decoration: none
+}
+
+#content a {
+    border-bottom: 1px dotted #fc6305;
+}
+
+a:hover {
+    color: #fc6305;
+    font-weight: bold;
+    text-decoration: none
+}
+
+
+.nav
+{
+padding: 0 1px 1px;
+margin: 0;
+font: bold 12px Verdana, sans-serif;
+//background: gray;
+//width: 13em;
+width: 160px;
+}
+
+.nav ul {
+    border: 1px solid black;
+    border-top: 1px;
+    margin: 0em 0em 0em 1em;
+    padding: 0em;
+}
+
+.nav li
+{
+list-style: none;
+margin: 0px;
+border-top: 1px solid black;
+text-align: left;
+}
+
+.nav li a
+{
+display: block;
+padding: 0.25em 0.5em 0.25em 0.75em;
+border-left: 1em solid #AAB;
+background: #CCD;
+text-decoration: none;
+}
+
+.nav li a:link { color: #448; }
+.nav li a:visited { color: #667; }
+
+.nav li a:hover
+{
+border-color: #fc6305;
+color: #FFF;
+background: #332;
+}
+
 
 """ % {"color": color})
-
+    
     </rdf:value>
   </server:PagePartHandler>
 
