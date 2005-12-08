@@ -27,6 +27,7 @@
     <commands:command rdf:resource="#restore"/>            
     <commands:command rdf:resource="#remove"/>
     <commands:command rdf:resource="#clear"/>                
+    <commands:command rdf:resource="#rename"/>                
   </redfoot:Configuration>>
 
   <commands:Command rdf:ID="set_base">
@@ -654,6 +655,42 @@ from itertools import chain
 
 redfoot.index.remove((REDFOOT.Checked, RDFS.member, None))
     
+]]>
+       </rdf:value>
+     </redfoot:Python>
+    </redfoot:code>
+  </commands:Command>
+
+  <commands:Command rdf:ID="rename">
+    <rdfs:label>rename</rdfs:label>
+    <redfoot:code>
+     <redfoot:Python rdf:ID="rename_code">
+       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+    
+OLD = args[0]
+NEW = "args[1]
+
+for cid in list(redfoot.contexts()):
+    context = redfoot.get_context(cid)
+    if OLD in cid:
+        new_context = redfoot.get_context(URIRef(cid.replace(OLD, NEW)))
+    else:
+        new_context = context
+
+    for s, p, o in context:
+        context.remove((s, p, o))
+        if isinstance(s, URIRef) and OLD in s:
+            s = URIRef(s.replace(OLD, NEW))
+        if isinstance(p, URIRef) and OLD in p:
+            p = URIRef(p.replace(OLD, NEW))
+        if isinstance(o, URIRef) and OLD in o:
+            o = URIRef(o.replace(OLD, NEW))
+        new_context.add((s, p, o))
+
+    if new_context!=context:
+        redfoot.remove_context(cid)
+
 ]]>
        </rdf:value>
      </redfoot:Python>
