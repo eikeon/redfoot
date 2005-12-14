@@ -183,7 +183,7 @@ def display(uri, fragment=True, output=None, **args):
             assert uri, "No 'unauthorized_content' found for: %s" % uri
     value = redfoot.value(uri)
     if value and value.datatype==SERVER.Kid:
-	t_mod = kid.load_template(StringIO(value))
+	t_mod = kid.load_template(StringIO(value.encode("utf-8")))
 	t = t_mod.Template(**context)                  
 	if write_to_response:
 	    write_to_response = False
