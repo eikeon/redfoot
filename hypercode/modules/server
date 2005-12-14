@@ -13,7 +13,7 @@
 
 from twisted.web.server import Site, NOT_DONE_YET
 from twisted.web.resource import IResource
-from twisted.internet import reactor, threads
+from twisted.internet import reactor
 
 from zope.interface import Attribute, implements
 
