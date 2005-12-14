@@ -517,7 +517,7 @@ for cid in redfoot.contexts():
         context = redfoot.get_context(cid)
 
         try:
-            sio = StringIO(context.serialize(format="pretty-xml"))
+            sio = StringIO(context.serialize())
         except Exception, e:
             sio = None
             print "Could not serialize %s: %s" % (cid, e)
@@ -669,7 +669,7 @@ redfoot.index.remove((REDFOOT.Checked, RDFS.member, None))
 <![CDATA[
     
 OLD = args[0]
-NEW = "args[1]
+NEW = args[1]
 
 for cid in list(redfoot.contexts()):
     context = redfoot.get_context(cid)
