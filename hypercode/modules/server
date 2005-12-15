@@ -17,6 +17,7 @@ from twisted.internet import reactor
 
 from zope.interface import Attribute, implements
 
+import redfootlib
 from rdflib import URIRef, BNode, RDF, RDFS
 from rdflib.util import date_time
 
@@ -185,6 +186,7 @@ class _Resource(object):
 
         handler = redfoot.value(request.uri, SERVER.handler) or redfoot.value(request.host, SERVER.handler) or redfoot.value(redfoot.uri, SERVER.handler)
 
+        response.setHeader("X-Powered-By", "Redfoot/%s (%s)" % (redfootlib.__version__, handler))
         redfoot.execute(handler, request=request, response=response)
         # Note: it is the handler's job to call response.finish()
 
