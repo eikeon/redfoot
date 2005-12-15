@@ -11,13 +11,14 @@
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
-from twisted.web.server import Site, NOT_DONE_YET
+from twisted.web.server import Site, NOT_DONE_YET, version
 from twisted.web.resource import IResource
 from twisted.internet import reactor
 
 from zope.interface import Attribute, implements
 
 import redfootlib
+
 from rdflib import URIRef, BNode, RDF, RDFS
 from rdflib.util import date_time
 
@@ -28,6 +29,8 @@ from itertools import chain
 from string import ascii_letters
 from random import choice
 import md5, time
+
+from cStringIO import StringIO
 
 SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
 SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
@@ -142,6 +145,7 @@ class Request(object):
 class Response(object):
     def __init__(self, request):
         self.__request = request
+        self.__body = StringIO()
 
     def setStatus(self, status, reason):
         self.__request.setResponseCode(status, reason)
@@ -169,29 +173,20 @@ class _Resource(object):
 
     isLeaf = True
 
-    def getChildWithDefault(self, name, request):
-        raise Exception("NYI")
-
-    def putChild(self, path, child):
-        raise Exception("NYI")
-
-    def render(self, request):
-        #reactor.callInThread(self._render, request)
-        self._render(request)
-        return NOT_DONE_YET
-
-    def _render(self, twisted_request):
+    def render(self, twisted_request):
         request = Request(twisted_request)
         response = Response(twisted_request)
 
         handler = redfoot.value(request.uri, SERVER.handler) or redfoot.value(request.host, SERVER.handler) or redfoot.value(redfoot.uri, SERVER.handler)
 
-        response.setHeader("X-Powered-By", "Redfoot/%s (%s)" % (redfootlib.__version__, handler))
+        response.setHeader("Server", "%s via Redfoot/%s using %s)" % (version, redfootlib.__version__, handler))
         redfoot.execute(handler, request=request, response=response)
+
         # Note: it is the handler's job to call response.finish()
+        # handlers can also do deferToThread (For example see handlers/page#)
+        return NOT_DONE_YET
 
 
-# TODO:    SERVER_IDENT = 'redfoot2005'
 class Server(object):
 
     def __init__(self, hostname='', port=9090):
