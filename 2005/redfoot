@@ -5,7 +5,6 @@
         xmlns:redfoot="http://redfoot.net/2005/redfoot#"
         xmlns:program="http://redfoot.net/2005/program#"
         xmlns:server = "http://redfoot.net/2005/server#"        
-        xmlns:doap="http://usefulinc.com/ns/doap#"
 >
 
   <redfoot:Namespace rdf:about="#">
@@ -142,6 +141,12 @@
     <rdfs:label>Python Code String</rdfs:label>
     <rdfs:comment></rdfs:comment>
   </rdfs:Datatype>
+
+  <rdfs:Property rdf:ID="admin">
+    <rdfs:label>admin</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:range rdf:resource="session#User"/> <!-- or other agents or group-->
+  </rdfs:Property>
 
 <!--
   <rdfs:Class rdf:ID="Class">
