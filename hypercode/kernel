@@ -54,6 +54,7 @@ class Redfoot(Graph):
 
     def __init__(self, backend):
         super(Redfoot, self).__init__(backend)
+	self.__base = None # default to CWD
         self.__log = None        
         self.__index = None
         self.__config = None
@@ -75,7 +76,6 @@ class Redfoot(Graph):
                         "URIRef": URIRef, "BNode": BNode, "Literal": Literal
                         })
         self.__context = context
-	self.__base = None # default to CWD
         
     def absolutize(self, uri, defrag=1):
         base = self.base
@@ -162,7 +162,12 @@ class Redfoot(Graph):
 
         
     def load(self, location, format="xml", publicID=None, context_id=None, creator=None):
-        location = URIRef(urldefrag(location)[0])
+        location, fragment = urldefrag(location)
+        if fragment:
+            if context_id:
+                redfoot.log.warn("publicID has fragment. Ignoring context_id.")
+            context_id = "#%s" % fragment
+        location = URIRef(location)
         publicID = publicID or self.absolutize(location)
         id = self.context_id(publicID, context_id=context_id)        
         self.remove_context(id)
@@ -253,37 +258,25 @@ class Redfoot(Graph):
         return URIRef(context_id, base=uri)
         
     def namespace(self, uri, context=None):
-        #if uri[-1]!="#":
-        #    self.log.warning("Namespace should end in #: '%s'" % uri)
         uri = URIRef(uri)
-        if context is None:
-            self.check(uri)
-            context_uri = self.context_id(uri)            
-            context = self.get_context(context_uri, creator=redfoot_loader.program)            
-
-        module_name = uri
-        module = sys.modules.get(module_name, None)
-        if module:
-            return module
-
-        safe_module_name = "namespace_%s" % hash(module_name)
-        module = ModuleType(safe_module_name)
-        module.__name__ = module_name 
-        module.__file__ = module_name
-        module.__ispkg__ = 0
-
-        from rdflib.util import uniq
-
-        d = module.__dict__
-        d["NS"] = uri
-        # TODO: module.__getattribute__ = module.__dict__.__getitem__ 
-        for subject in uniq(context.subjects(None, None)):
-            if subject.startswith(uri):
-                ns, qname = subject.split(uri)
-                d[qname] = subject
-
-        sys.modules[module_name] = module
-        return sys.modules[module_name]
+        module = sys.modules.get(uri, None)
+        if module is None:
+            module = sys.modules[uri] = ModuleType("namespace_%s" % hash(uri))
+            module.__name__ = uri 
+            module.__file__ = uri
+            module.__ispkg__ = 0
+            if context is None:
+                self.check(uri)
+                context_uri = self.context_id(uri)            
+                context = self.get_context(context_uri, creator=redfoot_loader.program)            
+            d = module.__dict__
+            d["NS"] = uri
+            # TODO: module.__getattribute__ = module.__dict__.__getitem__ 
+            for subject in set(context.subjects(None, None)):
+                if subject.startswith(uri):
+                    ns, qname = subject.split(uri)
+                    d[qname] = subject
+        return module
 
     def bind(self, prefix, namespace, override=True):
         """
@@ -358,11 +351,18 @@ class Redfoot(Graph):
             self.log.info("running: %s ( %s )" % (self.label(program), program))
             self.execute(program, args=args)
 
+def add_func(store):
+    orig_add = store.add
+    def add((s, p, o), context, quoted=False):
+        print "add:", s, p, o
+        orig_add((s, p, o), context=context, quoted=quoted)
+    return add
 
 try:
     redfoot = redfoot_loader.redfoot
 except:
     redfoot = Redfoot(redfoot_loader.backend)
+    #redfoot.store.add = add_func(redfoot.store)
     redfoot_loader.redfoot = redfoot 
     # NOTE: redfoot_loader is already dealing with opening and closing the backend
 
