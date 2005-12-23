@@ -10,6 +10,7 @@
     <rdfs:label>commands config</rdfs:label>
     <rdfs:comment>A configuration with all the commands</rdfs:comment>
     <commands:command rdf:resource="#server"/>
+    <commands:command rdf:resource="#add_admin"/>
     <commands:command rdf:resource="#set_base"/>
     <commands:command rdf:resource="#load"/>
     <commands:command rdf:resource="#save"/>
@@ -29,6 +30,25 @@
     <commands:command rdf:resource="#clear"/>                
     <commands:command rdf:resource="#rename"/>                
   </redfoot:Configuration>>
+
+  <commands:Command rdf:ID="add_admin">
+    <rdfs:label>add_admin</rdfs:label>
+    <redfoot:code>
+     <redfoot:Python rdf:ID="add_admin_code">
+        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+REDFOOT = redfoot.namespace("http://redfoot.net/2005/redfoot#")
+
+assert len(args)==1, "expecting one argument that is the URIRef of an admin"
+
+redfoot.config.add((REDFOOT.Globals, REDFOOT.admin, URIRef(args[0])))
+
+]]>
+      </rdf:value>
+     </redfoot:Python>
+    </redfoot:code>      
+  </commands:Command>
 
   <commands:Command rdf:ID="set_base">
     <rdfs:label>set_base</rdfs:label>
