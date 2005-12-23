@@ -29,6 +29,7 @@ from itertools import chain
 from string import ascii_letters
 from random import choice
 import md5, time
+from base64 import b64encode
 
 from cStringIO import StringIO
 
@@ -145,7 +146,31 @@ class Request(object):
 class Response(object):
     def __init__(self, request):
         self.__request = request
-        self.__body = StringIO()
+        self.__body = None
+
+    def __getCacheBody(self): 
+        if self.__body is None:
+            return False
+        else:
+            return True
+
+    def __setCacheBody(self, value):
+        if value:
+            if self.__body is None:
+                self.__body = StringIO()
+        else:
+            raise Exception("can not turn body caching back off")
+
+    cache_body = property(__getCacheBody, __setCacheBody)
+
+    def __getBody(self):
+        body = self.__body
+        if body is not None:
+            return body.getvalue()
+        else:
+            raise Exception("cache body not set.") 
+    body = property(__getBody)
+
 
     def setStatus(self, status, reason):
         self.__request.setResponseCode(status, reason)
@@ -153,9 +178,20 @@ class Response(object):
     def write(self, data):
         if isinstance(data, unicode):
             data = data.encode("UTF-8")
-        self.__request.write(data)
+        body = self.__body
+        if body:
+            body.write(data)
+        else:
+            self.__request.write(data)
 
     def finish(self):
+        if self.__body:
+            body = self.body 
+            self.setHeader('content-length', str(len(body)))
+            encoded_md5_digest = b64encode(md5.new(body).digest())
+            self.setHeader("Content-MD5", encoded_md5_digest)
+            self.setHeader("ETag", encoded_md5_digest)
+            self.__request.write(body)
         self.__request.finish()
     
     def setHeader(self, name, value):
