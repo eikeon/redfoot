@@ -147,7 +147,7 @@ title = "%s %s" % (label, ", ".join(types))
 <![CDATA[
 <div xmlns:kid="http://purl.org/kid/ns#" kid:strip="">
 
-<h1><a href="${request.host}">${redfoot.label(request.host)}</a></h1></div>]]>
+<h1><a href="${request.host}">${redfoot.label(request.host) or request.host}</a></h1></div>]]>
     </rdf:value>    
   </server:PagePartHandler>
 
@@ -179,7 +179,7 @@ for section in redfoot.objects(request.host, TEMPLATE.section):
         sections.append((rank, label, section))
 sections.sort()
 ?>
-  <ul>
+  <ul kid:if="sections">
     <li kid:for="rank, label, section in sections">
       <a href="${section}">${label}</a>
     </li>
