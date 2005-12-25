@@ -16,7 +16,7 @@
 SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
 
 # Support tunneling requests for any resource through a server
-if request.path.startswith(";"):
+if request.path.startswith("/;"):
     request.uri = URIRef(request.uri.split(";", 1)[-1]) 
 
 # This was needed to fix a bug that happens fronting redfoot with apache via mod_proxy
