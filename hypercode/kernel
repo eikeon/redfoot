@@ -162,17 +162,16 @@ class Redfoot(Graph):
 
         
     def load(self, location, format="xml", publicID=None, context_id=None, creator=None):
-        location, fragment = urldefrag(location)
-        if fragment:
-            if context_id:
-                redfoot.log.warn("publicID has fragment. Ignoring context_id.")
-            context_id = "#%s" % fragment
-        location = URIRef(location)
-        publicID = publicID or self.absolutize(location)
-        id = self.context_id(publicID, context_id=context_id)        
+        publicID = publicID or location
+        location = URIRef(urldefrag(location)[0])
+
+        if "#" not in publicID:
+            id = self.context_id(self.absolutize(publicID))
+        else:
+            id = self.absolutize(publicID, defrag=False)
         self.remove_context(id)
         context = self.get_context(id, creator=creator)
-        context.load(location, publicID, format)
+        context.load(location, id, format)
         self.index.remove((id, REDFOOT.source, None))
         self.index.add((id, REDFOOT.source, location))
         self.index.remove((id, REDFOOT.context_id, None))        
