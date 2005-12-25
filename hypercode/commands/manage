@@ -175,12 +175,14 @@ for cid in redfoot.contexts():
 REDFOOT = redfoot.namespace("http://redfoot.net/2005/redfoot#")
 
 for arg in args:
-    uri = URIRef(redfoot.absolutize(arg, defrag=0))
+    if arg.startswith("_"):
+        uri = BNode(arg[1:])
+    else:
+        uri = URIRef(redfoot.absolutize(arg, defrag=0))
     redfoot.remove_context(uri) 
     for cid in redfoot.subjects(REDFOOT.source, uri):
         print "removing:", cid, uri
         redfoot.remove_context(cid)
-    redfoot.remove_context(BNode(arg))
 
 ]]>
       </rdf:value>
@@ -527,7 +529,7 @@ tar = open("%s.tgz" % root, "w:gz")
 
 DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
 
-# usage reload all contexts starting with prefix (first arg)... defaults to all contexts
+# usage backup all contexts starting with prefix (first arg)... defaults to all contexts
 try:
     prefix = args[0]
 except:
@@ -571,6 +573,7 @@ tar.close()
        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
     
+from rdflib.Graph import Graph
 import time, logging
 from tarfile import open, TarInfo
 try:
@@ -592,6 +595,12 @@ except:
 if filename is not None:
     tar = open(filename, "r:gz")
 
+    for name in tar.getnames():
+        root, scheme, netloc, path = name.split("/", 3)
+        if path=="_index":
+            source_index = Graph()
+            source_index.parse(tar.extractfile(tar.getmember(name)))
+            break
     for tarinfo in tar:
         if tarinfo.isreg():
             root, scheme, netloc, path = tarinfo.name.split("/", 3)
@@ -606,6 +615,8 @@ if filename is not None:
             else:
                 fragment = ""
             url = urlunparse((scheme, netloc, path, params, query, fragment))
+            if url=="_config" or url=="_index":
+                continue
             if url.startswith("_"):
                 context_id = BNode(url)
             else:
@@ -616,8 +627,14 @@ if filename is not None:
                     publicID = url
                     frag = None
                 context_id = redfoot.context_id(url, frag)
+            print "url:", url, "context_id:", context_id
             context = redfoot.get_context(context_id)
-            context.parse(tar.extractfile(tarinfo), publicID=publicID)
+            if len(context)==0:
+                context.parse(tar.extractfile(tarinfo), publicID=publicID, preserve_bnode_ids=True)
+                for t in source_index.triples((context_id, None, None)):
+                    redfoot.index.add(t)
+            else:
+                print "skipping %s as it already exists" % url
         elif tarinfo.isdir():
             print "a directory."
         else:
