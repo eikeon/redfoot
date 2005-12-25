@@ -126,7 +126,7 @@ else:
 <div xmlns="http://www.w3.org/1999/xhtml" xmlns:kid="http://purl.org/kid/ns#" kid:strip="">
 <?python
 types = []
-for type in redfoot.objects(request.uri, RDF.type):
+for type in redfoot.objects(request.uri.abstract(), RDF.type):
     label = redfoot.label(type)
     if label:
         types.append(label)
