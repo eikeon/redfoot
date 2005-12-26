@@ -230,7 +230,7 @@ if object_orig and isinstance(object_orig, Literal):
 if object!=None:
     processor = request.parameters.get("processor", None)
     if processor=="delete":
-	redfoot.remove((subject, predicate, object))
+	redfoot.remove((subject, predicate, object_orig))
 	predicate = None
 	object = None
     elif processor=="update":
@@ -310,8 +310,8 @@ if object and not isinstance(object, Literal):
     value_list.append((redfoot.label(object) or object, object))
 if predicate:
     for range in redfoot.objects(predicate, RDFS.range):
-	for type in redfoot.transitive_subjects(RDFS.subClassOf, range):
-	    for value in redfoot.subjects(RDF.type, type):
+	for t in redfoot.transitive_subjects(RDFS.subClassOf, range):
+	    for value in redfoot.subjects(RDF.type, t):
 		if not value in seen:
 		    seen.add(value)
 		    #label = "%s (%s)" % (redfoot.label(value), value)
