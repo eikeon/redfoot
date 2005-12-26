@@ -213,7 +213,7 @@ SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
 subject = from_n3(request.parameters.get("subject"))
 predicate = from_n3(request.parameters.get("predicate"))
 object = from_n3(request.parameters.get("object", None), None)
-datatype = request.parameters.get("datatype")    
+datatype = request.parameters.get("datatype") or None
 if datatype:
     datatype = URIRef(datatype)
 if object and datatype and isinstance(object, Literal):
@@ -223,7 +223,7 @@ if object is None:
     object = Literal(o, datatype=datatype)
 object_orig = from_n3(request.parameters.get("object_orig", None), None)
 if object_orig and isinstance(object_orig, Literal):
-    dt = request.parameters.get("object_orig_datatype")
+    dt = request.parameters.get("object_orig_datatype") or None
     if dt:
         object_orig.datatype = URIRef(dt)
     
