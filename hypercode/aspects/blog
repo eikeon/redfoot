@@ -87,10 +87,20 @@ from urllib import quote
 href = quote(entry.concrete(), ':/')
 href = request.relative(href)
 creator = redfoot.value(entry, DC.creator)
+try:
+    d = parse_date_time(date)
+except:
+    redfoot.log.warning("could not parse %s as a date_time" % date)
+    d = None
+if d:
+    date = time.strftime("%A %d %B, %Y", time.gmtime(d))
+else:
+    date = None
 ?>
     <h3><a href="${href}">${redfoot.label(entry)}</a></h3>
-    <p kid:if="creator" class="blog_by_line">by ${redfoot.label(creator) or creator} on 
-      ${time.strftime("%A %d %B, %Y", time.gmtime(parse_date_time(date)))}:</p>
+    <p> <span kid:if="creator" class="blog_by_line">by ${redfoot.label(creator) or creator} </span>
+        <span kid:if="date">on ${date}</span>:<span>
+    </p>
     <p kid:strip="" kid:if="content_type=='http://www.w3.org/TR/REC-html40'">${HTML(content_value)}</p>
     <p kid:strip="" kid:if="content_type=='http://www.w3.org/1999/xhtml'">${XML(content_value)}</p>
     <pre kid:if="not content_type">${content_value}</pre>
