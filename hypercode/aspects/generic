@@ -238,8 +238,8 @@ if object!=None:
         #context = redfoot.get_context(redfoot.context_id(subject))        
         uid = redfoot.value(request.session_id, SESSION.uid)
         if uid:
-            #use context associated with user id.
-            user_document = redfoot.value(uid, SESSION.context, None)
+            #use context associated with session id.
+            user_document = redfoot.value(request.session_id, SESSION.context, None)
             if user_document is None:
                 from time import gmtime
                 # 2005/04/06/09:45:22/
