@@ -149,12 +149,17 @@ class Redfoot(Graph):
 
         Currently, if not, Redfoot will attempt to load from uri.
         """
+        location = uri
+        uri = publicID or uri
         if isinstance(uri, URIRef):
             context_uri = self.context_id(uri)
             if not (uri, None, None) in self:
                 if not (REDFOOT.Checked, RDFS.member, context_uri) in self: 
                     self.index.add((REDFOOT.Checked, RDFS.member, context_uri))
-                    self.log.info("loading: %s" % uri)
+                    if uri==location
+                        self.log.info("loading: %s" % uri)
+                    else:
+                        self.log.info("loading: %s from %s" % (publicID, location))
                     try:
                         context = self.load(context_uri, publicID=publicID, creator=redfoot_loader.program)
                     except Exception, e:
