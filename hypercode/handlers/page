@@ -76,10 +76,10 @@ from time import time
 SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
 
 if (request.host, None, None) not in redfoot:
-    redfoot.check(URIRef("aspects/auth", base=redfoot_program), publicID="%s#auth_aspect" % request.host)
-    redfoot.check(URIRef("aspects/generic", base=redfoot_program), publicID="%s#generic_aspect" % request.host)
-    redfoot.check(URIRef("aspects/edit_content", base=redfoot_program), publicID="%s#edit_content_aspect" % request.host)
-    redfoot.check(URIRef("aspects/contexts", base=redfoot_program), publicID="%s#contexts_aspect" % request.host)
+    redfoot.check(URIRef("aspects/auth", base=redfoot_program), publicID=URIRef("%s#auth_aspect" % request.host))
+    redfoot.check(URIRef("aspects/generic", base=redfoot_program), publicID=URIRef("%s#generic_aspect" % request.host))
+    redfoot.check(URIRef("aspects/edit_content", base=redfoot_program), publicID=URIRef("%s#edit_content_aspect" % request.host))
+    redfoot.check(URIRef("aspects/contexts", base=redfoot_program), publicID=URIRef("%s#contexts_aspect" % request.host))
 
 
 def lookup(property, default=None):
