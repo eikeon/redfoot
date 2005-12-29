@@ -161,7 +161,7 @@ class Redfoot(Graph):
                     else:
                         self.log.info("loading: %s from %s" % (publicID, location))
                     try:
-                        context = self.load(context_uri, publicID=publicID, creator=redfoot_loader.program)
+                        context = self.load(location, publicID=publicID, creator=redfoot_loader.program)
                     except Exception, e:
                         self.log.warning("couldn't load %s while checking: %s\n" % (uri, e))
 
