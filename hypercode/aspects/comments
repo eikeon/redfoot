@@ -215,8 +215,9 @@ DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
 
 comments = []
 for resource, _, comment in redfoot.triples((None, COMMENT.comment, None)):
-    date = redfoot.value(comment, DCTERMS.created)
-    comments.append((date, comment, resource))
+    if comment.startswith(request.host):
+        date = redfoot.value(comment, DCTERMS.created)
+        comments.append((date, comment, resource))
 comments.sort()
 comments.reverse()
 ?>
