@@ -239,7 +239,10 @@ if object!=None:
         uid = redfoot.value(request.session_id, SESSION.uid)
         if uid:
             #use context associated with session id.
-            user_document = redfoot.value(request.session_id, SESSION.context, None)
+            try:
+                user_document = redfoot.value(request.session_id, SESSION.context)
+            except UniquenessError, e:
+                user_document = None 
             if user_document is None:
                 from time import gmtime
                 # 2005/04/06/09:45:22/
@@ -248,7 +251,8 @@ if object!=None:
                 uri = URIRef("%s/document/%s" % (request.host, name))
                 user_document = redfoot.context_id(uri)
                 c = redfoot.get_context(request.session_id)
-                c.add((uid, SESSION.context, user_document))
+                redfoot.remove((request.session_id, SESSION.context, None))
+                c.add((request.session_id, SESSION.context, user_document))
                 c.add((user_document, RDF.type, REDFOOT.Context))
             context = redfoot.get_context(user_document, creator=uid)
 	    if object_orig!=None and object_orig!=object:
