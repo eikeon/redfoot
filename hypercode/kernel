@@ -176,7 +176,7 @@ class Redfoot(Graph):
             id = self.absolutize(publicID, defrag=False)
         self.remove_context(id)
         context = self.get_context(id, creator=creator)
-        context.load(location, id, format)
+        context.load(location, publicID=publicID, format=format)
         self.index.remove((id, REDFOOT.source, None))
         self.index.add((id, REDFOOT.source, location))
         self.index.remove((id, REDFOOT.context_id, None))        
