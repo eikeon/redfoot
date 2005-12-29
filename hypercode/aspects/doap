@@ -53,7 +53,7 @@ people.sort()
 <ul>
   <li kid:for="label, person, relationships in people">
     <a href="${redfoot.value(person, FOAF.homepage)}">${label}</a>, 
-    ${redfoot.value(person, FOAF.nick)},
+    ${redfoot.value(person, FOAF.nick, any=True)},
     (${", ".join(relationships)})
   </li>
 </ul>
@@ -82,26 +82,21 @@ format_uri = redfoot.module(URIRef("modules/simple_format#module", base=redfoot_
 project = request.host.abstract()
 releases = []
 for release in redfoot.objects(project, DOAP.release):
-    created = redfoot.value(project, DOAP.created)
+    created = redfoot.value(release, DOAP.created)
     releases.append((created, release))
 releases.sort()
 releases.reverse()
 ?>
 
-    <dl>
+    <ul>
      <span kid:strip="" kid:for="created, release in releases">
-      <dt>${XML(format_uri(release))}</dt>
-<?python
-content_value = redfoot.comment(release)
-content_type = content_value.datatype
-?>
-      <dd kid:if="content_type=='http://www.w3.org/1999/xhtml'">${XML(content_value)}</dd>
-      <dd kid:if="content_type!='http://www.w3.org/1999/xhtml'">${XML(format_uri(content_value))}</dd>
+      <li>${XML(format_uri(release))} (${created})</li>
      </span>
-    </dl>
+    </ul>
 
 
 </div>
+    
 ]]>    
       </rdf:value>      
     </template:content>
