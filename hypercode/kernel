@@ -156,7 +156,7 @@ class Redfoot(Graph):
             if not (uri, None, None) in self:
                 if not (REDFOOT.Checked, RDFS.member, context_uri) in self: 
                     self.index.add((REDFOOT.Checked, RDFS.member, context_uri))
-                    if uri==location
+                    if uri==location:
                         self.log.info("loading: %s" % uri)
                     else:
                         self.log.info("loading: %s from %s" % (publicID, location))
