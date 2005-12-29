@@ -34,6 +34,7 @@ in which case "" should be a server:Site
   <server:Page rdf:about="/login/process/">
     <rdfs:label>Login process</rdfs:label>
     <rdfs:comment></rdfs:comment>
+    <server:long_running>true</server:long_running>
     <server:page_handler rdf:resource="#login_process"/>
   </server:Page>
 
