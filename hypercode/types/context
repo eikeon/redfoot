@@ -4,27 +4,56 @@
   xmlns:rdfs='http://www.w3.org/2000/01/rdf-schema#'
   xmlns:redfoot='http://redfoot.net/2005/redfoot#'
   xmlns:template='http://redfoot.net/2005/template#'
+  xmlns:server="http://redfoot.net/2005/server#"
 >
   <rdfs:Class rdf:about="http://redfoot.net/2005/redfoot#Context">
+    <rdfs:label>Context</rdfs:label>
     <template:content>
-      <rdf:Description>
+      <server:PagePartHandler>
+        <server:allow rdf:resource="#Admin"/>          
         <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
 
 <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
 <?python
+from urllib import quote
+
 cid = request.uri.abstract()
 context = redfoot.get_context(cid)
 REDFOOT = redfoot.namespace("http://redfoot.net/2005/redfoot#")
-for t in redfoot.triples((cid, None, None)):
-    print t
+DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
+DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
+action = request.parameters.get("action", None)
+if action=="reload":
+    source = redfoot.value(cid, REDFOOT.source)
+    if source:
+        print "reloading: %s" % source
+        redfoot.load(source, publicID=cid)
+if action=="delete":
+    print "Deleting:", cid
+    redfoot.remove_context(cid)   
 ?>
+  <p>Creator: ${redfoot.value(cid, DC.creator, any=True)}</p>
   <p>Length: ${len(context)}</p>
-  <p>Source: ${redfoot.index.value(cid, REDFOOT.source, default="unknown")}</p>
+  <p>Source: ${",".join(redfoot.objects(cid, REDFOOT.source))}</p>
+  <p>View: <a href="${request.host}/rdfxml?uri=${quote(cid)}">RDF/XML</a></p>
+
+<p>
+<form method="POST" action="">
+  <input type="submit" name="action" value="reload"/>
+</form>
+</p>
+
+<p>
+<form method="POST" action="">
+  <input type="submit" name="action" value="delete"/>
+</form>
+</p>
+
 </span>
 
 
       ]]></rdf:value>
-      </rdf:Description>
+      </server:PagePartHandler>
     </template:content>
   </rdfs:Class>
 
