@@ -164,16 +164,15 @@ class Redfoot(Graph):
                         context = self.load(location, publicID=publicID, creator=redfoot_loader.program)
                     except Exception, e:
                         self.log.warning("couldn't load %s while checking: %s\n" % (uri, e))
-
         
     def load(self, location, format="xml", publicID=None, context_id=None, creator=None):
         publicID = publicID or location
-        location = URIRef(urldefrag(location)[0])
-
-        if "#" not in publicID:
-            id = self.context_id(self.absolutize(publicID))
-        else:
+        url, frag =  urldefrag(location)
+        location = URIRef(url)
+        if frag:
             id = self.absolutize(publicID, defrag=False)
+        else:
+            id = self.context_id(self.absolutize(publicID))
         self.remove_context(id)
         context = self.get_context(id, creator=creator)
         context.load(location, publicID=publicID, format=format)
