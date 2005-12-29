@@ -232,7 +232,7 @@ else:
     base = redfoot.context_id(cid, context_id="") # TODO: basically defrag... need better way
 context = redfoot.get_context(cid)
 context.serialize(destination=response, base=base)
-response.finish()
+# NOTE: serialize calls close on response. So we should not call: response.finish() 
 
 ]]>
     </rdf:value>
