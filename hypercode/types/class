@@ -80,22 +80,19 @@ superclasses = list(redfoot.objects(uri, RDFS.subClassOf)) # TODO:
   </div>    
 
   <div kid:if="instances">
-  <dl> 
+  <ul> 
     <span kid:strip="" 
           kid:for="label, instance in instances">
-      <dt kid:if="isinstance(instance, URIRef)">      
+      <li kid:if="isinstance(instance, URIRef)">      
         <a href="${request.relative(instance.concrete())}">
           ${label}
         </a>
-      </dt>
-      <dt kid:if="isinstance(instance, BNode)">
+      </li>
+      <li kid:if="isinstance(instance, BNode)">
         ${label}      
-      </dt>      
-      <dd>
-        ${XML(format(redfoot.comment(instance)))}
-      </dd>
+      </li>      
     </span>
-  </dl>
+  </ul>
   
   </div>
 
