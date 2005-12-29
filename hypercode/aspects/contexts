@@ -42,18 +42,10 @@ for context in redfoot.contexts():
         #    label = redfoot.label(abstract) or context
         contexts.append((label, context))
 contexts.sort()
-
-# TODO: move to request object?
-def prefix(url, host=request.host):
-    if url.startswith(host):
-        return url.concrete()
-    else:
-        return request.relative(url.concrete())
-   
 ?>
   <ul>
     <li kid:for="label, context in contexts">
-      <a href="${prefix(context)}">
+      <a href="${request.relative(context.concrete())}">
         ${label}
       </a>
     </li>
