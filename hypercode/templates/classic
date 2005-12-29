@@ -137,7 +137,7 @@ if not types:
             types.append(label)
 types.sort()
 label = redfoot.label(request.uri.abstract(), None) or redfoot.label(request.uri, None)
-title = "%s %s" % (label, ", ".join(types))
+title = "%s (%s)" % (label, ", ".join(types))
 ?>${title}</div>]]>
     </rdf:value>    
   </server:PagePartHandler>
