@@ -98,8 +98,8 @@ else:
     date = None
 ?>
     <h3><a href="${href}">${redfoot.label(entry)}</a></h3>
-    <p> <span kid:if="creator" class="blog_by_line">by ${redfoot.label(creator) or creator} </span>
-        <span kid:if="date">on ${date}</span>:<span>
+    <p kid:if="creator or date"> <span kid:if="creator" class="blog_by_line">by ${redfoot.label(creator) or creator} </span>
+        <span kid:if="date">on ${date}</span>:
     </p>
     <p kid:strip="" kid:if="content_type=='http://www.w3.org/TR/REC-html40'">${HTML(content_value)}</p>
     <p kid:strip="" kid:if="content_type=='http://www.w3.org/1999/xhtml'">${XML(content_value)}</p>
