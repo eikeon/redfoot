@@ -304,7 +304,10 @@ possible.sort()
     <td>
 
 <?python
-isDatatype = (predicate, RDFS.range, RDFS.Literal) in redfoot or (predicate, RDFS.range, RDFS.Resource) in redfoot or (predicate, RDF.type, URIRef('http://www.w3.org/2002/07/owl#DatatypeProperty')) in redfoot
+if object is not None and isinstance(object, Literal):
+    isDatatype = True
+else:
+    isDatatype = (predicate, RDFS.range, RDFS.Literal) in redfoot or (predicate, RDFS.range, RDFS.Resource) in redfoot or (predicate, RDF.type, URIRef('http://www.w3.org/2002/07/owl#DatatypeProperty')) in redfoot
 
 values = {}
 value_list = []
