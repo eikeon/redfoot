@@ -34,12 +34,15 @@ if method=="get" or method=="head":
         except:
             modified_since = None
 
-        last_modified = redfoot.value(request.uri, SERVER.last_modified)
-        if last_modified:
-            try:
-                last_modified = int(last_modified)          
-            except:
-                last_modified = None
+    last_modified = redfoot.value(request.uri, SERVER.last_modified)
+    if last_modified:
+        try:
+            last_modified = int(last_modified)          
+        except:
+            last_modified = None
+
+    if last_modified:
+        response.setHeader("Last-Modified", datetimeToString(last_modified))
 
     if modified_since and last_modified and last_modified <= modified_since:
         response.setStatus(NOT_MODIFIED, "Not Modified")
