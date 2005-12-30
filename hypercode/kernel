@@ -83,6 +83,8 @@ class Redfoot(Graph):
         if not defrag:
             if uri and uri[-1]=="#" and result[-1]!="#":
                 result = "%s#" % result
+        else:
+            result, frag = urldefrag(result)
         return URIRef(result)
 
     def __get_base(self):
@@ -165,21 +167,25 @@ class Redfoot(Graph):
                     except Exception, e:
                         self.log.warning("couldn't load %s while checking: %s\n" % (uri, e))
         
-    def load(self, location, format="xml", publicID=None, context_id=None, creator=None):
-        publicID = publicID or location
-        url, frag =  urldefrag(location)
-        location = URIRef(url)
-        if frag:
-            id = self.absolutize(publicID, defrag=False)
-        else:
-            id = self.context_id(self.absolutize(publicID))
-        self.remove_context(id)
-        context = self.get_context(id, creator=creator)
+    def load(self, location, format="xml", publicID=None, creator=None):
+        """
+        location is a relative or absolute URI
+        publicID if specified will override location as the xml:base
+        contextID
+        """
+        publicID = publicID or self.absolutize(location)
+        publicID = self.absolutize(publicID, defrag=False)
+        context_id = self.context_id(publicID)
+
+        context = self.get_context(context_id, creator=creator)
+        context.remove((None, None, None))
         context.load(location, publicID=publicID, format=format)
-        self.index.remove((id, REDFOOT.source, None))
-        self.index.add((id, REDFOOT.source, location))
-        self.index.remove((id, REDFOOT.context_id, None))        
-        self.index.add((id, REDFOOT.context_id, id))        
+
+        self.index.remove((context_id, REDFOOT.source, None))
+        self.index.add((context_id, REDFOOT.source, location))
+        self.index.remove((context_id, REDFOOT.publicID, None))        
+        self.index.add((context_id, REDFOOT.publicID, publicID))
+
         return context
 
     def get_context(self, identifier, creator=None):
@@ -255,11 +261,12 @@ class Redfoot(Graph):
 
     def context_id(self, uri, context_id=None):
         """ URI#context """
-        uri = uri.split("#", 1)[0]
-        if context_id is None:
-            context_id = "#context"
-        return URIRef(context_id, base=uri)
-        
+        uri, frag = urldefrag(uri)
+        frag = context_id or frag or "context"
+        if frag.startswith("#"):
+            frag = frag[1:]
+        return URIRef("%s#%s" % (uri, frag))
+
     def namespace(self, uri, context=None):
         uri = URIRef(uri)
         module = sys.modules.get(uri, None)

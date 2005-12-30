@@ -74,24 +74,17 @@ redfoot.base = URIRef(args[0])
 <![CDATA[
 
 if len(args)==0 or len(args)>3:
-    print "usage: ./redfoot.py load <uri> [<publicID>] [<context_id>]"
+    print "usage: ./redfoot.py load <uri> [<publicID>]"
 else:
-    url = args[0]
+    url = URIRef(args[0])
     try:
         publicID = URIRef(args[1])
     except:
         publicID = None
-    try:
-        context_id = URIRef(args[2])
-    except:
-        context_id = None
-
     print "loading: %s" % url
     if publicID:
         print " with publicID: %s" % publicID
-    if context_id:
-        print " with context_id: %s" % context_id
-    redfoot.load(url, publicID=publicID, context_id=context_id, creator=redfoot.uri)
+    redfoot.load(url, publicID=publicID, creator=redfoot.uri)
 
 ]]>
       </rdf:value>
@@ -155,7 +148,10 @@ REDFOOT = redfoot.namespace("http://redfoot.net/2005/redfoot#")
 for cid in redfoot.contexts():
     try:
         source = redfoot.value(cid, REDFOOT.source)
-        print cid, source #, len(redfoot.get_context(cid))
+        if source is None or cid.startswith(source):
+            print cid
+        else:
+            print "%s\n   source: %s" % (cid, source) #, len(redfoot.get_context(cid))
     except Exception, e:
         print cid, e
 
@@ -179,9 +175,11 @@ for arg in args:
         uri = BNode(arg[1:])
     else:
         uri = URIRef(redfoot.absolutize(arg, defrag=0))
-    redfoot.remove_context(uri) 
+    if uri in redfoot.contexts():
+        print "removing:", uri
+        redfoot.remove_context(uri) 
     for cid in redfoot.subjects(REDFOOT.source, uri):
-        print "removing:", cid, uri
+        print "removing: %s\n    source: %s" % (cid, uri)
         redfoot.remove_context(cid)
 
 ]]>
@@ -208,20 +206,21 @@ prefix = redfoot.absolutize(prefix)
 REDFOOT = redfoot.namespace("http://redfoot.net/2005/redfoot#")
 DC_creator = URIRef("http://purl.org/dc/elements/1.1/creator")
 
-for cid, _, source in redfoot.triples((None, RDF.type, REDFOOT.Context)):
-    try:
-        source = redfoot.value(cid, REDFOOT.source, default=None)
-    except Exception, e:
-        source = None
-        print e
-    if source and cid.startswith(prefix):
-        print "loading %s" % source
+for cid in redfoot.contexts():
+    if cid.startswith(prefix):
         try:
-            context_id = redfoot.value(cid, REDFOOT.context_id, default=None)
-            creator = redfoot.value(cid, DC_creator, default=None) or redfoot.uri
-            redfoot.load(source, publicID=cid, context_id=context_id, creator=creator)
-        except Exception, e:
-            print e
+            source = redfoot.value(cid, REDFOOT.source)
+        except UniquenessError, e:
+            redfoot.log.warning("Multiple sources for %s: %s" % (cid, list(redfoot.objects(cid, REDFOOT.source))))
+            source = None
+        if source is not None:
+            publicID = redfoot.value(cid, REDFOOT.publicID)
+            if cid.startswith(source):
+                print "reloading: %s" % (cid,)
+            else:
+                print "reloading: %s\n    source: %s" % (cid, source)
+            c = redfoot.get_context(cid)
+            c.load(source, publicID=publicID)
 
 ]]>
       </rdf:value>
@@ -627,14 +626,14 @@ if filename is not None:
                     publicID = url
                     frag = None
                 context_id = redfoot.context_id(url, frag)
-            print "url:", url, "context_id:", context_id
+            print "loading:", context_id
             context = redfoot.get_context(context_id)
             if len(context)==0:
                 context.parse(tar.extractfile(tarinfo), publicID=publicID, preserve_bnode_ids=True)
                 for t in source_index.triples((context_id, None, None)):
                     redfoot.index.add(t)
             else:
-                print "skipping %s as it already exists" % url
+                print "skipping: %s (already exists)" % url
         elif tarinfo.isdir():
             print "a directory."
         else:
@@ -662,17 +661,17 @@ try:
     startswith = args[0]
 except:
     startswith = None
-    print "usage: <startswith> [<prefix>]" # [<new_prefix>]
+    print "usage: [startswith]"
 
 if startswith:
     # list is currently needed else not all will get removed due to
     # concurrency issues (removing while iterating over)
-    for context_id in list(chain(redfoot.contexts(), redfoot.subjects(RDF.type, REDFOOT.Context))):
-        if context_id.startswith(startswith):
-            print "Removing:", context_id    
-            redfoot.remove_context(context_id)
-            redfoot.index.remove((REDFOOT.Checked, RDFS.member, context_id))
-    
+    for cid in list(redfoot.contexts()):
+        if cid.startswith(startswith):
+            print "Removing:", cid    
+            c = redfoot.get_context(cid)
+            c.remove((None, None, None))
+            redfoot.index.remove((REDFOOT.Checked, RDFS.member, cid))
 
 ]]>
        </rdf:value>
