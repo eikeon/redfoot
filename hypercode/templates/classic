@@ -44,8 +44,7 @@
 
 <div id="container">
 
-  <div id="top">
-    ${display(lookup(TEMPLATE.header))}
+  <div id="topnav">
 
 <ul>
   <!-- TODO: -->
@@ -77,6 +76,12 @@ else:
 </ul>
 
   </div>
+
+  <div id="top">
+    ${display(lookup(TEMPLATE.header))}
+  </div>
+
+
 <!--
   <div id="leftnav">
   </div>
@@ -236,15 +241,15 @@ pre {
 	//line-height: 130%%;
 }
 
-#top
+#topnav
 {
-	padding: .5em;
+        float: right;
+        width: 50%%;
+	xpadding: .5em;
 	background-color: transparent;
-	//border-bottom: 1px solid gray;
-
 	height: 47px;
 	color: #fff;
-	position: relative;
+	xposition: absolute;
 	margin-right: 1%%;
 	padding-right: 3px;
 }
@@ -305,7 +310,7 @@ pre {
 #edit_page {}
 #edit_content {float: right;}
 
-#top ul {
+#topnav ul {
 	margin: 0;
 	padding: 0;
         display: inline;
@@ -313,14 +318,14 @@ pre {
         float: right;
 }
 
-#top li {
+#topnav li {
         display: inline;
 	xfloat: right;
 	margin: 0;
 	padding: 0;
 }
 
-#top li a, #header li a:visited, #header form {
+#topnav li a, #header li a:visited, #header form {
 	display: inline;
 	xfloat: left;
 	font-weight: bold;

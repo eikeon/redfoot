@@ -164,7 +164,7 @@ else:
 if o.language:
     ss += ("-%s" % o.language)    
 ?>
-  ${ss}
+  ${ss} 
   </pre>
   <a kid:if="not isinstance(o, Literal)"
      href="resource?subject=${quote(o.n3())}" 
