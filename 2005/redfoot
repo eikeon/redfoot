@@ -21,8 +21,7 @@
 
   <redfoot:Resource rdf:ID="Defaults">
     <rdfs:label>Redfoot Defaults</rdfs:label>
-    <!-- Soon to be released... working on it at the moment ;)-->
-    <redfoot:program rdf:resource="http://redfoot.net/2005/09/13/hypercode/kernel#"/>
+    <redfoot:program rdf:resource="http://redfoot.net/2005/12/03/hypercode/kernel#"/>
   </redfoot:Resource>
 
   <rdfs:Class rdf:ID="Resource">
@@ -103,6 +102,12 @@
 
   <rdfs:Property rdf:ID="context_id">
     <rdfs:label>context_id</rdfs:label>
+    <rdfs:comment>used by load; see load method on kernel for more info</rdfs:comment>
+    <rdfs:domain rdf:resource="#Context"/>
+  </rdfs:Property>
+
+  <rdfs:Property rdf:ID="publicID">
+    <rdfs:label>publicID</rdfs:label>
     <rdfs:comment>used by load; see load method on kernel for more info</rdfs:comment>
     <rdfs:domain rdf:resource="#Context"/>
   </rdfs:Property>
