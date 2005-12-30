@@ -145,6 +145,7 @@
   <rdfs:Property rdf:ID="last_modified">
     <rdfs:label>last modified</rdfs:label>
     <rdfs:comment>Used to indicate the value of the HTTP headr last modified in seconds since epoch</rdfs:comment>
+    <rdfs:domain rdf:resource="#Site"/>
     <rdfs:domain rdf:resource="#Page"/>
     <!--<rdfs:range rdf:resource="todo: seconds since epoch"/>-->
   </rdfs:Property>
