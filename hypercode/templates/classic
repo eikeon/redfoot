@@ -44,7 +44,7 @@
 
 <div id="container">
 
-  <div id="topnav">
+  <div id="usernav">
 
 <ul>
   <!-- TODO: -->
@@ -82,11 +82,7 @@ else:
   </div>
 
 
-<!--
-  <div id="leftnav">
-  </div>
--->
-  <div id="rightnav">
+  <div id="sitenav">
     ${display(lookup(TEMPLATE.navigation))}
   </div>
 
@@ -184,9 +180,9 @@ for section in redfoot.objects(request.host, TEMPLATE.section):
         sections.append((rank, label, section))
 sections.sort()
 ?>
-  <ul kid:if="sections">
+  <ul kid:if="sections" id="navlist">
     <li kid:for="rank, label, section in sections">
-      <a href="${section}">${label}</a>
+      <a href="${section}" id="${section==request.uri and 'current' or None}">${label}</a>
     </li>
   </ul>  
 </div>
@@ -209,12 +205,12 @@ response.write("""
 html {
     background-color: %(color)s;
     background: %(color)s url("http://redfoot.net/2005/fade-in-light.png") top left repeat-x;
-
 }
 
 body {
     margin: 0.5em 1em;
     padding: 0em;
+    font-family: arial, helvetica, sans-serif;
 }
 
 pre {
@@ -231,107 +227,109 @@ pre {
   word-wrap: break-word; /* IE */
 }
 
-#container
-{
-	width: 100%%;
-	margin: 10px auto;
-	background-color: transparent;
-	color: #333;
-	//border: 1px solid gray;
-	//line-height: 130%%;
+#container {
+    width: 100%%;
+    margin: 10px auto;
+    background-color: transparent;
 }
 
-#topnav
-{
-        float: right;
-        width: 50%%;
-	xpadding: .5em;
-	background-color: transparent;
-	height: 47px;
-	color: #fff;
-	xposition: absolute;
-	margin-right: 1%%;
-	padding-right: 3px;
+#top h1 {
+    padding: 0;
+    margin: 0;
+    display: inline;
 }
 
-#top h1
-{
-	padding: 0;
-	margin: 0;
-        display: inline;
+#sitenav {
+    xwidth: 100%%;
+    margin: 0px;
+    padding: 0em;
+    background-color: transparent;
 }
 
-#leftnav
-{
-	float: left;
-	width: 160px;
-	margin: 0;
-	padding: 1em;
+#navlist {
+    margin: 0;
+    margin-top: 0.5em;
+    xmargin-right: 160px;
+    padding: 0;
+    font-size: smaller;
 }
 
-#rightnav
-{
-	float: right;
-	width: 160px;
-	margin: 0px;
-	padding: 0em;
-        background-color: transparent;
+#navlist ul {
+    list-style-type: none;
 }
 
-#content
-{
-	margin-left: 0px;//200px;
-        border: 1px solid black;
-	//border-left: 1px solid gray;
-        background-color: #ffffff;
-        background: #ffffff url("http://redfoot.net/2005/fade-out.png") bottom left repeat-x;
-
-	margin-right: 160px;
-	//border-right: 1px solid gray;
-	padding: 1em;
-        min-height: 400px;
-        min-width: 200px;
-	//max-width: 36em;
+#navlist li {
+    display: inline;
+    margin: 0 1em 0px 0;
 }
 
-#footer
-{
-	clear: both;
-	margin: 0;
-	padding: .5em;
-	color: #333;
-	background-color: transparent;
-	//border-top: 1px solid gray;
+#navlist a {    
+    padding: 0.2em 0.5em 1px 0.5em;
 }
 
-#leftnav p, #rightnav p { margin: 0 0 1em 0; }
+#navlist a:link#current, #navlist a:visited#current {
+    background-color: #fff;
+    border: 1px solid black;
+    border-bottom: 1px solid white;
+}
+
+#navlist a:hover {
+}
+
+#content {
+    margin: 0px;
+    margin-left: 0px;
+    xmargin-right: 160px;
+
+    padding: 1em;
+
+    border: 1px solid black;
+
+    background-color: #ffffff;
+    background: #ffffff url("http://redfoot.net/2005/fade-out.png") bottom left repeat-x;
+
+    min-height: 400px;
+    min-width: 200px;
+    //max-width: 36em;
+}
+
+#footer {
+    clear: both;
+    margin: 0;
+    padding: .5em;
+    color: #333;
+    background-color: transparent;
+}
+
 #content h2 { margin: 0 0 .5em 0; }
 
 #edit_page {}
 #edit_content {float: right;}
 
-#topnav ul {
-	margin: 0;
-	padding: 0;
-        display: inline;
-	list-style: none;
-        float: right;
+#usernav {
+    float: right;
+    background-color: transparent;
 }
 
-#topnav li {
-        display: inline;
-	xfloat: right;
-	margin: 0;
-	padding: 0;
+#usernav ul {
+    margin: 0;
+    padding: 0;
+    display: inline;
+    list-style: none;
 }
 
-#topnav li a, #header li a:visited, #header form {
-	display: inline;
-	xfloat: left;
-	font-weight: bold;
-	padding: 14px 1.5em 0 1.5em;
-	height: 27px;
-	font-size: 0.75em;
+#usernav li {
+    display: inline;
+    margin: 0;
+    padding: 0;
+}
+
+#usernav li a, #header li a:visited {
+    display: inline;
+    font-weight: bold;
+    padding: 0 1.5em;
+    font-size: 0.6em;
+    xfont-size: small;
 }
 
 a {
@@ -348,51 +346,6 @@ a:hover {
     color: #fc6305;
     font-weight: bold;
     text-decoration: none
-}
-
-
-.nav
-{
-padding: 0 1px 1px;
-margin: 0;
-font: bold 12px Verdana, sans-serif;
-//background: gray;
-//width: 13em;
-width: 160px;
-}
-
-.nav ul {
-    border: 1px solid black;
-    border-top: 1px;
-    margin: 0em 0em 0em 1em;
-    padding: 0em;
-}
-
-.nav li
-{
-list-style: none;
-margin: 0px;
-border-top: 1px solid black;
-text-align: left;
-}
-
-.nav li a
-{
-display: block;
-padding: 0.25em 0.5em 0.25em 0.75em;
-border-left: 1em solid #AAB;
-background: #CCD;
-text-decoration: none;
-}
-
-.nav li a:link { color: #448; }
-.nav li a:visited { color: #667; }
-
-.nav li a:hover
-{
-border-color: #fc6305;
-color: #FFF;
-background: #332;
 }
 
 
