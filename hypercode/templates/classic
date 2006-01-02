@@ -203,8 +203,8 @@ color = lookup(TEMPLATE.background_color) or "#cccccc"
 response.write("""
 
 html {
-    background-color: #A8B973;
-    background: #A8B973 url("http://redfoot.net/2005/fade-in-light.png") top left repeat-x;
+    background-color: %(color)s;
+    background: %(color)s url("http://redfoot.net/2005/fade-in-light.png") top left repeat-x;
 }
 
 body {
@@ -243,7 +243,7 @@ pre {
 
 #content {
     margin: 0px;
-    margin-left: 5em;
+    margin-left: 8em;
 
     padding: 0 1em 1em 1em;
 
@@ -285,7 +285,7 @@ pre {
 
 #sitenav {
     float: left;
-    width: 5em;
+    width: 8em;
     margin: 0;
     text-align: right;
     padding: 0em;
