@@ -243,7 +243,7 @@ pre {
 
 #content {
     margin: 0px;
-    margin-left: 8em;
+    margin-left: 7em;
 
     padding: 0 1em 1em 1em;
 
@@ -285,7 +285,7 @@ pre {
 
 #sitenav {
     float: left;
-    width: 8em;
+    width: 7em;
     margin: 0;
     text-align: right;
     padding: 0em;
