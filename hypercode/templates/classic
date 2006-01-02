@@ -203,14 +203,28 @@ color = lookup(TEMPLATE.background_color) or "#cccccc"
 response.write("""
 
 html {
-    background-color: %(color)s;
-    background: %(color)s url("http://redfoot.net/2005/fade-in-light.png") top left repeat-x;
+    background-color: #A8B973;
+    background: #A8B973 url("http://redfoot.net/2005/fade-in-light.png") top left repeat-x;
 }
 
 body {
     margin: 0.5em 1em;
     padding: 0em;
     font-family: arial, helvetica, sans-serif;
+}
+
+#top h1 {
+    margin-top: 0;
+}
+
+#content h2 { 
+    margin: .5em 0; 
+}
+
+#edit_page {}
+#edit_content {float: right;}
+
+#container {
 }
 
 pre {
@@ -227,62 +241,13 @@ pre {
   word-wrap: break-word; /* IE */
 }
 
-#container {
-    width: 100%%;
-    margin: 10px auto;
-    background-color: transparent;
-}
-
-#top h1 {
-    padding: 0;
-    margin: 0;
-    display: inline;
-}
-
-#sitenav {
-    xwidth: 100%%;
-    margin: 0px;
-    padding: 0em;
-    background-color: transparent;
-}
-
-#navlist {
-    margin: 0;
-    margin-top: 0.5em;
-    xmargin-right: 160px;
-    padding: 0;
-    font-size: smaller;
-}
-
-#navlist ul {
-    list-style-type: none;
-}
-
-#navlist li {
-    display: inline;
-    margin: 0 1em 0px 0;
-}
-
-#navlist a {    
-    padding: 0.2em 0.5em 1px 0.5em;
-}
-
-#navlist a:link#current, #navlist a:visited#current {
-    background-color: #fff;
-    border: 1px solid black;
-    border-bottom: 1px solid white;
-}
-
-#navlist a:hover {
-}
-
 #content {
     margin: 0px;
-    margin-left: 0px;
-    xmargin-right: 160px;
+    margin-left: 5em;
 
-    padding: 1em;
+    padding: 0 1em 1em 1em;
 
+    border: 1px solid #758640;
     border: 1px solid black;
 
     background-color: #ffffff;
@@ -292,20 +257,7 @@ pre {
     min-width: 200px;
     //max-width: 36em;
 }
-
-#footer {
-    clear: both;
-    margin: 0;
-    padding: .5em;
-    color: #333;
-    background-color: transparent;
-}
-
-#content h2 { margin: 0 0 .5em 0; }
-
-#edit_page {}
-#edit_content {float: right;}
-
+      
 #usernav {
     float: right;
     background-color: transparent;
@@ -328,8 +280,39 @@ pre {
     display: inline;
     font-weight: bold;
     padding: 0 1.5em;
-    font-size: 0.6em;
-    xfont-size: small;
+    font-size: 0.8em;
+}
+
+#sitenav {
+    float: left;
+    width: 5em;
+    margin: 0;
+    text-align: right;
+    padding: 0em;
+    background-color: transparent;
+    xborder: 1px solid black;
+}
+
+#navlist {
+    margin: 0;
+    padding: 0;
+    font-size: 0.8em;
+    list-style-type: none;
+}
+
+#navlist li {
+    padding: 0.1em 0;
+}
+
+#navlist a {    
+    padding: 0.2em 0.5em 0.2em 0.5em;
+}
+
+#navlist a:link#current, #navlist a:visited#current {
+    text-decoration: underline;
+}
+
+#navlist a:hover {
 }
 
 a {
@@ -348,6 +331,19 @@ a:hover {
     text-decoration: none
 }
 
+#footer {
+    clear: both;
+    margin: 1em;
+    xpadding: .5em;
+    font-size: 0.6em;
+    background-color: transparent;
+    text-align: center;
+}
+
+#footer img {
+    border: 0; 
+    vertical-align: middle;
+}
 
 """ % {"color": color})
     
