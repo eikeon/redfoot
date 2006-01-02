@@ -127,17 +127,17 @@ else:
 <div xmlns="http://www.w3.org/1999/xhtml" xmlns:kid="http://purl.org/kid/ns#" kid:strip="">
 <?python
 types = []
-for type in redfoot.objects(request.uri.abstract(), RDF.type):
+for type in redfoot.objects(request.uri, RDF.type):
     label = redfoot.label(type)
     if label:
         types.append(label)
 if not types:
-    for type in redfoot.objects(request.uri, RDF.type):
+    for type in redfoot.objects(request.uri.abstract(), RDF.type):
         label = redfoot.label(type)
         if label:
             types.append(label)
 types.sort()
-label = redfoot.label(request.uri.abstract(), None) or redfoot.label(request.uri, None)
+label = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract(), None)
 title = "%s (%s)" % (label, ", ".join(types))
 ?>${title}</div>]]>
     </rdf:value>    
