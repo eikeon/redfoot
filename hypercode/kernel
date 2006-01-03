@@ -326,12 +326,13 @@ class Redfoot(Graph):
 		if t not in seen:
 		    seen.add(t)
 		    l.append((num, t))
-	for type in self.objects(subject.abstract(), RDF.type):
-	    for t in self.transitive_objects(type, RDFS.subClassOf):
-		num = len(list(self.transitive_objects(t, RDFS.subClassOf)))
-		if t not in seen:
-		    seen.add(t)
-		    l.append((num, t))
+        if isinstance(subject, URIRef):
+            for type in self.objects(subject.abstract(), RDF.type):
+                for t in self.transitive_objects(type, RDFS.subClassOf):
+                    num = len(list(self.transitive_objects(t, RDFS.subClassOf)))
+                    if t not in seen:
+                        seen.add(t)
+                        l.append((num, t))
 	l.sort()
 	l.reverse()
 	for num, type in l:
