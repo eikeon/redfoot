@@ -24,8 +24,13 @@
       xmlns:kid="http://purl.org/kid/ns#">
 <?python SERVER = redfoot.namespace("http://redfoot.net/2005/server#")?>
 <?python TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")?>
+
+<?python
+title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract(), None) or "-"
+?>
+
   <head>
-    <title>${redfoot.label(request.host)}: ${display(lookup(TEMPLATE.title))}</title>
+    <title>${redfoot.label(request.host)}: ${title}</title>
     <meta http-equiv="Content-Type" content="text/xhtml; charset=UTF-8"/>
     <meta name="keywords" content=""/>
     <link rel="shortcut icon" href="${lookup(TEMPLATE.shortcut_icon)}"/>
@@ -97,7 +102,7 @@ else:
         <a kid:if="(request.uri, None, None) not in redfoot" href="/edit/content/?uri=${quote(request.uri)}">Create</a>
       </div>
 
-      <h2><a href="${request.uri}">${display(lookup(TEMPLATE.title))}</a></h2>
+      <h2><a href="${request.uri}">${title}</a></h2>
 
       ${display(lookup(TEMPLATE.content))}
 
@@ -120,12 +125,11 @@ else:
     </rdf:value>    
   </template:Template>
 
-  <server:PagePartHandler rdf:ID="title">
-    <rdfs:label>classic title</rdfs:label>
+  <server:PagePartHandler rdf:ID="types">
+    <rdfs:label>classic types</rdfs:label>
     <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
 <![CDATA[
-<div xmlns="http://www.w3.org/1999/xhtml" xmlns:kid="http://purl.org/kid/ns#" kid:strip="">
-<?python
+<div xmlns="http://www.w3.org/1999/xhtml" xmlns:kid="http://purl.org/kid/ns#" kid:strip=""><?python
 types = []
 for type in redfoot.objects(request.uri, RDF.type):
     label = redfoot.label(type)
@@ -137,9 +141,8 @@ if not types:
         if label:
             types.append(label)
 types.sort()
-label = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract(), None)
-title = "%s (%s)" % (label, ", ".join(types))
-?>${title}</div>]]>
+types = "%s" % ", ".join(types)
+?>${types}</div>]]>
     </rdf:value>    
   </server:PagePartHandler>
 
