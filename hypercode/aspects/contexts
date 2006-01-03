@@ -22,12 +22,12 @@
   <server:Page rdf:about="/contexts/">
     <rdfs:label>Contexts</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <server:allow rdf:resource="#Admin"/>
     <template:default_section_rank>80.0</template:default_section_rank>
     <template:content rdf:resource="#contexts"/>
   </server:Page>
 
   <server:PagePartHandler rdf:ID="contexts">
+    <server:allow rdf:resource="#Admin"/>
     <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
 <![CDATA[
 
