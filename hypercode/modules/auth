@@ -14,6 +14,7 @@
 import md5, sha
 
 SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
 
 def authenticate(request, username=None, password=None):
     "Returns uid if authentication succeeds or None otherwise"
@@ -82,6 +83,27 @@ def authenticate(request, username=None, password=None):
             msg = message or "invalid email or password"
 	    c.add((session_id, SESSION.message, Literal(msg)))
         return None 
+
+
+def allow(request, uri=None):
+    if uri is None:
+        uri = request.uri
+    if (uri, SERVER.allow, None) in redfoot:
+        session_id = request.session_id
+        if session_id:
+	    uid = redfoot.value(session_id, SESSION.uid)
+	    if uid is None:
+		return False
+            if (REDFOOT.Globals, REDFOOT.admin, uid) in redfoot:
+                return True
+	    for allow in redfoot.objects(uri, SERVER.allow):
+		if allow==uid:
+		    return True
+		elif (uid, RDF.type, allow) in redfoot:
+		    return True
+        return False
+    else:
+        return True
 
 ]]>
     </rdf:value>

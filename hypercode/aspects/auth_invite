@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
+  xmlns:rdfs='http://www.w3.org/2000/01/rdf-schema#'
+  xmlns:redfoot='http://redfoot.net/2005/redfoot#'
+  xmlns:server="http://redfoot.net/2005/server#"
+  xmlns:template='http://redfoot.net/2005/template#'
+>
+
+  <rdf:Description rdf:ID="auth_context">
+    <rdfs:label>authentication support</rdfs:label>
+    <rdfs:comment>
+    </rdfs:comment>
+    <!--
+need to load #auth with a command like:
+redfoot load http://redfoot.net/dev/content/auth http://localhost:8080 "#auth_context"
+
+in which case "" should be a server:Site
+      -->
+  </rdf:Description>
+
+  <rdfs:Class rdf:ID="Admin">
+    <rdfs:label>Admin</rdfs:label>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/session#User"/>
+  </rdfs:Class>
+
+  <rdfs:Class rdf:ID="User">
+    <rdfs:label>User</rdfs:label>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/session#User"/>
+  </rdfs:Class>
+
+  <server:Page rdf:about="/login/">
+    <rdfs:label>Login</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
+    <template:content rdf:resource="#login"/>
+  </server:Page>
+
+  <server:Page rdf:about="/login/process/">
+    <rdfs:label>Login process</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <server:long_running>true</server:long_running>
+    <server:page_handler rdf:resource="#login_process"/>
+  </server:Page>
+
+  <server:Page rdf:about="/logout/">
+    <rdfs:label>Logout</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
+    <server:page_handler rdf:resource="#logout_process"/>
+  </server:Page>
+
+  <server:Page rdf:about="/user/invite/">
+    <rdfs:label>Invite User</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
+    <server:allow rdf:resource="#User"/>
+    <template:content rdf:resource="#auth_invite"/>
+  </server:Page>
+
+  <server:Page rdf:about="/user/invite/process/">
+    <rdfs:label>Invite User</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
+    <template:content rdf:resource="#auth_invite_process"/>
+  </server:Page>
+
+  <server:Page rdf:about="/register/process/">
+    <rdfs:label>Register Process</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <server:page_handler rdf:resource="#register_process"/>
+  </server:Page>
+
+  <server:PagePartHandler rdf:ID="login">
+    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
+
+ <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
+<?python 
+SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+authenticated = request.session_id and (request.session_id, SESSION.authenticated, Literal('True')) in redfoot
+if request.session_id:
+    message = redfoot.value(request.session_id, SESSION.message)
+else:
+    message = ""
+?>
+  <span kid:if="request.method=='GET'" kid:omit="">
+    <span kid:if="authenticated" kid:omit="">
+      <p>You are already logged in.</p>
+    </span>
+    <span kid:if="not authenticated" kid:omit="">
+      <p>${message}</p>
+      <form action="process/" method="POST">
+        <table>
+          <tr>
+            <th>Email Address</th>
+            <td><input type="text" name="uid" value=""/></td>
+          </tr>
+          <tr>
+           <th>Password</th>
+            <td><input type="password" name="password"/></td>
+          </tr>
+         <tr>    
+           <th>&#160;</th>
+           <td><input type="submit" value="login"/></td>
+         </tr>
+        </table>
+        <input type="hidden" name="return_uri" value="${request.headers.get('referer', '%s/login/' % request.host)}"/>
+        <input type="hidden" name="login_uri" value="${request.uri}"/>
+      </form>
+    </span>
+  </span>
+ </span>
+      
+      ]]></rdf:value>
+  </server:PagePartHandler>
+
+  <server:PageHandler rdf:ID="login_process">
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python"><![CDATA[
+
+if request.method=='POST':
+    from urllib import quote
+    import md5
+
+    uid = request.parameters.get("uid", None)
+    password = request.parameters.get("password", None)
+    return_uri = URIRef(request.parameters.get("return_uri", "%s/" % request.host))
+    login_uri = URIRef(request.parameters.get("login_uri"))
+
+    auth = redfoot.module(URIRef("modules/auth#module", base=redfoot_program))
+    request.create_session()
+    if auth.authenticate(request, username=uid, password=password):
+	response.setStatus(302, 'found')
+	if not return_uri.startswith(request.host):
+	    return_uri = URIRef(request.relative(return_uri))
+	response.setHeader('Location', return_uri)
+    else:
+	login_uri += "?return_uri=%s" % quote(return_uri)
+	response.setStatus(302, 'found')   
+	response.setHeader('Location', login_uri)
+      
+]]></rdf:value>
+  </server:PageHandler>
+
+  <server:PageHandler rdf:ID="logout_process">
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python"><![CDATA[
+
+SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+authenticated = request.session_id and (request.session_id, SESSION.authenticated, Literal('True')) in redfoot
+
+sid = request.session_id
+if sid:
+    context = redfoot.get_context(redfoot.context_id(sid))
+    redfoot.remove((sid, SESSION.authenticated, None))
+    redfoot.remove((sid, SESSION.uid, None))
+    context.add((sid, SESSION.authenticated, Literal("False")))
+
+return_uri = URIRef(request.headers.get("referer", "%s/" % request.host))
+
+response.setStatus(302, 'found')
+response.setHeader('Location', return_uri)
+      
+      ]]></rdf:value>
+  </server:PageHandler>
+
+
+  <server:PageHandler rdf:ID="register_process">
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python"><![CDATA[
+import md5
+
+FOAF = redfoot.namespace("http://xmlns.com/foaf/0.1/")
+SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+
+return_uri = URIRef(request.parameters.get("return_uri", "%s/" % request.host))
+register_uri = URIRef(request.parameters.get("register_uri", "%s/register/" % request.host))
+username = request.parameters.get("username", None)
+password = request.parameters.get("password", None)
+verify = request.parameters.get("verify", None)
+invitation = URIRef(request.parameters.get("invitation", None))
+
+from rdflib.Namespace import Namespace
+USER = Namespace("%s/user#" % request.host)
+
+def register():
+    request.create_session()
+    sid = request.session_id
+    assert sid
+    context = redfoot.get_context(redfoot.context_id(sid))
+    context.remove((sid, SESSION.message, None))
+    users_context = redfoot.get_context(redfoot.context_id("%s#users" % request.host))
+    if invitation is None or (invitation, RDF.type, USER.Invitation) not in redfoot:
+        context.add((sid, SESSION.message, Literal("No invitation found")))
+        response.setStatus(302, 'found')   
+        response.setHeader('Location', register_uri)
+        return
+    if (None, USER.invitation, invitation) in redfoot: # if already associated with a user
+        context.add((sid, SESSION.message, Literal("Sorry, invitation already accepted.")))
+        response.setStatus(302, 'found')   
+        response.setHeader('Location', register_uri)
+        return
+    uid = redfoot.value(invitation, FOAF.mbox)
+    if uid is None:
+        context.add((sid, SESSION.message, Literal("Sorry, invitation missing a FOAF.mbox")))
+        response.setStatus(302, 'found')   
+        response.setHeader('Location', register_uri)
+        return
+    if (uid, SESSION.hexdigest, None) in redfoot:
+        context.add((sid, SESSION.message, Literal("User already exists.")))
+        response.setStatus(302, 'found')   
+        response.setHeader('Location', register_uri)
+        return
+    if not username:
+        context.add((sid, SESSION.message, Literal("No username entered.")))
+        response.setStatus(302, 'found')   
+        response.setHeader('Location', register_uri)
+        return
+    # TODO: check username is not in user
+    if password==verify:
+        hexdigest = Literal(md5.new(password).hexdigest())
+        redfoot.remove((sid, SESSION.authenticated, None))
+        redfoot.remove((sid, SESSION.uid, None))
+        context.add((sid, SESSION.authenticated, Literal("True")))
+        context.add((sid, SESSION.uid, uid))
+        users_context.add((uid, RDFS.label, Literal(username)))
+        users_context.add((uid, RDF.type, URIRef("#User", base=request.host)))
+        users_context.add((uid, SESSION.hexdigest, hexdigest))
+        #users_context.add((uid, DC_created, Literal("%s" % time(), datatype=URIRef(REDFOOT.seconds_since_epoch))))
+        users_context.add((uid, USER.invitation, invitation))
+        response.setStatus(302, 'found')   
+        response.setHeader('Location', return_uri)
+        return
+    else:
+        context.add((sid, SESSION.message, Literal("password and verify mismatch.")))
+        response.setStatus(302, 'found')   
+        response.setHeader('Location', register_uri)
+        return
+
+if request.method=='POST':
+    register()
+else:
+    pass # TODO
+    
+      ]]></rdf:value>
+  </server:PageHandler>
+
+  <server:PagePartHandler rdf:ID="auth_invite">
+    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
+ <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
+
+  <form action="/user/invite/process/" method="POST">
+    <table width="100%%">
+      <tr>
+	<th>Email Address</th>
+	<td><input type="text" name="email" value="" size="40"/></td>
+      </tr>
+      <tr>
+       <th>Message</th>
+	<td><textarea name="message" cols="80" rows="10"></textarea></td>
+      </tr>
+     <tr>    
+       <th>&#160;</th>
+       <td><input type="submit" value="invite"/></td>
+     </tr>
+    </table>
+  </form>
+
+ </span> 
+      ]]></rdf:value>
+  </server:PagePartHandler>
+
+  <server:PagePartHandler rdf:ID="auth_invite_process">
+    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
+ <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
+<?python
+
+# Import smtplib for the actual sending function
+import smtplib
+
+# Import the email modules we'll need
+from email.MIMEText import MIMEText
+
+email = request.parameters.get("email")
+message = request.parameters.get("message")
+uid = None
+session_id = request.session_id
+if session_id:
+    uid = redfoot.value(session_id, SESSION.uid)
+assert uid
+
+subject = "testing"
+
+from string import ascii_letters
+from random import choice
+
+import md5
+
+token = md5.new()
+for i in xrange(0, 10):
+    token.update(choice(ascii_letters))
+
+FOAF = redfoot.namespace("http://xmlns.com/foaf/0.1/")
+DC_creator = URIRef("http://purl.org/dc/elements/1.1/creator")
+DC_created = URIRef("http://purl.org/dc/terms/created")
+
+from rdflib.Namespace import Namespace
+USER = Namespace("%s/user#" % request.host)
+
+invitation = URIRef(token.hexdigest(), base=request.host)
+
+c = redfoot.get_context(URIRef("#invitations", base=request.host))
+c.add((invitation, RDFS.label, Literal("Invitation")))
+c.add((invitation, RDF.type, USER.Invitation))
+c.add((invitation, FOAF.mbox, URIRef("mailto:%s" % email)))
+#c.add((invitation, DC_created, Literal("%s" % time(), datatype=URIRef(REDFOOT.seconds_since_epoch))))
+c.add((invitation, DC_creator, URIRef("mailto:%s" % uid)))
+
+message += ("""\
+====================
+
+Click on:
+%s
+
+""" % invitation)
+
+# Create a text/plain message
+msg = MIMEText(message)
+
+msg['Subject'] = subject
+msg['From'] = uid
+msg['To'] = email
+
+# Send the message via our own SMTP server, but don't include the
+# envelope header.
+s = smtplib.SMTP()
+s.connect()
+s.sendmail(uid, [email], msg.as_string())
+s.close()
+
+?>
+  <h2>Your invitation has been sent</h2>
+
+ </span> 
+      ]]></rdf:value>
+  </server:PagePartHandler>
+
+  <rdf:Description rdf:about="/user#Invitation">
+    <template:content>
+      <server:PagePartHandler rdf:ID="Invitation_handler">
+        <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
+ <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
+<?python
+SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+
+if request.session_id:
+    message = redfoot.value(request.session_id, SESSION.message)
+else:
+    message = None
+
+from rdflib.Namespace import Namespace
+USER = Namespace("%s/user#" % request.host)
+
+invite_used = (None, USER.invitation, request.uri) in redfoot # if already associated with a user
+
+?>
+ <span kid:if="invite_used">
+  <p>Invite already used.</p>
+ </span>
+
+ <span kid:if="not invite_used">
+  <p>
+    Welcome. 
+  </p>
+
+  <p>${message}</p>
+  <form action="/register/process/" method="POST">
+    <table>
+      <tr>
+        <th>Username</th>
+        <td><input type="text" name="username" value=""/></td>
+      </tr>
+      <tr>
+       <th>Password</th>
+        <td><input type="password" name="password"/></td>
+      </tr>
+      <tr>
+        <th>Verify</th>
+        <td><input type="password" name="verify"/></td>
+      </tr>
+     <tr>    
+       <th>&#160;</th>
+       <td><input type="submit" value="register"/></td>
+     </tr>
+    </table>
+    <input type="hidden" name="invitation" value="${request.uri}"/>
+    <input type="hidden" name="register_uri" value="${request.uri}"/>
+  </form>
+ </span>
+</span> 
+      ]]></rdf:value>
+      </server:PagePartHandler>
+    </template:content>
+  </rdf:Description>
+
+</rdf:RDF>

@@ -88,11 +88,18 @@ if (request.host, None, None) not in redfoot:
 def lookup(property, default=None):
     return request.lookup(property) or redfoot.value(redfoot_current, property) or default
 
-page_handler = lookup(SERVER.page_handler)
-if page_handler is None:
-    response.setStatus(404, "Not Found")            
-    response.write("No page handler found")
-    response.finish()
+auth = redfoot.module(URIRef("modules/auth#module", base=redfoot_program))
+allow = auth.allow
+
+if not allow(request):
+    page_handler = lookup(SERVER.unauthorized_page_handler)
+    assert page_handler, "No 'unauthorized_page' found for: %s" % request.uri
+else:
+    page_handler = lookup(SERVER.page_handler)
+    if page_handler is None:
+        response.setStatus(404, "Not Found")            
+        response.write("No page handler found")
+        response.finish()
 
 accept = request.headers.get("accept")
 # TODO: check for best match
@@ -135,27 +142,12 @@ else:
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 # TODO: this is a bit out of hand :(
-#allow = redfoot.execute(lookup(SERVER.allow_support), request=request, response=response)["allow"]
+
 SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
-SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+auth = redfoot.module(URIRef("modules/auth#module", base=redfoot_program))
 
 def allow(uri):
-    if (uri, SERVER.allow, None) in redfoot:
-        session_id = request.session_id
-        if session_id:
-	    uid = redfoot.value(session_id, SESSION.uid)
-	    if uid is None:
-		return False
-            if (REDFOOT.Globals, REDFOOT.admin, uid) in redfoot:
-                return True
-	    for allow in redfoot.objects(uri, SERVER.allow):
-		if allow==uid:
-		    return True
-		elif (uid, RDF.type, allow) in redfoot:
-		    return True
-        return False
-    else:
-        return True
+    return auth.allow(request, uri)
 
 import kid
 from StringIO import StringIO
