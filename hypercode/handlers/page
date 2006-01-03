@@ -144,10 +144,7 @@ else:
 # TODO: this is a bit out of hand :(
 
 SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
-auth = redfoot.module(URIRef("modules/auth#module", base=redfoot_program))
-
-def allow(uri):
-    return auth.allow(request, uri)
+TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")
 
 import kid
 from StringIO import StringIO
@@ -156,6 +153,18 @@ from itertools import chain
 # redefine lookup
 def lookup(property, default=None, uri=None):
     return request.lookup(property, uri=uri) or redfoot.value(page_handler, property) or default
+
+auth = redfoot.module(URIRef("modules/auth#module", base=redfoot_program))
+
+def allow(uri):
+    if auth.allow(request, uri):
+        content = lookup(TEMPLATE.content, uri=uri)
+        if content is None or auth.allow(request, content):
+            return True
+        else:
+            return False
+    else:
+        return False
 
 def display(uri, fragment=True, output=None, **args):
     if not uri:

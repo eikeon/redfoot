@@ -180,9 +180,7 @@ for section in redfoot.objects(request.host, TEMPLATE.section):
     except:
         rank = 0.0
     if allow(section):
-        content = lookup(TEMPLATE.content, uri=section)
-        if content is None or allow(content):
-            sections.append((rank, label, section))
+        sections.append((rank, label, section))
 sections.sort()
 ?>
   <ul kid:if="sections" id="navlist">
