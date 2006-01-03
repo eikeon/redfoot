@@ -201,7 +201,7 @@ try:
     prefix = args[0]
 except:
     prefix = ""
-prefix = redfoot.absolutize(prefix)
+prefix = redfoot.absolutize(prefix, defrag=False)
     
 REDFOOT = redfoot.namespace("http://redfoot.net/2005/redfoot#")
 DC_creator = URIRef("http://purl.org/dc/elements/1.1/creator")
