@@ -154,12 +154,8 @@ from StringIO import StringIO
 from itertools import chain
 
 # redefine lookup
-def lookup(property, default=None):
-    return request.lookup(property) or redfoot.value(page_handler, property) or default
-
-# special lookup for content
-def lookup_content(property, default=None): 
-    return lookup(property, default)
+def lookup(property, default=None, uri=None):
+    return request.lookup(property, uri=uri) or redfoot.value(page_handler, property) or default
 
 def display(uri, fragment=True, output=None, **args):
     if not uri:

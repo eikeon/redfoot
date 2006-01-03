@@ -179,7 +179,7 @@ for section in redfoot.objects(request.host, TEMPLATE.section):
         rank = float(val)
     except:
         rank = 0.0
-    if allow(section):
+    if allow(section) and allow(lookup(TEMPLATE.content, uri=section)):
         sections.append((rank, label, section))
 sections.sort()
 ?>

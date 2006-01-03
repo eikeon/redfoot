@@ -96,10 +96,13 @@ class Request(object):
        return self.__request.content
     content = property(__getContent)
 
-    def lookup(self, property, default=None): # TODO: generalize to value?
-        sources = chain([self.uri], redfoot.types(self.uri), [self.host, redfoot.uri, REDFOOT.Globals]) # add self.sources as additional sources; first, let's see if we can find what's depending on them and make a test case
-        if (self.uri, RDF.type, RDFS.Class) in redfoot:
-            sources.next() # ignore self.uri
+    def lookup(self, property, default=None, uri=None):
+        uri = uri or self.uri
+        sources = chain([uri], redfoot.types(uri), [self.host, redfoot.uri, REDFOOT.Globals]) 
+        # add self.sources as additional sources; first, let's see if
+        # we can find what's depending on them and make a test case
+        if (uri, RDF.type, RDFS.Class) in redfoot:
+            sources.next() # ignore uri
         for source in sources: 
             p = redfoot.value(source, property)
 	    if p:
