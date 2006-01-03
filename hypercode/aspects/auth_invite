@@ -54,7 +54,6 @@ in which case "" should be a server:Site
     <rdfs:label>Invite User</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
-    <server:allow rdf:resource="#User"/>
     <template:content rdf:resource="#auth_invite"/>
   </server:Page>
 
@@ -243,6 +242,7 @@ else:
   </server:PageHandler>
 
   <server:PagePartHandler rdf:ID="auth_invite">
+    <server:allow rdf:resource="#User"/>
     <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
  <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
 

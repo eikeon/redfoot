@@ -9,8 +9,7 @@
   <rdfs:Class rdf:about="http://redfoot.net/2005/redfoot#Context">
     <rdfs:label>Context</rdfs:label>
     <template:content>
-      <server:PagePartHandler>
-        <server:allow rdf:resource="#Admin"/>          
+      <server:PagePartHandler rdf:ID="content_handler">
         <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
 
 <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">

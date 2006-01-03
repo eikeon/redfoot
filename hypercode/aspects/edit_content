@@ -18,13 +18,11 @@
   <server:Page rdf:about="/edit/content/">
     <rdfs:label>Edit Content</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>    
-
-    <!-- TODO: define a class specifically for those who can edit content -->
-    <server:allow rdf:resource="#Admin"/>
-    
+    <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>        
     <template:content>
      <server:PagePartHandler rdf:ID="edit_content_content">
+      <!-- TODO: define a class specifically for those who can edit content -->
+      <server:allow rdf:resource="#Admin"/>
       <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
 <![CDATA[
   <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
@@ -88,9 +86,9 @@ if uri:
   <server:Page rdf:about="/edit/put_content/">
     <rdfs:label>Put Content</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <server:allow rdf:resource="http://redfoot.net/2005/session#User"/>
     <template:content>
      <server:PagePartHandler rdf:ID="put_content_content">
+      <server:allow rdf:resource="http://redfoot.net/2005/session#User"/>
       <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
 <![CDATA[
   <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">

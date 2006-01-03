@@ -93,6 +93,7 @@ allow = auth.allow
 
 if not allow(request):
     page_handler = lookup(SERVER.unauthorized_page_handler)
+    response.setStatus(403, "Forbidden")
     assert page_handler, "No 'unauthorized_page' found for: %s" % request.uri
 else:
     page_handler = lookup(SERVER.page_handler)
@@ -179,6 +180,7 @@ def display(uri, fragment=True, output=None, **args):
     if fragment==False:
         if not allow(uri):
             uri = lookup(SERVER.unauthorized_page_handler)
+            response.setStatus(403, "Forbidden")
             assert uri, "No 'unauthorized_page' found for: %s" % uri
 	write_to_response = True
 	content_type = redfoot.value(uri, SERVER.content_type) or 'text/html; charset=UTF-8'
@@ -192,6 +194,7 @@ def display(uri, fragment=True, output=None, **args):
     else:
         if not allow(uri):
             uri = lookup(SERVER.unauthorized_content_handler)
+            response.setStatus(403, "Forbidden")
             assert uri, "No 'unauthorized_content' found for: %s" % uri
     value = redfoot.value(uri)
     if value and value.datatype==SERVER.Kid:

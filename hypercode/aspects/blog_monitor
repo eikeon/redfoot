@@ -89,9 +89,9 @@ feed = redfoot.value(entry, BLOG.via, any=True)
   <server:Page rdf:about="/blog_monitor/feeds/">
     <rdfs:label>Blog Monitor Feeds</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <server:allow rdf:resource="http://redfoot.net/2005/session#User"/>
     <template:content>
      <server:PagePartHandler  rdf:ID="blog_monitor_feeds">
+      <server:allow rdf:resource="http://redfoot.net/2005/session#User"/>
       <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
 <![CDATA[
 <div xmlns:kid="http://purl.org/kid/ns#" kid:strip="">

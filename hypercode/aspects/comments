@@ -62,9 +62,9 @@ regarding <a href="${request.relative(resource)}">${redfoot.label(resource, reso
   <server:Page rdf:about="/add_comment/">
     <rdfs:label>Add Comment</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <server:allow rdf:resource="http://redfoot.net/2005/session#User"/>
     <template:content>
      <server:PagePartHandler rdf:ID="add_comment_content">
+      <server:allow rdf:resource="http://redfoot.net/2005/session#User"/>
       <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
 <![CDATA[
   <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
