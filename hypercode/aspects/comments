@@ -71,12 +71,13 @@ regarding <a href="${request.relative(resource)}">${redfoot.label(resource, reso
 <?python
 from rdflib.util import date_time
 from urlparse import urljoin
-from time import gmtime
+from time import gmtime, time
 
 SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
 COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")
 DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
+SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
 
 uri = request.parameters.get("uri")
 if not uri is None:
@@ -99,7 +100,9 @@ if uri is not None and comment:
     context.add((c_uri, RDFS.label, label))
     context.add((c_uri, RDFS.comment, comment))
     context.add((c_uri, DC.creator, uid))
-    
+
+    redfoot.remove((uri, SERVER.last_modified, None))
+    context.add((uri, SERVER.last_modified, Literal("%s" % time())))
 ?>
 
 <div kid:if="uri is None">
