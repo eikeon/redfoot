@@ -29,6 +29,7 @@
     <commands:command rdf:resource="#remove"/>
     <commands:command rdf:resource="#clear"/>                
     <commands:command rdf:resource="#rename"/>                
+    <commands:command rdf:resource="#touch"/>                
   </redfoot:Configuration>>
 
   <commands:Command rdf:ID="add_admin">
@@ -729,6 +730,29 @@ for cid in list(redfoot.contexts()):
     if new_context!=context:
         redfoot.remove_context(cid)
 
+]]>
+       </rdf:value>
+     </redfoot:Python>
+    </redfoot:code>
+  </commands:Command>
+
+  <commands:Command rdf:ID="touch">
+    <rdfs:label>touch</rdfs:label>
+    <rdfs:comment>Modifies all SERVER.last_modified times to the current time.</rdfs:comment>
+    <redfoot:code>
+     <redfoot:Python rdf:ID="touch_code">
+       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+    
+SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+
+from time import time
+now = Literal("%s" % time())
+
+for (s, p, o), cg in redfoot.store.triples((None, SERVER.last_modified, None), None):
+    for c in cg:
+        c.remove((s, p, o))
+        c.add((s, p, now))
 ]]>
        </rdf:value>
      </redfoot:Python>

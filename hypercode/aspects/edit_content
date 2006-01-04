@@ -96,7 +96,7 @@ if uri:
 from rdflib.util import date_time
 from urlparse import urljoin
 from urllib import quote
-from time import gmtime
+from time import gmtime, time
     
 from kid import XML
 
@@ -104,6 +104,7 @@ TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")
 DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
 SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
 
 uri = request.parameters.get("uri")
 title = request.parameters.get("title")
@@ -123,6 +124,9 @@ if uri:
         context.add((uri, TEMPLATE.content, content))
     redfoot.remove((content, RDF.value, None))
     context.add((content, RDF.value, content_value))
+
+    redfoot.remove((uri, SERVER.last_modified, None))
+    context.add((uri, SERVER.last_modified, "%s" % time()))
 
     message = ""
     if content_value.datatype==URIRef("http://redfoot.net/2005/server#Kid"):
