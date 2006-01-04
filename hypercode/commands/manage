@@ -216,7 +216,7 @@ for cid in redfoot.contexts():
             redfoot.log.warning("Multiple sources for %s: %s" % (cid, list(redfoot.objects(cid, REDFOOT.source))))
             source = None
         if source is not None:
-            publicID = redfoot.value(cid, REDFOOT.publicID)
+            publicID = redfoot.value(cid, REDFOOT.publicID, any=True)
             if cid.startswith(source):
                 print "reloading: %s" % (cid,)
             else:
@@ -772,7 +772,8 @@ for (s, p, o), cg in redfoot.store.triples((None, SERVER.last_modified, None), N
 for (s, p, o), cg in redfoot.store.triples((None, REDFOOT.context_id, None), None):
     for c in cg:
         c.remove((s, p, o))
-        c.add((s, REDFOOT.publicID, o))
+        if (s, REDFOOT.publicID, None) not in redfoot:
+            c.add((s, REDFOOT.publicID, o))
 ]]>
        </rdf:value>
      </redfoot:Python>
