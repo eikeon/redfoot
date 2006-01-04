@@ -172,6 +172,7 @@ TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")
 sections = []
 for section in redfoot.objects(request.host, TEMPLATE.section):
     label = redfoot.value(section, TEMPLATE.section_name) or redfoot.label(section)
+    comment = redfoot.comment(section)
     try:
         val = redfoot.value(section, TEMPLATE.section_rank)
         if val is None:
@@ -180,12 +181,12 @@ for section in redfoot.objects(request.host, TEMPLATE.section):
     except:
         rank = 0.0
     if allow(section):
-        sections.append((rank, label, section))
+        sections.append((rank, label, section, comment))
 sections.sort()
 ?>
   <ul kid:if="sections" id="navlist">
-    <li kid:for="rank, label, section in sections">
-      <a href="${section}" id="${section==request.uri and 'current' or None}">${label}</a>
+    <li kid:for="rank, label, section, comment in sections">
+      <a href="${section}" title="${comment}" id="${section==request.uri and 'current' or None}">${label}</a>
     </li>
   </ul>  
 </div>
