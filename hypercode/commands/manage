@@ -30,6 +30,7 @@
     <commands:command rdf:resource="#clear"/>                
     <commands:command rdf:resource="#rename"/>                
     <commands:command rdf:resource="#touch"/>                
+    <commands:command rdf:resource="#update"/>                
   </redfoot:Configuration>>
 
   <commands:Command rdf:ID="add_admin">
@@ -753,6 +754,25 @@ for (s, p, o), cg in redfoot.store.triples((None, SERVER.last_modified, None), N
     for c in cg:
         c.remove((s, p, o))
         c.add((s, p, now))
+]]>
+       </rdf:value>
+     </redfoot:Python>
+    </redfoot:code>
+  </commands:Command>
+
+  <commands:Command rdf:ID="update">
+    <rdfs:label>update</rdfs:label>
+    <rdfs:comment>...</rdfs:comment>
+    <redfoot:code>
+     <redfoot:Python rdf:ID="update_code">
+       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+
+for (s, p, o), cg in redfoot.store.triples((None, REDFOOT.context_id, None), None):
+    for c in cg:
+        c.remove((s, p, o))
+        c.add((s, REDFOOT.publicID, o))
 ]]>
        </rdf:value>
      </redfoot:Python>
