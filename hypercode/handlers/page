@@ -37,7 +37,7 @@ if method=="get" or method=="head":
     last_modified = redfoot.value(request.uri, SERVER.last_modified)
     if last_modified:
         try:
-            last_modified = int(last_modified)          
+            last_modified = int(float(last_modified))
         except:
             last_modified = None
 
