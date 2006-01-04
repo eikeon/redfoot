@@ -126,7 +126,7 @@ if uri:
     context.add((content, RDF.value, content_value))
 
     redfoot.remove((uri, SERVER.last_modified, None))
-    context.add((uri, SERVER.last_modified, "%s" % time()))
+    context.add((uri, SERVER.last_modified, Literal("%s" % time())))
 
     message = ""
     if content_value.datatype==URIRef("http://redfoot.net/2005/server#Kid"):
