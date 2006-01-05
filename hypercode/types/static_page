@@ -13,7 +13,8 @@
         <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 content_type = redfoot.value(request.uri, SERVER.content_type)
-response.setHeader('Content-Type', content_type)
+if content_type:
+    response.setHeader('Content-Type', content_type)
 
 html_root = "html"
 path = request.uri.replace(request.host, '')
