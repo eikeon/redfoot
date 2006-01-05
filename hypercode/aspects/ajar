@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
+  xmlns:rdfs='http://www.w3.org/2000/01/rdf-schema#'
+  xmlns:redfoot='http://redfoot.net/2005/redfoot#'
+  xmlns:server='http://redfoot.net/2005/server#'
+  xmlns:template='http://redfoot.net/2005/template#'  
+>
+
+  <redfoot:Aspect rdf:about="#ajar_aspect">
+    <rdfs:label>ajar based Editor</rdfs:label>
+    <template:section rdf:resource="/edit/ajar/"/>
+    <rdfs:seeAlso rdf:resource="http://www.w3.org/2005/ajar/"/>
+  </redfoot:Aspect>
+
+  <server:Page rdf:about="/edit/ajar/">  
+    <template:head rdf:resource="#ajar_head"/>
+  </server:Page>
+
+  <server:PagePartHandler rdf:ID="ajar_head">
+    <rdfs:label>Default head</rdfs:label>
+    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+<div xmlns:kid="http://purl.org/kid/ns#"
+     kid:strip="">
+<?python
+title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract(), None) or "-"
+?>
+  <head>
+    <title>${redfoot.label(request.host)}: ${title}</title>
+    <meta http-equiv="Content-Type" content="text/xhtml; charset=UTF-8"/>
+    <meta name="keywords" content=""/>
+    <link rel="shortcut icon" href="${lookup(TEMPLATE.shortcut_icon)}"/>
+    <style type="text/css">
+      ${display(lookup(TEMPLATE.css))}
+    </style>
+    <span kid:for="alternate in redfoot.objects(request.uri, SERVER.alternate)" kid:strip="" >
+    <link rel="alternate"
+      href="${alternate}" title="${redfoot.label(alternate)}"
+      type="${redfoot.value(alternate, SERVER.content_type)}" />
+    </span> 
+
+  <link rel="stylesheet" href="dynamic.css" type="text/css"/>
+
+<script src="rdf/uri.js" type="text/javascript">
+</script>
+<script src="rdf/term.js" type="text/javascript">
+</script>
+<script src="rdf/match.js" type="text/javascript">
+</script>
+<script src="rdf/parser.js" type="text/javascript">
+</script>
+<script src="rdf/identity.js" type="text/javascript">
+</script>
+<script src="rdf/query.js" type="text/javascript">
+</script>
+<script src="tabulate.js" type="text/javascript">
+</script>
+
+  </head>
+</div>
+]]>
+    </rdf:value>
+  </server:PagePartHandler>
+
+  <!-- 
+NOTE: http://redfoot.net/hypercode/types/static_page or somesuch has
+to be loaded.
+
+And you'll need to have the corresponding files in a html subdirectory of your redfoot's CWD.
+
+TODO: It'd be nice to have a tool to install these resouces into the
+hypercode instead of leaving them external to it.
+  -->
+
+  <server:StaticPage rdf:about="/rdf/identity.js"/>
+  <server:StaticPage rdf:about="/rdf/match.js"/>
+  <server:StaticPage rdf:about="/rdf/parser.js"/>
+  <server:StaticPage rdf:about="/rdf/query.js"/>
+  <server:StaticPage rdf:about="/rdf/term.js"/>
+  <server:StaticPage rdf:about="/rdf/uri.js"/>
+  <server:StaticPage rdf:about="/tabulate.js"/>
+  <server:StaticPage rdf:about="/dynamic.css">
+    <server:content_type>text/css</server:content_type>
+  </server:StaticPage>
+
+  <server:StaticPage rdf:about="/icons/16dot-blue.gif"/>
+  <server:StaticPage rdf:about="/icons/16dot-green.gif"/>
+  <server:StaticPage rdf:about="/icons/16dot-red.gif"/>
+  <server:StaticPage rdf:about="/icons/16dot-yellow.gif"/>
+  <server:StaticPage rdf:about="/icons/document.png"/>
+  <server:StaticPage rdf:about="/icons/tbl-collapse.png"/>
+  <server:StaticPage rdf:about="/icons/tbl-expand-trans.png"/>
+
+  <server:Page rdf:about="/resource">
+    <rdfs:label>resource</rdfs:label>
+    <rdfs:comment>Return all the known statements about the given URIRef</rdfs:comment>
+    <server:page_handler>
+      <redfoot:Python rdf:about="resource_code">
+        <server:content_type>application/rdf+xml</server:content_type>      
+        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python"><![CDATA[
+
+uri = URIRef(request.parameters.get("uri", None))
+
+# TODO support BNode identifiers
+
+from rdflib.Graph import Graph
+out = Graph()
+
+# Include all statements about uri. And any statement about one of the
+# objects in those statements.
+for s, p, o in redfoot.triples((uri, None, None)):
+    out.add((s, p, o))
+    if isinstance(o, (URIRef, BNode)):
+        for t in redfoot.triples((o, None, None)):
+            out.add(t)
+
+# Include all info from context corresponding to URIRef
+cid = redfoot.context_id(uri)
+g = redfoot.get_context(cid)
+out += g
+
+out.serialize(destination=response)
+
+      ]]></rdf:value>
+      </redfoot:Python>
+    </server:page_handler>
+  </server:Page>
+
+</rdf:RDF>
