@@ -11,6 +11,7 @@
     <rdfs:label>Classic Template</rdfs:label>
     <template:content rdf:resource="#content"/>
     <template:background_color>#B0C9BE</template:background_color>
+    <template:head rdf:resource="#head"/>
     <template:css rdf:resource="#css"/>
     <template:title rdf:resource="#title"/>
     <template:shortcut_icon rdf:resource="http://redfoot.net/2002/11/25/favicon.ico"/>
@@ -30,20 +31,7 @@
 title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract(), None) or "-"
 ?>
 
-  <head>
-    <title>${redfoot.label(request.host)}: ${title}</title>
-    <meta http-equiv="Content-Type" content="text/xhtml; charset=UTF-8"/>
-    <meta name="keywords" content=""/>
-    <link rel="shortcut icon" href="${lookup(TEMPLATE.shortcut_icon)}"/>
-    <style type="text/css">
-      ${display(lookup(TEMPLATE.css))}
-    </style>
-    <span kid:for="alternate in redfoot.objects(request.uri, SERVER.alternate)" kid:strip="" >
-    <link rel="alternate"
-      href="${alternate}" title="${redfoot.label(alternate)}"
-      type="${redfoot.value(alternate, SERVER.content_type)}" />
-    </span> 
-  </head>
+  ${display(lookup(TEMPLATE.head))}
 
   <body>
 
@@ -196,6 +184,35 @@ sections.sort()
   </server:PagePartHandler>
 
 
+  <server:PagePartHandler rdf:ID="head">
+    <rdfs:label>Default head</rdfs:label>
+    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+<div xmlns:kid="http://purl.org/kid/ns#"
+     kid:strip="">
+<?python
+title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract(), None) or "-"
+?>
+  <head>
+    <title>${redfoot.label(request.host)}: ${title}</title>
+    <meta http-equiv="Content-Type" content="text/xhtml; charset=UTF-8"/>
+    <meta name="keywords" content=""/>
+    <link rel="shortcut icon" href="${lookup(TEMPLATE.shortcut_icon)}"/>
+    <style type="text/css">
+      ${display(lookup(TEMPLATE.css))}
+    </style>
+    <span kid:for="alternate in redfoot.objects(request.uri, SERVER.alternate)" kid:strip="" >
+    <link rel="alternate"
+      href="${alternate}" title="${redfoot.label(alternate)}"
+      type="${redfoot.value(alternate, SERVER.content_type)}" />
+    </span> 
+  </head>
+</div>
+]]>
+    </rdf:value>
+  </server:PagePartHandler>
+
+
   <server:PagePartHandler rdf:ID="css">
     <rdfs:label>Default css</rdfs:label>
     <server:content_type>text/css</server:content_type>
@@ -237,13 +254,6 @@ pre {
   border: 1px solid black;
   padding: 0.5em 1em;
   white-space: pre; /* CSS2 */
-  white-space: -moz-pre-wrap; /* Mozilla */
-  white-space: -hp-pre-wrap; /* HP printers */
-  white-space: -o-pre-wrap; /* Opera 7 */
-  white-space: -pre-wrap; /* Opera 4-6 */
-  white-space: pre-wrap; /* CSS 2.1 */
-  white-space: pre-line; /* CSS 3 (and 2.1 as well, actually) */
-  word-wrap: break-word; /* IE */
 }
 
 #content {
@@ -260,7 +270,6 @@ pre {
 
     min-height: 400px;
     min-width: 200px;
-    //max-width: 36em;
 }
       
 #usernav {
@@ -295,7 +304,6 @@ pre {
     text-align: right;
     padding: 0em;
     background-color: transparent;
-    xborder: 1px solid black;
 }
 
 #navlist {
@@ -339,7 +347,6 @@ a:hover {
 #footer {
     clear: both;
     margin: 1em;
-    xpadding: .5em;
     font-size: 0.6em;
     background-color: transparent;
     text-align: center;
