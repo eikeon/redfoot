@@ -15,6 +15,82 @@
 
   <server:Page rdf:about="/edit/ajar/">  
     <template:head rdf:resource="#ajar_head"/>
+    <template:content>
+      <server:PagePartHandler rdf:ID="ajar_content">
+        <rdfs:label>ajar content</rdfs:label>
+        <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+<div xmlns:kid="http://purl.org/kid/ns#"  kid:strip="">
+
+  <form name="AddressBar" onsubmit="void GotoFormURI()" action=""
+  id="AddressBar">
+    URI: <input type="text" name="UserURI" size="80"/> <input type=
+    "button" onclick="GotoFormURI()" value="Add to outliner"/>
+    <a class="menu" href="Help.html">Help</a> <a class="menu" href=
+    "About.html">About</a>
+  </form>
+
+  <div onmousedown="TabulatorMousedown(event)" ondblclick=
+  "TabulatorDoubleClick(event)">
+    <table id="browser">
+      <tr>
+        <td about=
+        "&lt;http://www.w3.org/2005/04/swls/BioDash/Demo/gsk&gt;">
+        <img border="0" src="icons/tbl-expand-trans.png" alt=
+        "expand"/> <img border="0" src="icons/16dot-blue.gif" alt=
+        "fetch"/> Life Scienecs demo data: GSK3-Beta Drug
+        Target</td>
+      </tr>
+    </table>
+  </div>
+
+  <div id="key">
+    &nbsp;Key: Data: <img src="icons/16dot-blue.gif" alt="fetch"/>
+    fetch data. <img src="icons/16dot-yellow.gif" alt="requested"/>
+    loading. <img src="icons/16dot-red.gif" alt="failed"/> failed.
+    <img src="icons/16dot-green.gif" alt="loaded"/> loaded.
+    &nbsp;&nbsp;&nbsp; Display: <img src=
+    "icons/tbl-expand-trans.png" alt="expand"/> expand, <img src=
+    "icons/tbl-collapse.png" alt="collapse"/> collapse,
+  </div>
+  <hr/>
+
+  <form name="TabulateForm" onsubmit="void 0" action="" id=
+  "TabulateForm">
+    <input type="button" onclick="void AJAR_Tabulate()" value=
+    "Tabulate selected properties"/> <a class="menu" href=
+    "Help.html">Help</a> <a class="menu" href=
+    "About.html">About</a>
+  </form>
+
+  <div id="results"></div>
+  <hr/>
+
+  <h3>Sources</h3>
+
+  <table id="sources"><tr><td></td></tr></table>
+
+  <div id="log">
+    <hr/>
+
+    <h3>Log</h3><span onmousedown="setLogging(true)">[turn logging
+    on]</span> <span onmousedown="setLogging(false)">[turn logging
+    off]</span> <span onmousedown="clearStatus()">[clear
+    log]</span> <span onmousedown="dumpStore()">[dump store to
+    log]</span><br/>
+    <hr/>
+    <pre id="status">
+<br/>
+</pre><span onmousedown="setLogging(true)">[turn logging on]</span>
+<span onmousedown="setLogging(false)">[turn logging off]</span>
+<span onmousedown="clearStatus()">[clear log]</span>
+<span onmousedown="dumpStore()">[dump store to log]</span><br/>
+  </div>
+</div>
+]]>
+        </rdf:value>
+      </server:PagePartHandler>
+    </template:content>
   </server:Page>
 
   <server:PagePartHandler rdf:ID="ajar_head">
@@ -73,6 +149,7 @@ TODO: It'd be nice to have a tool to install these resouces into the
 hypercode instead of leaving them external to it.
   -->
 
+<!--
   <server:StaticPage rdf:about="/rdf/identity.js"/>
   <server:StaticPage rdf:about="/rdf/match.js"/>
   <server:StaticPage rdf:about="/rdf/parser.js"/>
@@ -91,6 +168,7 @@ hypercode instead of leaving them external to it.
   <server:StaticPage rdf:about="/icons/document.png"/>
   <server:StaticPage rdf:about="/icons/tbl-collapse.png"/>
   <server:StaticPage rdf:about="/icons/tbl-expand-trans.png"/>
+-->
 
   <server:Page rdf:about="/resource">
     <rdfs:label>resource</rdfs:label>
