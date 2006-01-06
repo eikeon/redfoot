@@ -7,47 +7,6 @@
    xmlns:commands="http://redfoot.net/2005/commands#"
 >
 
-  <rdfs:Class rdf:about="http://redfoot.net/2005/server#StaticPage">
-    <server:page_handler>
-      <server:PageHandler rdf:ID="file_handler">
-        <rdfs:label>file handler</rdfs:label>
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
-<![CDATA[
-base64Binary = URIRef("http://www.w3.org/2001/XMLSchema#base64Binary")
-from base64 import b64decode
-
-content_type = redfoot.value(request.uri, SERVER.content_type)
-if content_type:
-    response.setHeader('Content-Type', content_type)
-
-html_root = "html"
-path = request.uri.replace(request.host, '')
-#url2pathname
-#os.path.join(html_root, path)
-#check for ".." etc re: security
-from os.path import exists
-
-if ".." not in path:
-    filename = "%s%s" % (html_root, path)
-    if exists(filename):
-        f = file(filename)
-        response.write(f.read())
-        f.close()
-    else:
-        value = redfoot.value(request.uri, RDF.value)
-        if value:
-            if value.datatype==base64Binary:
-                response.write(b64decode(value))
-            else:
-                response.write(value)
-
-]]>
-        </rdf:value>
-      </server:PageHandler>
-    </server:page_handler>
-  </rdfs:Class>
-
-
   <rdf:Description rdf:about="http://redfoot.net/2005/redfoot#Globals">
     <commands:config>
       <redfoot:Configuration rdf:ID="static_config">
