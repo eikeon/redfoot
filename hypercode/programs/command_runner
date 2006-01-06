@@ -26,6 +26,12 @@ for config in chain(redfoot.objects(redfoot.uri, COMMANDS.config),
         label = redfoot.label(command)
         code = redfoot.value(command, REDFOOT.code)
         commands[label] = code
+
+        # TODO: also make available as command's label prefixed with
+        # config's label (or somesuch)... so that there's a way to
+        # disambiguate commands with same name from two different
+        # config groups.
+
         redfoot.check(code)
 
 if not args:
