@@ -54,6 +54,13 @@
     <rdfs:subClassOf rdf:resource="server#PageHandler"/>
   </rdfs:Class>
 
+  <rdf:Property rdf:ID="head">
+    <rdfs:label>head</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:domain rdf:resource="server#Site"/>
+    <rdfs:range rdf:resource="server#PagePartHandler"/>
+  </rdf:Property>
+
   <rdf:Property rdf:ID="css">
     <rdfs:label>css</rdfs:label>
     <rdfs:comment></rdfs:comment>

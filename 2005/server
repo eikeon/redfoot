@@ -138,6 +138,7 @@ if ".." not in path:
     <rdfs:domain rdf:resource="http://redfoot.net/2005/redfoot#Kernel"/>
     <rdfs:domain rdf:resource="http://redfoot.net/2005/server#Site"/>
     <rdfs:domain rdf:resource="http://redfoot.net/2005/server#Page"/>
+    <rdfs:domain rdf:resource="http://redfoot.net/2005/server#PagePartHandler"/>
     <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Class"/> <!-- TODO make this more specific.. Agent? -->
   </rdf:Property>
 
@@ -187,7 +188,7 @@ if ".." not in path:
     <rdfs:comment>Used to indicate the value of the HTTP headr last modified in seconds since epoch</rdfs:comment>
     <rdfs:domain rdf:resource="#Site"/>
     <rdfs:domain rdf:resource="#Page"/>
-    <!--<rdfs:range rdf:resource="todo: seconds since epoch"/>-->
+    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/> <!-- seconds since epoch -->
   </rdf:Property>
 
 </rdf:RDF>  
