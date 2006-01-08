@@ -4,10 +4,6 @@
     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
     xmlns:owl="http://www.w3.org/2002/07/owl#"
     xmlns:redfoot="http://redfoot.net/2005/redfoot#"
-    xmlns:program="http://redfoot.net/2005/program#"
-    xmlns:dc="http://purl.org/dc/elements/1.1/"
-    xmlns:dct="http://purl.org/dc/terms/"
-    xmlns:foaf="http://xmlns.com/foaf/0.1/"
     xmlns:template="http://redfoot.net/2005/template#"
     xmlns:server="http://redfoot.net/2005/server#"
 >
@@ -32,35 +28,44 @@
       <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
 <![CDATA[
   <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
-    <p><a href="${redfoot.value(request.uri)}">${redfoot.label(redfoot.value(request.uri)) or "--"}</a></p>
 <?python
+import time
 
 BOOKMARK = redfoot.namespace("http://redfoot.net/2006/bookmark#")
 DC_created = URIRef("http://purl.org/dc/terms/created")
 DC_creator = URIRef("http://purl.org/dc/elements/1.1/creator")
 
-bookmark_uri = redfoot.value(request.uri)
+refersTo = redfoot.value(request.uri, BOOKMARK.refersTo)
 
-bookmarks = set()
-for bookmark in redfoot.subjects(RDF.type, BOOKMARK.Bookmark):
-    uri = redfoot.value(bookmark)
-    if uri == bookmark_uri:
-        created = redfoot.value(bookmark, DC_created)
-        creator = redfoot.value(bookmark, DC_creator)
-        bookmarks.add((created, creator, uri))
-bookmarks = list(bookmarks)
-bookmarks.sort()
-bookmarks.reverse()
+if refersTo:
+      creators = list(redfoot.objects(request.uri, DC_creator))
+      c = redfoot.value(request.uri, DC_created)
+      try:
+          created = time.strftime("%A %d %B, %Y", time.gmtime(float(c)))
+      except:
+          created = None
+
 ?>
-    <span kid:if="bookmarks">
-      <p>Other bookmarks for this page</p>
-      <ul>
-        <li kid:for="created, creator, uri in bookmarks">
-          <a href="${uri}">by ${creator} on ${created}</a>
-        </li>
-      </ul>
-    </span>  
+   <span kid:if="refersTo" >
+    <p>This bookmark refers to 
+      <a href="${refersTo}">${redfoot.label(refersTo) or "--"}</a>.
+      <span kid:if="created">The bookmark was created on ${created}.</span>
+      <span kid:if="len(creators)==1">The bookmark was added by 
+            <a href="${request.relative(creators[0].concrete())}">${redfoot.label(creators[0]) or creators[0]}</a>.
+      </span> 
+      <span kid:if="len(creators)>1">The bookmark was added by:
+        <ul>
+          <li kid:for="creator in creators">
+            <a href="${request.relative(creator.concrete())}">${redfoot.label(creator) or creator}</a>
+          </li>
+        </ul>
+      </span> 
+    </p>
 
+   </span>
+   <span kid:if="not refersTo" >
+     <p>This bookmark does not refer to anything :(</p>
+   </span>
   </span>
 ]]>
       </rdf:value>

@@ -357,6 +357,21 @@ a:hover {
     vertical-align: middle;
 }
 
+.bookmarks li h3 {
+    margin-bottom: 0em;
+}
+
+.bookmarks {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.meta {
+    font-size: 0.8em;    
+    color: gray;
+}
+
 """ % {"color": color})
     
     </rdf:value>

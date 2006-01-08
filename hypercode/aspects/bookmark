@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:server="http://redfoot.net/2005/server#"
+   xmlns:session="http://redfoot.net/2005/session#"
+   xmlns:template="http://redfoot.net/2005/template#"
+>
+
+  <redfoot:Aspect rdf:ID="aspect">
+    <rdfs:label>Bookmark aspect</rdfs:label>
+    <rdfs:comment>
+    </rdfs:comment>
+  </redfoot:Aspect>
+
+  <rdf:Description rdf:about="">
+    <template:section rdf:resource="/bookmarks/"/>    
+    <template:default_section_rank>25.0</template:default_section_rank>
+  </rdf:Description>
+
+  <server:Page rdf:about="/bookmarks/">
+    <rdfs:label>Bookmarks</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>        
+    <template:content>
+     <server:PagePartHandler rdf:ID="Bookmarks">
+      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+  <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
+<?python 
+import time
+
+BOOKMARK = redfoot.namespace("http://redfoot.net/2006/bookmark#")
+SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+DC_creator = URIRef("http://purl.org/dc/elements/1.1/creator")
+DC_created = URIRef("http://purl.org/dc/terms/created")
+
+bookmarks = set()
+for bookmark in redfoot.subjects(RDF.type, BOOKMARK.Bookmark): 
+    if (bookmark, SERVER.site, request.host) in redfoot:
+        uri = redfoot.value(bookmark, BOOKMARK.refersTo)
+        label = redfoot.label(uri) or uri
+        c = redfoot.value(bookmark, DC_created)
+        try:
+            created = time.strftime("%A %d %B, %Y", time.gmtime(float(c)))
+        except:
+            created = None
+        bookmarks.add((c, created, label, uri, bookmark))
+bookmarks = list(bookmarks)
+bookmarks.sort()
+bookmarks.reverse()
+
+?>
+    <p>
+      Drag and drop this to you bookmark bar: <a href="javascript:void(document.location='${request.uri}add_bookmark');">Add ${redfoot.label(request.host)} Bookmark</a>
+    </p>
+
+    <ul class="bookmarks">
+      <li kid:for="c, created, label, uri, bookmark in bookmarks">
+        <h3><a href="${uri}">${label}</a></h3>
+        <div class="meta">
+          <a href="${bookmark}">bookmark</a> 
+          <span kid:if="created">created on ${created}</span>.
+        </div>
+      </li>
+    </ul>
+  </span>
+]]>
+      </rdf:value>
+     </server:PagePartHandler> 
+    </template:content>
+  </server:Page>
+
+  <server:Page rdf:about="/bookmarks/add_bookmark">
+    <rdfs:label>Add Bookmark</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <server:long_running>true</server:long_running>
+    <server:handler>
+     <server:PagePartHandler rdf:ID="add_bookmark">
+      <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+from sgmllib import SGMLParser
+
+class BookmarkParser(SGMLParser):
+    def __init__(self, bookmark, uri):
+        SGMLParser.__init__(self)
+        self.bookmark = bookmark
+        self.uri = uri
+        self.context = redfoot.get_context(redfoot.context_id(bookmark))
+        self.data = ""
+
+    def reset(self):                              
+        SGMLParser.reset(self)
+
+    def handle_data(self, data):
+        self.data += data
+
+    def start_title(self, attrs):                     
+        self.data = ""
+
+    def end_title(self):
+        c = self.context
+        if (self.uri, RDFS.label, None) not in c:
+            c.add((self.uri, RDFS.label, Literal(self.data)))
+        self.data = ""
+
+    def unknown_endtag(self, tag):
+        pass
+
+import md5
+from time import time
+from twisted.web.client import getPage
+from twisted.web import http
+
+BOOKMARK = redfoot.namespace("http://redfoot.net/2006/bookmark#")
+SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+DC_creator = URIRef("http://purl.org/dc/elements/1.1/creator")
+DC_created = URIRef("http://purl.org/dc/terms/created")
+
+uri = request.headers.get("referer")
+
+if uri:
+    uri = URIRef(uri) 
+    b = URIRef("/bookmark/%s" % md5.new(uri).hexdigest(), base=request.host)
+    c = redfoot.get_context(redfoot.context_id(b))
+    c.add((b, RDFS.label, Literal("Bookmark")))
+    c.add((b, RDF.type, BOOKMARK.Bookmark))
+    c.add((b, BOOKMARK.refersTo, uri))
+    if (b, DC_created, None) not in redfoot:
+        c.add((b, DC_created, Literal("%s" % time())))
+    c.add((b, SERVER.site, request.host))
+    if request.session_id:
+        # TODO: add a uid method to request?
+        uid = redfoot.value(request.session_id, SESSION.uid)
+        if uid:
+            c.add((b, DC_creator, uid))
+
+    def finish(page):
+        import urllib
+        parser = BookmarkParser(b, uri)
+        parser.feed(page)
+
+        response.setStatus(http.SEE_OTHER, "no referer")
+        response.setHeader("Location", b)               
+        response.finish()
+
+    d = getPage(uri.encode("utf-8"))
+    d.addCallback(finish)
+else:
+    response.setStatus(http.PRECONDITION_FAILED, "no referer")
+    response.write("No referer specified")
+    response.finish()
+]]>
+      </rdf:value>
+     </server:PagePartHandler> 
+    </server:handler>
+  </server:Page>
+
+</rdf:RDF>
+
