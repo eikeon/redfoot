@@ -16,13 +16,13 @@
 
   <rdf:Description rdf:about="">
     <template:section rdf:resource="/bookmarks/"/>    
-    <template:default_section_rank>25.0</template:default_section_rank>
   </rdf:Description>
 
   <server:Page rdf:about="/bookmarks/">
     <rdfs:label>Bookmarks</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>        
+    <template:default_section_rank>25.0</template:default_section_rank>
     <template:content>
      <server:PagePartHandler rdf:ID="Bookmarks">
       <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
