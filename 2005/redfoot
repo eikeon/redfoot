@@ -36,11 +36,11 @@
     <rdfs:subClassOf rdf:resource="#Resource"/>
   </rdfs:Class>
 
-  <rdfs:Property rdf:ID="code">
+  <rdf:Property rdf:ID="code">
     <rdfs:label>code</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:range rdf:resource="#Code"/>
-  </rdfs:Property>
+  </rdf:Property>
 
 
   <rdfs:Class rdf:ID="Module">
@@ -59,12 +59,12 @@
     <rdfs:subClassOf rdf:resource="#Code"/>
   </rdfs:Class>
 
-  <rdfs:Property rdf:ID="program"> <!-- TODO: relationship with REDFOOT.code ? -->
+  <rdf:Property rdf:ID="program"> <!-- TODO: relationship with REDFOOT.code ? -->
     <rdfs:label>program</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:domain rdf:resource="#Globals"/>
     <rdfs:range rdf:resource="#Program"/>
-  </rdfs:Property>
+  </rdf:Property>
 
   <rdfs:Class rdf:ID="Kernel">
     <rdfs:label>Redfoot Kernel</rdfs:label>
@@ -74,19 +74,19 @@
     <rdfs:subClassOf rdf:resource="#Program"/>
   </rdfs:Class>
 
-  <rdfs:Property rdf:ID="base">
+  <rdf:Property rdf:ID="base">
     <rdfs:label>base</rdfs:label>
     <rdfs:comment>indicated the base URI Redfoot is to resolve relative URI against</rdfs:comment>
     <rdfs:domain rdf:resource="#Globals"/>
     <rdfs:range rdf:resource="#Resource"/>
-  </rdfs:Property>
+  </rdf:Property>
 
-  <rdfs:Property rdf:ID="version">
+  <rdf:Property rdf:ID="version">
     <rdfs:label>version</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:domain rdf:resource="#Globals"/>
     <rdfs:range rdf:resource="#Program"/> 
-  </rdfs:Property>
+  </rdf:Property>
 
   <rdfs:Class rdf:ID="Context">
     <rdfs:label>Context</rdfs:label>
@@ -94,23 +94,23 @@
     <rdfs:subClassOf rdf:resource="#Resource"/>
   </rdfs:Class>
 
-  <rdfs:Property rdf:ID="source">
+  <rdf:Property rdf:ID="source">
     <rdfs:label>source</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:domain rdf:resource="#Context"/>
-  </rdfs:Property>
+  </rdf:Property>
 
-  <rdfs:Property rdf:ID="context_id">
+  <rdf:Property rdf:ID="context_id">
     <rdfs:label>context_id</rdfs:label>
     <rdfs:comment>used by load; see load method on kernel for more info</rdfs:comment>
     <rdfs:domain rdf:resource="#Context"/>
-  </rdfs:Property>
+  </rdf:Property>
 
-  <rdfs:Property rdf:ID="publicID">
+  <rdf:Property rdf:ID="publicID">
     <rdfs:label>publicID</rdfs:label>
     <rdfs:comment>used by load; see load method on kernel for more info</rdfs:comment>
     <rdfs:domain rdf:resource="#Context"/>
-  </rdfs:Property>
+  </rdf:Property>
 
   <rdfs:Class rdf:ID="DeletedContext">
     <rdfs:label>Deleted Context</rdfs:label>
@@ -124,12 +124,12 @@
     <rdfs:subClassOf rdf:resource="#Resource"/>
   </rdfs:Class>
 
-  <rdfs:Property rdf:ID="todo">
+  <rdf:Property rdf:ID="todo">
     <rdfs:label>todo</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:domain rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
     <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
-  </rdfs:Property>
+  </rdf:Property>
 
   <rdfs:Class rdf:ID="Checked">
     <rdfs:label>Checked uris</rdfs:label>
@@ -147,11 +147,11 @@
     <rdfs:comment></rdfs:comment>
   </rdfs:Datatype>
 
-  <rdfs:Property rdf:ID="admin">
+  <rdf:Property rdf:ID="admin">
     <rdfs:label>admin</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:range rdf:resource="session#User"/> <!-- or other agents or group-->
-  </rdfs:Property>
+  </rdf:Property>
 
 <!--
   <rdfs:Class rdf:ID="Class">

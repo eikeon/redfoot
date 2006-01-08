@@ -14,19 +14,19 @@
     </rdfs:comment>
   </redfoot:Namespace>
 
-  <rdfs:Property rdf:ID="config">
+  <rdf:Property rdf:ID="config">
     <rdfs:label>config</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:domain rdf:resource="http://redfoot.net/2005/redfoot#Main"/>
     <rdfs:range rdf:resource="#Config"/>
-  </rdfs:Property> 
+  </rdf:Property> 
 
-   <rdfs:Property rdf:ID="command">
+   <rdf:Property rdf:ID="command">
     <rdfs:label>command</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:domain rdf:resource="#Config"/>
     <rdfs:range rdf:resource="#Command"/>
-  </rdfs:Property> 
+  </rdf:Property> 
 
   <rdfs:Class rdf:ID="Command">
     <rdfs:label>Command</rdfs:label>

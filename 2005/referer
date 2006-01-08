@@ -17,11 +17,11 @@
     <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/server#Class"/>
   </rdfs:Class>
 
-  <rdfs:Property rdf:ID="referer">
+  <rdf:Property rdf:ID="referer">
     <rdfs:label>referer</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:domain rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
     <rdfs:range rdf:resource="#Referer"/>
-  </rdfs:Property>
+  </rdf:Property>
 
 </rdf:RDF>  

@@ -17,26 +17,26 @@
     <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/server#Class"/>
   </rdfs:Class>
 
-  <rdfs:Property rdf:ID="session">
+  <rdf:Property rdf:ID="session">
     <rdfs:label>session</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:domain rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
     <rdfs:range rdf:resource="#Session"/>
-  </rdfs:Property>
+  </rdf:Property>
 
-  <rdfs:Property rdf:ID="authenticated">
+  <rdf:Property rdf:ID="authenticated">
     <rdfs:label>authenticated</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:domain rdf:resource="#Session"/>
     <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
-  </rdfs:Property>
+  </rdf:Property>
 
-  <rdfs:Property rdf:ID="uid">
+  <rdf:Property rdf:ID="uid">
     <rdfs:label>user ID</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:domain rdf:resource="#Session"/>
     <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
-  </rdfs:Property>
+  </rdf:Property>
 
   <rdfs:Class rdf:ID="User">
     <rdfs:label>User</rdfs:label>
@@ -44,32 +44,32 @@
     <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/server#Class"/>
   </rdfs:Class>
 
-  <rdfs:Property rdf:ID="hexdigest">
+  <rdf:Property rdf:ID="hexdigest">
     <rdfs:label>hexdigest</rdfs:label>
     <rdfs:comment>The md5 hexdigest of a secret. For example to generate from Python: md5.new(secret).hexdigest()</rdfs:comment>
     <rdfs:domain rdf:resource="#User"/>
     <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
-  </rdfs:Property>
+  </rdf:Property>
 
-  <rdfs:Property rdf:ID="message">
+  <rdf:Property rdf:ID="message">
     <rdfs:label>message</rdfs:label>
     <rdfs:comment>Used by auth</rdfs:comment>
     <rdfs:domain rdf:resource="#User"/>
     <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
-  </rdfs:Property>
+  </rdf:Property>
 
-  <rdfs:Property rdf:ID="context">
+  <rdf:Property rdf:ID="context">
     <rdfs:label>context</rdfs:label>
     <rdfs:comment>context</rdfs:comment>
     <rdfs:domain rdf:resource="#User"/>
     <rdfs:range rdf:resource="http://redfoot.net/2005/redfooot#Context"/>
-  </rdfs:Property>
+  </rdf:Property>
 
-  <rdfs:Property rdf:ID="created">
+  <rdf:Property rdf:ID="created">
     <rdfs:label>created</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:domain rdf:resource="#Session"/>
     <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
-  </rdfs:Property>
+  </rdf:Property>
 
 </rdf:RDF>  

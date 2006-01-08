@@ -10,42 +10,42 @@
     <rdfs:comment>The Redfoot Handler namespace is...</rdfs:comment>
   </redfoot:Namespace>
 
-  <rdfs:Property rdf:ID="section">
+  <rdf:Property rdf:ID="section">
     <rdfs:label>section</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:domain rdf:resource="server#Site"/>
     <rdfs:domain rdf:resource="server#Page"/>
     <rdfs:range rdf:resource="server#Page"/>
-  </rdfs:Property>
+  </rdf:Property>
 
-  <rdfs:Property rdf:ID="default_section_rank">
+  <rdf:Property rdf:ID="default_section_rank">
     <rdfs:label>default section rank</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:domain rdf:resource="server#Page"/>
     <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
-  </rdfs:Property>
+  </rdf:Property>
 
-  <rdfs:Property rdf:ID="section_rank">
+  <rdf:Property rdf:ID="section_rank">
     <rdfs:label>section rank</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:domain rdf:resource="server#Page"/>
     <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
-  </rdfs:Property>
+  </rdf:Property>
 
-  <rdfs:Property rdf:ID="section_name">
+  <rdf:Property rdf:ID="section_name">
     <rdfs:label>section name</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:domain rdf:resource="server#Page"/>
     <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
-  </rdfs:Property>
+  </rdf:Property>
 
-  <rdfs:Property rdf:ID="content">
+  <rdf:Property rdf:ID="content">
     <rdfs:label>content</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:domain rdf:resource="server#Site"/>
     <rdfs:domain rdf:resource="server#Page"/>
     <rdfs:range rdf:resource="server#PagePartHandler"/>
-  </rdfs:Property>
+  </rdf:Property>
 
 
   <rdfs:Class rdf:ID="Template">
@@ -54,70 +54,70 @@
     <rdfs:subClassOf rdf:resource="server#PageHandler"/>
   </rdfs:Class>
 
-  <rdfs:Property rdf:ID="css">
+  <rdf:Property rdf:ID="css">
     <rdfs:label>css</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:domain rdf:resource="server#Site"/>
     <rdfs:range rdf:resource="server#PagePartHandler"/>
-  </rdfs:Property>
+  </rdf:Property>
 
-  <rdfs:Property rdf:ID="header">
+  <rdf:Property rdf:ID="header">
     <rdfs:label>header</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:domain rdf:resource="server#Site"/>
     <rdfs:range rdf:resource="server#PagePartHandler"/>
-  </rdfs:Property>
+  </rdf:Property>
 
-  <rdfs:Property rdf:ID="footer">
+  <rdf:Property rdf:ID="footer">
     <rdfs:label>footer</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:domain rdf:resource="server#Site"/>
     <rdfs:range rdf:resource="server#PagePartHandler"/>
-  </rdfs:Property>
+  </rdf:Property>
 
-  <rdfs:Property rdf:ID="not_found">
+  <rdf:Property rdf:ID="not_found">
     <rdfs:label>not_found</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:domain rdf:resource="server#Site"/>
     <rdfs:range rdf:resource="server#PagePartHandler"/>
-  </rdfs:Property>
+  </rdf:Property>
 
-  <rdfs:Property rdf:ID="text">
+  <rdf:Property rdf:ID="text">
     <rdfs:label>text</rdfs:label>
     <rdfs:comment></rdfs:comment>
-  </rdfs:Property>
+  </rdf:Property>
 
-  <rdfs:Property rdf:ID="navigation">
+  <rdf:Property rdf:ID="navigation">
     <rdfs:label>navigation</rdfs:label>
     <rdfs:comment></rdfs:comment>
-  </rdfs:Property>
+  </rdf:Property>
 
-  <rdfs:Property rdf:ID="copyright">
+  <rdf:Property rdf:ID="copyright">
     <rdfs:label>copyright</rdfs:label>
     <rdfs:comment></rdfs:comment>
-  </rdfs:Property>
+  </rdf:Property>
 
-  <rdfs:Property rdf:ID="background_color">
+  <rdf:Property rdf:ID="background_color">
     <rdfs:label>background_color</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <redfoot:todo>Is there a better namespace for this property?</redfoot:todo>
     <rdfs:domain rdf:resource="server#Site"/>
     <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
-  </rdfs:Property>
+  </rdf:Property>
 
-  <rdfs:Property rdf:ID="comments">
+  <rdf:Property rdf:ID="comments">
     <rdfs:label>comments</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:domain rdf:resource="server#Site"/>
     <rdfs:range rdf:resource="server#PagePartHandler"/>
-  </rdfs:Property>
+  </rdf:Property>
 
-  <rdfs:Property rdf:ID="add_comment">
+  <rdf:Property rdf:ID="add_comment">
     <rdfs:label>add comment</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:domain rdf:resource="server#Site"/>
     <rdfs:range rdf:resource="server#PagePartHandler"/>
-  </rdfs:Property>
+  </rdf:Property>
 
   <rdfs:Class rdf:ID="Title">
     <rdfs:label>Title</rdfs:label>
@@ -125,14 +125,14 @@
     <rdfs:subClassOf rdf:resource="#PagePartHandler"/>
   </rdfs:Class>
 
-  <rdfs:Property rdf:ID="title">
+  <rdf:Property rdf:ID="title">
     <rdfs:label>title</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:domain rdf:resource="redfoot#Release"/>
     <rdfs:domain rdf:resource="server#Site"/>
     <rdfs:domain rdf:resource="server#Page"/>
     <rdfs:range rdf:resource="#Title"/>
-  </rdfs:Property>
+  </rdf:Property>
 
   <rdfs:Class rdf:ID="Shortcut_Icon">
     <rdfs:label>Shortcut_Icon</rdfs:label>
@@ -140,13 +140,13 @@
     <rdfs:subClassOf rdf:resource="#PagePartHandler"/>
   </rdfs:Class>
 
-  <rdfs:Property rdf:ID="shortcut_icon">
+  <rdf:Property rdf:ID="shortcut_icon">
     <rdfs:label>shortcut_icon</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:domain rdf:resource="redfoot#Release"/>
     <rdfs:domain rdf:resource="server#Site"/>
     <rdfs:domain rdf:resource="server#Page"/>
     <rdfs:range rdf:resource="#Shortcut_Icon"/>
-  </rdfs:Property>
+  </rdf:Property>
 
 </rdf:RDF>  

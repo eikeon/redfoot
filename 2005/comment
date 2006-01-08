@@ -17,12 +17,12 @@
     <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/server#Class"/>
   </rdfs:Class>
 
-  <rdfs:Property rdf:ID="comment">
+  <rdf:Property rdf:ID="comment">
     <rdfs:label>comment</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:domain rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
     <rdfs:range rdf:resource="#Comment"/>
-  </rdfs:Property>
+  </rdf:Property>
 
   <redfoot:Resource rdf:ID="exclude">
     <rdfs:label>exclude</rdfs:label>

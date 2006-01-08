@@ -16,13 +16,13 @@
     <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/redfoot#Code"/>
   </rdfs:Class>
 
-  <rdfs:Property rdf:ID="handler">
+  <rdf:Property rdf:ID="handler">
     <rdfs:label>handler</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:domain rdf:resource="http://redfoot.net/2005/redfoot#Release"/>
     <rdfs:domain rdf:resource="#Server"/>
     <rdfs:domain rdf:resource="#DispatchHandler"/>
     <rdfs:range rdf:resource="#Handler"/>
-  </rdfs:Property>
+  </rdf:Property>
 
 </rdf:RDF>  
