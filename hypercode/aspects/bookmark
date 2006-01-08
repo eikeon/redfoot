@@ -45,6 +45,7 @@ for bookmark in redfoot.subjects(RDF.type, BOOKMARK.Bookmark):
         try:
             created = time.strftime("%A %d %B, %Y", time.gmtime(float(c)))
         except:
+            redfoot.log.warning("Couldn't format timestamp: %s" % e)
             created = None
         bookmarks.add((c, created, label, uri, bookmark))
 bookmarks = list(bookmarks)
@@ -60,7 +61,7 @@ bookmarks.reverse()
       <li kid:for="c, created, label, uri, bookmark in bookmarks">
         <h3><a href="${uri}">${label}</a></h3>
         <div class="meta">
-          <a href="${bookmark}">bookmark</a> 
+          <a href="${bookmark.concrete()}">bookmark</a> 
           <span kid:if="created">created on ${created}</span>.
         </div>
       </li>
@@ -75,11 +76,15 @@ bookmarks.reverse()
   <server:Page rdf:about="/bookmarks/add_bookmark">
     <rdfs:label>Add Bookmark</rdfs:label>
     <rdfs:comment></rdfs:comment>
+    <server:allow rdf:resource="http://redfoot.net/2005/session#User"/>
     <server:long_running>true</server:long_running>
     <server:handler>
      <server:PagePartHandler rdf:ID="add_bookmark">
       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
+
+auth = redfoot.module(URIRef("modules/auth#module", base=redfoot_program))
+
 from sgmllib import SGMLParser
 
 class BookmarkParser(SGMLParser):
@@ -109,6 +114,7 @@ class BookmarkParser(SGMLParser):
         pass
 
 import md5
+import urlparse
 from time import time
 from twisted.web.client import getPage
 from twisted.web import http
@@ -121,9 +127,13 @@ DC_created = URIRef("http://purl.org/dc/terms/created")
 
 uri = request.headers.get("referer")
 
-if uri:
+if not auth.allow(request):
+    response.setStatus(403, "Forbidden")
+    response.write("Must be logged in to add a bookmark.")
+    response.finish()
+elif uri:
     uri = URIRef(uri) 
-    b = URIRef("/bookmark/%s" % md5.new(uri).hexdigest(), base=request.host)
+    b = URIRef("/bookmark/%s/" % md5.new(uri).hexdigest(), base=request.host).abstract()
     c = redfoot.get_context(redfoot.context_id(b))
     c.add((b, RDFS.label, Literal("Bookmark")))
     c.add((b, RDF.type, BOOKMARK.Bookmark))
@@ -131,23 +141,46 @@ if uri:
     if (b, DC_created, None) not in redfoot:
         c.add((b, DC_created, Literal("%s" % time())))
     c.add((b, SERVER.site, request.host))
+
+    scheme, netloc, url, params, query, fragment = urlparse.urlparse(uri)
+    host = URIRef(urlparse.urlunparse((scheme, netloc, "", "", "", "")))
+
+    # TODO: d = getPage(host.encode("utf-8")); d.addCallback(updateCategory)
+    category = URIRef("/bookmarks/category/%s/" % md5.new(host).hexdigest(), base=request.host).abstract()
+    c.remove((category, RDFS.label, None))
+    c.add((category, RDFS.label, redfoot.label(host) or Literal(host)))
+    c.add((category, RDF.type, BOOKMARK.Category))
+    c.add((b, BOOKMARK.category, category))
+
     if request.session_id:
         # TODO: add a uid method to request?
         uid = redfoot.value(request.session_id, SESSION.uid)
         if uid:
-            c.add((b, DC_creator, uid))
+            if (b, DC_creator, None) not in redfoot:
+                c.add((b, DC_creator, uid))
 
     def finish(page):
-        import urllib
-        parser = BookmarkParser(b, uri)
-        parser.feed(page)
-
-        response.setStatus(http.SEE_OTHER, "no referer")
-        response.setHeader("Location", b)               
+        if page is not None:
+              import urllib
+              parser = BookmarkParser(b, uri)
+              parser.feed(page)
+        response.setStatus(http.SEE_OTHER, "The Bookmark Page")
+        response.setHeader("Location", b.concrete())               
         response.finish()
 
-    d = getPage(uri.encode("utf-8"))
-    d.addCallback(finish)
+    def error(result):
+        finish(None)       
+
+    if host==request.host:
+        # Don't try to fetch page from ourself... just finish up.
+        finish(None)
+    else:
+        # else some of the bits turn unicode again and cause a twisted
+        # TypeError("Data must not be unicode")
+        urlparse.clear_cache() 
+        d = getPage(uri.encode("utf-8"))
+        d.addCallback(finish)
+        d.addErrback(error)
 else:
     response.setStatus(http.PRECONDITION_FAILED, "no referer")
     response.write("No referer specified")

@@ -31,36 +31,43 @@
 <?python
 import time
 
+bookmark = request.uri.abstract()
+
 BOOKMARK = redfoot.namespace("http://redfoot.net/2006/bookmark#")
 DC_created = URIRef("http://purl.org/dc/terms/created")
 DC_creator = URIRef("http://purl.org/dc/elements/1.1/creator")
 
-refersTo = redfoot.value(request.uri, BOOKMARK.refersTo)
+refersTo = redfoot.value(bookmark, BOOKMARK.refersTo)
 
 if refersTo:
-      creators = list(redfoot.objects(request.uri, DC_creator))
-      c = redfoot.value(request.uri, DC_created)
+      creator = redfoot.value(bookmark, DC_creator)
+      c = redfoot.value(bookmark, DC_created)
       try:
           created = time.strftime("%A %d %B, %Y", time.gmtime(float(c)))
       except:
           created = None
+
+categories = list(redfoot.objects(bookmark, BOOKMARK.category))
 
 ?>
    <span kid:if="refersTo" >
     <p>This bookmark refers to 
       <a href="${refersTo}">${redfoot.label(refersTo) or "--"}</a>.
       <span kid:if="created">The bookmark was created on ${created}.</span>
-      <span kid:if="len(creators)==1">The bookmark was added by 
-            <a href="${request.relative(creators[0].concrete())}">${redfoot.label(creators[0]) or creators[0]}</a>.
-      </span> 
-      <span kid:if="len(creators)>1">The bookmark was added by:
-        <ul>
-          <li kid:for="creator in creators">
-            <a href="${request.relative(creator.concrete())}">${redfoot.label(creator) or creator}</a>
-          </li>
-        </ul>
+      <span kid:if="creator">The bookmark was added by 
+            <a href="${request.relative(creator.concrete())}">${redfoot.label(creator) or creator}</a>.
       </span> 
     </p>
+
+    <span kid:if="categories"><p>The bookmark is in the following categories:
+      <ul>
+        <li kid:for="category in categories">
+          <a href="${request.relative(category.concrete())}">${redfoot.label(category) or category}</a>
+        </li>
+      </ul>
+     </p> 
+    </span> 
+
 
    </span>
    <span kid:if="not refersTo" >
@@ -80,7 +87,67 @@ if refersTo:
     <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
   </owl:ObjectProperty>
 
-<!-- Tag -->
+  <owl:Class rdf:ID="Category">
+    <rdfs:label>Category</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+    <template:content>
+     <server:PagePartHandler rdf:ID="CategoryHandler">
+      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+  <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
+<?python
+import time
 
+category = request.uri.abstract()
+
+BOOKMARK = redfoot.namespace("http://redfoot.net/2006/bookmark#")
+SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+DC_creator = URIRef("http://purl.org/dc/elements/1.1/creator")
+DC_created = URIRef("http://purl.org/dc/terms/created")
+
+bookmarks = set()
+for bookmark in redfoot.subjects(BOOKMARK.category, category):
+    if (bookmark, SERVER.site, request.host) in redfoot:
+        uri = redfoot.value(bookmark, BOOKMARK.refersTo)
+        label = redfoot.label(uri) or uri
+        c = redfoot.value(bookmark, DC_created)
+        try:
+            created = time.strftime("%A %d %B, %Y", time.gmtime(float(c)))
+        except Exception, e:
+            redfoot.log.warning("Couldn't format timestamp: %s" % e)
+            created = None
+        bookmarks.add((c, created, label, uri, bookmark))
+bookmarks = list(bookmarks)
+bookmarks.sort()
+bookmarks.reverse()
+
+
+?>
+    <ul class="bookmarks">
+      <li kid:for="c, created, label, uri, bookmark in bookmarks">
+        <h3><a href="${uri}">${label}</a></h3>
+        <div class="meta">
+          <a href="${bookmark.concrete()}">bookmark</a> 
+          <span kid:if="created">created on ${created}</span>.
+        </div>
+      </li>
+    </ul>
+
+   </span>
+]]>
+      </rdf:value>
+     </server:PagePartHandler> 
+    </template:content>
+  </owl:Class>
+
+  <owl:ObjectProperty rdf:ID="category">
+    <rdfs:label>category</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:domain rdf:resource="#Bookmark"/>
+    <rdfs:range rdf:resource="#Category"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
+    <!-- Allow literals in range to support using category for tags -->
+  </owl:ObjectProperty>
 
 </rdf:RDF>  
