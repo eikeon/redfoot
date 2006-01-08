@@ -45,6 +45,12 @@
     <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/redfoot#Resource"/>
   </rdfs:Class>
 
+  <rdf:Property rdf:ID="site">
+    <rdfs:label>site</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:range rdf:resource="#Site"/>
+  </rdf:Property>
+
   <rdfs:Class rdf:ID="Page">
     <rdfs:label>Page</rdfs:label>
     <rdfs:comment></rdfs:comment>
