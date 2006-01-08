@@ -9,6 +9,7 @@
     xmlns:dct="http://purl.org/dc/terms/"
     xmlns:foaf="http://xmlns.com/foaf/0.1/"
     xmlns:template="http://redfoot.net/2005/template#"
+    xmlns:server="http://redfoot.net/2005/server#"
 >
 
   <redfoot:Namespace rdf:about="#">
@@ -34,7 +35,7 @@
     <p><a href="${redfoot.value(request.uri)}">${redfoot.label(redfoot.value(request.uri)) or "--"}</a></p>
 <?python
 
-BOOKMARK = redfoot.namespace("http://redfoot.net/2005/bookmark#")
+BOOKMARK = redfoot.namespace("http://redfoot.net/2006/bookmark#")
 DC_created = URIRef("http://purl.org/dc/terms/created")
 DC_creator = URIRef("http://purl.org/dc/elements/1.1/creator")
 
@@ -75,14 +76,6 @@ bookmarks.reverse()
   </owl:ObjectProperty>
 
 <!-- Tag -->
-
-    <owl:DatatypeProperty rdf:about="http://www.holygoat.co.uk/owl/redwood/0.1/tags/taggedOn">
-        <comment xml:lang="en">The subject Tagging occurred at the subject time and date.</comment>
-        <domain rdf:resource="http://www.holygoat.co.uk/owl/redwood/0.1/tags/Tagging"/>
-        <label xml:lang="en">tagged on</label>
-        <subPropertyOf rdf:resource="http://purl.org/dc/elements/1.1/date"/>
-        <vs:term_status>testing</vs:term_status>
-    </owl:DatatypeProperty>
 
 
 </rdf:RDF>  
