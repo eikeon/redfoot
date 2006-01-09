@@ -46,10 +46,21 @@ def main(command=None):
 	from redfootlib.BootLoader import BootLoader
 	loader = BootLoader(backend=options.backend)
 	try:
-	    loader.open(options.path)
+	    loader.open(options.path,create=False)
+            len(loader)
+            print "Graph opened / verified"
 	    loader.main(options, args)
-	finally:
-	    loader.close()
+            loader.close()
+        except:
+            import traceback
+            traceback.print_exc()
+            print "Creating new graph"
+            try:
+                loader.open(options.path,create=True)
+                loader.main(options,args)
+            finally:
+                loader.close
+
 	return loader
 
 if __name__=="__main__":
