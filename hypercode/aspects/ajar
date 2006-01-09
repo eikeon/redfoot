@@ -7,17 +7,17 @@
   xmlns:template='http://redfoot.net/2005/template#'  
 >
 
-  <redfoot:Aspect rdf:about="#ajar_aspect">
+  <redfoot:Aspect rdf:about="#editor_aspect">
     <rdfs:label>ajar based Editor</rdfs:label>
-    <template:section rdf:resource="/edit/ajar/"/>
+    <template:section rdf:resource="/editor/"/>
     <rdfs:seeAlso rdf:resource="http://www.w3.org/2005/ajar/"/>
   </redfoot:Aspect>
 
-  <server:Page rdf:about="/edit/ajar/">  
-    <template:head rdf:resource="#ajar_head"/>
+  <server:Page rdf:about="/editor/">  
+    <template:head rdf:resource="#editor_head"/>
     <template:content>
-      <server:PagePartHandler rdf:ID="ajar_content">
-        <rdfs:label>ajar content</rdfs:label>
+      <server:PagePartHandler rdf:ID="editor_content">
+        <rdfs:label>editor content</rdfs:label>
         <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
 <![CDATA[
 <div xmlns:kid="http://purl.org/kid/ns#"  kid:strip="">
@@ -93,8 +93,8 @@
     </template:content>
   </server:Page>
 
-  <server:PagePartHandler rdf:ID="ajar_head">
-    <rdfs:label>Default head</rdfs:label>
+  <server:PagePartHandler rdf:ID="editor_head">
+    <rdfs:label>head for editor</rdfs:label>
     <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
 <![CDATA[
 <div xmlns:kid="http://purl.org/kid/ns#"
@@ -139,42 +139,11 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
     </rdf:value>
   </server:PagePartHandler>
 
-  <!-- 
-NOTE: http://redfoot.net/hypercode/types/static_page or somesuch has
-to be loaded.
-
-And you'll need to have the corresponding files in a html subdirectory of your redfoot's CWD.
-
-TODO: It'd be nice to have a tool to install these resouces into the
-hypercode instead of leaving them external to it.
-  -->
-
-<!--
-  <server:StaticPage rdf:about="/rdf/identity.js"/>
-  <server:StaticPage rdf:about="/rdf/match.js"/>
-  <server:StaticPage rdf:about="/rdf/parser.js"/>
-  <server:StaticPage rdf:about="/rdf/query.js"/>
-  <server:StaticPage rdf:about="/rdf/term.js"/>
-  <server:StaticPage rdf:about="/rdf/uri.js"/>
-  <server:StaticPage rdf:about="/tabulate.js"/>
-  <server:StaticPage rdf:about="/dynamic.css">
-    <server:content_type>text/css</server:content_type>
-  </server:StaticPage>
-
-  <server:StaticPage rdf:about="/icons/16dot-blue.gif"/>
-  <server:StaticPage rdf:about="/icons/16dot-green.gif"/>
-  <server:StaticPage rdf:about="/icons/16dot-red.gif"/>
-  <server:StaticPage rdf:about="/icons/16dot-yellow.gif"/>
-  <server:StaticPage rdf:about="/icons/document.png"/>
-  <server:StaticPage rdf:about="/icons/tbl-collapse.png"/>
-  <server:StaticPage rdf:about="/icons/tbl-expand-trans.png"/>
--->
-
-  <server:Page rdf:about="/resource">
+  <server:Page rdf:about="/editor/resource">
     <rdfs:label>resource</rdfs:label>
     <rdfs:comment>Return all the known statements about the given URIRef</rdfs:comment>
     <server:page_handler>
-      <redfoot:Python rdf:about="resource_code">
+      <redfoot:Python rdf:ID="resource_code">
         <server:content_type>application/rdf+xml</server:content_type>      
         <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python"><![CDATA[
 
@@ -204,5 +173,2908 @@ out.serialize(destination=response)
       </redfoot:Python>
     </server:page_handler>
   </server:Page>
+
+<!-- 
+   All the required "static pages". Can use the command:
+
+redfoot static_export 
+
+   to have the pages writen into a html dir in your CWD. This html
+   directory will take precedence over the values store in redfoot. So
+   you can edit the files when developing.
+  -->
+
+  <rdf:Description rdf:about="/edit/ajar/tabulate.js">
+    <rdf:type rdf:resource="http://redfoot.net/2005/server#StaticPage"/>
+    <rdf:value>//   Display RDF information in tabular form using HTML DOM
+// 
+// $Id: tabulate.js,v 1.14 2006/01/04 20:57:30 timbl Exp $
+//
+// See Help.html, About.html, tb.html	
+
+
+var documentStatus = []
+var documents = []
+// var kb = new RDFFormula()    // Using this gives no smushing
+var kb = new RDFIndexedFormula()  // This uses indexing and smushing
+kb.predicateCallback = AJAR_handleNewTerm
+kb.typeCallback = AJAR_handleNewTerm
+
+selection = []	// Array of statements which have been selected
+myQuery = []	// Array of pattern statements
+
+var logging = false  // flag: Should fyi() log to the status area 
+
+// Icons. Must be able to change for platform-consistency,
+// color blindness, etc.
+
+var SiteMap = []
+
+// For offline working, you might want to map URIs to local copies.
+// SiteMap[ "http://www.w3.org/" ] = "http://localhost/www.w3.org/"  // Salt to taste
+
+
+icon_expand = 'icons/tbl-expand-trans.png'
+// icon_expand = 'icons/clean/icon_expand.png'
+icon_collapse = 'icons/tbl-collapse.png'  // icons/clean/icon_menu.png
+
+icon_rows = 'icons/tbl-rows.png'
+// icon_columns = 'icons/tbl-columns.png'
+
+icon_unrequested = 'icons/16dot-blue.gif'
+// icon_parse = 'icons/18x18-white.gif'
+icon_fetched = 'icons/16dot-green.gif'
+icon_failed = 'icons/16dot-red.gif'  
+icon_requested = 'icons/16dot-yellow.gif'
+// icon_maximize = 'icons/clean/icon_con_max.png'
+icon_visit = 'icons/document.png'
+
+// Special knowledge of properties
+
+foaf = Namespace("http://xmlns.com/foaf/0.1/")
+rdf = Namespace("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
+rdfs = Namespace("http://www.w3.org/2000/01/rdf-schema#")
+dc = Namespace("http://purl.org/dc/elements/1.1/")
+rss = Namespace("http://purl.org/rss/1.0/")
+contact = Namespace("http://www.w3.org/2000/10/swap/pim/contact#")
+
+labelPriority = []
+labelPriority[foaf('name').uri] = 10
+labelPriority[dc('title').uri] = 8
+labelPriority[rss('title').uri] = 6   // = dc:title?
+labelPriority[contact('fullName').uri] = 4
+labelPriority['http://www.w3.org/2001/04/roadmap/org#name'] = 4
+
+labelPriority[rdfs('label').uri] = 2
+  
+
+PropertiesWithRangeImage = []
+PropertiesWithRangeImage[foaf('depiction').uri] = true
+PropertiesWithRangeImage[foaf('img').uri] = true
+PropertiesWithRangeImage[foaf('thumb').uri] = true
+PropertiesWithRangeImage[foaf('logo').uri] = true
+
+     
+ //////////  URI space mapping
+ //
+ // Maybe here we track redirectios 301 302 and not to mention 303
+ //
+ //  Also online/offline working, caches etc
+ //  Tracking of information obtained by HTTP, I suppose.
+ //  Hmmm. interesting to keep that information available to user tabulated
+ //
+ function mapURI(uri) {
+    var j, j, v
+    fyi("document.domain "+document.domain)
+    i = uri.indexOf('//')
+    if (document.domain == "localhost") {   // ie script is local
+	if ( i &gt;= 0) {
+	    j = uri.indexOf('/', i+2)
+	    if (j &gt;= 0) {
+		v =  SiteMap[uri.slice(0,j+1)]
+		if (v) {
+		    fyi("Mapped "+uri+" to "+v + uri.slice(j+1))
+		    uri = v + uri.slice(j+1)
+		}
+	    }
+	}
+    }
+    uri = URIjoin("resource?uri=" + escape(uri), document.URL)
+    fyi("Mapped "+uri)
+    return uri
+ }
+ 
+ ////////// Document management:
+ 
+function documentURI(uri) {
+    //var i = uri.indexOf("#")
+    //if (i &lt; 0) return uri
+    //return uri.slice(0,i)
+    return uri
+} 
+
+function docState(uri) {
+    //if (uri.slice(0,5) != 'http:') return 'unfetchable' // @@ add ftp, file?
+//    if (uri.slice(7, 7+document.domain.length) != document.domain)
+//	return 'unpermitted';
+    var status = documentStatus[uri]
+    if (typeof status == 'undefined') return 'unrequested';
+    return status.state
+}
+
+function AJAR_handleNewTerm(kb, p) {
+    if (p.termType != 'symbol') return;
+    //if (p.uri.indexOf('#') &lt; 0) return; //@@ because dc and foaf don't work
+    if (docState(documentURI(p.uri)) != 'unrequested') return;
+    //eik//requestFetch(kb.sym(documentURI(p.uri)))
+}
+
+function requestFetch(subject, callback) {
+    var uri = documentURI(subject.uri)
+    var why = subject
+    if (subject.uri.indexOf("#") &gt;=0) why = kb.sym(uri)
+    var state = docState(uri)
+    if ((state != 'unrequested') &amp;&amp; (state != 'failed')
+			    &amp;&amp; (state != 'unpermitted')) {
+	//eik//alert("Can't request "+uri+" "+state)
+        if (callback) callback()
+	return;
+    }
+    var i = documents.length
+    documents.push(uri)
+    documentStatus[uri] = { state: 'requested', number: i}
+
+    refreshButtons(uri, icon_requested)
+    var x = document.getElementById('sources');
+    if (x) {
+	var addendum = document.createElement("TR")
+	x.appendChild(addendum)
+	addendum.setAttribute('class', 'requested')
+	addendum.setAttribute('id', 'source'+i)
+	var td = document.createElement('td')
+	addendum.appendChild(td)
+	var tn = document.createTextNode(uri)
+	td.appendChild(tn)
+	td = document.createElement('td')
+	addendum.appendChild(td)
+	tn = document.createTextNode('requested')
+	td.appendChild(tn)
+    }
+
+    RDFLoad(mapURI(uri), uri, kb, function(status) {documentLoaded(uri, status, callback)}, why);
+}
+ 
+ 
+function documentLoaded(uri, responseCode, callback) {
+    var state = docState(uri)
+    if (state != 'requested') alert("eh? "+uri+" "+state)
+    var status = documentStatus[uri]
+    var i = status.number
+    var newIcon
+    if (responseCode == 200) {
+	status.state = 'fetched'
+	newIcon = icon_fetched
+    } else {
+//	alert("Error: HTTP response code " + responseCode + " for "+uri)
+//   Alert box blocks the program
+	status.state = 'failed'
+	newIcon = icon_failed
+    }
+    if (!document.getElementById('sources')) return;
+    var x = document.getElementById('source'+i);
+    if (!x)
+	alert("What? no source"+i)
+    else
+	x.setAttribute('class', status.state)
+	var td = x.childNodes[1]
+	var tn = td.childNodes[0]
+	fyi("td="+td+" tn="+tn+" response="+responseCode)
+	td.replaceChild(document.createTextNode(responseCode), tn)
+    
+    refreshButtons(uri, newIcon)
+    fyi("Fetch over and UI updated: "+ uri + "\n")	    
+    if (callback) callback();
+}
+
+// Bonus prize for a better way to do this. This refreshes the whole
+// browser table for any icons which need to change state when URI has loaded
+
+function refreshButtons(resourceURI, iconURI, ele, parent) {
+//    fyi("    Refresh name "+ ele + " name " + ele.tagName)
+    if (typeof ele == 'undefined') ele = document.getElementById('browser')
+    if ('TABLE TBODY TR TD'.indexOf(ele.tagName) &gt;=0 ) {
+	var nodes = ele.childNodes, len = nodes.length, i
+	for (i=0; i&lt;len; i++) refreshButtons(resourceURI, iconURI, nodes[i], ele)
+    } else if (ele.tagName == 'IMG') {
+	var about = parent.getAttribute('about').replace(/^&lt;/, "").replace(/&gt;$/,"")
+        //eik//about = about.replace(/#.*/,"")
+	tsrc = ele.src
+	var j = tsrc.indexOf('/icons/')
+	if (j &gt;=0 ) tsrc=tsrc.slice(j+1) // get just relative bit we use
+
+	if ((about == resourceURI) 
+		&amp;&amp; ((tsrc == icon_requested)
+		 ||(tsrc == icon_unrequested)
+		 ||(tsrc == icon_failed))) {
+	    fyi("Fixed an icon")
+	    ele.src = iconURI
+	}
+    }
+}
+
+/////////////////////////  Logging
+//
+
+function escapeForXML(str) {
+    return str.replace(/&amp;/g, '&amp;amp;').replace(/&lt;/g, '&amp;lt;')
+}
+
+function fyi(str)
+{
+    if (!logging) return
+    var x = document.getElementById('status');
+    if (!x) return;
+
+    var addendum = document.createElement("SPAN")
+    x.appendChild(addendum)
+    addendum.innerHTML = escapeForXML(str) + "&lt;br/&gt;";
+}
+
+function clearStatus(str)
+{
+    var x = document.getElementById('status');
+    if (!x) return;
+    x.innerHTML = "";
+}
+
+function setLogging(x) {
+    logging = true
+    fyi("Logging "+x)
+    logging = x
+}
+
+function dumpStore() {
+    var l = logging
+    logging = 1
+    fyi("\nStore:\n" + kb + "__________________\n")
+    logging = l
+}
+
+///////////////// Utility
+
+function emptyNode(node) {
+    var nodes = node.childNodes, len = nodes.length, i
+    for (i=len-1; i&gt;=0; i--) node.removeChild(nodes[i])
+    return node
+}
+
+function ArrayContains(a, x) {
+    var i, n = a.length
+    for (i=0; i&lt;n; i++)
+	if (a[i] == x) return true;
+    return false
+}
+
+///////////////////////// Representing data
+
+
+//  String to represent a thing in displays
+
+function label(x) {
+    var plist = kb.statementsMatching(x)
+    var y, best = 0, lab = ""
+    var i, n = plist.length
+    for (i=0; i&lt;n; i++) {
+	st = plist[i]
+	y = labelPriority[st.predicate.uri]
+	if (y &amp;&amp; (y &gt; best) &amp;&amp; (st.object.termType=='literal')) {
+	    lab = st.object.value
+	    best = y
+	}
+    }
+    if (lab) return lab
+
+    if (x.termType == 'bnode') {
+	return "..."
+    }
+    var hash = x.uri.indexOf("#")
+    if (hash &gt;=0) { return x.uri.slice(hash+1) }
+    return x.uri 
+}
+
+//  As above but escaped for XML
+function labelForXML(x) {
+    return escapeForXML(label(x))
+}
+
+
+//  Represent an object in summary form as a table cell
+
+
+function AJARImage(src, alt) {
+    var image = document.createElement('img')
+    image.setAttribute('src', src)
+    if (typeof alt != 'undefined') image.setAttribute('alt', alt)
+    return image
+}
+
+function appendAccessIcon(node, term) {
+    if (typeof term.termType == 'undefined') alert("??"+ term)
+    if (term.termType != 'symbol') return '';
+    var doc = documentURI(term.uri)
+    var state = docState(doc)
+    var icon, alt
+//    fyi("State of " + doc + ": " + state)
+    if (state == 'unrequested') {
+	icon = icon_unrequested
+	alt = 'fetch'
+    } else if (state == 'requested') {
+	icon = icon_requested
+	alt = 'fetching'
+    } else if (state == 'failed') {
+	icon = icon_failed
+	alt = 'failed'
+    } else if (state == 'unpermitted') {
+	icon = icon_failed
+	alt = 'no perm'
+    } else if (state == 'fetched') {
+	return ;
+//	icon = icon_fetched; alt = 'loaded'  // Maybe useful later
+    } else if (state == 'unfetchable') {
+	return ;
+    } else {
+	alert("?? state: " + state ) 
+    }
+    node.appendChild(AJARImage(icon, alt))
+}
+
+//  Summarize a thing as an outliner table cell
+
+function objectTD(obj, asImage) {
+    td = document.createElement('TD')
+    if  ((obj.termType == 'symbol') || (obj.termType == 'bnode')) {
+	td.setAttribute('about', obj.toNT());
+    }
+
+    var image
+    if (obj.termType == 'literal') {
+        var pre = document.createElement("PRE");
+        pre.appendChild(document.createTextNode(obj.value))
+	td.appendChild(pre)
+    } else if ((obj.termType == 'symbol') || (obj.termType == 'bnode')){
+	td.appendChild(AJARImage(icon_expand, 'expand'))
+	if (asImage) {
+	    image = AJARImage(mapURI(obj.uri), label(obj))
+	    image.setAttribute('class', 'pic')
+	    td.appendChild(image)	
+	} else {
+	    appendAccessIcon(td, obj)
+	    td.appendChild(document.createTextNode(label(obj)))
+	}
+	if ((obj.termType == 'symbol') &amp;&amp;
+            //eik//		    (obj.uri.indexOf("#") &lt;0) &amp;&amp;
+		    (obj.uri.slice(0,5)=='http:')) { // a web page @@ file, ftp
+	    td.appendChild(AJARImage(icon_visit, 'open'))
+	}
+    }
+    return td
+}
+
+///////////////// Represent an arbirary subject by its properties
+
+function expandedHeaderTR(subject) {
+    var tr = document.createElement('TR')
+    var td = document.createElement('td')
+    td.setAttribute('colspan', '2')
+    td.setAttribute('about', subject.toNT())
+    td.appendChild(AJARImage(icon_collapse, 'collapse'))
+    var strong = document.createElement('strong')
+    strong.appendChild(document.createTextNode(label(subject)))
+    td.appendChild(strong)
+    tr.appendChild(td)
+    return tr
+}
+
+function propertyTable(subject) {
+    fyi("Property table for: "+ subject)
+    var table = document.createElement('TABLE')
+    table.appendChild(expandedHeaderTR(subject))
+
+    var plist = kb.statementsMatching(subject)
+    appendPropertyTRs(table, plist, false)
+
+    plist = kb.statementsMatching(undefined, undefined, subject)
+    appendPropertyTRs(table, plist, true)
+
+    if ((subject.termType == 'symbol')
+	    &amp;&amp; (docState(documentURI(subject.uri)) == 'fetched')) {
+        appendClassViewTRs(table, subject)
+    }
+
+    return table
+} /* propertyTable */
+
+
+///////////// Property list
+
+function appendPropertyTRs(parent, plist, inverse)
+{
+
+    fyi("Property list length = " + plist.length)
+    if (plist.length == 0) return "";
+    var sel
+    if (inverse) {
+	sel = function(x) {return x.subject}
+	plist = plist.sort(RDFComparePredicateSubject)
+    } else {
+	sel = function(x){return x.object}
+	plist = plist.sort(RDFComparePredicateObject)
+    }
+    var j
+    var max = plist.length
+    for (j=0; j&lt;max; j++) {
+	var s = plist[j]
+//	    if (s.object == parentSubject) continue; // that we knew
+
+	var k
+	var dups = 0
+	for (k=0; (k+j &lt; max) &amp;&amp; (plist[j+k].predicate.sameTerm(s.predicate)); k++) {
+	    if (k&gt;0 &amp;&amp; (sel(plist[j+k]).sameTerm(sel(plist[j+k-1])))) dups++;
+	}
+
+	var lab = labelForXML(s.predicate)
+	var slash = lab.lastIndexOf("/")
+	if (slash &gt;=0) lab = lab.slice(slash+1);
+	if (inverse) lab = "is "+lab+" of";
+
+	var tr = document.createElement("TR")
+	parent.appendChild(tr)
+	tr.AJAR_statement = s
+	tr.AJAR_inverse = inverse
+	var td_p = document.createElement("TD")
+	td_p.setAttribute('about', s.predicate.toNT())
+	td_p.setAttribute('class', 'pred')
+	td_p.innerHTML = lab
+	tr.appendChild(td_p)
+	var asImage = ((!inverse) &amp;&amp; (s.predicate.termType == 'symbol')
+	    &amp;&amp; PropertiesWithRangeImage[s.predicate.uri])
+	tr.appendChild(objectTD(sel(s), asImage))
+	
+	if (k-dups != 1) {
+	    td_p.setAttribute('rowspan', k-dups)
+	    var l
+	    for(l=1; l&lt;k; l++) {
+		if (!sel(plist[j+l]).sameTerm(sel(plist[j+l-1]))) {
+		    s = plist[j+l]
+		    tr = document.createElement("TR")
+		    tr.appendChild(objectTD(sel(plist[j+l]), asImage))
+		    tr.AJAR_statement = s
+		    tr.AJAR_inverse = inverse
+		    parent.appendChild(tr)
+		}
+	    }
+	}
+	j += k-1  // extra push
+    }
+}
+
+
+
+////////// Views of contents of a document
+
+function  appendClassViewTRs(parent, subject) {
+    statements = kb.statementsMatching(
+			undefined, rdf('type'), undefined, subject)
+    var classes = [], i, n = statements.length
+    for (i=0; i&lt;n; i++) {
+	classes[statements[i].object] = true;
+    }
+
+    for (c in classes) {
+	    var tr = document.createElement('TR')
+	    var td1 = document.createElement('TD')
+	    tr.appendChild(td1)
+	    td1.appendChild(document.createTextNode('mentions'))   // was: 'mentions class'
+	    tr.appendChild(objectTD(kb.fromNT(c)))
+	    parent.appendChild(tr)
+    }
+}
+
+//////// Human-readable content of a document
+
+function documentContentTABLE(subject) {
+    var table = document.createElement("TABLE")
+
+    table.setAttribute('class', 'docView')
+    table.appendChild(expandedHeaderTR(subject))
+
+    var iframe = document.createElement("IFRAME")
+    iframe.setAttribute('src', subject.uri)
+    iframe.setAttribute('class', 'doc')
+    iframe.setAttribute('height', '480')
+    iframe.setAttribute('width', '640')
+    var tr = document.createElement('TR')
+    tr.appendChild(iframe)
+    table.appendChild(tr)
+    return table
+}
+
+////////////////////////////////////// VALUE BROWSER VIEW
+
+
+////////////////////////////////////// TABLE VIEW
+
+//  Summarize a thing as a table cell
+
+function matrixTD(obj, asImage) {
+    td = document.createElement('TD')
+    if  ((obj.termType == 'symbol') || (obj.termType == 'bnode')) {
+	td.setAttribute('about', obj.toNT());
+    }
+
+    var image
+    if (obj.termType == 'literal') {
+        asdf
+	td.appendChild(document.createTextNode(obj.value))
+    } else if ((obj.termType == 'symbol') || (obj.termType == 'bnode')){
+	if (asImage) {
+	    image = AJARImage(mapURI(obj.uri), label(obj))
+	    image.setAttribute('class', 'pic')
+	    td.appendChild(image)	
+	} else {
+	    td.appendChild(document.createTextNode(label(obj)))
+	}
+    }
+    return td
+}
+
+
+
+
+NextVariable = 0
+function newVariableName() {
+    return 'v' + NextVariable++
+}
+
+function AJAR_Tabulate(event) {
+    var i, n=selection.length, j, m, tr, sel, st
+    var  query = kb.formula(), vars = []
+
+    function patternFromTR(tr) {
+	var nodes = tr.childNodes, n = tr.childNodes.length,
+	    i, hasVar = 0, pattern, v, parentVar=null, level;
+/*	var level
+	for (i=0; i&lt;n; i++) {
+	    node = tr.childNodes[i]
+	    cla = node.getAttribute('class')
+	    if (cla
+		    &amp;&amp; (cla.indexOf('pred') &lt; 0)
+		    &amp;&amp; (cla.indexOf('selected') &gt;=0))
+		hasVar++;
+	}
+*/
+	hasVar = 1 // @@@@ kludge for now
+	var st = tr.AJAR_statement
+
+	for (level=tr.parentNode; level; level=level.parentNode) {
+	    if (typeof level.AJAR_statement != 'undefined') {
+		fyi("Parent TR "+level)
+		if (!level.AJAR_variable)
+		    patternFromTR(level);
+		parentVar = level.AJAR_variable
+		break;
+	    }
+	}
+
+
+	if (hasVar) {
+	    v = kb.variable(newVariableName())
+	    vars.push(v)
+	    if (tr.AJAR_inverse) {
+		if (parentVar) {
+		    v.label = parentVar.label 
+		    pattern = new RDFStatement(v, st.predicate, parentVar)
+		} else {
+		    v.label = label(st.object)
+		    pattern = new RDFStatement(v, st.predicate, st.object)
+		}
+		var pl = label(st.predicate)
+		if (pl != 'type') // Actually is better simply omitted
+		    v.label += ' is '+ pl +' of:';
+	    } else {
+		
+		if (parentVar) {
+		    v.label = parentVar.label;
+		    pattern = new RDFStatement(parentVar, st.predicate, v)
+		} else {
+		    v.label = label(st.subject)
+		    pattern = new RDFStatement(st.subject, st.predicate, v)
+		}
+		if (typeof labelPriority[v.uri] == 'undefined')
+		    v.label += " "+ label(st.predicate);
+		if (parentVar) pattern.subject = parentVar;
+	    }
+	    v.label = v.label.slice(0,1).toUpperCase() + v.label.slice(1)// init cap
+
+	} else {
+	    pattern = new RDFStatement(st.subject, st.predicate, st.object)
+	    v = null
+	}
+
+	pattern.tr = tr
+	tr.AJAR_pattern = pattern    // Cross-link UI and query line
+	tr.AJAR_variable = v
+	fyi("Query pattern: "+pattern)
+	query.statements.push(pattern)
+	return v
+    }
+
+    // Make query lines for each selected statement
+    for (i=0; i&lt;n; i++) {
+	sel = selection[i]
+	tr = sel.parentNode
+	st = tr.AJAR_statement
+	fyi("Statement "+st)
+	if (sel.getAttribute('class').indexOf('pred') &gt;= 0) {
+	    fyi("   We have a predicate")
+	    patternFromTR(tr)
+	}
+    }
+
+    fyi("Vars now: "+vars)
+    fyi("Query now:\n"+query+"\n")
+    
+    matrixTable(query, vars)
+}
+
+
+function matrixTable(query, vars) {
+
+    function onBinding(bindings) {
+	var i, tr, td
+	tr = document.createElement('tr')
+	t.appendChild(tr)
+	for (i=0; i&lt;nv; i++) {
+	    v = vars[i]
+	    tr.appendChild(matrixTD(bindings[v]))
+	}
+    }
+    
+    var i, nv=vars.length, td, th, j, v
+    var t = document.createElement('table')
+    tr = document.createElement('tr')
+    t.appendChild(tr)
+    t.setAttribute('class', 'results')
+    var div = document.getElementById('results')
+    emptyNode(div).appendChild(t) // See results as we go
+    for (i=0; i&lt;nv; i++) {
+	v = vars[i]
+//	fyi("table header cell for " + v + ': '+v.label)
+	th = document.createElement('th')
+	th.appendChild(document.createTextNode(v.label))
+	tr.appendChild(th)
+    }
+    use_callback = 1
+    if (use_callback) {
+	kb.query(query, onBinding)
+    } else {
+	var nbs = kb.query(query)
+	var j, tr, nb, bindings, what
+	for (j=0; j&lt;nbs.length; j++) {
+	    tr = document.createElement('tr')
+	    t.appendChild(tr)
+	    bindings = nbs[j][0]  // [bindings, reason]
+	    for (i=0; i&lt;nv; i++) {
+		v = vars[i]
+		td = document.createElement('td')
+		what = bindings[v]
+    //	    fyi("    table cell "+v+": "+what + " type="+what.termType)
+		tr.appendChild(matrixTD(what))
+	    }
+	}
+    }
+    return t
+}
+
+
+//////////////////////////////////// User Interface Events
+
+function getAboutLevel(target) {
+    var level
+    for (level = target; level; level = level.parentNode) {
+	fyi("Level "+level)
+	aa = level.getAttribute('about')
+	if (aa) return level
+    }
+    return undefined
+}
+
+function ancestor(target, tagName) {
+    var level
+    for (level = target; level; level = level.parentNode) {
+	fyi("looking for "+tagName+" Level: "+level)
+	if (level.tagName == tagName) return level;
+    }
+    return undefined
+}
+
+function getAbout(kb, target) {
+    var level, aa
+    for (level = target; level &amp;&amp; (level.nodeType==1); level = level.parentNode) {
+	fyi("Level "+level + ' '+level.nodeType)
+	aa = level.getAttribute('about')
+	if (aa) return kb.fromNT(aa)
+    }
+    return undefined
+}
+
+function getStatement(kb, target) {
+    var level, aa
+    for (level = target; level &amp;&amp; (level.nodeType==1); level = level.parentNode) {
+	fyi("Level "+level + ' '+level.nodeType)
+	aa = level.AJAR_statement
+	if (aa) return aa
+    }
+    return undefined
+}
+
+
+//   Selection support
+
+function selected(node) {
+    var a = node.getAttribute('class')
+    if (a &amp;&amp; (a.indexOf('selected') &gt;= 0)) return true
+    return false
+}
+
+function setSelected(node, newValue) {
+    if (newValue == selected(node)) return;
+    var cla = node.getAttribute('class')
+    if (!cla) cla = ""
+    if (newValue) {
+	cla += ' selected'
+	selection.push(node)
+	fyi("Selecting "+node)
+    } else {
+	fyi("cla=$"+cla+"$")
+	cla = cla.replace('selected','')
+	RDFArrayRemove(selection, node)
+	fyi("Deselecting "+node)
+	fyi("cla=$"+cla+"$")
+    }
+    node.setAttribute('class', cla)
+}
+
+function deselectAll() {
+    var i, n=selection.length
+    for (i=n-1; i&gt;=0; i--) setSelected(selection[i], false);
+}
+
+function TabulatorDoubleClick(e)
+{
+    var target
+    if (!e) var e = window.event
+    if (e.target) target = e.target
+    else if (e.srcElement) target = e.srcElement
+    if (target.nodeType == 3) // defeat Safari bug [sic]
+       target = target.parentNode
+    var tname = target.tagName
+    fyi("TabulatorDoubleClick: " + tname + " in "+target.parentNode.tagName)
+
+    fyi("Statement: " + getStatement(kb, target))
+
+    var aa = getAbout(kb, target)
+    if (!aa) return;
+    if (aa &amp;&amp; aa.termType == 'symbol')
+	GotoURI(aa.uri);
+}
+
+
+function TabulatorMousedown(e)
+{
+    var target
+    if (!e) var e = window.event
+    if (e.target) target = e.target
+    else if (e.srcElement) target = e.srcElement
+    if (target.nodeType == 3) // defeat Safari bug [sic]
+       target = target.parentNode;
+    var tname = target.tagName
+    fyi("TabulatorMousedown: " + tname + " shift="+e.shiftKey+" alt="+e.altKey+" ctrl="+e.ctrlKey)
+    p = target.parentNode
+ 
+    about = getAbout(kb, target)
+
+    if (tname != "IMG") {
+	if(about) {
+	    if (about.termType == 'symbol')
+		document.AddressBar.UserURI.value = about.uri;
+	}
+	var node = ancestor(target, 'TD')
+
+	sel = selected(node)
+	var cla = node.getAttribute('class')
+	fyi("Was node selected before: "+sel)
+	if (e.altKey) {
+	    setSelected(node, !selected(node))
+	} else if  (e.shiftKey) {
+	    setSelected(node, true)
+	} else {
+	    deselectAll()
+	    setSelected(node, true)
+	}
+	fyi("Was node selected after: "+selected(node)
+		+", count="+selection.length)
+
+    } else { // IMG
+
+	var tsrc = target.src
+	var outer
+	var i = tsrc.indexOf('/icons/')
+	if (i &gt;=0 ) tsrc=tsrc.slice(i+1) // get just relative bit we use
+	fyi("\nEvent: You clicked on an image, src=" + tsrc)
+	if (!about) {
+	    alert("No about attribute")
+	    return
+	}
+	var subject = about
+	fyi("TabulatorMousedown: subject=" + subject)
+	
+	
+	if ((tsrc == icon_expand) || (tsrc == icon_collapse)){
+	    if (e.shiftKey!=1) {
+		if (tsrc == icon_expand) {  // expand
+		    function cb() {emptyNode(p).appendChild(propertyTable(subject))}
+                    requestFetch(subject, cb)
+		} else {		    // Collapse
+		    var level
+		    for (level=p.parentNode; level.tagName != "TD";
+				    level=level.parentNode) {
+			if (typeof level == 'undefined') {
+			    alert("Not enclosed in TD!")
+			    return
+			}
+		    }
+		    fyi("Collapsing subject "+subject)
+		    emptyNode(level).appendChild(AJARImage(icon_expand, 'expand'))
+		    appendAccessIcon(level,subject)
+		    level.appendChild(document.createTextNode(label(subject)))
+		}
+	    } else {  // Shift-expand or shift-collapse: Maximize
+		outer = null
+		for (level=p.parentNode; level; level=level.parentNode) {
+		    fyi("level "+ level.tagName)
+		    if (level.tagName == "TD") outer = level
+		}
+		emptyNode(outer).appendChild(propertyTable(subject))
+		document.title = label(subject)	    
+		outer.setAttribute('about', subject.toNT())
+	    }
+	    	
+	} else if (tsrc == icon_visit) {
+	
+	    emptyNode(p).appendChild(documentContentTABLE(subject))
+	    document.url = subject.uri   // How to jump to new page?
+
+	} else if ((tsrc == icon_unrequested)
+		    || (tsrc == icon_failed)) {
+	    target.src = icon_requested
+	    requestFetch(subject)
+	}
+    }
+}
+
+function GotoFormURI(event) { GotoURI(document.AddressBar.UserURI.value) }
+
+function GotoURI(uri) {
+    var table = document.getElementById('browser')
+    emptyNode(table)
+    var tr = document.createElement("TR")
+    var subject = kb.sym(uri)
+    table.appendChild(tr)
+    root_tr = tr
+    root_uri = subject
+    function open_root() {
+        var td = objectTD(subject)
+        td.appendChild(propertyTable(root_uri))
+        emptyNode(root_tr).appendChild(td)
+    }
+
+    if (docState(documentURI(subject)) == 'unrequested') {
+        requestFetch(subject, open_root);
+    }
+    document.title = label(subject)
+
+
+    return
+}
+
+//ends
+
+</rdf:value>
+    <server:content_type>application/x-javascript</server:content_type>
+  </rdf:Description> 
+ <rdf:Description rdf:about="/edit/ajar/rdf/uri.js">
+    <rdf:type rdf:resource="http://redfoot.net/2005/server#StaticPage"/>
+    <rdf:value>//  Implementing URI-specific functions
+//
+//	See RFC 2386
+//
+// This is or was   http://www.w3.org/2005/10/ajaw/rdf/uri.js
+// 2005 W3C open source licence
+//
+//
+//  Take a URI given in relative or absolute form and a base
+//  URI, and return an absolute URI
+//
+//  See also http://www.w3.org/2000/10/swap/uripath.py
+//
+function URIjoin(given, base) {
+//    if (typeof fyi != 'undefined') fyi("   URI given="+given+" base="+base)
+    if (given.length==0) return base // before chopping its filename off
+    if (given.indexOf('#')==0) return base + given
+    var colon = given.indexOf(':')
+    if (colon &gt;= 0) return given	// Absolute URI form overrides base URI
+    var baseColon = base.indexOf(':')
+    if (base&lt;0) {alert("Invalid base URL "+ base); return given}
+    var baseScheme = base.slice(0,baseColon+1)  // eg http:
+    if (given.indexOf("//") == 0)     // Starts with //
+	return baseScheme + given;
+    if (base.indexOf('//', baseColon)==baseColon+1) {  // Any hostpart?
+	var baseSingle = base.indexOf("/", baseColon+3)
+    } else {
+	var baseSingle = base.indexOf("/", baseColon+1)
+    }
+    if (baseSingle &lt; 0) return baseScheme + given;
+    if (given.indexOf('/') == 0)	// starts with / but not //
+	return base.slice(0, baseSingle) + given
+
+    var path = base.slice(baseSingle)
+    var lastSlash = path.lastIndexOf("/")
+    if (lastSlash &lt;0) return baseScheme + given
+    if ((lastSlash &gt;=0) &amp;&amp; (lastSlash &lt; (path.length-1)))
+	path = path.slice(0, lastSlash+1) // Chop trailing filename from base
+
+    path = path + given
+    while (path.match(/[^\/]*\/\.\.\//)) // must apply to result of prev
+	path = path.replace( /[^\/]*\/\.\.\//, '') // ECMAscript spec 7.8.5
+    path = path.replace( /\.\//g, '') // spec vague on escaping
+    return base.slice(0, baseSingle) + path
+}
+ 
+
+//ends
+</rdf:value>
+    <server:content_type>application/x-javascript</server:content_type>
+  </rdf:Description>
+  <rdf:Description rdf:about="/edit/ajar/rdf/match.js">
+    <rdf:type rdf:resource="http://redfoot.net/2005/server#StaticPage"/>
+    <rdf:value>// Matching a statement against a formula
+//
+//
+// W3C open source licence 2005.
+//
+// We retpresent a set as an associative array whose value for
+// each member is set to true.
+
+RDFFormula.prototype.statementsMatching = function(s,p,o,w) {
+    var results = []
+    var i
+    var ls = this.statements.length
+    for (i=0; i&lt;ls; i++) {
+	var st = this.statements[i]
+	if (RDFTermMatch(p, st.predicate) &amp;&amp;  // first as simplest
+	    RDFTermMatch(s, st.subject) &amp;&amp;
+	    RDFTermMatch(o, st.object) &amp;&amp;
+	    RDFTermMatch(w, st.why)) {
+		results[st] = true
+	}
+	    
+    }
+    return results
+}
+
+RDFFormula.prototype.anyStatementMatching = function(s,p,o,w) {
+    var ls = this.statements.length
+    var i
+    for (i=0; i&lt;ls; i++) {
+	var st = this.statements[i]
+	if (RDFTermMatch(p, st.predicate) &amp;&amp;  // first as simplest
+	    RDFTermMatch(s, st.subject) &amp;&amp;
+	    RDFTermMatch(o, st.object) &amp;&amp;
+	    RDFTermMatch(w, st.why)) {
+		return st
+	}
+	    
+    }
+    return undefined
+}
+
+function RDFTermMatch(pattern, term) {
+    if (typeof pattern == 'undefined') return true;
+    return pattern.sameTerm(term)
+}
+
+RDFSymbol.prototype.sameTerm = function(other) {
+    return ((this.termType == other.termType) &amp;&amp; (this.uri == other.uri))
+}
+
+RDFBlankNode.prototype.sameTerm = function(other) {
+    return ((this.termType == other.termType) &amp;&amp; (this.id == other.id))
+}
+
+RDFLiteral.prototype.sameTerm = function(other) {
+    return ((this.termType == other.termType)
+	    &amp;&amp; (this.value == other.value)
+	    &amp;&amp; (this.lang == other.lang) &amp;&amp;
+	    (this.datatype == other.datatype));	    
+}
+
+//  Comparison for ordering
+//
+// These compare with ANY term
+//
+//
+// When we smush nodes we take the lowest value. This is not
+// arbitrary: we want the value actually used to be the literal
+// (or list or formula). 
+
+RDFLiteral.prototype.classOrder = 1
+// RDFList.prototype.classOrder = 2
+// RDFSet.prototype.classOrder = 3
+RDFFormula.prototype.classOrder = 4
+RDFSymbol.prototype.classOrder = 5
+RDFBlankNode.prototype.classOrder = 6
+
+//  Compaisons return  sign(self - other)
+//  Literals must come out before terms for smushing
+
+RDFLiteral.prototype.compareTerm = function(other) {
+    if (this.classOrder &lt; other.classOrder) return -1
+    if (this.classOrder &gt; other.classOrder) return +1
+    if (this.value &lt; other.value) return -1
+    if (this.value &gt; other.value) return +1
+    return 0
+} 
+
+RDFSymbol.prototype.compareTerm = function(other) {
+    if (this.classOrder &lt; other.classOrder) return -1
+    if (this.classOrder &gt; other.classOrder) return +1
+    if (this.uri &lt; other.uri) return -1
+    if (this.uri &gt; other.uri) return +1
+    return 0
+} 
+
+RDFBlankNode.prototype.compareTerm = function(other) {
+    if (this.classOrder &lt; other.classOrder) return -1
+    if (this.classOrder &gt; other.classOrder) return +1
+    if (this.id &lt; other.id) return -1
+    if (this.id &gt; other.id) return +1
+    return 0
+} 
+
+
+//  Convenience routines
+
+// Only one of s p o can be undefined, and w is optional.
+RDFFormula.prototype.each = function(s,p,o,w) {
+    var results = []
+    var sts = this.statementsMatching(s,p,o,w)
+    if (typeof s == 'undefined') {
+	for (st in sts) results[st.subject] = true
+    } else if (typeof p == 'undefined') {
+	for (st in sts) results[st.predicate] = true
+    } else if (typeof o == 'undefined') {
+	for (st in sts) results[st.object] = true
+    } else if (typeof w == 'undefined') {
+	for (st in sts) results[st.why] = true
+    }
+    return results
+}
+
+RDFFormula.prototype.any = function(s,p,o,w) {
+    var st = this.anyStatementMatching(s,p,o,w)
+    if (typeof st == 'undefined') return undefined
+    
+    if (typeof s == 'undefined') return st.subject;
+    if (typeof p == 'undefined') return st.predicate;
+    if (typeof o == 'undefined') return st.object;
+
+    return undefined
+}
+
+RDFFormula.prototype.the = function(s,p,o,w) {
+    // the() should contain a check there is only one
+    var x = this.any(s,p,o,w)
+    if (typeof st == 'undefined')
+	alert("No value found for {" + s + " " + p + " " + o + "}.")
+    return x
+}
+ 
+// Not a method. For use in sorts
+function RDFComparePredicateObject(self, other) {
+    var x = self.predicate.compareTerm(other.predicate)
+    if (x !=0) return x
+    return self.object.compareTerm(other.object)
+}
+function RDFComparePredicateSubject(self, other) {
+    var x = self.predicate.compareTerm(other.predicate)
+    if (x !=0) return x
+    return self.subject.compareTerm(other.subject)
+}
+// ends
+</rdf:value>
+    <server:content_type>application/x-javascript</server:content_type>
+  </rdf:Description>
+  <rdf:Description rdf:about="/edit/ajar/rdf/parser.js">
+    <rdf:type rdf:resource="http://redfoot.net/2005/server#StaticPage"/>
+    <rdf:value>/*
+rdfparser.js -
+
+Jim Ley's Version 0.27  Much hacked around by timbl@w3.org
+
+Copyright 2002-5 Jim Ley - http://jibbering.com/
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+1. Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+3. The name of the author may not be used to endorse or promote products
+   derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+Bug: &lt;foaf:interest r:resource="../../2001/sw/DataAccess/" s:label="RDF Data Access Working Group"/&gt;
+parses the label attribute as htough it wewre a property of the subject not the resource.
+
+Changes since 0.1 - added in code to do subPropertyOf widgies.
+Changes since 0.11 - added in seeAlso code handling, and multiple URL fetching.
+Changes since 0.12 - Added some Batik tweaks to get it working.
+Changes since 0.13 - Added nodeID support
+Changes since 0.14 - fixed rdfNS leak into global scope and xmlbase bugs reported by Ian Dickinson, added in Opera 8.5 support provided by Opera via chaals.
+Changes since 0.20 - fixed type bug with default namespace reported by Jia Mi.
+Changes since 0.21 - fixed datatype bug, when the datatype was null thanks to Carlo Strozzi.
+Changes since 0.22 - Added support for rdf:Bag/Alt/Seq and list properties
+Changes since 0.25 - fixed baseurl bug and nodeValue literal non-IE bug, thanks to Carlo Strozzi
+Changes since 0.26 - new baseurl bug fix contributed by Carlo Strozzi
+
+Since 0.27:
+- Wrote and used proper uri joiner fro relative to absolute (uri.js)
+- Got it running on safari
+- Speeded up the genid to realSubject translation (was nested loops)
+- added interface to RDF store API in AJAR
+
+Note that Triples assume sumjet and object are URI symbols, and have
+a separate object, type, lang and datatype.  The last 3 are assumed to apply
+to the object.  This allows RDF without bnodes as predicates, literals
+as subjects, etc.
+*/
+
+
+
+function RDFParser() {
+    var RDF_NS="http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+    var RDFS_NS="http://www.w3.org/2000/01/rdf-schema#";
+
+    this.Version="0.30.tbl";
+    var C=0;
+    var _rdfNS="";
+    var GlobalID=0;
+    var realSubject=[];
+    var inTriples=[];
+    var Namespaces=[];
+    var xmld=null;
+    var xml=null;
+    this.Match=Match;
+    this.getSingleObject=SingleObject;
+    this.getSingleObjectResource=SingleObjectResource;
+    this.getRDFURL=getRDF;
+    this.parseDOM = parseDOM;
+    this.loadRDFXML=_loadRDFXML;
+    this.reset = resetTriples
+    this.getTriples=function() { return inTriples; }
+    var callbackfn=null;
+    var baseURL='';
+    var doSeeAlso=false;
+    var URIS=[];
+    var visitedURIS=[];
+    var url
+    
+    function getRDF(url, base, func, seeAlso) {
+	// Remove any trailing slashes from URL.  (why? -tbl)
+	//url = url.replace(/\/*$/,'');     // */
+	callbackfn=func;
+	if (base) {
+	    baseURL = base
+	} else {
+	    if (url.indexOf('#')==-1) {
+		    baseURL=url;
+	    } else {
+		    baseURL=url.substr(0,url.indexOf('#'));
+	    }
+	}
+	if (seeAlso) {
+		doSeeAlso=true;
+	}
+	visitedURIS[url]=true;
+	getURL(url,ReturnRDF);
+    }
+
+    function resetTriples() {
+	 inTriples = []
+	 realSubject = []
+	 Namespaces=[];
+    }
+    
+    function ReturnRDF(obj) {
+	fyi("RDF get return status: " + obj.status +
+		    "\n\tURI: " + obj.url +
+		    "\n\tcontent-type: " + obj.contentType +
+		    "\n\tcontent length " + obj.content.length +
+		    "\n\tDOM: "+ obj.domcontent);
+	var url = obj.url
+	if (obj.status != 200) return callbackfn(obj.status)
+	if ((obj.contentType.indexOf('+xml')&lt;0)
+		&amp;&amp; (obj.contentType.slice(0,15) != 'application/rdf')
+		&amp;&amp; (obj.contentType.slice(0,10) != 'text/plain')
+	// @@ Bug: We do NOT have permission to parse a text/plain document
+		&amp;&amp; (obj.contentType.slice(0,15) != 'application/xml'))
+	    return callbackfn('Unsupported content type '+obj.contentType);
+
+/*	if (obj.domcontent) {
+	    xml = obj.domcontent;
+	    fyi("Parsing DOM we seem to have "+obj.domcontent)
+	    return GetTriples();
+	}
+*/
+
+	// For Firefox, we have to ask for permission to access the DOM
+	// of a loaded document for which we already have the contents.
+	// This is basically a Firefox bug.
+	
+	if (url.slice(7, 7+document.domain.length) != document.domain) {
+	    try {
+		netscape.security.PrivilegeManager.enablePrivilege(
+			"UniversalBrowserRead")
+	    } catch(e) {
+		if(typeof alert != 'undefined') alert("Failed to get priviledge "+
+		"UniversalBrowserRead to parse "+url+"\n\t"+e)
+	    }
+	}
+
+  
+	if (typeof parseXML=='undefined') {
+	    try {
+		xml=new ActiveXObject ("Microsoft.XMLDOM");
+		xml.async=false;
+		xml.validateOnParse=false;
+		xml.resolveExternals=false;
+		xml.loadXML(obj.content);
+	    } catch (e) {
+		if (obj.domcontent) {
+			xml=obj.domcontent;
+		} else {
+		    try {
+			Document.prototype.loadXML = function (s) {
+			    var doc2 = (new DOMParser()).parseFromString(s, "text/xml");
+			    while (this.hasChildNodes()) this.removeChild(this.lastChild);
+			    for (var i = 0; i &lt; doc2.childNodes.length; i++) {
+				    this.appendChild(this.importNode(doc2.childNodes[i], true));
+			    }
+			}
+			xml=document.implementation.createDocument('', '', null);
+			xml.loadXML(obj.content);
+		    } catch (e) {
+			fyi("Exception near (new DOMParser())parseFromString: "+e)
+			if (typeof alert!=null) alert("OK, I give up, you're not ASV, Batik, IE or\n a Mozilla build or anything else a bit like them.");
+		    }
+		}
+	    }
+	} else {
+	    try {
+		xml=parseXML(obj.content,null);
+	    } catch (e) {}
+	    if (''+xml=='null') {
+		xml=parseXML(obj.content,SVGDoc);
+		    // Batik area...
+	    }
+	}
+	try {
+	    xmld=xml.documentElement;
+	    var a=xml.documentElement.childNodes;
+	    gettriples=true;
+	} catch (E) {
+	    fyi("Exception near xml.documentElement.childNodes: "+E)
+	    try {
+		xmld=xml.childNodes.item(0);
+		gettriples=true;
+	    } catch (E) {
+		fyi("Exception near xmld=xml.childNodes.item(0): "+E)
+		// if (typeof alert != null) alert("No XML Document Found, or not valid XML, or something\n Basically an error so I'm giving up.");
+		gettriples=false;
+		fyi("Document content:_______\n"+obj.content+"\n____________\n")
+		return callbackfn("Can't parse XML: "+E)
+	    }
+
+ 	} 
+	if (gettriples) {
+	    GetTriples(inTriples.length);
+	}
+	callbackfn(obj.status);
+    }
+ 
+    function parseDOM(dom, base, sink, why) {
+	resetTriples()
+	baseURL = base
+	xmld = dom
+	GetTriples(0)
+ 	triplesToFormula(inTriples, sink, why)
+	resetTriples()  // Clear RDF triple accumulator
+ }
+ 
+ function _loadRDFXML(xmltxt) {
+	 if (typeof parseXML=='undefined') {
+		 try {
+		         fyi("Trying ActiveXObject")
+			 xml=new ActiveXObject ("Microsoft.XMLDOM");
+			 xml.async=false;
+			 xml.validateOnParse=false;
+			 xml.resolveExternals=false;
+			 xml.loadXML(xmltxt);
+		 } catch (e) {
+		    fyi('Exception near new ActiveXObject ("Microsoft.XMLDOM"): '+e)
+			 try {
+				 fyi("Trying DOMParser")
+				 Document.prototype.loadXML = function (s) {
+					 var doc2 = (new DOMParser()).parseFromString(s, "text/xml");
+					 while (this.hasChildNodes()) {
+						 this.removeChild(this.lastChild);
+					 }
+					 for (var i = 0; i &lt; doc2.childNodes.length; i++) {
+						 this.appendChild(this.importNode(doc2.childNodes[i], true));
+					 }
+				 }
+				 xml=document.implementation.createDocument('', '', null);
+				 xml.loadXML(xmltxt);
+			 } catch (e) {
+				fyi('Exception using DOMParser: '+e);
+				 if (typeof alert!=null) alert(
+				 "Error: No XML parser found. You're not ASV, Batik, IE or\n a Mozilla build or anything else a bit like them.");
+			 }
+		 }
+	 } else {
+		 xml=parseXML(xmltxt,null);
+	 }
+	 try {
+		 var a=xml.documentElement.childNodes;
+		 gettriples=true;
+	 } catch (E) {
+		 if (typeof alert!=null) {
+			 alert("No XML Document Found.");
+			 gettriples=false;
+		 }
+	 } 
+	 if (gettriples) {
+		 GetTriples();
+	 }
+ }
+
+
+ 
+    function GetTriples(offset) {
+	fyi("Parsing XML to RDF triples: " + xmld)
+	getNamespaces(xmld);
+	xmlbase=xmld.getAttribute('xml:base');
+	    if (xmlbase &amp;&amp; xmlbase!='') {
+		baseURL=xmlbase;
+	    }
+	    
+	docNodes = xmld.childNodes
+	var i, top
+	for (i=0; i&lt;docNodes.length; i++) {
+	    node = docNodes.item(i)
+	    if (node.nodeType == 1) {
+		top = qnameURI(node.nodeName)
+		fyi("Document top element: "+top)
+		if (top != (RDF_NS+'RDF')) {
+		    fyi ("Not rdf:RDF:  No code to parse this")
+		    return undefined
+		}
+	    }
+	    break;
+	}
+	createPredicates(xmld.childNodes);
+	fyi("Parsing phase 1, triples: " + inTriples.length)
+	for (var j=offset;j&lt;inTriples.length;j++) {
+	    var it=inTriples[j];
+    //	fyi("Considering s="+it.subject+" p="+it.predicate+" ty="+it.type
+    //		+ " ob="+it.object)
+	    if (!it.object) { it.object=""; it.type="literal" }
+	    it.subject = URIjoin(it.subject, baseURL)
+
+	    if ( it.type=="resource")  it.object = URIjoin(it.object, baseURL)
+
+	    if (it.type!="literal" &amp;&amp; it.object==RDF_NS+"Description") {
+		    inTriples.splice(j--,1); // oops  @@ fix the original parsing?
+	    }
+	    var s2 = realSubject[it.subject]
+	    if (s2) it.subject = s2
+	    s2 = realSubject[it.object]
+	    if (s2) it.object = s2
+    //	fyi("    becomes s="+it.subject+" p="+it.predicate+" ty="+it.type
+    //		+ " ob="+it.object)
+	}
+
+	fyi("Parsing done, triples: " + inTriples.length)
+	return inTriples;
+    }
+ 
+    function qnameURI(qn) {
+	var colon = qn.indexOf(':');
+	if (colon &lt; 0) {
+	    return Namespaces['_'] + qn // Default namespace
+	} else {
+	    ns = Namespaces['_'+qn.slice(0,colon)]
+	    if (typeof ns == 'undefined') {
+		fyi("XML parse error: Unbound namespace prefix: "+qn);
+		return undefined
+	    }
+	    return ns + qn.slice(colon+1)
+	}
+    }
+    
+    function createPredicates(els) {
+	 var el,i,j,attr,nn,nv,attrs,ns;
+	 for (i=0;i&lt;els.length;i++) {
+		 subject=GenID();
+		 el=els.item(i);
+		 while (el &amp;&amp; el.nodeType!=1) {
+			 el=els.item(++i);
+		 }
+		 if (el) {
+			 getNamespaces(el);
+			 attrs=el.attributes;
+			 if (typeof el.getAttributeNS=='unknown' | typeof el.getAttributeNS=='function') {
+				 vl=el.getAttributeNS(RDF_NS,'about');
+				 if (!vl) {
+					 vl=el.getAttributeNS(RDF_NS,'ID');
+					 if (vl) {
+						 vl='#'+vl;
+					 }
+					 if (!vl) {
+						 vl=el.getAttributeNS(RDF_NS,'nodeID');
+						 if (vl) {
+							 vl='genid:'+vl;
+						 }
+					 }
+				 }
+			 } else {
+				 vl=el.getAttribute(_rdfNS+':about');
+				 if (!vl) {
+					 vl=el.getAttribute(_rdfNS+':ID');
+					 if (vl) {
+						 vl='#'+vl;
+					 }
+					 if (!vl) {
+						 vl=el.getAttribute(_rdfNS+':nodeID');
+						 if (vl) {
+							 vl='genid:'+vl;
+						 }
+					 }
+				 }
+			 }
+			 if (vl &amp;&amp; vl!='') {
+				 subject=vl;
+			 }
+			 for (j=0;j&lt;attrs.length;j++) {
+				 attr=attrs.item(j);
+				 nn=String(':'+attr.nodeName+'::').split(':');
+				 ns=nn[1];
+				 nn=nn[2];
+				 nv=attr.nodeValue;
+				 if (ns!=_rdfNS &amp;&amp; ns!='xmlns') {
+					 inTriples.push(new Triple(subject,Namespaces['_'+ns]+nn,nv,"literal")); // Bug?? subject correct
+				 }
+				 if (ns==_rdfNS &amp;&amp; nn=='about') {
+					 realSubject[subject] = nv;
+					 if (!(Namespaces['_'+_rdfNS]+"type"=="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+					    &amp;&amp; Namespaces['_'+ns]+el.nodeName=="http://www.w3.org/1999/02/22-rdf-syntax-ns#rdf:Description")) {
+					    // @@ Do what?
+					 }
+				 }
+			 }
+		 }
+		 if (el) {
+			 nn=String(':'+el.nodeName+'::').split(':');
+			 ns=nn[1];
+			 nn=nn[2];
+			 if (ns!=_rdfNS) {
+				 if (el.nodeName.indexOf(':')==-1) {
+					 ses=['','',el.nodeName];
+				 } else {
+					 var ses=String(':'+el.nodeName+'::').split(':');
+				 }
+				 inTriples.push(new Triple(subject,Namespaces['_'+_rdfNS]+"type",Namespaces['_'+ses[1]]+ses[2],"resource"));
+			 }
+		 }
+		 if (el &amp;&amp; el.childNodes) {
+			 AnalyseChildren(subject,el.childNodes);
+		 }
+	 }
+   }
+
+   function getVL(el) {
+	 var vl;
+	 if (typeof el.getAttributeNS=='unknown' | typeof el.getAttributeNS=='function') {
+		 vl=el.getAttributeNS(RDF_NS,'about');
+		 if (!vl) {
+			 vl=el.getAttributeNS(RDF_NS,'ID');
+			 if (vl) {
+				 vl='#'+vl;
+			 }
+		 }
+	 } else {
+		 vl=el.getAttribute(_rdfNS+':about');
+		 if (!vl) {
+			 vl=el.getAttribute(_rdfNS+':ID');
+			 if (vl) {
+				 vl='#'+vl;
+			 }
+		 }
+	 }
+	 return vl;
+   }
+
+   function AnalyseChildren(subject,els) {
+	 var liCount=1;
+	 var el,i,n,attr,nn,nv,attr,ns,elsl;
+	 if (els) {
+		 elsl=els.length;
+		 for (var i=0;i&lt;elsl;i++) {
+			 el=els.item(i);
+			 while (el &amp;&amp; el.nodeType!=1) {
+				 el=els.item(++i);
+			 }
+			 if (el) {
+				 getNamespaces(el);
+				 nn=el.nodeName;
+				 attrs=el.attributes;
+				 vl=getVL(el);
+				 if (vl &amp;&amp; vl!='') {
+					 subject=vl;
+				 }	
+				 for (j=0;j&lt;attrs.length;j++) {
+					 attr=attrs.item(j);
+					 nna=String(':'+attr.nodeName+'::').split(':');
+					 nsa=nna[1];
+					 nna=nna[2];
+					 nva=attr.nodeValue;
+					 if (nsa!=_rdfNS &amp;&amp; nsa!='xmlns') {
+						 if (Namespaces['_'+nsa]) {
+							 inTriples.push(new Triple(subject,Namespaces['_'+nsa]+nna,nva,"literal"));
+						 }
+					 }
+					 if (nsa==_rdfNS &amp;&amp; nna=='about') {
+						 mysubject=nva;
+						 realSubject[subject] = nva;
+						 if (!(Namespaces['_'+_rdfNS]+"type"=="http://www.w3.org/1999/02/22-rdf-syntax-ns#type" &amp;&amp; Namespaces['_'+ns]+el.nodeName=="http://www.w3.org/1999/02/22-rdf-syntax-ns#rdf:Description")) {
+							 inTriples.push(new Triple(subject,Namespaces['_'+_rdfNS]+"about",mysubject,"resource"));
+						 }
+					 }
+				 }
+				 if (nn.indexOf(':')==-1) {
+					 ns='';
+				 } else {
+					 ns=nn.split(':')[0];
+					 nn=nn.split(':')[1];
+				 }
+				 nvobj=getNodeValue(el);
+				 nv=nvobj.val;typ=nvobj.type;datatype=nvobj.datatype;lang=nvobj.lang;
+				 if (ns==_rdfNS &amp;&amp; nn=='Description') {
+					 var elf=el.firstChild
+						 if (elf) {
+							 try {
+								 nn1=String(':'+elf.nodeName+'::').split(':');
+								 ns1=nn1[1];
+								 nn1=nn1[2];
+								 for (var ii=0;ii&lt;elf.attributes.length;ii++) {
+									 attr1=elf.attributes.item(ii);
+									 nna1=String(':'+attr1.nodeName+'::').split(':');
+									 nsa1=nna1[1];
+									 nna1=nna1[2];
+									 nva1=attr1.nodeValue;
+									 if (nsa1!=_rdfNS &amp;&amp; nsa1!='xmlns') {
+										 inTriples.push(new Triple(subject,Namespaces['_'+nsa1]+nna1,nva1,"literal"));
+									 }
+									 if (nsa1==_rdfNS &amp;&amp; nna1=='resource') {
+										 ii=1000;
+										 inTriples.push(new Triple(subject,Namespaces['_'+ns1]+nn1,nva1,'resource'));
+									 }
+									 if (nsa1==_rdfNS &amp;&amp; nna1=='literal') {
+										 ii=1000;
+										 inTriples.push(new Triple(subject,Namespaces['_'+nsa1]+nn1,nv1,'resource'));
+									 }
+								 }
+								 if (ii&lt;1000) {
+									 inTriples.push(new Triple(subject,Namespaces['_'+ns1]+nn1,elf.nodeValue,'resource'));
+								 }
+							 } catch (e) {}
+						 }
+				 } else {
+					 vl=el.getAttribute(_rdfNS+':nodeID');
+					 if (vl) {
+						 nv='genid:'+vl;
+					 }
+					 if (ns==_rdfNS &amp; nn=="li") {
+						 inTriples.push(new Triple(subject,Namespaces['_'+ns]+"_"+(liCount++),nv,typ,datatype,lang));
+
+					 } else {
+						 inTriples.push(new Triple(subject,Namespaces['_'+ns]+nn,nv,typ,datatype,lang));
+					 }
+				 }
+			 }
+		 } 
+	 }
+ }		
+ 
+ function getFCVal(el) {
+	 if (el.firstChild.xml) {
+		 return el.firstChild.xml;
+	 } else {
+		 return el.firstChild.nodeValue;
+	 }
+ }
+ function getNodeValue(el) {
+	 getNamespaces(el);
+	 var i,attr,els,subj;
+	 attrs=el.attributes;
+	 predicate="";
+	 for (j=0;j&lt;attrs.length;j++) {
+		 attr=attrs.item(j);
+		 nn=String(':'+attr.nodeName+'::').split(':');
+		 ns=nn[1];
+		 nn=nn[2];
+		 nv=attr.nodeValue;
+		 if (ns==_rdfNS &amp;&amp; nn=='parseType' &amp;&amp; nv=='Resource') {
+			 subj=GenID();
+			 AnalyseChildren(subj,el.childNodes);
+			 return {val:subj,type:'resource'};
+		 }
+		 if (ns==_rdfNS &amp;&amp; nn=='datatype') {
+			 try {
+				 return {val:getFCVal(el),type:'literal',datatype:nv};
+			 }catch (e) {
+				 return {val:"",type:'literal',datatype:nv};
+			 }
+		 }
+		 if (ns=='xml' &amp;&amp; nn=='lang') {
+			 return {val:getFCVal(el),type:'literal',lang:nv};
+		 }
+		 if (ns==_rdfNS &amp;&amp; nn=='about') {
+			 return {val:nv,type:'resource'};
+		 }
+		 if (ns==_rdfNS &amp;&amp; nn=='resource') {
+			 return {val:nv,type:'resource'};
+		 }
+		 if (ns==_rdfNS &amp;&amp; nn=='literal') {
+			 return {val:getFCVal(el),type:'literal'};
+		 }
+	 }
+	 els=el.childNodes;
+	 elsl2=els.length;
+	 if (elsl2==0) {
+		 return "";
+	 }
+	 if (elsl2==1 &amp;&amp; els.item(0).nodeType==3) {
+		 return {val:els.item(0).nodeValue,type:'literal'};
+	 }
+	 var iii=0;
+	 while (els.item(iii) &amp;&amp; els.item(iii).nodeType==3) {
+		 iii++;
+	 }
+	 var elsi=els.item(iii);
+	 subj=GenID();
+	 if (elsi!=null) {
+		 nn=String(':'+elsi.nodeName+'::').split(':');
+		 if (nn.length==4) {
+			 ns="";nn=nn[1];
+		 } else {
+			 ns=nn[1];
+			 nn=nn[2];
+		 }
+		 
+		 vl=getVL(elsi);
+		 if (vl &amp;&amp; vl!='') {
+			 subj=vl;
+		 }	
+		 inTriples.push(new Triple(subj,Namespaces['_'+_rdfNS]+"type",Namespaces['_'+ns]+nn,"resource"));
+		 attrs2=elsi.attributes;
+		 if (attrs2) {
+			 for (var ii=0;ii&lt;attrs2.length;ii++) {
+				 var attr=attrs2.item(ii);
+				 nna1=String(':'+attr.nodeName+'::').split(':');
+				 nsa1=nna1[1];
+				 nna1=nna1[2];
+				 nva1=attr.nodeValue;
+				 if (nsa1!=_rdfNS &amp;&amp; nsa1!='xmlns') {
+					 inTriples.push(new Triple(subj,Namespaces['_'+nsa1]+nna1,nva1,"literal"));
+				 }
+			 }
+			 if ((typeof elsi.getAttributeNS=='unknown' | typeof elsi.getAttributeNS=='function') &amp;&amp; elsi.getAttributeNS(RDF_NS,'about')!='') {
+				 realSubject[subj] = elsi.getAttributeNS(RDF_NS,'about');
+			 } else {
+				 if (elsi.getAttribute(_rdfNS+':about')!='') {
+					 realSubject[subj] = elsi.getAttribute(_rdfNS+':about');
+				 }
+			 }
+		 }
+		 AnalyseChildren(subj,elsi.childNodes);
+	 }
+	 return {val:subj,type:'resource'};
+ }
+
+ function GenID() {
+	 return "genid:"+(++GlobalID);
+ }
+
+//  Enters the namespace against "_"+ the prefix and ALSO against a number.
+//  (This is maybe because one can't iterate over the associative array?)
+ function getNamespaces(el) {
+	 if (el) {
+		 var nn,ns;
+		 var attr=el.attributes;
+		 if (attr) {
+			 var atl=attr.length;
+			 for (var i=0;i&lt;atl;i++) {
+				 nn=':'+attr.item(i).nodeName+"::";
+				 nn=nn.split(':')[2];
+				 ns=attr.item(i).nodeValue;
+				 Namespaces[Namespaces.length]=ns;
+				 Namespaces['_'+nn]=Namespaces[Namespaces.length-1];
+				 if (ns==RDF_NS) {
+					 _rdfNS=nn;
+				 }
+			 } 
+		 }
+	 }
+ }
+
+
+ 
+ function Triple(subject,predicate,object, type, datatype, lang) {
+	 this.subject=subject;
+	 this.predicate=predicate;
+	 this.object=object;
+	 this.type=type;
+	 this.lang=lang;
+	 this.datatype=datatype;
+	 return this;
+ }
+
+ function SubjectOrObject(triples,uri) {
+	if (triples==null) {
+		triples=inTriples;
+	}
+	outTriples=new Array();
+	for (var i=0;i&lt;triples.length;i++) {
+		var ti=triples[i];
+		if (ti.subject==uri || ti.object==uri) {
+			outTriples.push(ti);
+		}
+	}
+	return outTriples;
+ }
+
+function Match(triples,s,p,o) {
+	if (triples==null) {
+		triples=inTriples;
+	}
+	outTriples=new Array();
+	for (var i=0;i&lt;triples.length;i++) {
+		var ti=triples[i];
+		match=true;
+		if (!(s==null || ti.subject==s)) {
+			match=false;
+		}
+		if (!(p==null || ti.predicate==p)) {
+			match=false;
+		}
+		if (!(o==null || ti.object==o)) {
+			match=false;
+		}
+		if (match) {
+			outTriples.push(ti);
+		}
+	}
+	return outTriples;
+ }
+
+
+function SingleObject(triples,s,p,o) {
+	if (triples==null) {
+		triples=inTriples;
+	}
+	for (var i=0;i&lt;triples.length;i++) {
+		var ti=triples[i];
+		match=true;
+		if (!(s==null || ti.subject==s)) {
+			match=false;
+		}
+		if (!(p==null || ti.predicate==p)) {
+			match=false;
+		}
+		if (match) {
+			return(ti.object);
+		}
+	}
+	return "";
+ }
+
+function SingleObjectResource(triples,s,p,o) {
+	if (triples==null) {
+		triples=inTriples;
+	}
+	tl=triples.length;
+	for (var i=0;i&lt;tl;i++) {
+		var ti=triples[i];
+		match=true;
+		if (!(s==null || ti.subject==s)) {
+			match=false;
+		}
+		if (!(p==null || ti.predicate==p)) {
+			match=false;
+		}
+		if (!(ti.type=='resource')) {
+			match=false;
+		}
+		if (match) {
+			return(ti.object);
+		}
+	}
+	return "";
+ }
+
+ function doOwlSameAs(triples) {
+	 if (triples==null) {
+		 triples=inTriples;
+	 }
+	 subs=Match(triples,null,"http://www.w3.org/2002/07/owl#sameAs",null);
+	 for (i=0;i&lt;subs.length;i++) {
+		 var subjects=SubjectOrObject(triples,subs[i].subject);
+		 var objects=SubjectOrObject(triples,subs[i].object);
+		 for (j=0;j&lt;subjects.length;j++) {
+			 var tri=subjects[j];
+			 if (tri.predicate!="http://www.w3.org/2002/07/owl#sameAs") {
+				 triples.push(replaceTriple(tri,subs[i].subject,subs[i].object))
+			 }
+		 }
+		 for (j=0;j&lt;objects.length;j++) {
+			 var tri=objects[j];
+			 if (tri.predicate!="http://www.w3.org/2002/07/owl#sameAs") {
+				 triples.push(replaceTriple(tri,subs[i].subject,subs[i].object));
+			 }
+		 }
+	 }
+ }
+ function replaceTriple(tri,subj,obj) {
+	 var s=tri.subject;
+	 var o=tri.object;
+	 if (s==subj) {
+		 s=obj;
+	 } else {
+		 if (s==obj) {
+			 s=subj;
+		 }
+	 }
+	 if (o==subj) {
+		 o=obj;
+	 } else {
+		 if (o==obj) {
+			 o=subj;
+		 }
+	 }
+	 return new Triple(s,tri.predicate,o,tri.type,tri.datatype,tri.lang);
+ }
+
+
+// See http://developer.apple.com/internet/webcontent/xmlhttpreq.html
+
+
+function HTTP() {
+	var xmlhttp;
+	/*@cc_on @*/
+	/*@if (@_jscript_version &gt;= 5)
+		try {
+		xmlhttp=new ActiveXObject("Msxml2.XMLHTTP")
+		} catch (e) {
+		try {
+		xmlhttp=new ActiveXObject("Microsoft.XMLHTTP")
+		} catch (E) {
+    xmlhttp=false
+		}
+		}
+		@else
+		xmlhttp=false
+		@end @*/
+	if (!xmlhttp) {
+		try {
+			xmlhttp = new XMLHttpRequest();
+		} catch (e) {
+			xmlhttp=false;
+		}
+		fyi("xmlhtp = "+xmlhttp)
+	}
+	return xmlhttp;
+ }
+ 
+ if (typeof getURL=='undefined') {
+	 getURL=function(url,fn) { 
+		 var xmlhttp=new HTTP();
+		 if (xmlhttp) {
+
+//			 xmlhttp.setRequestHeader('Accept','application/rdf+xml')
+// Gives Error: uncaught exception: [Exception... "Component returned failure code: 0x80004005 (NS_ERROR_FAILURE) [nsIXMLHttpRequest.setRequestHeader]"
+//  nsresult: "0x80004005 (NS_ERROR_FAILURE)"  location: "JS frame :: http://www.w3.org/2005/10/ajaw/rdf/parser.js :: anonymous :: line 836"  data: no]
+
+			 xmlhttp.overrideMimeType('text/xml') ///@@  System does not recognize application/rdf+xml as xml alas
+			 try {
+				xmlhttp.open("GET",url,true,'test','test');
+			 } catch (exception) {
+			    fyi("Exception: " + exception)
+			    fn({status: 999, content: ("Exception: " + exception),
+						domcontent: undefined,
+						contentType: undefined})
+			    return
+			 }
+			 xmlhttp.onreadystatechange=function() {
+				 if (xmlhttp.readyState==4) {
+				    
+				    fn({status:xmlhttp.status,
+					    url:url,
+					    content:xmlhttp.responseText,
+					    domcontent:xmlhttp.responseXML,
+					    contentType:xmlhttp.getResponseHeader("Content-Type")})
+				    
+				 }
+			 }
+			 xmlhttp.send(null);
+		 } else {
+			 //Some Appropriate Fallback...
+			 if (typeof alert!=null) {
+				 alert("OK, I give up, you're not ASV, Batik, IE or\n a Mozilla build or anything else a bit like them.");
+			 }
+		 }
+	 }
+ }
+ if (typeof postURL=='undefined') {
+	 postURL=function(url,txt,fn,type,enc) {
+		 var xmlhttp=new HTTP();
+		 if (xmlhttp) {
+			 xmlhttp.open("POST",url,true,'test','test');
+			 if (enc) xmlhttp.setRequestHeader("Content-Encoding",enc)
+				 if (type) xmlhttp.setRequestHeader("Content-Type",type)
+					 xmlhttp.onreadystatechange=function() {
+					 if (xmlhttp.readyState==4) {
+						 fn({status:xmlhttp.status,content:xmlhttp.responseText,
+										domcontent:xmlhttp.responseXML,
+										contentType:xmlhttp.getResponseHeader("Content-Type")});
+					 }
+				 }
+			 xmlhttp.send(txt);
+		 } else {
+			 //Some Appropriate Fallback...
+			 if (typeof alert!=null) {
+				 alert("Error. can't make XMLHTTP object.OK, I give up: you're not ASV, Batik, IE or\n a Mozilla build or anything else a bit like them.");
+			 }
+		 }
+	 }
+ }
+} // RDFParser()
+
+
+
+//////////////////////// Interface to term.js etc
+//
+// The interface is in the style of cwm and rdlib
+//  This layer should later be integrated with the parser more
+
+function RDFLoad(url, base, sink, callback, why) {
+
+    function callback1(status, myRDF, sink, callback) {
+	fyi("Callback1 status " + status)
+	if (status != 200) return callback(status)
+	
+	fyi("   callback, triples: " + myRDF.getTriples().length)
+	triplesToFormula(myRDF.getTriples(), sink, why)
+	myRDF.reset()  // Clear RDF triple accumulator
+	callback(status)
+	fyi("Callback done, KB size now " + sink.statements.length)
+	return
+
+     }
+    var myRDF = new RDFParser()  //  parser resource
+    fyi("myRDF: "+myRDF+", why="+why)
+
+    fyi("Loading: "+url)
+    if (url.slice(7, 7+document.domain.length) != document.domain) {
+	try {
+	    netscape.security.PrivilegeManager.enablePrivilege(
+		    "UniversalBrowserRead")
+	} catch(e) {
+	    if(typeof alert != 'undefined') alert("Failed to get priviledge "+
+	    "UniversalBrowserRead to open "+url)
+	}
+    }
+    /*   only works if script jar'd &amp; signed -- or domainname-based security */
+     myRDF.getRDFURL(url, base, function(status)
+		    {callback1(status, myRDF, sink, callback)})
+}
+  
+function RDFParseDOM(dom, base, sink, why) {
+    var myRDF = new RDFParser()  //  parser resource
+    fyi("Parsing DOM: "+dom)
+    myRDF.parseDOM(dom, base, sink, why)
+    return;
+}
+	
+function triplesToFormula(triples, F, why) {
+    var i, tr
+    var genidMap = []
+    var lt = triples.length
+    fyi("Converting triples why="+why)
+    function map(uri) {
+	var term
+	if (uri.slice(0,6) =='genid:') {
+	    if (typeof genidMap[uri] == 'undefined') {
+		term = F.bnode()
+		genidMap[uri] = term
+	    } else {
+		term = genidMap[uri]
+	    }
+	    return term
+	}
+	return F.sym(uri)
+    }
+
+    for (i=0; i&lt;lt; i++) {
+	tr = triples[i]
+	var obj
+	if (tr.type=='literal') {
+	    F.add(map(tr.subject), map(tr.predicate),
+		    F.literal(tr.object, tr.lang, tr.datatype), why)
+	} else {
+	    F.add(map(tr.subject), map(tr.predicate), map(tr.object), why)
+	}
+	
+    }
+
+} 
+
+</rdf:value>
+    <server:content_type>application/x-javascript</server:content_type>
+  </rdf:Description>
+  <rdf:Description rdf:about="/edit/ajar/rdf/query.js">
+    <rdf:type rdf:resource="http://redfoot.net/2005/server#StaticPage"/>
+    <rdf:value>// Matching a formula against another formula
+//
+//
+// W3C open source licence 2005.
+//
+// This builds on term.js, match.js (and identity.js?)
+// to allow a query of a formula.
+// Here we introduce for the first time a subclass of term: variable.
+//
+
+//	Variable
+//
+// Compare with RDFBlankNode.  They are similar, but a variable
+// stands for something whose value is to be returned.
+// Also, users name variables and want the same name back when stuff is printed
+
+RDFVariableBase = "varid:" // We deem variabe x to be the symbol varid:x 
+
+function RDFVariable(rel) {
+    this.uri = URIjoin(rel, RDFVariableBase)
+    return this
+}
+
+RDFVariable.prototype.termType = 'variable'
+
+RDFVariable.prototype.toNT = function() {
+    if (this.uri.slice(0, RDFVariableBase.length) == RDFVariableBase)
+	return '?'+ this.uri.slice(RDFVariableBase.length) // @@ poor man's refTo
+    return '?' + this.uri
+}
+
+RDFVariable.prototype.toString = RDFVariable.prototype.toNT    
+RDFVariable.prototype.classOrder = 7    
+
+RDFFormula.prototype.variable = function(name) {
+    return new RDFVariable(name)
+}
+
+RDFVariable.prototype.hashString = RDFVariable.prototype.toNT
+
+RDFVariable.prototype.isVar = 1
+RDFBlankNode.prototype.isVar = 1
+RDFSymbol.prototype.isVar = 0
+RDFLiteral.prototype.isVar = 0
+RDFFormula.prototype.isVar = 0
+// RDFList.prototype.isVar = 0
+// RDFSet.prototype.isVar = 0
+
+
+// Unification: see also 
+//  http://www.w3.org/2000/10/swap/term.py
+// for similar things in python
+//
+// Unification finds all bindings such that when teh binding is applies
+// to one term it is equal to the other.
+
+function RDFUnifyTerm(self, other, bindings) {
+    var actual = bindings[self]
+    if (typeof actual == 'undefined') { // Not mapped
+	if (self.isVar) {
+	    var b = []
+	    b[self] = other
+	    return [[  b, null ]] // Match
+	}
+	actual = self;
+    }
+    if (!actual.complexType) {
+	if (actual.sameTerm(other)) return [[ [], null]];
+	return []
+    }
+    if (self instanceof Array) {
+	if (!(other instanceof Array)) return [];
+	return RDFArrayUnifyContents(self, other, bindings)
+    }
+    alert('oops - code not written yet')
+//    return actual.unifyContents(other, bindings)
+}
+
+function RDFArrayUnifyContents(self, other, bindings) {
+    if (self.length != other.length) return []; // no way
+    if (!self.length) return [[ [], null ]] // Success
+    var nbs = RDFUnifyTerm(self[0], other[0], bindings)
+    if (nbs == []) return nbs
+    var res = []
+    var i, n=nbs.length, nb, b2, j, m, v
+    for (i=0; i&lt;n; i++) { // for each possibility from the first term
+	nb = nbs[i][0] // new bindings
+	var bindings2 = []
+	for (v in nb) bindings2[v] = nb[v]; // copy
+	for (v in bindings) bindings2[v] = bindings[v]; // copy
+	nbs2 = RDFArrayUnifyContents(self.slice(1), other.slice(1), bindings2)
+	m = nbs2.length
+	for (j=0; j&lt;m; j++) {
+	    nb2 = nbs2[j][0]
+	    for (v in nb) nb2[v]=nb[v];
+	    res.push([nb2, null])
+	}
+    }
+    return res
+}
+
+
+
+//	Matching
+//
+// Matching finds all bindings such that when the binding is applied
+// to one term it is equal to the other term.  We only match formulae.
+
+function RDFBind(x, binding) {
+    y = binding[x]
+    if (typeof y == 'undefined') return x;
+    return y
+}
+
+RDFIndexedFormula.prototype.query = function(foodog, callback) {
+
+    function prepare(f, item, bindings) {
+	item.nvars = 0
+	item.index = null
+//	fyi("Preparing "+item)
+	if (item.subject.isVar &amp;&amp;
+	    !(item.subject in bindings)) {
+	    item.nvars++ ;
+	} else {
+	    item.index = f.subjectIndex[RDFBind(item.subject, bindings)]
+	    if (typeof item.index == 'undefined') {
+//		fyi("Query fail: no occurrence of subject of "+item)
+		return true
+	    }
+	}
+	if (item.object.isVar &amp;&amp;
+	    !(item.object in bindings)) {
+	    item.nvars++ ;
+	} else {
+	    oix = f.objectIndex[RDFBind(item.object, bindings)]
+	    if (typeof oix == 'undefined') {
+//		fyi("Query fail: no occurrence of object of "+item)
+		return true
+	    }
+	    if ((item.index == null) ||
+			(item.index.length &gt; oix.length)) item.index = oix;
+	}
+	if (item.index == null) item.index = f.statements
+	// fyi("Prep: index length="+item.index.length+" for "+item)
+	return false
+    }
+    
+    function easiestQuery(self, other) { // self-other -1 if self easier
+	return self.index.length - other.index.length
+    }
+    
+
+    function match(f, g, bindingsSoFar, level) {
+	var pattern = g.statements
+	if (pattern.length == 0) {
+	    if (callback) callback(bindingsSoFar);
+	    return [[ [], null ]] // Success
+	}
+	var item, i, n=pattern.length
+//	fyi(level + "Match "+n+" left, bs so far:"+bindingDebug(bindingsSoFar))
+	for (i=0; i&lt;n; i++) {
+	    item = pattern[i]
+	    if (prepare(f, item, bindingsSoFar)) return []; // No way
+	}
+	pattern.sort(easiestQuery)
+	// fyi("Sorted pattern:\n"+pattern)
+	var item = pattern[0]
+	var rest = f.formula()
+	rest.statements = pattern.slice(1)
+	fyi(level + "Match searching "+item.index.length+ " for "+item+
+			    "; bindings so far="+bindingDebug(bindingsSoFar))
+	var results = []
+	var c, nc=item.index.length, nbs1
+	for (c=0; c&lt;nc; c++) {   // For each candidate statement
+	    st = item.index[c]
+//	    fyi("trying statement "+st) 
+	    nbs1 = RDFArrayUnifyContents(
+		    [item.subject, item.predicate, item.object],
+		    [st.subject, st.predicate, st.object], bindingsSoFar)
+	    fyi(level+" From first: "+nbs1.length+": "+bindingsDebug(nbs1))
+	    var k, nk=nbs1.length, nb1, v;
+	    for (k=0; k&lt;nk; k++) {  // For each way that statement binds
+		var bindings2 = []
+		var newBindings1 = nbs1[k][0]
+		for (v in newBindings1) bindings2[v] = newBindings1[v]; // copy
+		for (v in bindingsSoFar) bindings2[v] = bindingsSoFar[v]; // copy
+		var nbs = match(f, rest, bindings2, level+ '  ')
+//		fyi("    match iteration, from first: "+bindingDebug(newBindings1))
+//		fyi("    match iteration, from rest: "+bindingsDebug(nbs))
+		var k2
+		for (k2=0; k2&lt;nbs.length; k2++) { // For each possibility
+		    var nb = nbs[k2][0], v1
+		    for (v1 in nbs1[k][0]) nb[v1] = nbs1[k][0][v1]
+//		    fyi("      match iteration, total: "+bindingsDebug(nbs))
+		    results.push([nb, null])
+		}
+	    }
+	}
+	return results
+    }
+    
+//    fyi("Query F length"+this.statements.length+" G="+foodog)
+    var res = match(this, foodog, [], '')
+//    fyi("Returning from query length="+res.length+" bindings: "+bindingsDebug(res))
+    var r, nr=res.length, b, v
+    for (r=0; r&lt;nr; r++) {
+	b = res[r][0]
+	for (v in b) {
+	    if (v[0] == '_') { // bnode removal
+		delete res[r][0][v]
+	    }
+	}
+    }
+    fyi("Returning from query length="+res.length+" bindings: "+bindingsDebug(res))
+    
+    return res
+}
+
+///////////// Debug strings
+
+function bindingsDebug(nbs) {
+    var str = "Bindings:\n"
+    var i, n=nbs.length
+    for (i=0; i&lt;n; i++) {
+	str+= bindingDebug(nbs[i][0])+'\n';
+    }
+    return str
+}
+
+function bindingDebug(b) {
+    var str = "", v
+    for (v in b) {
+	str += "    "+v+" -&gt; "+b[v]
+    }
+    return str
+}
+
+// ends
+</rdf:value>
+    <server:content_type>application/x-javascript</server:content_type>
+  </rdf:Description>
+  <rdf:Description rdf:about="/edit/ajar/rdf/term.js">
+    <rdf:type rdf:resource="http://redfoot.net/2005/server#StaticPage"/>
+    <rdf:value>// These are the classes corresponding to the RDF and N3 data models
+//
+// Designed to look like rdflib and cwm designs.
+//
+// Issues: Should the names start with RDF to make them
+//          unique as program-wide symbols?
+//
+// W3C open source licence 2005.
+//
+
+RDFTracking = 0  // Are we requiring reasons for statements?
+
+
+function makeTerm(val) {
+//    fyi("Making term from " + val)
+    if (typeof val == 'object') return val;
+    if (typeof val == 'string') return new RDFLiteral(val);
+    if (typeof val == 'undefined') return undefined;
+    alert("Can't make term from " + val + " of type " + typeof val) // @@ add numbers
+}
+
+//	Symbol
+
+function RDFSymbol_toNT(x) {
+    return ("&lt;" + x.uri + "&gt;")
+}
+
+function toNT() {
+    return ("&lt;" + this.uri + "&gt;")
+}
+
+function RDFSymbol(uri) {
+    this.uri = uri
+    return this
+}
+    
+RDFSymbol.prototype.termType = 'symbol'
+RDFSymbol.prototype.toString = toNT
+RDFSymbol.prototype.toNT = toNT
+
+
+//	Blank Node
+
+var RDFNextId = 0;  // Gobal genid
+RDFGenidPrefix = "genid:"
+NTAnonymousNodePrefix = "_:n"
+
+function RDFBlankNode() {
+    this.id = RDFNextId++
+    return this
+}
+
+RDFBlankNode.prototype.termType = 'bnode'
+
+RDFBlankNode.prototype.toNT = function() {
+    return NTAnonymousNodePrefix + this.id
+}
+RDFBlankNode.prototype.toString = RDFBlankNode.prototype.toNT    
+    
+//	Literal
+
+function RDFLiteral(value, lang, datatype) {
+    this.value = value
+    this.lang=lang;	    // string
+    this.datatype=datatype;  // term
+    this.toString = RDFLiteral_toNT
+    this.toNT = RDFLiteral_toNT
+    return this
+}
+
+RDFLiteral.prototype.termType = 'literal'
+
+function RDFLiteral_toNT() {
+    var str = this.value
+    if (typeof str != 'string') alert("Not string: "+str)
+    str = str.replace(/\\/g, '\\\\');  // escape
+    str = str.replace(/"/g, '\\"');  // '
+    
+    str = '"' + str + '"'
+    if (this.datatype){
+	str = str + '^^' + this.datatype //eik//.toNT
+    }
+    if (this.lang) {
+	str = str + "@" + this.lang
+    }
+    return str
+}
+
+function RDFLiteralToString() {
+    fyi("literal "+this.value) //@@@
+    return this.value
+}
+
+RDFLiteral.prototype.toString = RDFLiteralToString     
+RDFLiteral.prototype.toNT = RDFLiteral_toNT
+
+//	Statement
+//
+//  This is a triple with an optional reason.
+//
+//   The reason can point to provenece or inference
+//
+function RDFStatement_toNT() {
+    return (this.subject.toNT() + " "
+		+ this.predicate.toNT() + " "
+		+  this.object.toNT() +".")
+}
+
+function RDFStatement(subject, predicate, object, why) {
+    this.subject = makeTerm(subject)
+    this.predicate = makeTerm(predicate)
+    this.object = makeTerm(object)
+    if (typeof why !='undefined') {
+	this.why = why
+    } else if (RDFTracking) {
+	fyi("WARNING: No reason on "+subject+" "+predicate+" "+object)
+    }
+    return this
+}
+
+RDFStatement.prototype.toNT = RDFStatement_toNT
+RDFStatement.prototype.toString = RDFStatement_toNT
+     
+
+//	Formula
+//
+//	Set of statements.
+
+function RDFFormula() {
+    this.statements = []
+    return this
+}
+
+function RDFFormula_toNT() {
+    return "{\n" + this.statements.join('\n') + "}"
+}
+
+RDFFormula.prototype.termType = 'formula'
+RDFFormula.prototype.toNT = RDFFormula_toNT
+RDFFormula.prototype.toString = RDFFormula_toNT     
+
+RDFFormula.prototype.add = function(s, p, o, why) {
+    var st = new RDFStatement(s, p, o, why)
+    this.statements.push(st)
+}
+
+// Convenience methods on a formula allow the creation of new RDF terms:
+
+RDFFormula.prototype.sym = function(uri) {
+    return new RDFSymbol(uri)
+}
+
+RDFFormula.prototype.literal = function(val, lang, dt) {
+    return new RDFLiteral(val, lang, dt)
+}
+
+RDFFormula.prototype.bnode = function() {
+    return new RDFBlankNode()
+}
+
+RDFFormula.prototype.formula = function() {
+    return new RDFFormula()
+}
+
+
+// The namespace function generator 
+
+function Namespace(nsuri) {
+    return function(ln) { return new RDFSymbol(nsuri+ln) }
+}
+
+// Parse a single token
+//
+// The bnode bit should not be used on program-external values; designed
+// for internal work such as storing a bnode id in an HTML attribute.
+// Not coded for literals.
+
+RDFFormula.prototype.fromNT = function(str) {
+    var len = str.length
+    var x
+    if (str[0] == '&lt;') return kb.sym(str.slice(1,len-1))
+    if (str[0] == '_') {
+	x = new RDFBlankNode()
+	x.id = parseInt(str.slice(3))
+	RDFNextId--
+	return x
+    }
+    alert("Can't yet convert from NT: '"+str+"'")
+}
+
+// ends
+</rdf:value>
+    <server:content_type>application/x-javascript</server:content_type>
+  </rdf:Description>
+  <rdf:Description rdf:about="/edit/ajar/rdf/identity.js">
+    <rdf:type rdf:resource="http://redfoot.net/2005/server#StaticPage"/>
+    <rdf:value>//  Identity management for RDF
+//
+// This file sees that things which are identical 
+// according to owl:sameAs or an owl:InverseFunctionalProperty
+// or an owl:FunctionalProperty
+//
+// Schema must be loaed before data for IFPs and FPs to work.
+//
+// On Inheritance: http://www.kevlindev.com/tutorials/javascript/inheritance/
+
+// String for hashing. The literal one maybe is slow?
+
+owl_ns = "http://www.w3.org/2002/07/owl#"
+
+RDFLiteral.prototype.hashString = RDFLiteral.prototype.toNT
+RDFSymbol.prototype.hashString = RDFSymbol.prototype.toNT
+RDFBlankNode.prototype.hashString = RDFBlankNode.prototype.toNT
+
+
+RDFIndexedFormula.prototype = new RDFFormula();
+RDFIndexedFormula.prototype.constructor = RDFIndexedFormula;
+// RDFIndexedFormula.superclass = RDFFormula.prototype;
+
+RDFArrayRemove = function(a, x) {
+    var i
+    var n=a.length
+    for(i=0; i&lt;n; i++) {
+	if (a[i] == x) {
+	    a.splice(i,1)
+	    return
+	}
+    }
+    alert("RDFArrayRemove: Array did not contain "+x)
+}
+
+function RDFIndexedFormula() {
+    this.statements = []    // As in RDFFormula
+    this.propertyAction = [] // What to do when getting statement with {s X o}
+    this.classAction = []   // What to do when adding { s type X }
+    this.redirection = []   // redirect to lexically smaller equivalent symbol
+    this.subjectIndex = []  // Array of statements with this X as subject
+    this.objectIndex = []  // Array of statements with this X as object
+    
+    function handleRDFType(F, s, p, o) {
+	if (typeof F.typeCallback != 'undefined')
+	    F.typeCallback(F, o)
+
+	x = F.classAction[o.hashString()]
+	if (x) return x(F, s, p, o)
+	return false
+    }
+
+    this.propertyAction['&lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt;']
+	= handleRDFType;
+
+    // Assumption: these terms are not redirected
+    this.propertyAction['&lt;http://www.w3.org/2002/07/owl#sameAs&gt;']
+	    = function(F, s, p, o) {
+	F.equate(s,o)
+	return true
+    }
+    
+	
+    this.classAction["&lt;"+owl_ns+"InverseFunctionalProperty&gt;"] =
+	function(kb, s, p, o, addFn) {
+	kb.propertyAction[s] = handle_IFP;
+	return false
+    }
+
+    this.classAction["&lt;"+owl_ns+"FunctionalProperty&gt;"] =
+      function(kb, s, p, o, addFn) {
+	kb.propertyAction[s] = handle_FP;
+	return false
+    }
+
+    function handle_IFP(F, s, p, o)  {
+	s1 = F.any(undefined, p, o)
+	if (typeof s1 == 'undefined') return false // First time with this value
+	F.equate(s1, s)
+	return true	
+    }
+
+    function handle_FP(F, s, p, o)  {
+	o1 = F.any(s, p, undefined)
+	if (typeof o1 == 'undefined') return false // First time with this value
+	F.equate(o1, o)
+	return true	
+    }
+
+} /* end RDFIndexedFormula */
+
+
+RDFIndexedFormula.prototype.equate = function(s, o) {
+    // fyi("Equating "+s+" and "+o)
+    d = s.compareTerm(o)
+    if (!d) return true // No information in {a = a}
+    var big, small
+    if (d &lt; 0)  {  // s less than o
+	small = s; big = o
+    } else {
+	big = s; small = o
+    }
+    
+    var i, n, fixenda
+    fixenda = this.statementsMatching(big, undefined, undefined)
+    n = fixenda.length
+    for (i=0; i&lt;n; i++) {
+	st = fixenda[i]
+//	RDFArrayRemove(this.subjectIndex[big], st) // don't mess with while iter
+	st.subject = small;
+	if (typeof this.subjectIndex[small] == 'undefined')
+					this.subjectIndex[small] = [];
+	this.subjectIndex[small].push(st)
+    }
+    delete this.subjectIndex[big]
+
+//	// If we allow equating predicates we must index them.
+//    fixenda = this.statementsMatching(undefined, big, undefined)
+//    n = fixenda.length
+//    for (i=0; i&lt;n; i++) {
+//	st = fixenda[i]
+//	st.predicate = small
+//	if (typeof this.predicateIndex[small] == 'undefined')
+//					    this.predicateIndex[small] = [];
+//	this.predicateIndex[small] = st
+//    }
+//    delete this.predicateIndex[big]
+    
+    fixenda = this.statementsMatching(undefined, undefined, big);
+    n = fixenda.length
+    for (i=0; i&lt;n; i++) {
+	st = fixenda[i]
+//	RDFArrayRemove(this.objectIndex[big], st)
+	st.object = small
+	if (typeof this.objectIndex[small] == 'undefined')
+					this.objectIndex[small] = []
+	this.objectIndex[small].push(st)
+    }
+    delete this.objectIndex[big]
+    
+    this.redirection[big.hashString()] = small
+    // fyi("Equate done. "+big+" to be known as "+small)    
+
+}
+
+
+// On input parameters, do redirection and convert constants to terms
+function RDFMakeTerm(F,val) {
+    if (typeof val != 'object') {	
+	if (typeof val == 'string') {
+	    val = new RDFLiteral(val);
+	} else if (typeof val == 'undefined') {
+	    return undefined;
+	} else {   // @@ add converting of dates and numbers
+	    alert("Can't make term from " + val + " of type " + typeof val) 
+	}
+    }
+    var y = F.redirection[val.hashString()]
+    if (typeof y == 'undefined') return val
+//    fyi(" redirecting "+val+" to "+y)
+    return y
+}
+
+
+RDFIndexedFormula.prototype.add = function(s1, p1, o1, w1) {
+
+    var action, st
+    var s = RDFMakeTerm(this, s1)
+    var p = RDFMakeTerm(this, p1)
+    var o = RDFMakeTerm(this, o1)
+    var w = RDFMakeTerm(this, w1)
+    
+//    fyi("\nActions for "+s+" "+p+" "+o+". size="+this.statements.length)
+
+    if (typeof this.predicateCallback != 'undefined')
+	this.predicateCallback(this, p)
+    
+    // Action return true if the statement does not need to be added
+    action = this.propertyAction[p.hashString()]
+    if (action &amp;&amp; action(this, s, p, o)) return
+    
+    st = new RDFStatement(s, p, o, w)
+    if (typeof this.subjectIndex[s] =='undefined') this.subjectIndex[s] = []
+    this.subjectIndex[s].push(st) // Set of things with this as subject
+    
+    if (typeof this.objectIndex[o] == 'undefined') this.objectIndex[o] = []
+    this.objectIndex[o].push(st) // Set of things with this as object
+
+    this.statements.push(st)
+}
+
+RDFIndexedFormula.prototype.anyStatementMatching = function(s,p,o,w) {
+    var x = this.statementsMatching(s,p,o,w,true)
+    if (!x || x == []) return undefined
+    return x[0]
+}
+
+RDFIndexedFormula.prototype.statementsMatching = function(s1,p1,o1,w1,justOne) {
+    var results = []
+    var candidates
+//    fyi("\nMatching {"+s1+" "+p1+" "+o1+"}")
+    var s = RDFMakeTerm(this, s1)
+    var p = RDFMakeTerm(this, p1)
+    var o = RDFMakeTerm(this, o1)
+    var w = RDFMakeTerm(this, w1)
+    if (typeof(s) =='undefined') {
+	if (typeof(o) =='undefined') {
+	    candidates = this.statements
+//	    fyi("Trying all "+candidates.length+" statements")
+	} else {
+	    candidates = this.objectIndex[o]
+	    if (typeof candidates == 'undefined') return [];
+	    if ((typeof p == 'undefined')
+		&amp;&amp; (typeof s == 'undefined') &amp;&amp; (typeof w == 'undefined')) {
+		// fyi("Returning all statements for object")
+		return candidates 
+	    }
+	    // fyi("Trying only "+candidates.length+" object statements")
+	}
+    } else {
+	candidates = this.subjectIndex[s]
+	if (typeof candidates == 'undefined') return [];
+	if ((typeof p == 'undefined')
+	    &amp;&amp; (typeof o == 'undefined') &amp;&amp; (typeof w == 'undefined')) {
+	    // fyi("Trying all "+candidates.length+" subject statements")
+	    return candidates 
+	}
+	// fyi("Trying only "+candidates.length+" subject statements")
+    }
+    
+    if (typeof candidates == 'undefined') return []
+    var n = candidates.length
+//    fyi("Matching {"+s+" "+p+" "+o+"} against "+n+" stmts")
+    var i
+    var st
+    for(i=0; i&lt;n; i++) {
+	st = candidates[i]
+	// fyi("  Matching against st=" + st +" why="+st.why)
+
+	if (RDFTermMatch(p, st.predicate) &amp;&amp;  // first as simplest
+	    RDFTermMatch(s, st.subject) &amp;&amp;
+	    RDFTermMatch(o, st.object) &amp;&amp;
+	    RDFTermMatch(w, st.why)) {
+		// fyi("   Found: "+st)
+		if (justOne) return [st];
+		results.push(st)
+	}
+	    
+    }
+    return results
+}
+
+
+// ends
+</rdf:value>
+    <server:content_type>application/x-javascript</server:content_type>
+  </rdf:Description>
+  <rdf:Description rdf:about="/edit/ajar/dynamic.css">
+    <rdf:type rdf:resource="http://redfoot.net/2005/server#StaticPage"/>
+    <rdf:value>/*  Some style for the tabulator
+*/
+
+.selected {background-color: #8F3}
+
+strong { font-size: 16pt; color: #333 }
+table table {background-color: white}
+
+table table table { background-color: #eee }
+table table table table { background-color: white }
+table table table table table
+	 { background-color: #eee }
+table table table table table table
+	 { background-color: white}
+
+iframe { background: white }
+
+img.pic { max-height: 20em }
+
+.fetched { background-color: #eeffee }
+.requested { background-color: yellow }
+.failed { color: red; background-color: white }
+
+pre#status { font-size: 10pt }
+pre {
+    margin: 0;
+    padding: 0;
+    border: 0px;
+}
+
+table#sources { background-color: #222 }
+
+
+table { border-spacing: 0}
+
+table { margin: 0.5em }
+
+td { 	font-size: 12pt;
+	border-left: none;
+	border-top: none;
+	border-right: none;
+	border-bottom: none;
+	margin: 1px;
+/*	border-right: solid #eee 1px ;
+	border-bottom: solid #eee 1px;
+*/
+	vertical-align: top }
+
+table.results { width: 100% }
+
+table.results td { 	font-size: 12pt;
+	border-left: none;
+	border-top: none;
+	border-right: none;
+	border-bottom: none;
+	margin: 1px;
+	border-right: solid #777 1px ;
+	border-bottom: solid #777 1px;
+
+	vertical-align: top }
+
+
+table.results th { 	font-size: 12pt;
+	background-color: #ddf; 
+	border-left: none;
+	border-top: none;
+	border-right: solid #777 1px;
+	border-bottom: solid #777 1px;
+	margin: 3px;
+	border-right: solid #777 1px ;
+	border-bottom: solid #777 1px;
+
+	vertical-align: top }
+
+
+
+</rdf:value>
+    <server:content_type>text/css</server:content_type>
+  </rdf:Description>
+  <rdf:Description rdf:about="/edit/ajar/icons/16dot-blue.gif">
+    <rdf:type rdf:resource="http://redfoot.net/2005/server#StaticPage"/>
+    <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#base64Binary">R0lGODlhDAAMANUAAARewIS65Dy0+hSK/Fzc/MTW5Ax26ETG/FyKvOTu9Cyg/IT+/Giy7Gzv/Nzk6CxyvCRqtDSW7BSB8aS6zETB/CSZ/EzQ/ARq1JTG7Dy6/ByS/GTk/Mze7PT6/Cym/ARm1HSezLzS5Eya5Jy2zHz+/PT2/Bx23Dye9DRurNzq9JT+/HT2/Jy+3AxitNTe5ByN+RR67Ozy/GTe/Mza5EzJ/BSC/FTQ/Axu1Pz+/DSq/Jy63NTi9ES69OTq7Iz+/AAAACH5BAkAAD8ALAAAAAAMAAwAAAZvwJ/wV+r1hkgcyPSqRALIHgRWydAINkZHiDBocgdCg7TB/ByAmkJw3Sx8PNzkM/BYbZuVT8YZfV4KFDQ2YgsEHC5pFQIUeCsLAjE/KAYvHgIWBBsEDEIuLTAaaxQUJ0eeDzcSGi8iKUhCITo6M0hBADs=</rdf:value>
+  </rdf:Description>
+  <rdf:Description rdf:about="/edit/ajar/icons/16dot-green.gif">
+    <rdf:type rdf:resource="http://redfoot.net/2005/server#StaticPage"/>
+    <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#base64Binary">R0lGODlhDAAMANUAAASUBJzCnBTOHGTebCzrNMTixEz6XFymXGz+fDTSPAy2DOTs5Fz+YJTmlCTgLDz4PiSSJNzy3BzYINTo1GT8eET+TgSiBKTGpFT+Wuz27GT+bIT+kUT6RITWjBzQHjzqREzGTLzavETmVHS2dByqHJzQnBTFFCyeLJT+rPz+/Hz+lDSWNDTyPMzqzAyqDDzaPCzmLIz+pCTaLAySDBS6FNzo3PT69Ez+ZFz9bCziLDz2TMzizHT+gGzebEz+VAAAACH5BAkAAD8ALAAAAAAMAAwAAAZtwJ/wl6othkjbiOSRJTrIBcTk0BlwmEFKeFBIWD4cRUVp/BYA6qOCQ2xQIlvAIiBUbhgKL4abzD12GD4MbjgtNWkOaxgaPBsfGT8rCoAPgxoMPUI7MzQeOWscLxFDOycuJh4eIKRIPyElJTtIQQA7</rdf:value>
+  </rdf:Description>
+  <rdf:Description rdf:about="/edit/ajar/icons/tbl-expand-trans.png">
+    <rdf:type rdf:resource="http://redfoot.net/2005/server#StaticPage"/>
+    <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#base64Binary">iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAACHSURBVCiRtdE9CsJAEIbh91tyFEE9Qk7iCTykCJIilUXKIB7AxkDSpFAhn80KW8jGFE41xTzzw8g2SyIsqgaKTyJpB4xAbXuYBYCBDbCVdImwz4EUriO8Rtj9csMErIC9pDI3IY0XcLLdzIEAtMDR9iN3QwDuwMH27VunFDyByvY5t6P+/uk3mIYxrbLd5V0AAAAASUVORK5CYII=</rdf:value>
+    <server:content_type>image/png</server:content_type>
+  </rdf:Description>
+  <rdf:Description rdf:about="/edit/ajar/icons/tbl-collapse.png">
+    <rdf:type rdf:resource="http://redfoot.net/2005/server#StaticPage"/>
+    <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#base64Binary">iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAACHSURBVCiRtZGxDcJQDESfo2Qb5mFDZqCgQInSpaCgYwIaGgpAQtGjCEjh5wcpBa4s353ts0NlSRSL2ED5SSJi/YNXqZsvAXAFVjOCU26lHTBnaDsRqD3QJU0KoFOfuQmoDXAflW5qPebkrtQyeKuAOgUnAvUAXICzekzxMi28Yw88ckD8/dMvHeMuLJZwmjoAAAAASUVORK5CYII=</rdf:value>
+    <server:content_type>image/png</server:content_type>
+  </rdf:Description>
+  <rdf:Description rdf:about="/edit/ajar/icons/16dot-yellow.gif">
+    <rdf:type rdf:resource="http://redfoot.net/2005/server#StaticPage"/>
+    <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#base64Binary">R0lGODlhDAAMANUAAKSuBMzWDNTanOTuHOTmzOzuVOz6HKy2XPT23LTCBOzulNziTOzuzPz+WPz+P9TiFOzyPPz+e5yqJOTivOT2HOzq3Pz+NPz+kuzyLOTm3PT6LMTKnPz69LzKDOzu5Pz+acTGdKy2LNzmPOTqbNzijPz+qKy2BNTeFNzqFKSqNPT2RNzenNzmFPTy5MzKpPT27Pz+TPz+hLzKHOTyHOTqzOTmxPz+/MzaDLTGBPT+LKSuDOTuJOTm1Oz6JOzu1AAAACH5BAkAAD8ALAAAAAAMAAwAAAZmwJ/wx6l4hkgOSLbDiEhIj+SRgzUijRFHeLj1HI1P5BJT/DI6lAUsvpQKHFditm6EL5eIb5MYWKxhYx8MGSYoOQ5WbSpbKQEUdWFZQgQ6NwYaiQ4QCEMVIR0sAwMLLUhCEwIrBEhBADs=</rdf:value>
+  </rdf:Description>
+  <rdf:Description rdf:about="/edit/ajar/icons/16dot-red.gif">
+    <rdf:type rdf:resource="http://redfoot.net/2005/server#StaticPage"/>
+    <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#base64Binary">R0lGODlhDAAMANUAAKQGBNyKjKxaXNQSFMRydOTGxNwyPNxKTORibMympOzm5PyJkeRqbJwiJOwiJPQuLPx4fPxYWeTW1PxJSvRCRPxhYLwKDPyWpPxobvxQVvxubOQdHfz29OySlPQqLPw/PuS+vMSenKQyNLwaHNianOw+POTOzLQGBKwqLPTe3MwODPyOlOxKVPw2PKQODPTu7Oje3PQmLPx+hPyerPz+/OzKzPwyNOzS1NwWFPxWZPxibPxxfPxCTKwGBPTm5AAAACH5BAkAAD8ALAAAAAAMAAwAAAZvwJ/wx4H5hkgaYbRxGAJIRWMQ4+V0OQRNKFA5bBndbrHr/GAAXDVTGc9YnMQJZ+NlchjZBXMLWTY2ExERbQs6NRJpHi2CGBALFC8/IhZfH2waFQxCNwADDg8fExMlKUM3KBY4GxsHpkg/ICQkBUhBADs=</rdf:value>
+  </rdf:Description>
+  <rdf:Description rdf:about="/edit/ajar/icons/document.png">
+    <rdf:type rdf:resource="http://redfoot.net/2005/server#StaticPage"/>
+    <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#base64Binary">iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAAGa2tLEAAAAElBMVEX///8AAADGxsYAAAAAAP8AAAA5vSNOAAAAFnRFWHRTb2Z0d2FyZQBnaWYycG5nIDIuMy4xPxgAMQAAAD9JREFUeNpjYIABVigdEMAQwABCrCAhVrgUa2hoAIpaVjAXg4CoCw2FKgcRQSAigMXFAawRyHBxwMFAdggQAABFRAwd5efVrAAAAABJRU5ErkJggg==</rdf:value>
+    <server:content_type>image/png</server:content_type>
+  </rdf:Description>
 
 </rdf:RDF>
