@@ -87,8 +87,10 @@ else:
       <div kid:if="(edit_content_uri, None, None) in redfoot and allow(edit_content_uri)"
            id="edit_content">
        <?python from urllib import quote?>
+       <p> 
         <a kid:if="(request.uri, None, None) in redfoot" href="/edit/content/?uri=${quote(request.uri)}">Edit Content</a>
         <a kid:if="(request.uri, None, None) not in redfoot" href="/edit/content/?uri=${quote(request.uri)}">Create</a>
+       </p>
       </div>
 
       <h2><a href="${request.uri}">${title}</a></h2>
