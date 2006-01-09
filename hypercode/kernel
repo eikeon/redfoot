@@ -123,7 +123,7 @@ class HTTPGetEvent:
         the content at the location was updated
         """
         for http_cache_pred in HTTP_CACHE_PREDICATES:
-            self.provenanceGraph.remove((graph.identifier,http_cache_pred,None))
+            self.provenanceGraph.remove((self.identifier,http_cache_pred,None))
 
     def createHTTPHeaders(self):
         """
