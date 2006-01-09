@@ -36,32 +36,39 @@ parser.set_defaults(path="__rfdb__", program = None, update=False, quiet=False, 
 
 def main(command=None):
     if command is None:
-	options, args = parser.parse_args()	
+        options, args = parser.parse_args() 
     else:
-	args = command.split()
-	options, args = parser.parse_args(args)
+        args = command.split()
+        options, args = parser.parse_args(args)
     if options.install_rdflib:
-	install_rdflib(args)
+        install_rdflib(args)
     else:
-	from redfootlib.BootLoader import BootLoader
-	loader = BootLoader(backend=options.backend)
-	try:
-	    loader.open(options.path,create=False)
+        from redfootlib.BootLoader import BootLoader
+        loader = BootLoader(backend=options.backend)
+        try:
+            loader.open(options.path,create=False)
             len(loader)
-            print "Graph opened / verified"
-	    loader.main(options, args)
-            loader.close()
+            print "Existing store opened / verified"
         except:
+            print "Unable to open / verify store:"
             import traceback
             traceback.print_exc()
-            print "Creating new graph"
             try:
                 loader.open(options.path,create=True)
-                loader.main(options,args)
-            finally:
+                print "New store created"
+            except Exception, e:
+                print "Unable to create new store"
                 loader.close
-
-	return loader
+                raise e
+        try:
+            loader.main(options, args)
+            loader.commit()
+            loader.close()
+        except:
+            loader.rollback()
+            loader.close()
+    
+        return loader
 
 if __name__=="__main__":
     main()
