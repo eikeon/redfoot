@@ -42,19 +42,119 @@ logging = redfoot_loader.log
 root = logging.getLogger()
 #root.setLevel(logging.DEBUG)
 
-from rdflib import RDF, RDFS
+from rdflib import RDF, RDFS, Namespace, StringInputSource
 from rdflib import Graph, URIRef, BNode, Literal
 from rdflib.util import first, date_time
+import urllib2, re
 
 NAMESPACE = URIRef("http://redfoot.net/2005/redfoot#")
 
 DC_creator = URIRef("http://purl.org/dc/elements/1.1/creator")
 DC_created = URIRef("http://purl.org/dc/terms/created")
 
+HTTP = Namespace("http://www.w3.org/1999/xx/http#")
+OWL = Namespace("http://www.w3.org/2002/07/owl#")
+SCUTTER = Namespace("http://redfoot.net/2006/scutter#")
+
+LINK_PREDICATES = [OWL.imports,RDFS.isDefinedBy,RDFS.seeAlso]
+
+HTTP_CACHE_PREDICATES = [
+    HTTP['Date'],
+    HTTP['Last-Modified'],
+    HTTP['Content-Type'],
+    HTTP['ETag'],
+]
+
+HEADER_KEYS = [
+    'Date',
+    'Last-Modified',
+    'Content-Type',
+    'ETag',
+]
+
+SCUTTER_STEPS = 5
+
+class HTTPGetEvent:
+    """
+    Represents a prior HTTP GET by a scutter (a dated event).  Provides functionality for
+    managing HTTP headers for subsequent fetches (to the same location)
+    """
+    def __init__(self,provenanceGraph,location,log,eventId=None):
+        self.log = log
+        if eventId:
+            assert isinstance(eventId,BNode)
+            self.identifier = eventId
+        else:
+            event = first(provenanceGraph.subjects(SCUTTER.fetch,URIRef(location)))
+            
+            if event:
+                self.identifier = event
+            else:
+                self.identifier = BNode()
+                provenanceGraph.add((self.identifier,SCUTTER.fetch,URIRef(location)))
+                provenanceGraph.add((self.identifier,RDF.type,SCUTTER.Event))
+                provenanceGraph.add((self.identifier, DC_created, Literal(date_time())))
+            
+        self.provenanceGraph = provenanceGraph
+
+    def cacheEvent(self,httpStream,parseFormat):
+        """
+        Cache HTTP header information from the given HTTP stream
+        parseFormat is the format (xml or n3) that was used to successfully parse
+        the RDF graph and is used as a fallback if the content-type doesn't match (text/plain, for instance)
+        """
+        #self.log.info("Caching HTTP headers for URL: %s"%(first(self.provenanceGraph.objects(self.identifier,SCUTTER.fetch))))
+        for header_key in HEADER_KEYS:
+            val = httpStream.info().get(header_key)
+            if header_key == 'Content-Type':
+                isXml = re.match(r'(?:text|application)/.*\+?xml',val) is not None
+                if not isXml and parseFormat=='n3':
+                    val = 'text/n3'
+                elif not isXml and parseFormat=='xml':
+                    val = 'application/rdf+xml'
+                
+            if val:
+                #self.log.info("Caching HTTP header (%s): %s"%(header_key,val))
+                self.provenanceGraph.add((self.identifier,HTTP[header_key],Literal(val)))
+
+    def invalidateCache(self):
+        """
+        Clear the HTTP header metadata associated with this event. This would be called if
+        the content at the location was updated
+        """
+        for http_cache_pred in HTTP_CACHE_PREDICATES:
+            self.provenanceGraph.remove((graph.identifier,http_cache_pred,None))
+
+    def createHTTPHeaders(self):
+        """
+        Return a dictionary of HTTP headers to be used for a subsequent fetch to
+        the location associated with this event.  This is mechanism by which
+        HTTP caching and content negotiation is faciliated
+        """
+        headers={}        
+        httpDate = first(self.provenanceGraph.objects(self.identifier,HTTP['Date']))
+        httpLastModified = first(self.provenanceGraph.objects(self.identifier,HTTP['Last-Modified']))
+        httpContentType = first(self.provenanceGraph.objects(self.identifier,HTTP['Content-Type']))
+        httpETag = first(self.provenanceGraph.objects(self.identifier,HTTP['ETag']))
+
+        if httpDate:
+            headers['If-Modified-Since']= httpDate
+            
+        if httpETag:
+            headers['If-None-Match']    = httpETag
+
+        headers['Accept']               = httpContentType
+        headers['User-agent']           = 'Redfoot 2.0.X'
+
+        isXml = re.match(r'(?:text|application)/.*\+?xml',httpContentType) is not None
+
+        return headers, isXml and 'xml' or 'n3'
+
 class Redfoot(Graph):
 
     def __init__(self, backend):
         super(Redfoot, self).__init__(backend)
+        self.scutterFailureCache = {}
 	self.__base = None # default to CWD
         self.__log = None        
         self.__index = None
@@ -167,7 +267,109 @@ class Redfoot(Graph):
                         context = self.load(location, publicID=publicID, creator=redfoot_loader.program)
                     except Exception, e:
                         self.log.warning("couldn't load %s while checking: %s\n" % (uri, e))
-        
+
+    def scutter(self, location, creator, steps=SCUTTER_STEPS):
+        """
+        Performs a recursive scutter from the given location.  This assumes that the location has already
+        been loaded / cached prior to this function being called.  It attempts to load references (via link predicates)
+        as URLs, recursively (breadth-first) calling scutter on each URL that was successfully loaded as an RDF graph .  It does
+        this no more than SCUTTER_STEPS times.  Content negotiation is used to perform discovery of uknown URLs in order
+        to determine how to parse remote content.
+        """
+        self.log.info("Scuttering from %s"%location)
+        visitedNodes = []
+        for linkPredicate in LINK_PREDICATES:
+            sourceGraph = self.get_context(self.context_id(location),creator=creator)
+            for linkURL in sourceGraph.objects(None,linkPredicate):
+                #If the link is to itself or it has been attempted before, ignore
+                if linkURL == location or linkURL in self.scutterFailureCache:
+                    continue
+                #Skip the rest if the maximum number of recursion steps have been surpassed
+                if steps < 1:
+                    break
+                
+                #Check if linkURL has already been loaded
+                priorEvent = first(self.index.subjects(SCUTTER.fetch,linkURL))
+                if priorEvent:
+                    #Aleady loaded, attempt a cacheable, content-negotiated load with HTTP provenance data on RDF graph URL
+                    priorEvent = HTTPGetEvent(self.index,linkURL,self.log,priorEvent)
+                    hdrs,format = priorEvent.createHTTPHeaders()
+                    try:
+                        httpStream = urllib2.urlopen(urllib2.Request(linkURL,headers=hdrs))
+                        rt = httpStream.read()
+                        self.log.info("URL %s (linked by %s) already loaded previously, but content has changed since .."%(linkURL,linkPredicate))
+                        #Fresh content since last fetch, need to update HTTP cache provenance and refresh graph
+                        priorEvent.invalidateCache()
+                        graph = self.get_context(self.context_id(linkURL))
+                        graph.remove((None,None,None))
+                        graph.load(StringInputSource(rt),format=format)
+                        priorEvent.cacheEvent(httpStream,format)
+                    except urllib2.HTTPError, e:
+                        assert e.code == 304
+                        #HTTP Error 304: Not Modified, do nothing
+                else:
+                    #self.log.info("URL %s (linked by %s) has not been loaded before.. Attempting RESTful discovery"%(linkURL,linkPredicate))
+                    #Hasn't been loaded.  Need to perform 'RESTful' scutter discovery
+                    #Try to connect, first
+                    try:
+                        httpStream = urllib2.urlopen(linkURL)
+                    except Exception, e:
+                        self.log.warning("Unable to connect to %s: %s\n"%(linkURL,e))
+                        continue
+                    
+                    contentType = httpStream.info().get('content-type')
+
+                    #Ignore HTML content type (XHTML or otherwise)
+                    if re.match(r'.*html',contentType) is not None:
+                        self.scutterFailureCache[linkURL]=None
+                        continue
+                    isXml = re.match(r'(?:text|application)/.*\+?xml',contentType) is not None
+                    
+                    try:
+                        #Trying Notation 3 parse first, unless content-type header specifies it is
+                        #RDF/XML or N3 parse fails
+                        if isXml:
+                            raise Exception("Not Notation 3 (%s)"%contentType)
+
+                        self.log.info("Non-XML content, attempting Notation parse")
+
+                        graph = super(Redfoot, self).get_context(self.context_id(linkURL))
+                        graph.load(httpStream,format='n3')
+                        #Successfully performed Notation 3 parse, persist HTTP headers (and other provenance data) and setup for next recursion
+                        graph = self.get_context(self.context_id(linkURL),creator=creator)
+                        graph.remove((context_id, REDFOOT.source, None))
+                        graph.add((context_id, REDFOOT.source, location))
+                        
+                        newEvent = HTTPGetEvent(self.index,linkURL,self.log)
+                        newEvent.cacheEvent(httpStream,'n3')
+                        visitedNodes.append(linkURL)
+                        steps -= 1
+                        
+                    except:
+                        #import traceback
+                        #traceback.print_exc()
+                        #Attempt to parse as RDF/XML instead (send accept header of 'application/rdf+xml')
+                        #self.log.info("Attempting RDF/XML parse")
+                        try:
+                            context_id = self.context_id(linkURL)
+                            graph = self.get_context(context_id,creator=creator)
+                            graph.load(httpStream)
+                            #Successfully performed RDF/XML persist HTTP headers (and other provenance data) and setup for next recursion
+                            graph.remove((context_id, REDFOOT.source, None))
+                            graph.add((context_id, REDFOOT.source, location))
+                            
+                            newEvent = HTTPGetEvent(self.index,linkURL,self.log)
+                            newEvent.cacheEvent(httpStream,'xml')
+                            visitedNodes.append(linkURL)
+                            steps -= 1
+
+                        except Exception, e:
+                            self.log.warning("Unable to parse %s as either N3 or RDF/XML: %s"%(linkURL,e))
+                            self.scutterFailureCache[linkURL]=None
+                            
+        for visitedLocation in visitedNodes:
+            self.scutter(visitedLocation,creator,steps=steps)
+
     def load(self, location, format="xml", publicID=None, creator=None):
         """
         location is a relative or absolute URI
@@ -177,16 +379,53 @@ class Redfoot(Graph):
         publicID = publicID or self.absolutize(location)
         publicID = self.absolutize(publicID, defrag=False)
         context_id = self.context_id(publicID)
-
         context = self.get_context(context_id, creator=creator)
-        context.remove((None, None, None))
-        context.load(location, publicID=publicID, format=format)
+        priorEvent = first(self.index.subjects(SCUTTER.fetch,location))
+        if priorEvent:
+            self.log.info("HTTP provenance metadata exists for %s.  Attempting RESTful HTTP request "%location)
+            #Aleady loaded, attempt a cacheable, content-negotiated load with HTTP provenance data on RDF graph URL
+            priorEvent = HTTPGetEvent(self.index,location,self.log,priorEvent)
+            hdrs,format = priorEvent.createHTTPHeaders()
+
+            try:
+                httpStream = urllib2.urlopen(urllib2.Request(location,headers=hdrs))
+                rt = httpStream.read()
+                self.log.info("Fresh content (%s bytes) loaded (modified since last attempt)"%(len(rt)))
+                #Fresh content since last fetch, need to update HTTP provenance and reload graph
+                priorEvent.invalidateCache()
+                context.remove((None,None,None))
+                graph.load(StringInputSource(rt),format=format)
+                priorEvent.cacheEvent(httpStream,format)
+
+            except urllib2.HTTPError, e:
+                self.log.info("Recieved 304 status from server.  Cached content is sufficient")
+                assert e.code == 304
+                #HTTP Error 304: Not Modified, do nothing
+
+            #Scutter from location
+            self.scutter(location,creator)
+            
+        else:
+            context.remove((None, None, None))
+            context.load(location, publicID=publicID, format=format)
+            try:
+                httpStream = urllib2.urlopen(urllib2.Request(location))
+                #Content was loaded via HTTP, cache HTTP headers and attempt to scutter
+                self.log.info("New RDF Graph loaded over HTTP from %s"%location)
+                newEvent = HTTPGetEvent(self.index,location,self.log)
+                newEvent.cacheEvent(httpStream,format)
+
+            except Exception, e:
+                raise
+                self.log.warning(repr(e))
+                #Content wasn't loaded via HTTP, no header cache
+                pass
 
         self.index.remove((context_id, REDFOOT.source, None))
         self.index.add((context_id, REDFOOT.source, location))
         self.index.remove((context_id, REDFOOT.publicID, None))        
         self.index.add((context_id, REDFOOT.publicID, publicID))
-
+        self.scutter(location,creator)
         return context
 
     def get_context(self, identifier, creator=None):
@@ -195,10 +434,9 @@ class Redfoot(Graph):
         result = super(Redfoot, self).get_context(identifier)
         self.index.remove((identifier, RDF.type, REDFOOT.DeletedContext))
         self.index.add((identifier, RDF.type, REDFOOT.Context))
-        if not (identifier, DC_created, None) in self.index:
-            self.index.add((identifier, DC_created, Literal(date_time())))
         if creator and not (identifier, DC_creator, None) in self.index:
             self.index.add((identifier, DC_creator, creator))
+            self.index.add((identifier, DC_created, Literal(date_time())))
         return result
 
     def remove_context(self, identifier):
@@ -303,6 +541,9 @@ class Redfoot(Graph):
 
 
     def subclasses(self, uri):
+        """
+        Applies brute force RDFS entailment to infer additional classification 
+        """
         if uri==RDFS.Resource:
             for subclass in self.subjects(RDF.type, RDFS.Class):
                 for c in self.objects(subclass, RDFS.subClassOf):
@@ -318,7 +559,10 @@ class Redfoot(Graph):
 	    yield instance
 
     def types(self, subject):
-	"""generator over the types of subject ordered from most specific to least."""
+	"""
+        generator over the types of subject ordered from most specific to least
+        Applies brute force RDFS entailment to infer additional classification
+        """
 	seen = set()
 	l = []
 	for type in self.objects(subject, RDF.type):
