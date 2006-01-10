@@ -66,6 +66,7 @@
         <rdfs:label>file handler</rdfs:label>
         <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
+import os
 from os.path import join, exists
 from base64 import b64decode
 
@@ -78,17 +79,20 @@ if content_type:
 # TODO: grab root for site instead of hard-coded value of html
 html_root = "html"
 
-path = request.uri.replace(request.host, '')
+path = request.uri.replace(request.host, '.')
 # TODO: url2pathname
 
 if ".." not in path:
-    filename = join(html_root, path)
+    filename = join(os.getcwd(), join(html_root, path))
+
     # TODO: support if-modified-since as well as sending last-modified
     if exists(filename):
+        #redfoot.log.info("Serving from html dir: %s" % filename)
         f = file(filename)
         response.write(f.read())
         f.close()
     else:
+        #redfoot.log.info("Serving from rdf: %s" % filename)
         value = redfoot.value(request.uri, RDF.value)
         if value:
             if value.datatype==base64Binary:
