@@ -15,6 +15,7 @@
     <commands:command rdf:resource="#load"/>
     <commands:command rdf:resource="#save"/>
     <commands:command rdf:resource="#print"/>
+    <commands:command rdf:resource="#serialize"/>
     <commands:command rdf:resource="#contexts"/>
     <commands:command rdf:resource="#remove_context"/>
     <commands:command rdf:resource="#reload"/>
@@ -778,6 +779,36 @@ for (s, p, o), cg in redfoot.store.triples((None, REDFOOT.context_id, None), Non
        </rdf:value>
      </redfoot:Python>
     </redfoot:code>
+  </commands:Command>
+
+  <commands:Command rdf:ID="serialize">
+    <rdfs:label>serialize</rdfs:label>
+    <redfoot:code>
+     <redfoot:Python rdf:ID="serialize_code">
+      <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+import sys
+from rdflib.Graph import Graph
+
+prefix = redfoot.absolutize(args[0], defrag=0)
+if len(args)>1:
+    base = redfoot.absolutize(args[1])
+else:
+    base = prefix
+
+out = Graph(namespace_manager=redfoot.namespace_manager)
+for cid in redfoot.contexts():
+    if cid.startswith(prefix):
+        c = redfoot.get_context(cid)
+        out += c  
+
+out.serialize(destination=sys.stdout, base=base)
+
+]]>
+      </rdf:value>
+     </redfoot:Python>
+    </redfoot:code>      
   </commands:Command>
 
 </rdf:RDF>  
