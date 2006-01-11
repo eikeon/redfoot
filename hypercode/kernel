@@ -396,7 +396,7 @@ class Redfoot(Graph):
         for visitedLocation in visitedNodes:
             self.scutter(visitedLocation,creator,steps=steps)
 
-    def load(self, location, format="xml", publicID=None, creator=None):
+    def load(self, location, format="xml", publicID=None, creator=None, scutter=False):
         """
         location is a relative or absolute URI
         publicID if specified will override location as the xml:base
@@ -411,36 +411,41 @@ class Redfoot(Graph):
 
         absolute_location = self.absolutize(location)
 
-        # TODO: 
-        priorEvent = self.index.value(predicate=SCUTTER.fetch, object=publicID, any=True)
-        if priorEvent:
-            priorEvent = HTTPGetEvent(self.index, absolute_location, self.log, priorEvent)
-        input_source = URLInputSource(absolute_location, public_id=publicID, priorEvent=priorEvent)
-
-        if input_source.modified:
+        if scutter:
+            # TODO: 
+            priorEvent = self.index.value(predicate=SCUTTER.fetch, object=publicID, any=True)
             if priorEvent:
-                priorEvent.invalidateCache()
+                priorEvent = HTTPGetEvent(self.index, absolute_location, self.log, priorEvent)
+            priorEvent = None
+            input_source = URLInputSource(absolute_location, public_id=publicID, priorEvent=priorEvent)
 
-            context.remove((None, None, None))
-            context.parse(input_source, publicID=publicID, format=format)
+            if input_source.modified:
+                if priorEvent:
+                    priorEvent.invalidateCache()
 
-            httpStream = input_source.getByteStream()
-            #Content was loaded via HTTP, cache HTTP headers
-            if priorEvent:
-                priorEvent.cacheEvent(httpStream, format)
+                context.remove((None, None, None))
+                context.parse(input_source, publicID=publicID, format=format)
+
+                httpStream = input_source.getByteStream()
+                #Content was loaded via HTTP, cache HTTP headers
+                if priorEvent:
+                    priorEvent.cacheEvent(httpStream, format)
+                else:
+                    self.log.info("New RDF Graph loaded over HTTP from %s" % location)
+                    newEvent = HTTPGetEvent(self.index, publicID, self.log)
+                    newEvent.cacheEvent(httpStream, format)
             else:
-                self.log.info("New RDF Graph loaded over HTTP from %s" % location)
-                newEvent = HTTPGetEvent(self.index, publicID, self.log)
-                newEvent.cacheEvent(httpStream, format)
+                # Do we care to record the not modified or anything else here?
+                pass
         else:
-            # Do we care to record the not modified or anything else here?
-            pass
-        
+            context.load(absolute_location, publicID=publicID, format=format)
+
         self.index.remove((context_id, REDFOOT.source, None))
         self.index.add((context_id, REDFOOT.source, location))
         self.index.remove((context_id, REDFOOT.publicID, None))        
         self.index.add((context_id, REDFOOT.publicID, publicID))
-        self.scutter(input_source.url, creator)
+        if scutter:
+            self.scutter(input_source.url, creator)
         return context
 
     def get_context(self, identifier, creator=None):
