@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:template="http://redfoot.net/2005/template#"
+   xmlns:server="http://redfoot.net/2005/server#"
+>
+
+  <template:Template rdf:ID="page">
+    <rdfs:label>Metacongnition Template</rdfs:label>
+    <template:content rdf:resource="classic#content"/>
+    <template:background_color>#FFB846</template:background_color>
+    <template:head rdf:resource="metacognition#head"/>
+    <template:css rdf:resource="metacognition#css"/>
+    <template:title rdf:resource="classic#title"/>
+    <template:shortcut_icon rdf:resource="http://redfoot.net/2002/11/25/favicon.ico"/>
+    <template:header rdf:resource="classic#header"/>
+    <template:navigation rdf:resource="metacognition#navigation"/>
+    <template:footer rdf:resource="classic#footer"/>
+    <server:unauthorized_page_handler rdf:resource="classic#unauthorized_page_handler"/>
+    <server:unauthorized_content_handler rdf:resource="classic#unauthorized_content_handler"/>
+    <server:content_type>application/xhtml+xml</server:content_type>
+    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:kid="http://purl.org/kid/ns#">
+<?python SERVER = redfoot.namespace("http://redfoot.net/2005/server#")?>
+<?python TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")?>
+
+<?python
+title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract(), None) or "-"
+comment = redfoot.comment(request.uri, None) or redfoot.comment(request.uri.abstract(), None) or "-"
+?>
+
+  ${display(lookup(TEMPLATE.head))}
+
+  <body>
+    <div id="outer">
+      <div id="header">
+        ${display(lookup(TEMPLATE.header))}
+        <span id="subTitle">${comment}</span>
+      </div>
+         
+      <div id="sub">
+        <div id="center">
+
+      <!-- TODO: -->
+      <?python edit_content_uri = URIRef('%s/edit/content/' % request.host)?>
+      <div kid:if="(edit_content_uri, None, None) in redfoot and allow(edit_content_uri)"
+           id="edit_content">
+       <?python from urllib import quote?>
+       <p> 
+        <a kid:if="(request.uri, None, None) in redfoot" href="/edit/content/?uri=${quote(request.uri)}">Edit Content</a>
+        <a kid:if="(request.uri, None, None) not in redfoot" href="/edit/content/?uri=${quote(request.uri)}">Create</a>
+       </p>
+      </div>
+
+      <h2><a href="${request.uri}">${title}</a></h2>
+
+      ${display(lookup(TEMPLATE.content))}
+
+      <?python COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")?>
+      <div class="comments"
+           kid:if="lookup(TEMPLATE.comments) and (request.uri, RDFS.member, COMMENT.exclude) not in redfoot">
+        ${display(lookup(TEMPLATE.comments))}
+        ${display(lookup(TEMPLATE.add_comment))}
+      </div>
+
+        </div>
+        <hr />
+        <div id="left">
+          ${display(lookup(TEMPLATE.navigation))}
+        </div>
+      </div>
+      <hr />
+      <div id="footer">
+        ${display(lookup(TEMPLATE.footer))}
+      </div>
+    </div>
+  </body>
+</html>
+]]>
+    </rdf:value>    
+  </template:Template>
+
+
+<!-- TODO: update sytlesheet to work with classic#Navigation instead of duplication here. -->
+  <server:PagePartHandler rdf:ID="navigation">
+    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
+
+<div id="menu" xmlns:kid="http://purl.org/kid/ns#">
+<?python
+TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")
+sections = []
+for section in redfoot.objects(request.host, TEMPLATE.section):
+    label = redfoot.value(section, TEMPLATE.section_name) or redfoot.label(section)
+    comment = redfoot.comment(section)
+    try:
+        val = redfoot.value(section, TEMPLATE.section_rank)
+        if val is None:
+            val = redfoot.value(section, TEMPLATE.default_section_rank, any=True)            
+        rank = float(val)
+    except:
+        rank = 0.0
+    if allow(section):
+        sections.append((rank, label, section, comment))
+sections.sort()
+?>
+  <span kid:if="sections" id="navlist" kid:strip="">
+      <a kid:for="rank, label, section, comment in sections" href="${section}" title="${comment}" id="${section==request.uri and 'current' or None}">${label}</a>
+  </span>  
+</div>
+    
+      ]]></rdf:value>
+  </server:PagePartHandler>
+
+  <server:PagePartHandler rdf:ID="head">
+    <rdfs:label>Default head</rdfs:label>
+    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+<div xmlns:kid="http://purl.org/kid/ns#"
+     kid:strip="">
+<?python
+title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract(), None) or "-"
+?>
+  <head>
+    <title>${redfoot.label(request.host)}: ${title}</title>
+    <meta http-equiv="Content-Type" content="text/xhtml; charset=UTF-8"/>
+    <link rel="shortcut icon" href="${lookup(TEMPLATE.shortcut_icon)}"/>
+<!--    <script type="text/javascript" src="http://metacognition.info/javascript/minmax.js"></script>-->
+    <style type="text/css" media="screen">
+
+#menu a, #menu a:visited {
+  text-align:right; 
+  text-decoration:none; 
+  color:black; 
+  font-weight:bold; 
+  display:block; 
+  }
+#menu a:hover {
+  background-color:lightblue; 
+  border-color:#f8f8f8 #f0f0f0;
+  }
+
+a, a:visited {
+  text-decoration:none; 
+  color:black; 
+  font-weight:bold; 
+  }
+a:hover {
+  background-color:lightblue; 
+  border-color:#f8f8f8 #f0f0f0;
+  }
+
+#footer-links a:link, #footer-links a:visited, #footer-links a:active {
+    text-decoration: none;
+    color: black;
+}
+
+    </style>
+    <style type="text/css">
+      ${display(lookup(TEMPLATE.css))}
+    </style>
+
+    <span kid:for="alternate in redfoot.objects(request.uri, SERVER.alternate)" kid:strip="" >
+    <link rel="alternate"
+      href="${alternate}" title="${redfoot.label(alternate)}"
+      type="${redfoot.value(alternate, SERVER.content_type)}" />
+    </span> 
+  </head>
+</div>
+]]>
+    </rdf:value>
+  </server:PagePartHandler>
+
+
+  <server:PagePartHandler rdf:ID="css">
+    <rdfs:label>Default css</rdfs:label>
+    <server:content_type>text/css</server:content_type>
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+
+TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")
+
+color = lookup(TEMPLATE.background_color) or "#cccccc"
+
+response.write("""
+&lt;!--
+
+/** Global **/
+/* technique explained @ http://leftjustified.net/journal/2004/10/19/global-ws-reset/  */
+* {
+    margin:0;
+    padding:0;
+}
+
+/********
+the #outer div is the key element to the flexibility of this design.
+By setting maximum and minimum widths in 'em', whilst the width is set in '%%', 
+we effectively create the perfect combination of 'fluid' and 'elastic' layouts.
+Javscript is used to add support for min/max width in IE
+
+Any elements inside #outer that require a set width or horizontal margins/padding use the '%%' unit for that value.
+This means that regardless of what causes the #outer div to expand (font size or screen size), 
+the content will seemlessly re-flow to fill that space.
+*********/
+#outer {
+    padding-top: 20px;
+    margin:0 auto;
+	width:94%%;
+    min-width:40em;
+    max-width:70em;
+	border:10px solid #fff;
+	border-width:0 10px;
+    background:#fff;
+}
+
+hr {display:none}
+
+/** Title **/
+#header {
+	background:%(color)s;
+	border:1px solid #black;
+}
+#header h1 {
+    padding-left:.6em;
+    font:bold 3em/2.5 "Lucida Bright", Georgia, Times, serif; /* line-height allows for image of buildings */
+    letter-spacing:1pt;
+	color:#black;
+}
+#header h1 a {
+	color:#845697;
+	text-decoration:none;
+}
+
+#subTitle {
+        padding-top: 0px;margin-top: 0px;padding-right: 15px;padding-bottom: 15px;display: block;text-align: right;font-style: italic;        
+}
+
+/** Content Containers **/
+#sub, #right {
+	font: 1em/1.5 'Lucida Grande', arial, verdana, sans-serif;
+	word-spacing:.1em;
+	margin-bottom:1em;
+}
+
+/******
+div#sub is an extra wrapper, which allows the center column to come first in the source. 
+#sub is floated left, with #center -the content column- nested within and floated to the right.
+concept from http://www.positioniseverything.net/piefecta-rigid.html
+******/
+#sub {
+	width:100%%;
+	float:left;
+	position:relative;
+}
+
+/***
+Containers should be named according to what they contain. not where they sit in the layout.
+To make identifying each column more simple, I have named them according to their position.
+***/
+#center {
+	width:65%%;
+	float:right;
+}
+#left {
+	width:33%%;
+	float:left;
+	/* the following 3 declarations are for design purposes only - not required for layout */
+	padding:220px 0 10px;
+	border-bottom:9px solid #blue;
+                              padding-top: 35px;
+
+}
+#right {
+	width:25%%;
+	float:right;
+                              border-bottom:9px solid #blue;
+                              text-align: right;
+}
+ 
+ /** Main Col Contents **/
+#center p {
+	margin:.5em 2%% .5em 0;
+}
+img.img-right {
+	float:right;
+}
+
+/** Left Col Contents**/
+#left h2 {
+	color:#845697;
+	font-size:1.5em;
+}
+#left p {
+	font-size:.9em;
+}
+
+/** Footer **/
+#footer {
+	clear:both;
+	font: 0.6em/1  'Lucida Grande', Arial, tahoma, verdana, sans-serif;
+	border:1px solid #black;
+                             background:%(color)s;
+                             text-align: center;
+                             height: 6em;
+	padding-top: 2em;
+                             padding-bottom: 2em;
+        
+        
+}
+#footer span {
+                             display: inline;
+	width:70%%;
+}
+
+--&gt;
+
+""" % {"color": color})
+    
+    </rdf:value>
+  </server:PagePartHandler>
+
+</rdf:RDF>  
+
