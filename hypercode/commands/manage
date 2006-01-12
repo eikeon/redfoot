@@ -199,6 +199,8 @@ for arg in args:
       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
+from rdflib import exceptions
+
 # usage reload all contexts starting with prefix (first arg)... defaults to all contexts
 try:
     prefix = args[0]
@@ -213,7 +215,7 @@ for cid in redfoot.contexts():
     if cid.startswith(prefix):
         try:
             source = redfoot.value(cid, REDFOOT.source)
-        except UniquenessError, e:
+        except exceptions.UniquenessError, e:
             redfoot.log.warning("Multiple sources for %s: %s" % (cid, list(redfoot.objects(cid, REDFOOT.source))))
             source = None
         if source is not None:
@@ -712,6 +714,28 @@ redfoot.index.remove((REDFOOT.Checked, RDFS.member, None))
 OLD = args[0]
 NEW = args[1]
 
+# rename any occurrences in any context
+for t, cg in list(redfoot.store.triples((None, None, None), None)):
+    s, p, o = t
+    if isinstance(s, URIRef) and OLD in s:
+        ss = URIRef(s.replace(OLD, NEW))
+    else:
+        ss = s
+    if isinstance(p, URIRef) and OLD in p:
+        pp = URIRef(p.replace(OLD, NEW))
+    else:
+        pp = p
+    if isinstance(o, URIRef) and OLD in o:
+        oo = URIRef(o.replace(OLD, NEW))
+    else:
+        oo = o
+    if (ss, pp, oo) != t:
+        for c in list(cg):
+            c.remove(t)
+            c.add((ss, pp, oo))
+
+# rename contexts (and checking again if there's any triples that need
+# renaming... probably can/should get rid of this redundant bit)
 for cid in list(redfoot.contexts()):
     context = redfoot.get_context(cid)
     if OLD in cid:
