@@ -360,6 +360,16 @@ a:hover {
     vertical-align: middle;
 }
 
+.log li h3 {
+    margin-bottom: 0em;
+}
+
+.log {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
 .bookmarks li h3 {
     margin-bottom: 0em;
 }
