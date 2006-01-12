@@ -438,6 +438,7 @@ class Redfoot(Graph):
                 # Do we care to record the not modified or anything else here?
                 pass
         else:
+            context.remove((None, None, None))
             context.load(absolute_location, publicID=publicID, format=format)
 
         self.index.remove((context_id, REDFOOT.source, None))
