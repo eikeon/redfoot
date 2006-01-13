@@ -29,10 +29,9 @@ For help on Redfoot see:
 """
 
 import sys, getopt
-
 import traceback
 from types import ModuleType
-from urlparse import urljoin, urldefrag
+from urlparse import urljoin, urldefrag, urlparse
 from urllib import pathname2url, url2pathname
 from itertools import chain
 import os
@@ -46,6 +45,7 @@ from rdflib import RDF, RDFS, Namespace, StringInputSource
 from rdflib import Graph, URIRef, BNode, Literal
 from rdflib.util import first, date_time
 import urllib2, re
+from datetime import datetime, timedelta
 
 NAMESPACE = URIRef("http://redfoot.net/2005/redfoot#")
 
@@ -74,15 +74,17 @@ HEADER_KEYS = [
 
 SCUTTER_STEPS = 5
 
+HTTP_CACHE_TTL = 24 * 60 * 60 #One day
+
 class HTTPGetEvent:
     """
     Represents a prior HTTP GET by a scutter (a dated event).  Provides functionality for
     managing HTTP headers for subsequent fetches (to the same location)
     """
-    def __init__(self,provenanceGraph,location,log,eventId=None):
+    def __init__(self,provenanceGraph,location,log,publicID=None,eventId=None):
         self.log = log
         if eventId:
-            assert isinstance(eventId,BNode)
+            assert isinstance(eventId,BNode),"Scutter event identifiers should be BNodes, not %s"%(type(eventId))
             self.identifier = eventId
         else:
             event = first(provenanceGraph.subjects(SCUTTER.fetch,URIRef(location)))
@@ -92,18 +94,40 @@ class HTTPGetEvent:
             else:
                 self.identifier = BNode()
                 provenanceGraph.add((self.identifier,SCUTTER.fetch,URIRef(location)))
-                provenanceGraph.add((self.identifier,RDF.type,SCUTTER.Event))
                 provenanceGraph.add((self.identifier, DC_created, Literal(date_time())))
-            
+                provenanceGraph.add((self.identifier, RDF.type, SCUTTER.Event))
+                if publicID:
+                    provenanceGraph.add((self.identifier, SCUTTER.target, URIRef(publicID)))
+                
         self.provenanceGraph = provenanceGraph
+
+    def __get_expiration_date(self):
+        now=datetime.now().isoformat().split('.')[0]
+        expiration = first(self.provenanceGraph.objects(self.identifier,SCUTTER.httpCacheExpiration))
+        #self.log.info(" ".join([now,expiration,str(expiration > now)]))
+        return first(self.provenanceGraph.objects(self.identifier,SCUTTER.httpCacheExpiration))
+    expirationDate = property( __get_expiration_date)
+
+    def __get_public_id(self):
+        return self.provenanceGraph.value(subject=self.identifier,predicate=SCUTTER.target, any=True)
+    publicID = property( __get_public_id)
+
+    def __get_system_id(self):
+        return self.provenanceGraph.value(subject=self.identifier,predicate=SCUTTER.fetch, any=True)
+    systemID = property(__get_system_id)        
 
     def cacheEvent(self,httpStream,parseFormat):
         """
         Cache HTTP header information from the given HTTP stream
-        parseFormat is the format (xml or n3) that was used to successfully parse
+        parseFormat is the format (xml or n3) that was used to successfully parse.  Setup the cache expiration
         the RDF graph and is used as a fallback if the content-type doesn't match (text/plain, for instance)
         """
         #self.log.info("Caching HTTP headers for URL: %s"%(first(self.provenanceGraph.objects(self.identifier,SCUTTER.fetch))))
+        now = datetime.now()
+        expirationDT = (now + timedelta(seconds = HTTP_CACHE_TTL)).isoformat().split('.')[0]
+        #self.log.info(" ".join([now.isoformat(),str(HTTP_CACHE_TTL),expirationDT]))
+        self.provenanceGraph.remove((self.identifier,SCUTTER.httpCacheExpiration,None))
+        self.provenanceGraph.add((self.identifier, SCUTTER.httpCacheExpiration, Literal(expirationDT)))
         for header_key in HEADER_KEYS:
             val = httpStream.info().get(header_key)
             if header_key == 'Content-Type':
@@ -122,8 +146,24 @@ class HTTPGetEvent:
         Clear the HTTP header metadata associated with this event. This would be called if
         the content at the location was updated
         """
+        now = datetime.now()
+        expirationDT = (now + timedelta(seconds = HTTP_CACHE_TTL)).isoformat().split('.')[0]
+        self.provenanceGraph.remove((self.identifier,SCUTTER.httpCacheExpiration,None))
+        self.provenanceGraph.add((self.identifier, SCUTTER.httpCacheExpiration, Literal(expirationDT)))
         for http_cache_pred in HTTP_CACHE_PREDICATES:
             self.provenanceGraph.remove((self.identifier,http_cache_pred,None))
+
+    def bumpExpiration(self):
+        """
+        Extend the cache expiration.  This is called because the cache expired and
+        a (cacheable) subsequent request responded in a 304 (no change at the server).
+        This should probably bump the cache by an increasing amount so static RDF graphs
+        (like the owl.rdfs) aren't repeatably hit uneccessarily
+        """
+        now = datetime.now()
+        expirationDT = (now + timedelta(seconds = HTTP_CACHE_TTL)).isoformat().split('.')[0]
+        self.provenanceGraph.remove((self.identifier,SCUTTER.httpCacheExpiration,None))
+        self.provenanceGraph.add((self.identifier, SCUTTER.httpCacheExpiration, Literal(expirationDT)))
 
     def createHTTPHeaders(self):
         """
@@ -156,57 +196,52 @@ from xml.sax.xmlreader import InputSource
 
 from rdflib import __version__
 
-# TODO: add types for n3. text/rdf+n3 ?
-headers = {
-    'Accept': 'application/rdf+xml', 
-    'User-agent':
-    'rdflib-%s (http://rdflib.net/; eikeon@eikeon.com)' % __version__
-    }
-
-
-class URLInputSource(InputSource, object):
-    def __init__(self, system_id=None, public_id=None, priorEvent=None):
-        super(URLInputSource, self).__init__(system_id)
-        self.url = system_id
-        if public_id:
-            self.setPublicId(public_id)
-
+class UnknownURLInputSource(InputSource, object):
+    def __init__(self, location):
+        super(UnknownURLInputSource, self).__init__(location)
+        self.valid = False
+        try:
+            httpStream = urllib2.urlopen(urllib2.Request(location))
+            self.valid = True
+            self.contentType = httpStream.info().get('content-type')
+            self.format = None
+            if re.match(r'.*html', self.contentType) is not None:
+                self.format = "html"
+            elif re.match(r'(?:text|application)/.*\+?xml', self.contentType) is not None:
+                self.format = "xml"
+            elif re.match(r'.*n3', self.contentType) is not None:
+                self.format = 'n3'
+            self.setByteStream(httpStream)
+        except Exception, e:
+            self.log.warning("Unable to connect to %s: %s\n"%(linkURL,e))
+        
+class CacheableURLInputSource(InputSource, object):
+    def __init__(self, priorEvent):
+        super(CacheableURLInputSource, self).__init__(priorEvent.publicID)
         self.modified = True
         if priorEvent:
-            logging.info("HTTP provenance metadata exists for %s.  Attempting RESTful HTTP request "% system_id)
-            #Aleady loaded, attempt a cacheable, content-negotiated load with HTTP provenance data on RDF graph URL
             hdrs, format = priorEvent.createHTTPHeaders()
             try:
                 httpStream = urllib2.urlopen(urllib2.Request(system_id, headers=hdrs))
             except urllib2.HTTPError, e:
                 logging.info("Recieved 304 status from server.  Cached content is sufficient")
                 self.modified = False
-                assert e.code == 304
+                assert e.code == 304, "HTTP response code %s recieved after cacheable request to %s"%(e.code,self.url)
                 #HTTP Error 304: Not Modified, do nothing
                 httpStream = None
                 # TODO: we'll likely need to deal with other http errors
-        else:
-            try:
-                httpStream = urllib2.urlopen(urllib2.Request(system_id))
-            except Exception, e:
-                raise
-                logging.warning(repr(e))
-                #Content wasn't loaded via HTTP, no header cache
-                httpStream = None
 
         if httpStream:
             contentType = httpStream.info().get('content-type')
-
-            #Ignore HTML content type (XHTML or otherwise) 
             format = None
             if re.match(r'.*html', contentType) is not None:
                 format = "html"
-            isXml = re.match(r'(?:text|application)/.*\+?xml', contentType) is not None
-            if isXml:
+            elif re.match(r'(?:text|application)/.*\+?xml', contentType) is not None:
                 format = "xml"
+            elif re.match(r'.*n3', contentType) is not None:
+                format = 'n3'
             self.format = format
             self.setByteStream(httpStream)
-
 
     def __repr__(self):
         return self.url
@@ -340,63 +375,84 @@ class Redfoot(Graph):
         """
         self.log.info("Scuttering from %s"%location)
         visitedNodes = []
+        sourceGraph = self.get_context(self.context_id(location),creator=creator)
         for linkPredicate in LINK_PREDICATES:
-            sourceGraph = self.get_context(self.context_id(location),creator=creator)
-            for linkURL in sourceGraph.objects(None,linkPredicate):
+            linkedURLs = []
+            try:
+                linkedURLs = sourceGraph.objects(predicate=linkPredicate)
+            except Exception,e:
+                self.log.info(e)
+
+            for linkURL in linkedURLs:
                 #If the link is to itself or it has been attempted before, ignore
                 if "#" in linkURL:
                     uri, frag = urldefrag(linkURL)
                     linkURL = URIRef(uri)
+
                 if linkURL == location or linkURL in self.scutterFailureCache:
                     continue
                 #Skip the rest if the maximum number of recursion steps have been surpassed
                 if steps < 1:
                     break
-                
+
                 #Check if linkURL has already been loaded
-                priorEvent = first(self.index.subjects(SCUTTER.fetch,linkURL))
+                priorEvent = self.index.value(predicate=SCUTTER.fetch, object=linkURL, any=True)
                 if priorEvent:
-                    #Aleady loaded, attempt a cacheable, content-negotiated load with HTTP provenance data on RDF graph URL
                     priorEvent = HTTPGetEvent(self.index, linkURL, self.log, priorEvent)
-                    hdrs, format = priorEvent.createHTTPHeaders()
-                    self.load(linkURL, format=format)
+                    if priorEvent.expirationDate < datetime.now().isoformat().split('.')[0]:
+                        self.log.info("%s has already been loaded previously but the cache has expired"%linkURL)
+                        #Aleady loaded, attempt a cacheable, content-negotiated load with HTTP provenance data on RDF graph URL
+                        cacheableSource = CacheableURLInputSource(priorEvent)
+                        if cacheableSource.modified:
+                            self.load(linkURL, publicID=priorEvent.publicID,format=cacheableSource.format,scutter=False)
+                        else:
+                            priorEvent.bumpExpiration()
+                            
+                    visitedNodes.append(linkURL)
+                    steps -= 1
+
                 else:
-                    #self.log.info("URL %s (linked by %s) has not been loaded before.. Attempting RESTful discovery"%(linkURL,linkPredicate))
+                    self.log.info("URL %s (linked by %s) has not been loaded before.. Attempting RESTful discovery"%(linkURL,linkPredicate))
                     #Hasn't been loaded.  Need to perform 'RESTful' scutter discovery
                     #Try to connect, first
-                    try:
-                        input_source = URLInputSource(linkURL, public_id=linkURL)
-                        httpStream = input_source.getByteStream()
-                    except Exception, e:
-                        self.log.warning("Unable to connect to %s: %s\n"%(linkURL,e))
+                    unknownURL = UnknownURLInputSource(linkURL)
+                    if not unknownURL.valid:
                         continue
-                    
-                    format = input_source.format
-                    try:
-                        if format is not None:
-                            if format=="html":
-                                self.log.warning("Ignoring html formatted url: %s" % (linkURL))
-                                self.scutterFailureCache[linkURL]=None                 
-                            else:
-                                self.load(linkURL, format=format)
-                        else:
-                            #Trying Notation 3 parse first, unless content-type header specifies it is
-                            #RDF/XML or N3 parse fails
-                            try:
-                                self.load(linkURL, format='n3')
-                            except Exception, e:
-                                self.load(input_source.uri, format='xml') 
-                        visitedNodes.append(linkURL)
-                        steps -= 1
-                    except Exception, e:
-                        self.log.warning("Unable to parse %s as either N3 or RDF/XML: %s" % (linkURL, e))
-                        self.scutterFailureCache[linkURL]=None
 
-                            
+                    #If the format is known (HTML is ignored), parse it using the format recorded at
+                    #the server, otherwise ignore the URL (Perhaps this is too strict?)
+                    if unknownURL.format:
+                        if unknownURL.format=="html":
+                            #self.log.warning("Ignoring html formatted url: %s" % (linkURL))
+                            self.scutterFailureCache[linkURL]=None
+                        else:
+                            try:
+                                self.load(linkURL, format=unknownURL.format,scutter=False)
+                                visitedNodes.append(linkURL)
+                                steps -= 1
+                            except:
+                                self.log.warning("Couldn't parse %s using the given format: %s" % (linkURL,unknownURL.format))
+                                self.scutterFailureCache[linkURL]=None
+                    else:
+                        #Need to attempt an Notation 3 parse first, then an RDF/XML parse
+                        try:
+                            self.load(linkURL, format='n3',scutter=False)
+                            visitedNodes.append(linkURL)
+                            steps -= 1
+                        except:
+                            try:
+                                self.load(linkURL,scutter=False)
+                                visitedNodes.append(linkURL)
+                                steps -= 1                                
+                            except Exception,e:
+                                self.log.warning("Unable to parse %s as either N3 or RDF/XML: %s" % (linkURL, e))
+                                self.scutterFailureCache[linkURL]=None
+                                
+        visitedNodes = dict([(location,None) for location in visitedNodes]).keys()                   
         for visitedLocation in visitedNodes:
             self.scutter(visitedLocation,creator,steps=steps)
 
-    def load(self, location, format="xml", publicID=None, creator=None, scutter=False):
+    def load(self, location, format="xml", publicID=None, creator=None, scutter=True):
         """
         location is a relative or absolute URI
         publicID if specified will override location as the xml:base
@@ -410,43 +466,26 @@ class Redfoot(Graph):
         context = self.get_context(context_id, creator=creator)
 
         absolute_location = self.absolutize(location)
-
-        if scutter:
-            # TODO: 
-            priorEvent = self.index.value(predicate=SCUTTER.fetch, object=publicID, any=True)
+        context.remove((None, None, None))
+        context.load(absolute_location, publicID=publicID, format=format)
+        if urlparse(absolute_location)[0] == 'http':
+            priorEvent = self.index.value(predicate=SCUTTER.fetch, object=absolute_location, any=True)
             if priorEvent:
                 priorEvent = HTTPGetEvent(self.index, absolute_location, self.log, priorEvent)
-            priorEvent = None
-            input_source = URLInputSource(absolute_location, public_id=publicID, priorEvent=priorEvent)
-
-            if input_source.modified:
-                if priorEvent:
-                    priorEvent.invalidateCache()
-
-                context.remove((None, None, None))
-                context.parse(input_source, publicID=publicID, format=format)
-
-                httpStream = input_source.getByteStream()
-                #Content was loaded via HTTP, cache HTTP headers
-                if priorEvent:
-                    priorEvent.cacheEvent(httpStream, format)
-                else:
-                    self.log.info("New RDF Graph loaded over HTTP from %s" % location)
-                    newEvent = HTTPGetEvent(self.index, publicID, self.log)
-                    newEvent.cacheEvent(httpStream, format)
+                httpStream = urllib2.urlopen(urllib2.Request(absolute_location, headers=priorEvent.createHTTPHeaders()))
+                priorEvent.invalidateCache()
+                priorEvent.cacheEvent(httpStream, format)
             else:
-                # Do we care to record the not modified or anything else here?
-                pass
-        else:
-            context.remove((None, None, None))
-            context.load(absolute_location, publicID=publicID, format=format)
+                newEvent = HTTPGetEvent(self.index, absolute_location, self.log)
+                httpStream = urllib2.urlopen(urllib2.Request(absolute_location))
+                newEvent.cacheEvent(httpStream, format)
 
         self.index.remove((context_id, REDFOOT.source, None))
         self.index.add((context_id, REDFOOT.source, location))
         self.index.remove((context_id, REDFOOT.publicID, None))        
         self.index.add((context_id, REDFOOT.publicID, publicID))
         if scutter:
-            self.scutter(input_source.url, creator)
+            self.scutter(publicID, creator)
         return context
 
     def get_context(self, identifier, creator=None):
