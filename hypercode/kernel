@@ -412,7 +412,7 @@ class Redfoot(Graph):
                     steps -= 1
 
                 else:
-                    self.log.info("URL %s (linked by %s) has not been loaded before.. Attempting RESTful discovery"%(linkURL,linkPredicate))
+                    #self.log.info("URL %s (linked by %s) has not been loaded before.. Attempting RESTful discovery"%(linkURL,linkPredicate))
                     #Hasn't been loaded.  Need to perform 'RESTful' scutter discovery
                     #Try to connect, first
                     unknownURL = UnknownURLInputSource(linkURL)
