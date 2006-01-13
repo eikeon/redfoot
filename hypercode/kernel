@@ -452,7 +452,7 @@ class Redfoot(Graph):
         for visitedLocation in visitedNodes:
             self.scutter(visitedLocation,creator,steps=steps)
 
-    def load(self, location, format="xml", publicID=None, creator=None, scutter=True):
+    def load(self, location, format="xml", publicID=None, creator=None, scutter=False):
         """
         location is a relative or absolute URI
         publicID if specified will override location as the xml:base
