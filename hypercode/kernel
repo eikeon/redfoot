@@ -452,7 +452,7 @@ class Redfoot(Graph):
         for visitedLocation in visitedNodes:
             self.scutter(visitedLocation,creator,steps=steps)
 
-    def load(self, location, format="xml", publicID=None, creator=None, scutter=False):
+    def load(self, location, format="xml", publicID=None, creator=None, scutter=True):
         """
         location is a relative or absolute URI
         publicID if specified will override location as the xml:base
@@ -467,8 +467,7 @@ class Redfoot(Graph):
 
         absolute_location = self.absolutize(location)
         context.remove((None, None, None))
-        context.load(absolute_location, publicID=publicID, format=format)
-        if urlparse(absolute_location)[0] == 'http':
+        if scutter is True and urlparse(absolute_location)[0] == 'http':
             priorEvent = self.index.value(predicate=SCUTTER.fetch, object=absolute_location, any=True)
             if priorEvent:
                 priorEvent = HTTPGetEvent(self.index, absolute_location, self.log, priorEvent)
@@ -479,6 +478,9 @@ class Redfoot(Graph):
                 newEvent = HTTPGetEvent(self.index, absolute_location, self.log)
                 httpStream = urllib2.urlopen(urllib2.Request(absolute_location))
                 newEvent.cacheEvent(httpStream, format)
+            context.load(httpStream, publicID=publicID, format=format)
+        else:
+            context.load(absolute_location, publicID=publicID, format=format)
 
         self.index.remove((context_id, REDFOOT.source, None))
         self.index.add((context_id, REDFOOT.source, location))
