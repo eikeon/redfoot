@@ -457,6 +457,7 @@ class Redfoot(Graph):
         self.index.add((identifier, RDF.type, REDFOOT.Context))
         if creator and not (identifier, DC_creator, None) in self.index:
             self.index.add((identifier, DC_creator, creator))
+        if (identifier, DC_created, None) not in self.index:
             self.index.add((identifier, DC_created, Literal(date_time())))
         return result
 
