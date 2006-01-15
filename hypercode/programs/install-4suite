@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+    xmlns:ft-prop="http://xmlns.4suite.org/4ss/properties#"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+    xmlns:session="http://redfoot.net/2005/session#"
+    xmlns:foaf="http://xmlns.com/foaf/0.1/"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+    >
+    <redfoot:Program rdf:about="">
+        <rdf:seeAlso rdf:resource="http://metacognition.info/ontologies/FtssConfig.owl"/>
+        <ft-prop:SystemContainer>ftss</ft-prop:SystemContainer>
+        <rdf:type rdf:resource="http://xmlns.4suite.org/4ss/properties#Core"/>
+        <ft-prop:Driver rdf:parseType="Resource">
+            <!-- Sets up the repository to use the rdflib / filesystem persistence implementation -->
+            <rdf:type resource='http://xmlns.4suite.org/4ss/properties#RdflibFS'/>
+            <!-- The unique prefix name of the directory on the OS for non-RDF content-->
+            <ft-prop:Root>Agent</ft-prop:Root>
+            <!-- The 'path' (or configuration string) of rdflib's persistence mechanism -->
+            <ft-prop:RdflibConnection>/tmp</ft-prop:RdflibConnection>
+            <ft-prop:RdflibStore>Sleepycat</ft-prop:RdflibStore>
+        </ft-prop:Driver>
+        
+        <!-- Controller PID and log file locations -->
+        <ft-prop:PidFile>/tmp/4ss.pid</ft-prop:PidFile>
+        <ft-prop:LogFile>/tmp/4ss.log</ft-prop:LogFile>
+        
+        <!-- Controller log level (optional; default: notice) -->
+        <!-- one of emerg|crit|error|warning|notice|info|debug -->
+        <ft-prop:LogLevel>debug</ft-prop:LogLevel>
+        <!-- How often (in seconds) to check server in repository and synchronize it with the network servers launched in the OS -->
+        <ft-prop:DynamicReloadInterval>600</ft-prop:DynamicReloadInterval>
+        <!-- How often (in seconds) to check TTL on resources-->
+        <ft-prop:TemporaryReapInterval>600</ft-prop:TemporaryReapInterval>        
+        <owl:intersectionOf rdf:parseType="Collection">
+            <owl:Class>
+                <rdfs:comment>Commonly used 4Suite data and icons (required; must be  first component installed)</rdfs:comment>
+                <rdfs:label>data</rdfs:label>
+            </owl:Class>
+            <owl:Class>
+                <rdfs:comment>The default FtRpc and Ftp Server</rdfs:comment>
+                <rdfs:label>servers</rdfs:label>
+            </owl:Class>
+            <owl:Class>
+                <rdfs:comment>4ss and 4ss_manager commands and documentation; these are needed to be able to use the 4ss and 4ss_manager command-line tools</rdfs:comment>
+                <rdfs:label>commands</rdfs:label>
+            </owl:Class>
+            <!--owl:Class>
+                <rdfs:comment>The default 4Suite Repository Demonstration applications and the server to access them</rdfs:comment>
+                <rdfs:label>demos</rdfs:label>
+            </owl:Class>            
+            <owl:Class>
+                <rdfs:comment>The web-based control panel for 4Suite (outdated)</rdfs:comment>
+                <rdfs:label>dashboard</rdfs:label>
+            </owl:Class>
+            <owl:Class>
+                <rdfs:comment>All 4Suite documentation</rdfs:comment>
+                <rdfs:label>docs</rdfs:label>
+            </owl:Class-->            
+        </owl:intersectionOf>
+        <rdfs:seeAlso rdf:resource="http://4suite.org/docs/4SuiteCVS.xml"/>
+        <rdfs:seeAlso rdf:resource="http://redfoot.net"/>
+        <foaf:nick>installer</foaf:nick>
+        <session:hexdigest>fa9beb99e4029ad5a6615399e7bbae21356086b3</session:hexdigest>
+        <rdfs:label>A program for automating the process of creating / bootstrapping / launching a 4suite repository</rdfs:label>
+        <!--skos:related rdf:resource="urn:uuid:RedfootFtssConfig"/-->
+        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+            <![CDATA[
+import logging, sys, os
+import rdflib
+from rdflib import RDFS,RDF,Namespace
+from rdflib.Graph import ConjunctiveGraph
+from pprint import pprint
+from StringIO import StringIO
+from subprocess import Popen
+from tarfile import TarFile
+from urllib2 import urlopen, Request
+
+FT_PROP = Namespace("http://xmlns.4suite.org/4ss/properties#")
+
+intersectionProp = rdflib.URIRef("http://www.w3.org/2002/07/owl#intersectionOf")
+components       = [u'Core']+[str(redfoot_loader.value(component,RDFS.label)) for component in redfoot_loader.items(redfoot_loader.value(redfoot_program,intersectionProp))]            
+superuser        = redfoot_loader.value(redfoot_program,rdflib.URIRef('http://xmlns.com/foaf/0.1/nick'))
+
+if not len(args):
+    logging.critical("usage: <installer password> [.. repository components ..]")
+    logging.critical("Default components: root changeme data servers commands")
+    logging.critical("For list of components, try: 4ss_manager init --help")
+    sys.exit(1)
+elif len(args)==1:
+    superuser_passwd = args[0]
+else:
+    superuser_passwd = args[0]
+    components = ['Core'] + args[3:]
+
+logging.info("Initializing 4Suite repository with username/password: %s/%s"%(superuser,superuser_passwd))
+logging.info("Installing components: %s"%(components))    
+
+try:
+    from Ft.Server.Server import Drivers
+    from Ft.Server.Server import SCore, FtServerServerException, Error
+    from Ft.Server.Server.Drivers import PathImp
+    from Ft.Server.Common import AclConstants, ResourceTypes
+    from Ft.Server.Server.Commands import Init
+    from Ft.Server.Server.Lib import ConfigFile, LogUtil
+    from Ft.Server.Common import Schema, ClAuthenticate
+    from Ft.Server.Server import Controller, GlobalConfig
+    from Ft.Rdf.Model import Model
+    from Ft.Rdf.Drivers import Rdflib
+    from Ft.Rdf import Util
+except:
+    #See: http://cvs.4suite.org/viewcvs/4Suite/Ft/Server/Common/ClAuthenticate.py?view=markup
+    def _raw_input(prompt=''):
+        prompt = str(prompt)
+        if prompt:
+            sys.stderr.write(prompt)
+            sys.stderr.flush()
+        line = sys.stdin.readline()
+        if not line:
+            raise EOFError
+        if line[-1] == '\n':
+            line = line[:-1]
+        return line
+    
+    logging.critical("Unable to import 4Suite modules.  Is it properly installed? See: http://4suite.org/docs/4SuiteCVS.xml")
+    
+    download = ClAuthenticate._raw_input("Download latest CVS snapshot? [Y/n]: ").lower().strip() in ['y','yes']
+    
+    if not download:    
+        sys.exit(1)
+    
+    f = urlopen(Request("ftp://ftp.4suite.org/pub/cvs-snapshots/4Suite-CVS.tar.gz"))
+    sio = StringIO(f.read())
+    sio.seek(0)
+    tar = TarFile.gzopen("rdflib.tgz", fileobj=sio)
+
+    logging.info("extracting rdflib")
+    for member in tar:
+        if member.name.endswith("setup.py"):
+            setup = member.name
+        tar.extract(member)
+    dir, file = os.path.split(setup)
+    os.chdir(dir)
+
+    logging.info("installing 4Suite")
+    p = Popen([sys.executable, "setup.py", "install"])
+    p.wait()
+    if "Ft" in sys.modules:
+        del sys.modules["Ft"]
+    try:
+        import Ft
+        logging.info("4Suite %s installed" % Ft.__version__)
+    except ImportError, e:
+        logging.info("4Suite not installed: %s" % e)
+        sys.exit(1)
+    
+
+logging.info("setting up repository")
+
+#Read the config file
+Rdflib.InitializeModule()
+model = Model(Rdflib.DbAdapter(ConjunctiveGraph(redfoot_loader.store)))
+properties = ConfigFile.ReadCore(redfoot_program, model)
+properties['CoreId'] = redfoot_program
+properties['ConfigFile'] = redfoot_program
+
+superuser_passwdHash=ClAuthenticate.HashPasswd(superuser_passwd)
+
+#Validate that the installer has access to the repository
+driver = Drivers.Begin(LogUtil.NullLogger(), properties)
+
+exists = driver.exists()
+skipInstall = False
+if exists == 1:
+    print "Repository Exists"
+    destroy = ClAuthenticate._raw_input("Destroy existing repository? [Y/n]: ").lower().strip() in ['y','yes']
+    if destroy:
+        logging.info("Please authenticate with a user name and password\n")
+        logging.info("with execute permission for the init command.\n")
+        passwd = ClAuthenticate.GetPass("Password for %s: " % userName)
+        passwd = ClAuthenticate.HashPasswd(passwd)
+        driver.login(userName, passwd)
+        model = driver.getSystemModel()
+        stmts = model.complete(None,
+                               Schema.COMMAND_FULL_NAME,
+                               '4ss_manager.init')
+        try:
+            p = PathImp.CreateInitialPath('/', driver)
+            if len(stmts) == 1:
+                p = p.normalize(stmts[0].subject + ";no-traverse")
+            else:
+                initCmdDefaultPath = '/ftss/commands/4ss_manager.init'
+                logging.critical("Metadata for the Init command was not found in the repo.\n")
+                logging.critical("Will attempt to check execute permission using\n")
+                logging.critical("%s, if it exists.\n" % initCmdDefaultPath)
+                p = p.normalize('%s;no-traverse' % initCmdDefaultPath)
+            driver.verifyAcl(p, AclConstants.EXECUTE_ACCESS, 0)
+        except FtServerServerException, e:
+            if e.errorCode == Error.PERMISSION_DENIED:
+                raise e
+            pass
+        driver.rollback()
+        del driver
+        destroyed = True
+    else:
+        userName = superuser
+        passwd = superuser_passwdHash
+        skipInstall = True
+else:
+    userName = superuser
+    passwd = superuser_passwdHash
+            
+print "Repository credentials: %s/%s"%(userName,redfoot_loader.value(redfoot_program,rdflib.URIRef('http://redfoot.net/2005/session#hexdigest')))
+#Hand processing off to the common init routines
+if not skipInstall:
+    Init.DoInit(properties,
+           userName,
+           passwd,
+           components,
+           quiet=1,
+           confirm=0,
+           destroyRepo=exists != -1,
+           users = [(superuser, superuser_passwd)])
+    
+    logging.info("repository initialized with given components and superuser.  Setting FTP server status to 'on' and starting servers")
+
+logging.info("For future reference, find out more about 4suite repository server management via: 4ss_manager --help")            
+
+#Get Repository instance
+repo=SCore.GetRepository(userName, passwd, LogUtil.NullLogger(),properties)
+
+#Start FTP server
+ftpServer = repo.fetchResource('/ftss/servers/FtFtp-server.xml')
+ftpServer.setRunning()            
+repo.txCommit()
+config = GlobalConfig.GlobalConfig(
+            userName,
+            passwd,
+            redfoot_program,
+            'install-4suite.rdf',
+            debug=1)
+            
+controller = Controller.Controller(config)
+controller.run()            
+]]>
+        </rdf:value>
+    </redfoot:Program>>
+    
+</rdf:RDF>  
