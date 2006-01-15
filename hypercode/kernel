@@ -471,7 +471,7 @@ class Redfoot(Graph):
             priorEvent = self.index.value(predicate=SCUTTER.fetch, object=absolute_location, any=True)
             if priorEvent:
                 priorEvent = HTTPGetEvent(self.index, absolute_location, self.log, priorEvent)
-                httpStream = urllib2.urlopen(urllib2.Request(absolute_location, headers=priorEvent.createHTTPHeaders()))
+                httpStream = urllib2.urlopen(urllib2.Request(absolute_location, headers=priorEvent.createHTTPHeaders()[0]))
                 priorEvent.invalidateCache()
                 priorEvent.cacheEvent(httpStream, format)
             else:
