@@ -452,7 +452,7 @@ miscList = [t for t in redfoot.predicate_objects(uri) if t[0] not in [RDFS.label
         <pre>${o}</pre>
       </span>
       <span kid:strip="" kid:if="isinstance(o, URIRef)">      
-        <a href="${request.host}/;${o.concrete()}">
+        <a href="${request.relative(o.concrete())}">
           ${", ".join(redfoot.objects(o, RDFS.label)) or o}
         </a>
       </span>
