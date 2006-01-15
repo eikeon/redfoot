@@ -239,7 +239,7 @@ config = GlobalConfig.GlobalConfig(
             userName,
             passwd,
             redfoot_program,
-            'install-4suite.rdf',
+            'install-4suite',
             debug=1)
             
 controller = Controller.Controller(config)
