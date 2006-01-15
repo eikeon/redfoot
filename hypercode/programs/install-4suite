@@ -13,14 +13,16 @@
         <rdf:seeAlso rdf:resource="http://metacognition.info/ontologies/FtssConfig.owl"/>
         <ft-prop:SystemContainer>ftss</ft-prop:SystemContainer>
         <rdf:type rdf:resource="http://xmlns.4suite.org/4ss/properties#Core"/>
-        <ft-prop:Driver rdf:parseType="Resource">
-            <!-- Sets up the repository to use the rdflib / filesystem persistence implementation -->
-            <rdf:type resource='http://xmlns.4suite.org/4ss/properties#RdflibFS'/>
-            <!-- The unique prefix name of the directory on the OS for non-RDF content-->
-            <ft-prop:Root>Agent</ft-prop:Root>
-            <!-- The 'path' (or configuration string) of rdflib's persistence mechanism -->
-            <ft-prop:RdflibConnection>/tmp</ft-prop:RdflibConnection>
-            <ft-prop:RdflibStore>Sleepycat</ft-prop:RdflibStore>
+        <ft-prop:Driver>
+            <rdf:Description rdf:ID="Driver">
+                <!-- Sets up the repository to use the rdflib / filesystem persistence implementation -->
+                <rdf:type resource='http://xmlns.4suite.org/4ss/properties#RdflibFS'/>
+                <!-- The unique prefix name of the directory on the OS for non-RDF content-->
+                <ft-prop:Root>Agent</ft-prop:Root>
+                <!-- The 'path' (or configuration string) of rdflib's persistence mechanism -->
+                <ft-prop:RdflibConnection>/tmp</ft-prop:RdflibConnection>
+                <ft-prop:RdflibStore>Sleepycat</ft-prop:RdflibStore>
+            </rdf:Description>
         </ft-prop:Driver>
         
         <!-- Controller PID and log file locations -->
