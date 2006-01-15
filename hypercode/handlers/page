@@ -8,8 +8,6 @@
 
   <server:Handler rdf:about="#">
     <rdfs:label>Default handler</rdfs:label>      
-    <server:page_handler rdf:resource="../templates/classic#page"/>
-    <server:unauthorized_page_handler rdf:resource="../templates/classic#unauthorized_page_handler"/>
     <server:display_support rdf:resource="#display_support"/>
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python"><![CDATA[
 
@@ -67,7 +65,6 @@ else:
   <server:Handler rdf:about="#get_handler">
     <rdfs:label>Default GET handler</rdfs:label>      
     <server:page_handler rdf:resource="../templates/classic#page"/>
-    <server:unauthorized_page_handler rdf:resource="../templates/classic#unauthorized_page_handler"/>
     <server:display_support rdf:resource="#display_support"/>
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
@@ -88,19 +85,11 @@ if (request.host, None, None) not in redfoot:
 def lookup(property, default=None):
     return request.lookup(property) or redfoot.value(redfoot_current, property) or default
 
-auth = redfoot.module(URIRef("modules/auth#module", base=redfoot_program))
-allow = auth.allow
-
-if not allow(request):
-    page_handler = lookup(SERVER.unauthorized_page_handler)
-    response.setStatus(403, "Forbidden")
-    assert page_handler, "No 'unauthorized_page' found for: %s" % request.uri
-else:
-    page_handler = lookup(SERVER.page_handler)
-    if page_handler is None:
-        response.setStatus(404, "Not Found")            
-        response.write("No page handler found")
-        response.finish()
+page_handler = lookup(SERVER.page_handler)
+if page_handler is None:
+    response.setStatus(404, "Not Found")            
+    response.write("No page handler found")
+    response.finish()
 
 accept = request.headers.get("accept")
 # TODO: check for best match
@@ -156,16 +145,8 @@ def lookup(property, default=None, uri=None):
     return request.lookup(property, uri=uri) or redfoot.value(page_handler, property) or default
 
 auth = redfoot.module(URIRef("modules/auth#module", base=redfoot_program))
-
 def allow(uri):
-    if auth.allow(request, uri):
-        content = lookup(TEMPLATE.content, uri=uri)
-        if content is None or auth.allow(request, content):
-            return True
-        else:
-            return False
-    else:
-        return False
+    return auth.allow(request, uri)
 
 def display(uri, fragment=True, output=None, **args):
     if not uri:
@@ -178,10 +159,12 @@ def display(uri, fragment=True, output=None, **args):
     redfoot.check(uri)
     global write_to_response
     if fragment==False:
-        if not allow(uri):
-            uri = lookup(SERVER.unauthorized_page_handler)
+        if not allow(request.uri):
             response.setStatus(403, "Forbidden")
-            assert uri, "No 'unauthorized_page' found for: %s" % uri
+        #if not allow(uri):
+            #uri = lookup(SERVER.unauthorized_page_handler)
+            #response.setStatus(403, "Forbidden")
+        #    assert uri, "No 'unauthorized_page' found for: %s" % uri
 	write_to_response = True
 	content_type = redfoot.value(uri, SERVER.content_type) or 'text/html; charset=UTF-8'
         if content_type=="application/xhtml+xml":
@@ -194,7 +177,7 @@ def display(uri, fragment=True, output=None, **args):
     else:
         if not allow(uri):
             uri = lookup(SERVER.unauthorized_content_handler)
-            response.setStatus(403, "Forbidden")
+            #response.setStatus(403, "Forbidden")
             assert uri, "No 'unauthorized_content' found for: %s" % uri
     value = redfoot.value(uri)
     if value and value.datatype==SERVER.Kid:
@@ -244,8 +227,6 @@ context.serialize(destination=response, base=base)
 
   <server:Handler rdf:about="#put_handler">
     <rdfs:label>Default GET handler</rdfs:label>      
-    <server:page_handler rdf:resource="../templates/classic#page"/>
-    <server:unauthorized_page_handler rdf:resource="../templates/classic#unauthorized_page_handler"/>
     <server:display_support rdf:resource="#display_support"/>
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[

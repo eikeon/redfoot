@@ -17,99 +17,56 @@
     <template:shortcut_icon rdf:resource="http://redfoot.net/2002/11/25/favicon.ico"/>
     <template:header rdf:resource="#header"/>
     <template:navigation rdf:resource="#navigation"/>
+    <template:user_navigation rdf:resource="#user_navigation"/>
     <template:footer rdf:resource="#footer"/>
     <server:unauthorized_page_handler rdf:resource="#unauthorized_page_handler"/>
     <server:unauthorized_content_handler rdf:resource="#unauthorized_content_handler"/>
     <server:content_type>application/xhtml+xml</server:content_type>
     <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
-<![CDATA[<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:kid="http://purl.org/kid/ns#">
+<![CDATA[<html xmlns="http://www.w3.org/1999/xhtml" xmlns:kid="http://purl.org/kid/ns#">
 <?python SERVER = redfoot.namespace("http://redfoot.net/2005/server#")?>
 <?python TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")?>
-
 <?python
 title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract(), None) or "-"
 ?>
-
   ${display(lookup(TEMPLATE.head))}
-
   <body>
-
-
-<div id="container">
-
-  <div id="usernav">
-
-<ul>
-  <!-- TODO: -->
-  <?python edit_uri = URIRef('%s/edit/content/' % request.host)?>
-  <li kid:if="(edit_uri, None, None) in redfoot and allow(URIRef('%s/edit/resource' % request.host))"
-       id="edit_page">
-   <?python from urllib import quote?>
-    <a kid:if="(request.uri, None, None) in redfoot" href="/edit/resource?uri=${quote(request.uri)}">Edit Page</a>
-    <a kid:if="(request.uri.abstract(), None, None) in redfoot" href="/edit/resource?uri=${quote(request.uri.abstract())}">Edit Page (abstract)</a>
-  </li>
-
-<?python
-SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
-FOAF = redfoot.namespace("http://xmlns.com/foaf/0.1/")
-authenticated = request.session_id and (request.session_id, SESSION.authenticated, Literal('True')) in redfoot
-if authenticated:
-    uid = redfoot.value(request.session_id, SESSION.uid)
-else:
-    uid = None
-?>
- <span kid:if="uid is None" kid:strip="">
-  <li><a href="/login/">Login</a></li>
-  <li><a href="/register/">Register</a></li>
- </span>
- <span kid:if="uid" kid:strip="">
-  <li><a href="${request.relative(uid.concrete())}">${redfoot.label(uid) or uid}'s profile</a></li>
-  <li><a href="/logout/">logout</a></li>
- </span>
-</ul>
-
-  </div>
-
-  <div id="top">
-    ${display(lookup(TEMPLATE.header))}
-  </div>
-
-
-  <div id="sitenav">
-    ${display(lookup(TEMPLATE.navigation))}
-  </div>
-
-  <div id="content">
-
-      <!-- TODO: -->
-      <?python edit_content_uri = URIRef('%s/edit/content/' % request.host)?>
-      <div kid:if="(edit_content_uri, None, None) in redfoot and allow(edit_content_uri)"
-           id="edit_content">
-       <?python from urllib import quote?>
-       <p> 
-        <a kid:if="(request.uri, None, None) in redfoot" href="/edit/content/?uri=${quote(request.uri)}">Edit Content</a>
-        <a kid:if="(request.uri, None, None) not in redfoot" href="/edit/content/?uri=${quote(request.uri)}">Create</a>
-       </p>
+    <div id="container">
+      <div id="usernav">
+        ${display(lookup(TEMPLATE.user_navigation))}
       </div>
-
-      <h2><a href="${request.uri}">${title}</a></h2>
-
-      ${display(lookup(TEMPLATE.content))}
-
-      <?python COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")?>
-      <div class="comments"
-           kid:if="lookup(TEMPLATE.comments) and (request.uri, RDFS.member, COMMENT.exclude) not in redfoot">
-        ${display(lookup(TEMPLATE.comments))}
-        ${display(lookup(TEMPLATE.add_comment))}
+      <div id="top">
+        ${display(lookup(TEMPLATE.header))}
       </div>
-
-  </div>
-  <div id="footer">
-    ${display(lookup(TEMPLATE.footer))}
-  </div>
-</div>
-
+      <div id="sitenav">
+        ${display(lookup(TEMPLATE.navigation))}
+      </div>
+      <?python authorized = allow(request.uri)?>
+      <div id="content" kid:if="authorized">
+        <!-- TODO: -->
+        <?python edit_content_uri = URIRef('%s/edit/content/' % request.host)?>
+        <div kid:if="(edit_content_uri, None, None) in redfoot and allow(edit_content_uri)" id="edit_content">
+          <?python from urllib import quote?>
+          <p> 
+            <a kid:if="(request.uri, None, None) in redfoot" href="/edit/content/?uri=${quote(request.uri)}">Edit Content</a>
+            <a kid:if="(request.uri, None, None) not in redfoot" href="/edit/content/?uri=${quote(request.uri)}">Create</a>
+          </p>
+        </div>
+        <h2><a href="${request.uri}">${title}</a></h2>
+        ${display(lookup(TEMPLATE.content))}
+        <?python COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")?>
+        <div class="comments" kid:if="lookup(TEMPLATE.comments) and (request.uri, RDFS.member, COMMENT.exclude) not in redfoot">
+           ${display(lookup(TEMPLATE.comments))}
+           ${display(lookup(TEMPLATE.add_comment))}
+        </div>
+      </div>
+      <div id="content" kid:if="authorized is False">
+        <h2>Unauthorized Page</h2>
+      </div>
+      <div id="footer">
+       ${display(lookup(TEMPLATE.footer))}
+      </div>
+    </div>
   </body>
 </html>
 ]]>
@@ -181,6 +138,41 @@ sections.sort()
     </li>
   </ul>  
 </div>
+    
+      ]]></rdf:value>
+  </server:PagePartHandler>
+
+  <server:PagePartHandler rdf:ID="user_navigation">
+    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
+
+<ul xmlns:kid="http://purl.org/kid/ns#">
+  <!-- TODO: -->
+  <?python edit_uri = URIRef('%s/edit/content/' % request.host)?>
+  <li kid:if="(edit_uri, None, None) in redfoot and allow(URIRef('%s/edit/resource' % request.host))"
+       id="edit_page">
+   <?python from urllib import quote?>
+    <a kid:if="(request.uri, None, None) in redfoot" href="/edit/resource?uri=${quote(request.uri)}">Edit Page</a>
+    <a kid:if="(request.uri.abstract(), None, None) in redfoot" href="/edit/resource?uri=${quote(request.uri.abstract())}">Edit Page (abstract)</a>
+  </li>
+
+<?python
+SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+FOAF = redfoot.namespace("http://xmlns.com/foaf/0.1/")
+authenticated = request.session_id and (request.session_id, SESSION.authenticated, Literal('True')) in redfoot
+if authenticated:
+    uid = redfoot.value(request.session_id, SESSION.uid)
+else:
+    uid = None
+?>
+ <span kid:if="uid is None" kid:strip="">
+  <li><a href="/login/">Login</a></li>
+  <li><a href="/register/">Register</a></li>
+ </span>
+ <span kid:if="uid" kid:strip="">
+  <li><a href="${request.relative(uid.concrete())}">${redfoot.label(uid) or uid}'s profile</a></li>
+  <li><a href="/logout/">logout</a></li>
+ </span>
+</ul>
     
       ]]></rdf:value>
   </server:PagePartHandler>
@@ -387,19 +379,6 @@ a:hover {
 
 """ % {"color": color})
     
-    </rdf:value>
-  </server:PagePartHandler>
-
-  <server:PagePartHandler rdf:ID="unauthorized_page_handler">
-    <rdfs:label>Unauthorized page handler</rdfs:label>
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
-<![CDATA[
-response.setStatus(401, "Unauthorized")            
-response.write("""
-<h1>Unauthorized</h1>
-""")        
-    
-]]>
     </rdf:value>
   </server:PagePartHandler>
 
