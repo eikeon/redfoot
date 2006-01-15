@@ -17,6 +17,7 @@
     <template:content rdf:resource="#add_resource"/>
     <template:default_section_rank>70.0</template:default_section_rank>    
     <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>    
+    <server:allow rdf:resource="#Admin"/>
   </server:Page>
 
   <server:Page rdf:about="/edit/resource">
