@@ -479,6 +479,7 @@ class Redfoot(Graph):
                 httpStream = urllib2.urlopen(urllib2.Request(absolute_location))
                 newEvent.cacheEvent(httpStream, format)
             context.load(httpStream, publicID=publicID, format=format)
+            self.scutter(publicID, creator)
         else:
             context.load(absolute_location, publicID=publicID, format=format)
 
@@ -486,8 +487,6 @@ class Redfoot(Graph):
         self.index.add((context_id, REDFOOT.source, location))
         self.index.remove((context_id, REDFOOT.publicID, None))        
         self.index.add((context_id, REDFOOT.publicID, publicID))
-        if scutter:
-            self.scutter(publicID, creator)
         return context
 
     def get_context(self, identifier, creator=None):
