@@ -145,7 +145,12 @@ sections.sort()
   <server:PagePartHandler rdf:ID="user_navigation">
     <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
 
-<ul xmlns:kid="http://purl.org/kid/ns#">
+<?python 
+login_uri = URIRef('%s/login/' % request.host)
+login_support = (login_uri, None, None) in redfoot
+user_nav = login_support # TODO: check each of the user_nav bits
+?>
+<ul xmlns:kid="http://purl.org/kid/ns#" kid:if="user_nav">
   <!-- TODO: -->
   <?python edit_uri = URIRef('%s/edit/content/' % request.host)?>
   <li kid:if="(edit_uri, None, None) in redfoot and allow(URIRef('%s/edit/resource' % request.host))"
@@ -163,6 +168,7 @@ if authenticated:
     uid = redfoot.value(request.session_id, SESSION.uid)
 else:
     uid = None
+
 ?>
  <span kid:if="uid is None" kid:strip="">
   <li><a href="/login/">Login</a></li>
