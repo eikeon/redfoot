@@ -99,6 +99,11 @@
     <rdfs:comment></rdfs:comment>
   </rdf:Property>
 
+  <rdf:Property rdf:ID="user_navigation">
+    <rdfs:label>user navigation</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+  </rdf:Property>
+
   <rdf:Property rdf:ID="copyright">
     <rdfs:label>copyright</rdfs:label>
     <rdfs:comment></rdfs:comment>
