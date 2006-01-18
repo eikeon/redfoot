@@ -1,3 +1,5 @@
 User-agent: *
-Disallow: /cvs/
+
 Disallow: /;
+Disallow: /login/?
+Disallow: /cvs/
