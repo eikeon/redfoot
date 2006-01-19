@@ -43,11 +43,11 @@
   </div>
 
   <div id="key">
-    &nbsp;Key: <img src="icons/16dot-blue.gif" alt="fetch"/>
+    Key: <img src="icons/16dot-blue.gif" alt="fetch"/>
     fetch data. <img src="icons/16dot-yellow.gif" alt="requested"/>
     loading. <img src="icons/16dot-red.gif" alt="failed"/> failed.
     <img src="icons/16dot-green.gif" alt="loaded"/> loaded.
-    &nbsp;&nbsp;&nbsp; Display: <img src=
+     Display: <img src=
     "icons/tbl-expand-trans.png" alt="expand"/> expand, <img src=
     "icons/tbl-collapse.png" alt="collapse"/> collapse
   </div>
