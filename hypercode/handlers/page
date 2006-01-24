@@ -42,7 +42,7 @@ if method=="get" or method=="head":
     if last_modified:
         response.setHeader("Last-Modified", datetimeToString(last_modified))
 
-    if modified_since and last_modified and last_modified <= modified_since:
+    if not request.session_id and modified_since and last_modified and last_modified <= modified_since:
         response.setStatus(NOT_MODIFIED, "Not Modified")
         response.finish()
     else:
