@@ -114,8 +114,7 @@ if request.method=='POST':
     return_uri = URIRef(request.parameters.get("return_uri", "%s/" % request.host))
     login_uri = URIRef(request.parameters.get("login_uri"))
 
-    auth = redfoot.module(URIRef("modules/auth#module", base=redfoot_program))
-    request.create_session()
+    auth = redfoot.module(URIRef("modules/auth#module", base=redfoot_program))    
     if auth.authenticate(request, username=uid, password=password):
 	response.setStatus(302, 'found')
 	if not return_uri.startswith(request.host):

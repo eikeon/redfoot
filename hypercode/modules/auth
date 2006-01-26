@@ -21,7 +21,7 @@ def authenticate(request, username=None, password=None):
 
     message = ""
 
-    session_id = request.session_id
+    session_id = request.session_id or request.create_session()
     if username is None:
         username = request.user
     if password is None:
