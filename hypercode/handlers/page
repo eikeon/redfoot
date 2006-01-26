@@ -12,7 +12,6 @@
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python"><![CDATA[
 
 SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
-SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
 
 # Support tunneling requests for any resource through a server
 if request.path.startswith("/;"):
@@ -22,61 +21,28 @@ if request.path.startswith("/;"):
 if not "://" in request.uri:
     request.uri = URIRef(request.uri.replace(":/", "://"))
 
-response.request = request # TODO:
-
 method = request.method.lower()
 if method=="get" or method=="head":
     from twisted.web.http import datetimeToString, stringToDatetime, NOT_MODIFIED
 
-    redfoot.log.info("headers: %s" % repr(request.headers))
-
-    etag = request.getHeader('if-none-match')
-    if etag:
+    modified_since = request.getHeader('if-modified-since')
+    if modified_since:
         try:
-            etag = Literal(etag)
+            modified_since = stringToDatetime(modified_since)
         except:
-            etag = None
+            modified_since = None
 
-    redfoot.log.info("checking validator?")
-    valid = False
-    if etag:
-        redfoot.log.info("etag: %s" % etag)
-        # TODO: make sure etags are unique not only by page value but page uri and user
-        cached_page = redfoot.value(predicate=SERVER.etag, object=etag)
-        if cached_page:
-            redfoot.log.info("cached_page: %s" % cached_page)
-            uid = redfoot.value(cached_page, SESSION.uid)
-            redfoot.log.info("uid: %s, uid: %s" % (request.user_id, uid))
-            if request.user_id==uid:
-                valid = True
+    last_modified = redfoot.value(request.uri, SERVER.last_modified)
+    if last_modified:
+        try:
+            last_modified = int(float(last_modified))
+        except:
+            last_modified = None
 
+    if last_modified:
+        response.setHeader("Last-Modified", datetimeToString(last_modified))
 
-#     modified_since = request.getHeader('if-modified-since')
-#     if modified_since:
-#         try:
-#             modified_since = stringToDatetime(modified_since)
-#         except:
-#             modified_since = None
-
-#     last_modified = redfoot.value(request.uri, SERVER.last_modified)
-#     if last_modified:
-#         try:
-#             last_modified = int(float(last_modified))
-#         except:
-#             last_modified = None
-
-#     has_validator = last_modified or none_match
-#     if has_validator:
-#         for cached_page in redfoot.objects(request.uri, SERVER.cached_page):
-#             etag = redfoot.value(request.uri, SERVER.etag)
-#             last_modified      
-
-#     if last_modified:
-#         response.setHeader("Last-Modified", datetimeToString(last_modified))
-
-#     if has_validator and modified_since and last_modified and last_modified <= modified_since:
-    redfoot.log.info("valid: %s" % valid)
-    if valid:
+    if not request.session_id and modified_since and last_modified and last_modified <= modified_since:
         response.setStatus(NOT_MODIFIED, "Not Modified")
         response.finish()
     else:
