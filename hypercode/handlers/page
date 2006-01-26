@@ -25,24 +25,31 @@ method = request.method.lower()
 if method=="get" or method=="head":
     from twisted.web.http import datetimeToString, stringToDatetime, NOT_MODIFIED
 
-    modified_since = request.getHeader('if-modified-since')
-    if modified_since:
-        try:
-            modified_since = stringToDatetime(modified_since)
-        except:
-            modified_since = None
+    if request.user_id: 
+        # TODO: ETag support -- so we can support conditional GETs for
+        # pages when user is logged in.
+        valid = False
+    else:
+        modified_since = request.getHeader('if-modified-since')
+        if modified_since:
+            try:
+                modified_since = stringToDatetime(modified_since)
+            except:
+                modified_since = None
 
-    last_modified = redfoot.value(request.uri, SERVER.last_modified)
-    if last_modified:
-        try:
-            last_modified = int(float(last_modified))
-        except:
-            last_modified = None
+        last_modified = redfoot.value(request.uri, SERVER.last_modified)
+        if last_modified:
+            try:
+                last_modified = int(float(last_modified))
+            except:
+                last_modified = None
 
-    if last_modified:
-        response.setHeader("Last-Modified", datetimeToString(last_modified))
+        if last_modified:
+            response.setHeader("Last-Modified", datetimeToString(last_modified))
 
-    if not request.session_id and modified_since and last_modified and last_modified <= modified_since:
+        valid = modified_since and last_modified and last_modified <= modified_since
+
+    if valid:
         response.setStatus(NOT_MODIFIED, "Not Modified")
         response.finish()
     else:
