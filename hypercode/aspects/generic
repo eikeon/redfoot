@@ -25,6 +25,7 @@
     <rdfs:comment></rdfs:comment>
     <template:content rdf:resource="#edit_resource"/>
     <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
+    <server:allow rdf:resource="#Admin"/>
   </server:Page>
 
   <server:Page rdf:about="/edit/triple">
@@ -32,13 +33,14 @@
     <rdfs:comment></rdfs:comment>
     <template:content rdf:resource="#edit_triple"/>
     <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
+    <server:allow rdf:resource="#Admin"/>
   </server:Page>
 
   <rdf:Description rdf:about="/create/"> <!-- TODO: incorporate into generic-->
     <rdfs:label>Create Instance</rdfs:label>
+    <server:allow rdf:resource="#Admin"/>
     <server:page_handler>
       <rdf:Description rdf:ID="create">
-        <server:allow rdf:resource="#Admin"/>
         <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python"><![CDATA[
 
 from time import gmtime
@@ -73,7 +75,6 @@ else:
 
 
   <redfoot:Python rdf:ID="add_resource">
-    <server:allow rdf:resource="#Admin"/>
     <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
 <![CDATA[
 <div xmlns:kid="http://purl.org/kid/ns#" kid:strip="">
@@ -98,7 +99,6 @@ else:
 
 
   <redfoot:Python rdf:ID="edit_resource">
-    <server:allow rdf:resource="#Admin"/>
     <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
 <![CDATA[
 <div xmlns:kid="http://purl.org/kid/ns#" kid:strip="">
@@ -202,7 +202,6 @@ if o.language:
 
 
   <redfoot:Python rdf:ID="edit_triple">
-    <server:allow rdf:resource="#Admin"/>
     <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
 <![CDATA[
 <div xmlns:kid="http://purl.org/kid/ns#" kid:strip="">

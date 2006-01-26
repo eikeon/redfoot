@@ -122,9 +122,9 @@ else:
     <rdfs:label>Add Entry</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>    
+    <server:allow rdf:resource="http://redfoot.net/2005/session#User"/>
     <template:content>
      <server:PagePartHandler rdf:ID="add_entry_content">
-      <server:allow rdf:resource="http://redfoot.net/2005/session#User"/>
       <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
 <![CDATA[
   <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">

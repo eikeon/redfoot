@@ -24,6 +24,7 @@
     <rdfs:comment></rdfs:comment>
     <template:default_section_rank>80.0</template:default_section_rank>
     <template:content rdf:resource="#contexts"/>
+    <server:allow rdf:resource="#Admin"/>
   </server:Page>
 
   <rdf:Description rdf:about="http://redfoot.net/hypercode/types/context#content_handler"> 
@@ -31,7 +32,6 @@
   </rdf:Description>
 
   <server:PagePartHandler rdf:ID="contexts">
-    <server:allow rdf:resource="#Admin"/>
     <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
 <![CDATA[
 
