@@ -202,7 +202,7 @@ class Response(object):
             self.setHeader('content-length', str(len(body)))
             encoded_md5_digest = b64encode(md5.new(body).digest())
             self.setHeader("Content-MD5", encoded_md5_digest)
-            self.setHeader("ETag", encoded_md5_digest)
+            self.setHeader("ETag", '"%s"' % encoded_md5_digest)
             self.__request.write(body)
         self.__request.finish()
     
