@@ -29,6 +29,10 @@ if method=="get" or method=="head":
         # TODO: ETag support -- so we can support conditional GETs for
         # pages when user is logged in.
         valid = False
+
+        # set to date in past so that we don't return a 304 for the
+        # page when the user logs out.
+        response.setHeader("Last-Modified", datetimeToString(0)) 
     else:
         modified_since = request.getHeader('if-modified-since')
         if modified_since:
