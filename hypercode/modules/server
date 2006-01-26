@@ -139,7 +139,7 @@ class Request(object):
 	#m.update(self.getClientIP())
 	sid = m.hexdigest()
         self.__sid = sid
-	self.__request.cookies.append("session_id=%s; path=/; Max-Age=%s" % (sid, 60*60*24*7))
+	self.__request.cookies.append("session_id=%s; path=/; Expires=Wed, 01 Jan 2020 00:00:00 GMT" % sid)
         session_id = self.session_id
         assert session_id
         context = redfoot.get_context(redfoot.context_id(session_id))
