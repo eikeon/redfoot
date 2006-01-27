@@ -2,11 +2,15 @@
 <rdf:RDF
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:rdfe="http://redfoot.net/rdf#"
    xmlns:redfoot="http://redfoot.net/2005/redfoot#"
    xmlns:program="http://redfoot.net/2005/program#"
    xmlns:handler="http://redfoot.net/2005/01/handler#"
 >
 
+  <rdfe:RDFXMLDocument rdf:about="">
+  </rdfe:RDFXMLDocument>
+  
   <rdfs:Class rdf:about="http://redfoot.net/2005/redfoot#Release">
     <handler:content>
       <redfoot:Python rdf:ID="release_content">

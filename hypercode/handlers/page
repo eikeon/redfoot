@@ -2,9 +2,14 @@
 <rdf:RDF
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:rdfe="http://redfoot.net/rdf#"
    xmlns:redfoot="http://redfoot.net/2005/redfoot#"
    xmlns:server="http://redfoot.net/2005/server#"
 >
+
+  <rdfe:RDFXMLDocument rdf:about="">
+    <rdfs:label>Redfoot Kernel RDF/XML</rdfs:label>
+  </rdfe:RDFXMLDocument>
 
   <server:Handler rdf:about="#">
     <rdfs:label>Default handler</rdfs:label>      

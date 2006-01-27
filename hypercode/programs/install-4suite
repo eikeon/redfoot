@@ -3,12 +3,17 @@
     xmlns:ft-prop="http://xmlns.4suite.org/4ss/properties#"
     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:rdfe="http://redfoot.net/rdf#"
     xmlns:redfoot="http://redfoot.net/2005/redfoot#"
     xmlns:session="http://redfoot.net/2005/session#"
     xmlns:foaf="http://xmlns.com/foaf/0.1/"
     xmlns:owl="http://www.w3.org/2002/07/owl#"
     xmlns:skos="http://www.w3.org/2004/02/skos/core#"
     >
+
+  <rdfe:RDFXMLDocument rdf:about="">
+  </rdfe:RDFXMLDocument>
+  
     <redfoot:Program rdf:about="">
         <rdf:seeAlso rdf:resource="http://metacognition.info/ontologies/FtssConfig.owl"/>
         <ft-prop:SystemContainer>ftss</ft-prop:SystemContainer>

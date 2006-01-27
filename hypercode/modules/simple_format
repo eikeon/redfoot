@@ -2,9 +2,13 @@
 <rdf:RDF
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:rdfe="http://redfoot.net/rdf#"
    xmlns:redfoot="http://redfoot.net/2005/redfoot#"
 >
 
+  <rdfe:RDFXMLDocument rdf:about="">
+  </rdfe:RDFXMLDocument>
+  
   <redfoot:Module rdf:ID="module">
     <rdfs:label>Simple Formatter</rdfs:label>      
     <rdfs:comment>A formatter that turns uris into links.</rdfs:comment>        

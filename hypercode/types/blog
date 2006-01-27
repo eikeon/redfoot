@@ -2,11 +2,15 @@
 <rdf:RDF
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:rdfe="http://redfoot.net/rdf#"
    xmlns:redfoot="http://redfoot.net/2005/redfoot#"
    xmlns:server="http://redfoot.net/2005/server#"
    xmlns:template='http://redfoot.net/2005/template#'
 >
 
+  <rdfe:RDFXMLDocument rdf:about="">
+  </rdfe:RDFXMLDocument>
+  
   <rdf:Description rdf:about="http://redfoot.net/2005/blog#Entry">
     <template:content>
      <server:PagePartHandler rdf:ID="EntryContent">
