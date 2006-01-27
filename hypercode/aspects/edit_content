@@ -119,8 +119,9 @@ if uri:
         redfoot.remove((uri, RDFS.label, None))
         context.add((uri, RDFS.label, label))
     content = redfoot.value(uri, TEMPLATE.content)
-    if not content:
-        content = BNode()
+    if not content or isinstance(content, BNode):
+        content = redfoot.context_id(uri.abstract(), context_id="content_handler")
+        context.remove((uri, TEMPLATE.content, None))
         context.add((uri, TEMPLATE.content, content))
     redfoot.remove((content, RDF.value, None))
     context.add((content, RDF.value, content_value))
