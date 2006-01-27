@@ -41,7 +41,7 @@ class Request(object):
     def __init__(self, request):
         self.__request = request
         self.__parameters = None        
-        self.__sid = None
+        self.__session_id = None
         self.method = self.__request.method
         #self.query_string = self.__request.request_data.query
         hostname = self.getHeader("host")
@@ -124,27 +124,31 @@ class Request(object):
             return "%s/;%s" % (self.host, uri)
         return uri
 
-    def __getSessionID(self):
-	sid = self.__sid or self.getCookie("session_id", None)
-	if sid is None:
-	    return None
-	else:
-	    return URIRef("%s/sessions#%s" % (self.host, sid))
+    def __getSessionID(self, value=None):
+        session_id = self.__session_id
+        if session_id is None:
+            value = value or self.getCookie("redfoot", None)
+            if value:
+                hash = md5.new(value).hexdigest()
+                session_id = URIRef("%s/session/%s#" % (self.host, hash))
+                self.__session_id = session_id
+        return session_id
     session_id = property(__getSessionID)
 
+    def __random_hash(self):
+        m = md5.new()
+        m.update(str([choice(ascii_letters) for i in xrange(0, 8)]))
+        m.update(str(time.time()))
+        return m.hexdigest()
+
     def create_session(self):
-	m = md5.new()
-	m.update(str([choice(ascii_letters) for i in xrange(0, 8)]))
-	m.update(str(time.time()))
-	#m.update(self.getClientIP())
-	sid = m.hexdigest()
-        self.__sid = sid
-	self.__request.cookies.append("session_id=%s; path=/; Expires=Wed, 01 Jan 2020 00:00:00 GMT" % sid)
-        session_id = self.session_id
-        assert session_id
+        value = self.__random_hash()
+	self.__request.cookies.append("redfoot=%s; path=/; Expires=Wed, 01 Jan 2020 00:00:00 GMT" % value)
+        session_id = self.__getSessionID(value)
         context = redfoot.get_context(redfoot.context_id(session_id))
 	context.add((session_id, RDF.type, SESSION.Session))
 	context.add((session_id, SESSION.created, Literal(date_time())))
+        return session_id
 
     def __getUserID(self):
         session_id = self.session_id
