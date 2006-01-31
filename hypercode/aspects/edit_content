@@ -2,20 +2,26 @@
 <rdf:RDF
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:rdfe="http://redfoot.net/rdf#"
    xmlns:redfoot="http://redfoot.net/2005/redfoot#"
    xmlns:commands="http://redfoot.net/2005/commands#"
    xmlns:server="http://redfoot.net/2005/server#"
    xmlns:session="http://redfoot.net/2005/session#"
    xmlns:template='http://redfoot.net/2005/template#'
+   xmlns:aspect="http://redfoot.net/hypercode/aspect#"
 >
 
-  <redfoot:Aspect rdf:ID="edit_content_aspect">
-    <rdfs:label>Edit Content aspect</rdfs:label>
-    <rdfs:comment>
-    </rdfs:comment>
-  </redfoot:Aspect>
+  <rdfe:RDFXMLDocument rdf:about="">
+  </rdfe:RDFXMLDocument>
+  
+  <aspect:Aspect rdf:ID="aspect">
+    <rdfs:label>Edit Content Aspect</rdfs:label>
+    <aspect:item rdf:resource="#edit_content_page"/>
+    <aspect:item rdf:resource="#edit_put_content_page"/>
+  </aspect:Aspect>
 
-  <server:Page rdf:about="/edit/content/">
+  <server:Page rdf:ID="edit_content_page">
+    <aspect:location>/edit/content/</aspect:location>
     <rdfs:label>Edit Content</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>        
@@ -83,7 +89,8 @@ if uri:
   </server:Page>
 
 
-  <server:Page rdf:about="/edit/put_content/">
+  <server:Page rdf:ID="edit_put_content_page">
+    <aspect:location>/edit/put_content/</aspect:location>
     <rdfs:label>Put Content</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <server:allow rdf:resource="http://redfoot.net/2005/session#User"/>

@@ -2,26 +2,27 @@
 <rdf:RDF
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:rdfe="http://redfoot.net/rdf#"
    xmlns:redfoot="http://redfoot.net/2005/redfoot#"
    xmlns:commands="http://redfoot.net/2005/commands#"
    xmlns:server="http://redfoot.net/2005/server#"
    xmlns:session="http://redfoot.net/2005/session#"
    xmlns:template='http://redfoot.net/2005/template#'
+   xmlns:aspect="http://redfoot.net/hypercode/aspect#"
 >
 
-  <redfoot:Aspect rdf:ID="doap_aspect">
-    <rdfs:label>Doap aspect</rdfs:label>
-    <rdfs:comment>
-    </rdfs:comment>
+  <rdfe:RDFXMLDocument rdf:about="">
+  </rdfe:RDFXMLDocument>
+  
+  <aspect:Aspect rdf:ID="aspect">
+    <rdfs:label>Doap Aspect</rdfs:label>
     <redfoot:todo>Look into http://kupu.oscom.org/</redfoot:todo>
-  </redfoot:Aspect>
+    <aspect:item rdf:resource="#contributors"/>
+    <aspect:item rdf:resource="#releases"/>
+  </aspect:Aspect>
 
-  <rdf:Description rdf:about="">
-    <template:section rdf:resource="/releases/"/>    
-    <template:section rdf:resource="/contributors/"/>    
-  </rdf:Description>
-
-  <rdf:Description rdf:about="/contributors/">
+  <template:Section rdf:ID="contributors">
+    <aspect:location>/contributors/</aspect:location>
     <!-- Change page template to use abstract_uri's rdfs:label -->
     <!-- and have this override if present  -->
     <rdfs:label>Contributors</rdfs:label>
@@ -62,10 +63,11 @@ people.sort()
 ]]>    
       </rdf:value>      
     </template:content>
-  </rdf:Description>
+  </template:Section>
 
 
-  <rdf:Description rdf:about="/releases/">
+  <template:Section rdf:ID="releases">
+    <aspect:location>/releases/</aspect:location>
     <!-- Change page template to use abstract_uri's rdfs:label -->
     <!-- and have this override if present  -->
     <rdfs:label>Releases</rdfs:label>
@@ -100,7 +102,7 @@ releases.reverse()
 ]]>    
       </rdf:value>      
     </template:content>
-  </rdf:Description>
+  </template:Section>
 
 
   <rdf:Description rdf:about="http://usefulinc.com/ns/doap#Project">

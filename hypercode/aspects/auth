@@ -2,60 +2,51 @@
 <rdf:RDF
   xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
   xmlns:rdfs='http://www.w3.org/2000/01/rdf-schema#'
+  xmlns:rdfe="http://redfoot.net/rdf#"
   xmlns:redfoot='http://redfoot.net/2005/redfoot#'
   xmlns:server="http://redfoot.net/2005/server#"
   xmlns:template='http://redfoot.net/2005/template#'
+  xmlns:aspect="http://redfoot.net/hypercode/aspect#"
 >
 
-  <rdf:Description rdf:ID="auth_context">
-    <rdfs:label>authentication support</rdfs:label>
-    <rdfs:comment>
-    </rdfs:comment>
-    <!--
-need to load #auth with a command like:
-redfoot load http://redfoot.net/dev/content/auth http://localhost:8080 "#auth_context"
-
-in which case "" should be a server:Site
-      -->
-  </rdf:Description>
+  <rdfe:RDFXMLDocument rdf:about="">
+  </rdfe:RDFXMLDocument>
+  
+  <aspect:Aspect rdf:ID="aspect">
+    <rdfs:label>Authentication Aspect</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <aspect:item rdf:resource="#login_page"/>
+    <aspect:item rdf:resource="#login_process_page"/>
+    <aspect:item rdf:resource="#logout_page"/>
+  </aspect:Aspect>
 
   <rdfs:Class rdf:ID="Admin">
     <rdfs:label>Admin</rdfs:label>
     <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/session#User"/>
   </rdfs:Class>
 
-  <server:Page rdf:about="/login/">
+  <server:Page rdf:ID="login_page">
+    <aspect:location>/login/</aspect:location>
     <rdfs:label>Login</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
     <template:content rdf:resource="#login"/>
   </server:Page>
 
-  <server:Page rdf:about="/login/process/">
+  <server:Page rdf:ID="login_process_page">
+    <aspect:location>/login/process/</aspect:location>
     <rdfs:label>Login process</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <server:long_running>true</server:long_running>
     <server:page_handler rdf:resource="#login_process"/>
   </server:Page>
 
-  <server:Page rdf:about="/logout/">
+  <server:Page rdf:ID="logout_page">
+    <aspect:location>/logout/</aspect:location>
     <rdfs:label>Logout</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
     <server:page_handler rdf:resource="#logout_process"/>
-  </server:Page>
-
-  <server:Page rdf:about="/register/">
-    <rdfs:label>Register</rdfs:label>
-    <rdfs:comment></rdfs:comment>
-    <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
-    <template:content rdf:resource="#auth_register"/>
-  </server:Page>
-
-  <server:Page rdf:about="/register/process/">
-    <rdfs:label>Register Process</rdfs:label>
-    <rdfs:comment></rdfs:comment>
-    <server:page_handler rdf:resource="#register_process"/>
   </server:Page>
 
   <server:PagePartHandler rdf:ID="login">
@@ -79,7 +70,7 @@ else:
       <form action="process/" method="POST">
         <table>
           <tr>
-            <th>Email Address</th>
+            <th>User ID</th>
             <td><input type="text" name="uid" value=""/></td>
           </tr>
           <tr>
@@ -94,7 +85,6 @@ else:
         <input type="hidden" name="return_uri" value="${request.headers.get('referer', '%s/login/' % request.host)}"/>
         <input type="hidden" name="login_uri" value="${request.uri}"/>
       </form>
-      <p>or <a href="/register/">register new user</a></p>
     </span>
   </span>
  </span>
@@ -146,120 +136,6 @@ return_uri = URIRef(request.headers.get("referer", "%s/" % request.host))
 response.setStatus(302, 'found')
 response.setHeader('Location', return_uri)
       
-      ]]></rdf:value>
-  </server:PageHandler>
-
-  <server:PagePartHandler rdf:ID="auth_register">
-    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
-
- <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
-<?python 
-SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
-if request.session_id:
-    message = redfoot.value(request.session_id, SESSION.message)
-else:
-    message = ""
-?>
-
-  <p>${message}</p>  
-  <form action="process/" method="POST">
-    <table>
-      <tr>
-	<th>Email Address</th>
-	<td><input type="text" name="uid" value=""/></td>
-      </tr>
-      <tr>
-	<th>Name</th>
-	<td><input type="text" name="name" value=""/></td>
-      </tr>
-      <tr>
-       <th>Password</th>
-	<td><input type="password" name="password"/></td>
-      </tr>
-      <tr>
-       <th>Verify</th>
-	<td><input type="password" name="verify"/></td>
-      </tr>
-     <tr>    
-       <th>&#160;</th>
-       <td><input type="submit" value="register"/></td>
-     </tr>
-    </table>
-    <input type="hidden" name="return_uri" value="${request.headers.get('referer', '%s/' % request.host)}"/>
-    <input type="hidden" name="register_uri" value="${request.uri}"/>    
-  </form>
-
-  <p>or TODO: via FOAF identifier</p>
-
- </span> 
-      ]]></rdf:value>
-  </server:PagePartHandler>
-
-  <server:PageHandler rdf:ID="register_process">
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python"><![CDATA[
-
-if request.method=='POST':
-    import md5
-
-    SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
-
-    return_uri = URIRef(request.parameters.get("return_uri", "%s/" % request.host))
-    register_uri = URIRef(request.parameters.get("register_uri", "%s/register/" % request.host))
-
-    uid = request.parameters.get("uid", None)
-    if uid:
-        name = request.parameters.get("name", None) or uid.split("@")[0]
-        if "@" in uid:
-            if not uid.startswith("mailto:"):
-                uid = URIRef("mailto:%s" % uid)
-        else:
-            uid = URIRef("%s/users/%s#" % (request.host, uid))
-
-        password = request.parameters.get("password", None)
-        verify = request.parameters.get("verify", None)
-
-        request.create_session()
-        sid = request.session_id
-        assert sid
-
-        context = redfoot.get_context(redfoot.context_id(sid))
-        users_context = redfoot.get_context(redfoot.context_id("%s/users" % request.host))
-
-        if password==verify:
-            if not (uid, SESSION.hexdigest, None) in redfoot:
-                hexdigest = Literal(md5.new(password).hexdigest())
-                redfoot.remove((sid, SESSION.authenticated, None))
-                redfoot.remove((sid, SESSION.uid, None))
-                context.add((sid, SESSION.authenticated, Literal("True")))
-                context.add((sid, SESSION.uid, uid))
-                if name:
-                    users_context.add((uid, RDFS.label, Literal(name)))
-                users_context.add((uid, RDF.type, SESSION.User))
-                users_context.add((uid, SESSION.hexdigest, hexdigest))
-                #message = "Registered new user: %s" % uid
-                context.remove((sid, SESSION.message, None))        
-                response.setStatus(302, 'found')
-                response.setHeader('Location', return_uri)
-            else:
-                message = "User already exists"
-                context.remove((sid, SESSION.message, None))
-                context.add((sid, SESSION.message, Literal(message)))
-                response.setStatus(302, 'found')   
-                response.setHeader('Location', register_uri)
-
-        else:
-            message = "password and verify mismatch"
-            context.remove((sid, SESSION.message, None))
-            context.add((sid, SESSION.message, Literal(message)))
-            response.setStatus(302, 'found')   
-            response.setHeader('Location', register_uri)
-    else:
-        message = "must specify an email address"
-        context.remove((sid, SESSION.message, None))
-        context.add((sid, SESSION.message, Literal(message)))
-        response.setStatus(302, 'found')   
-        response.setHeader('Location', register_uri)
-    
       ]]></rdf:value>
   </server:PageHandler>
 

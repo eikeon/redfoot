@@ -2,25 +2,29 @@
 <rdf:RDF
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:rdfe="http://redfoot.net/rdf#"
    xmlns:redfoot="http://redfoot.net/2005/redfoot#"
    xmlns:commands="http://redfoot.net/2005/commands#"
    xmlns:server="http://redfoot.net/2005/server#"
    xmlns:session="http://redfoot.net/2005/session#"
    xmlns:template='http://redfoot.net/2005/template#'
+   xmlns:aspect="http://redfoot.net/hypercode/aspect#"
 >
 
-  <redfoot:Aspect rdf:ID="blog_aspect">
-    <rdfs:label>Blog aspect</rdfs:label>
-    <rdfs:comment>
-    </rdfs:comment>
+  <rdfe:RDFXMLDocument rdf:about="">
+  </rdfe:RDFXMLDocument>
+  
+  <aspect:Aspect rdf:ID="aspect">
+    <rdfs:label>Blog Aspect</rdfs:label>
     <redfoot:todo>Look into http://kupu.oscom.org/</redfoot:todo>
-  </redfoot:Aspect>
+    <aspect:item rdf:resource="#blog_page"/>
+    <aspect:item rdf:resource="#add_entry_page"/>
+    <aspect:item rdf:resource="#put_entry_page"/>
+    <aspect:item rdf:resource="#atom_page"/>
+  </aspect:Aspect>
 
-  <rdf:Description rdf:about="">
-    <template:section rdf:resource="/blog/"/>    
-  </rdf:Description>
-
-  <server:Page rdf:about="/blog/">
+  <template:Section rdf:ID="blog_page">
+    <aspect:location>/blog/</aspect:location>    
     <rdfs:label>Blog</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>    
@@ -116,9 +120,10 @@ else:
       </rdf:value>      
      </server:PagePartHandler>
     </template:content>
-  </server:Page>
+  </template:Section>
 
-  <server:Page rdf:about="/blog/add_entry/">
+  <server:Page rdf:ID="add_entry_page">
+    <aspect:location>/blog/add_entry/</aspect:location>
     <rdfs:label>Add Entry</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>    
@@ -156,7 +161,8 @@ from urllib import quote
   </server:Page>
 
 
-  <server:Page rdf:about="/put_entry/">
+  <server:Page rdf:ID="put_entry_page">
+    <aspect:location>/put_entry/</aspect:location>
     <rdfs:label>Put Entry</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <server:allow rdf:resource="http://redfoot.net/2005/session#User"/>
@@ -232,7 +238,8 @@ from urllib import quote
     </template:content>
   </server:Page>
 
-  <server:Page rdf:about="/blog/atom/">
+  <server:Page rdf:ID="atom_page">
+    <aspect:location>/blog/atom/</aspect:location>
     <rdfs:label>Blog Atom Feed</rdfs:label>
     <server:page_handler rdf:resource="#atom_1.0"/>
     <!-- TODO: infer from page eventually... currently both are needed explicitly. -->

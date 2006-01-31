@@ -2,25 +2,23 @@
 <rdf:RDF
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:rdfe="http://redfoot.net/rdf#"
    xmlns:redfoot="http://redfoot.net/2005/redfoot#"
    xmlns:commands="http://redfoot.net/2005/commands#"
    xmlns:server="http://redfoot.net/2005/server#"
    xmlns:session="http://redfoot.net/2005/session#"
    xmlns:template='http://redfoot.net/2005/template#'
+   xmlns:aspect="http://redfoot.net/hypercode/aspect#"
 >
 
-  <redfoot:Aspect rdf:ID="blog_monitor_aspect">
+  <aspect:Aspect rdf:ID="aspect">
     <rdfs:label>Blog Monitor aspect</rdfs:label>
-    <rdfs:comment>
-    </rdfs:comment>
-    <redfoot:todo>Look into http://kupu.oscom.org/</redfoot:todo>
-  </redfoot:Aspect>
+    <aspect:item rdf:resource="#blog_monitor_page"/>
+    <aspect:item rdf:resource="#blog_monitor_feeds_page"/>
+  </aspect:Aspect>
 
-  <rdf:Description rdf:about="">
-    <template:section rdf:resource="/blog_monitor/"/>    
-  </rdf:Description>
-
-  <server:Page rdf:about="/blog_monitor/">
+  <template:Section rdf:ID="blog_monitor_page">
+    <aspect:location>/blog_monitor/</aspect:location>
     <rdfs:label>Blog Monitor</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <template:default_section_rank>12.0</template:default_section_rank>
@@ -83,10 +81,11 @@ feed = redfoot.value(entry, BLOG.via, any=True)
       </rdf:value>      
      </server:PagePartHandler>
     </template:content>
-  </server:Page>
+  </template:Section>
 
 
-  <server:Page rdf:about="/blog_monitor/feeds/">
+  <server:Page rdf:ID="blog_monitor_feeds_page">
+    <aspect:location>/blog_monitor/feeds/</aspect:location>
     <rdfs:label>Blog Monitor Feeds</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <server:allow rdf:resource="http://redfoot.net/2005/session#User"/>

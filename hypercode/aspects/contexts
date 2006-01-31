@@ -2,30 +2,31 @@
 <rdf:RDF
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:rdfe="http://redfoot.net/rdf#"
    xmlns:redfoot="http://redfoot.net/2005/redfoot#"
    xmlns:commands="http://redfoot.net/2005/commands#"
    xmlns:server="http://redfoot.net/2005/server#"
    xmlns:session="http://redfoot.net/2005/session#"
    xmlns:template='http://redfoot.net/2005/template#'
+   xmlns:aspect="http://redfoot.net/hypercode/aspect#"
 >
 
-  <redfoot:Aspect rdf:ID="contexts_aspect">
-    <rdfs:label>context listing support</rdfs:label>
-    <rdfs:comment>
-    </rdfs:comment>
-  </redfoot:Aspect>
+  <rdfe:RDFXMLDocument rdf:about="">
+  </rdfe:RDFXMLDocument>
+  
+  <aspect:Aspect rdf:ID="aspect">
+    <rdfs:label>Contexts Aspect</rdfs:label>
+    <aspect:item rdf:resource="#contexts_page"/>
+  </aspect:Aspect>
 
-  <rdf:Description rdf:about="">
-    <template:section rdf:resource="/contexts/"/>    
-  </rdf:Description>
-
-  <server:Page rdf:about="/contexts/">
+  <template:Section rdf:ID="contexts_page">
+    <aspect:location>/contexts/</aspect:location>
     <rdfs:label>Contexts</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <template:default_section_rank>80.0</template:default_section_rank>
     <template:content rdf:resource="#contexts"/>
     <server:allow rdf:resource="#Admin"/>
-  </server:Page>
+  </template:Section>
 
   <rdf:Description rdf:about="http://redfoot.net/hypercode/types/context#content_handler"> 
     <server:allow rdf:resource="#Admin"/>          

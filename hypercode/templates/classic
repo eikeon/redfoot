@@ -103,7 +103,7 @@ types = "%s" % ", ".join(types)
 <![CDATA[
 <div xmlns:kid="http://purl.org/kid/ns#" kid:strip="">
 
-<h1><a href="${request.host}">${redfoot.label(request.host) or request.host}</a></h1></div>]]>
+<h1><a href="${request.host}">${redfoot.label(request.site) or request.host}</a></h1></div>]]>
     </rdf:value>    
   </server:PagePartHandler>
 
@@ -156,6 +156,7 @@ login_support = (login_uri, None, None) in redfoot
 user_nav = login_support # TODO: check each of the user_nav bits
 ?>
 <ul kid:if="user_nav">
+  <li kid:if="allow(request.site)"><a href="/data/Site">Edit Site</a></li>
   <!-- TODO: -->
   <?python edit_uri = URIRef('%s/edit/content/' % request.host)?>
   <li kid:if="(edit_uri, None, None) in redfoot and allow(URIRef('%s/edit/resource' % request.host))"
@@ -177,7 +178,7 @@ else:
 ?>
  <span kid:if="uid is None" kid:strip="">
   <li><a href="/login/">Login</a></li>
-  <li><a href="/register/">Register</a></li>
+  <li kid:if="(URIRef('%s/register/' % request.host), None, None) in redfoot"><a href="/register/">Register</a></li>
  </span>
  <span kid:if="uid" kid:strip="">
   <li><a href="${request.relative(uid.concrete())}">${redfoot.label(uid) or uid}'s profile</a></li>
@@ -199,7 +200,7 @@ else:
 title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract(), None) or "-"
 ?>
   <head>
-    <title>${redfoot.label(request.host)}: ${title}</title>
+    <title>${redfoot.label(request.site)}: ${title}</title>
     <meta http-equiv="Content-Type" content="text/xhtml; charset=UTF-8"/>
     <meta name="keywords" content=""/>
     <link rel="shortcut icon" href="${lookup(TEMPLATE.shortcut_icon)}"/>

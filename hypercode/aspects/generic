@@ -2,25 +2,36 @@
 <rdf:RDF
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:rdfe="http://redfoot.net/rdf#"
    xmlns:redfoot='http://redfoot.net/2005/redfoot#'
    xmlns:server="http://redfoot.net/2005/server#"
    xmlns:template='http://redfoot.net/2005/template#'
+   xmlns:aspect="http://redfoot.net/hypercode/aspect#"
 >
 
-  <rdf:Description rdf:about="">
-    <template:section rdf:resource="/edit/"/>    
-  </rdf:Description>
+  <rdfe:RDFXMLDocument rdf:about="">
+  </rdfe:RDFXMLDocument>
+  
+  <aspect:Aspect rdf:ID="aspect">
+    <rdfs:label>Generic (Editor) aspect</rdfs:label>
+    <aspect:item rdf:resource="#edit_page"/>
+    <aspect:item rdf:resource="#edit_resource_page"/>
+    <aspect:item rdf:resource="#edit_triple_page"/>
+    <aspect:item rdf:resource="#create_page"/>
+  </aspect:Aspect>
 
-  <server:Page rdf:about="/edit/">
+  <template:Section rdf:ID="edit_page">
+    <aspect:location>/edit/</aspect:location>
     <rdfs:label>Edit</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <template:content rdf:resource="#add_resource"/>
     <template:default_section_rank>70.0</template:default_section_rank>    
     <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>    
     <server:allow rdf:resource="#Admin"/>
-  </server:Page>
+  </template:Section>
 
-  <server:Page rdf:about="/edit/resource">
+  <server:Page rdf:ID="edit_resource_page">
+    <aspect:location>/edit/resource</aspect:location>
     <rdfs:label>Edit Resource</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <template:content rdf:resource="#edit_resource"/>
@@ -28,7 +39,8 @@
     <server:allow rdf:resource="#Admin"/>
   </server:Page>
 
-  <server:Page rdf:about="/edit/triple">
+  <server:Page rdf:ID="edit_triple_page">
+    <aspect:location>/edit/triple</aspect:location>
     <rdfs:label>View Triple</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <template:content rdf:resource="#edit_triple"/>
@@ -36,7 +48,8 @@
     <server:allow rdf:resource="#Admin"/>
   </server:Page>
 
-  <rdf:Description rdf:about="/create/"> <!-- TODO: incorporate into generic-->
+  <rdf:Description rdf:ID="create_page"> <!-- TODO: incorporate into generic-->
+    <aspect:location>/create/</aspect:location>
     <rdfs:label>Create Instance</rdfs:label>
     <server:allow rdf:resource="#Admin"/>
     <server:page_handler>

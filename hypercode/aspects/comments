@@ -2,64 +2,33 @@
 <rdf:RDF
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:rdfe="http://redfoot.net/rdf#"
    xmlns:redfoot="http://redfoot.net/2005/redfoot#"
    xmlns:commands="http://redfoot.net/2005/commands#"
    xmlns:server="http://redfoot.net/2005/server#"
    xmlns:session="http://redfoot.net/2005/session#"
    xmlns:template='http://redfoot.net/2005/template#'
+   xmlns:aspect="http://redfoot.net/hypercode/aspect#"
 >
 
-  <redfoot:Aspect rdf:ID="comments_aspect">
+  <rdfe:RDFXMLDocument rdf:about="">
+  </rdfe:RDFXMLDocument>
+  
+  <aspect:Aspect rdf:ID="aspect">
     <rdfs:label>Comments aspect</rdfs:label>
-    <rdfs:comment></rdfs:comment>
-  </redfoot:Aspect>
+    <aspect:item rdf:resource="#site"/>
+    <aspect:item rdf:resource="#comments_page"/>
+    <aspect:item rdf:resource="#add_atom_page"/>
+    <aspect:item rdf:resource="#add_atom_page"/>
+  </aspect:Aspect>
 
-  <rdf:Description rdf:about="">
+  <server:Site rdf:ID="site">
     <template:comments rdf:resource="#comments"/>
     <template:add_comment rdf:resource="#add_comment"/>    
-    <template:section rdf:resource="/comments/"/>    
-  </rdf:Description>
+  </server:Site>
 
-  <rdf:Description rdf:about="http://redfoot.net/2005/comment#Comment">
-    <template:content>
-     <server:PagePartHandler rdf:ID="RecipeContent">
-      <rdfs:label>Recipe</rdfs:label>
-      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
-<![CDATA[
-<div xmlns="http://www.w3.org/1999/xhtml"
-     xmlns:kid="http://purl.org/kid/ns#"
-     class="comment"
->
-<?python
-import time
-from rdflib.util import parse_date_time
-
-COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")
-DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
-DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
-
-comment = request.uri.abstract()
-resource = redfoot.value(None, COMMENT.comment, comment)
-date = redfoot.value(comment, DCTERMS.created)
-
-creator =  redfoot.value(comment, DC.creator)
-creator_label = redfoot.label(creator) or creator.split('@')[0]
-?>
-
-<p>
-by ${creator_label}
-<span kid:if="date">on ${time.strftime("%A %d %B, %Y", time.gmtime(parse_date_time(date)))}</span> 
-regarding <a href="${request.relative(resource)}">${redfoot.label(resource, resource)}</a>:</p>
-<pre>${redfoot.value(comment, RDFS.comment)}</pre>
-
-</div>
-]]>
-      </rdf:value>
-     </server:PagePartHandler>
-    </template:content>
-  </rdf:Description>
-
-  <server:Page rdf:about="/add_comment/">
+  <server:Page rdf:ID="add_comment_page">
+    <aspect:location>/add_comment/</aspect:location>
     <rdfs:label>Add Comment</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
@@ -197,7 +166,8 @@ creator_label = redfoot.label(creator) or creator.split('@')[0]
     </rdf:value>      
   </server:PagePartHandler>
 
-  <server:Page rdf:about="/comments/">
+  <template:Section rdf:ID="comments_page">
+    <aspect:location>/comments/</aspect:location>
     <rdfs:label>Comments</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <server:alternate rdf:resource="/comments/atom/"/>    
@@ -248,9 +218,10 @@ else:
     </template:content>  
     
     <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>    
-  </server:Page>
+  </template:Section>
 
-  <server:Page rdf:about="/comments/atom/">
+  <server:Page rdf:ID="comments_atom_page">
+    <aspect:location>/comments/atom/</aspect:location>
     <rdfs:label>Comments Atom Feed</rdfs:label>
     <server:page_handler rdf:resource="#comments_atom_0.3"/>
     <!-- TODO: infer from page eventually... currently both are needed explicitly. -->

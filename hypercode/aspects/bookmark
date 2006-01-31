@@ -2,23 +2,26 @@
 <rdf:RDF
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:rdfe="http://redfoot.net/rdf#"
    xmlns:redfoot="http://redfoot.net/2005/redfoot#"
    xmlns:server="http://redfoot.net/2005/server#"
    xmlns:session="http://redfoot.net/2005/session#"
    xmlns:template="http://redfoot.net/2005/template#"
+   xmlns:aspect="http://redfoot.net/hypercode/aspect#"
 >
 
-  <redfoot:Aspect rdf:ID="aspect">
+  <rdfe:RDFXMLDocument rdf:about="">
+    <rdfs:label>Bookmark Aspect RDF/XML</rdfs:label>
+  </rdfe:RDFXMLDocument>
+
+  <aspect:Aspect rdf:ID="aspect">
     <rdfs:label>Bookmark aspect</rdfs:label>
-    <rdfs:comment>
-    </rdfs:comment>
-  </redfoot:Aspect>
+    <aspect:item rdf:resource="#bookmarks"/>
+    <aspect:item rdf:resource="#add_bookmarks"/>
+  </aspect:Aspect>
 
-  <rdf:Description rdf:about="">
-    <template:section rdf:resource="/bookmarks/"/>    
-  </rdf:Description>
-
-  <server:Page rdf:about="/bookmarks/">
+  <template:Section rdf:ID="bookmarks">
+    <aspect:location>bookmarks/</aspect:location>
     <rdfs:label>Bookmarks</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>        
@@ -71,15 +74,15 @@ bookmarks.reverse()
       </rdf:value>
      </server:PagePartHandler> 
     </template:content>
-  </server:Page>
+  </template:Section>
 
-  <server:Page rdf:about="/bookmarks/add_bookmark">
+  <server:Page rdf:ID="add_bookmark">
     <rdfs:label>Add Bookmark</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <server:allow rdf:resource="http://redfoot.net/2005/session#User"/>
     <server:long_running>true</server:long_running>
     <server:handler>
-     <server:PagePartHandler rdf:ID="add_bookmark">
+     <server:PagePartHandler rdf:ID="add_bookmark_handler">
       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
