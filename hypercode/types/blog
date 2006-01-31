@@ -53,7 +53,7 @@ else:
 creator = redfoot.value(entry, DC.creator)
 ?>
 
-<p><span kid:if="creator" kid:strip="">by ${redfoot.label(creator)}</span> on 
+<p class="meta"><span kid:if="creator" kid:strip="">by ${redfoot.label(creator)}</span> on 
    ${time.strftime("%A %d %B, %Y", time.gmtime(parse_date_time(date)))}:</p>
 
   <span kid:if="content_value" kid:strip="">
