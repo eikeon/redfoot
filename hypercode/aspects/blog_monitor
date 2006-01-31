@@ -11,8 +11,12 @@
    xmlns:aspect="http://redfoot.net/hypercode/aspect#"
 >
 
+  <rdfe:RDFXMLDocument rdf:about="">
+    <rdfs:label>Blog Monitor Aspect RDF/XML</rdfs:label>
+  </rdfe:RDFXMLDocument>
+
   <aspect:Aspect rdf:ID="aspect">
-    <rdfs:label>Blog Monitor aspect</rdfs:label>
+    <rdfs:label>Blog Monitor</rdfs:label>
     <aspect:item rdf:resource="#blog_monitor_page"/>
     <aspect:item rdf:resource="#blog_monitor_feeds_page"/>
   </aspect:Aspect>

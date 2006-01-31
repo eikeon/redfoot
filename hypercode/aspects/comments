@@ -15,7 +15,7 @@
   </rdfe:RDFXMLDocument>
   
   <aspect:Aspect rdf:ID="aspect">
-    <rdfs:label>Comments aspect</rdfs:label>
+    <rdfs:label>Comments</rdfs:label>
     <aspect:item rdf:resource="#site"/>
     <aspect:item rdf:resource="#comments_page"/>
     <aspect:item rdf:resource="#add_atom_page"/>

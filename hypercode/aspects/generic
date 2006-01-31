@@ -13,7 +13,7 @@
   </rdfe:RDFXMLDocument>
   
   <aspect:Aspect rdf:ID="aspect">
-    <rdfs:label>Generic (Editor) aspect</rdfs:label>
+    <rdfs:label>Editor (Generic)</rdfs:label>
     <aspect:item rdf:resource="#edit_page"/>
     <aspect:item rdf:resource="#edit_resource_page"/>
     <aspect:item rdf:resource="#edit_triple_page"/>

@@ -14,7 +14,7 @@
   </rdfe:RDFXMLDocument>
   
   <aspect:Aspect rdf:ID="aspect">
-    <rdfs:label>Calendar aspect</rdfs:label>
+    <rdfs:label>Calendar</rdfs:label>
     <aspect:item rdf:resource="#calendar_month_page"/>
   </aspect:Aspect>
 

@@ -13,7 +13,7 @@
   </rdfe:RDFXMLDocument>
   
   <aspect:Aspect rdf:about="#editor_aspect">
-    <rdfs:label>ajar based Editor</rdfs:label>
+    <rdfs:label>Editor</rdfs:label>
     <template:section rdf:resource="/editor/"/>
     <rdfs:seeAlso rdf:resource="http://www.w3.org/2005/ajar/"/>
   </aspect:Aspect>

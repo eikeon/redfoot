@@ -15,7 +15,7 @@
   </rdfe:RDFXMLDocument>
   
   <aspect:Aspect rdf:ID="aspect">
-    <rdfs:label>Doap Aspect</rdfs:label>
+    <rdfs:label>Doap</rdfs:label>
     <redfoot:todo>Look into http://kupu.oscom.org/</redfoot:todo>
     <aspect:item rdf:resource="#contributors"/>
     <aspect:item rdf:resource="#releases"/>

@@ -15,7 +15,7 @@
   </rdfe:RDFXMLDocument>
   
   <aspect:Aspect rdf:ID="aspect">
-    <rdfs:label>Blog Aspect</rdfs:label>
+    <rdfs:label>Blog</rdfs:label>
     <redfoot:todo>Look into http://kupu.oscom.org/</redfoot:todo>
     <aspect:item rdf:resource="#blog_page"/>
     <aspect:item rdf:resource="#add_entry_page"/>

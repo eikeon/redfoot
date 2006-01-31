@@ -15,7 +15,7 @@
   </rdfe:RDFXMLDocument>
 
   <aspect:Aspect rdf:ID="aspect">
-    <rdfs:label>Bookmark aspect</rdfs:label>
+    <rdfs:label>Bookmark</rdfs:label>
     <aspect:item rdf:resource="#bookmarks"/>
     <aspect:item rdf:resource="#add_bookmarks"/>
   </aspect:Aspect>

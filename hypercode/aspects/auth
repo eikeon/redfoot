@@ -13,7 +13,7 @@
   </rdfe:RDFXMLDocument>
   
   <aspect:Aspect rdf:ID="aspect">
-    <rdfs:label>Authentication Aspect</rdfs:label>
+    <rdfs:label>Authentication</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <aspect:item rdf:resource="#login_page"/>
     <aspect:item rdf:resource="#login_process_page"/>
