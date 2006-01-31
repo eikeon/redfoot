@@ -37,7 +37,6 @@ markdown = redfoot.module(URIRef("modules/markdown#module", base=redfoot_program
 entry = request.uri.abstract()
 if (entry, RDF.type, BLOG.Entry) not in redfoot:
     entry = request.uri
-print entry
 
 date = redfoot.value(entry, DCTERMS.created)
 
