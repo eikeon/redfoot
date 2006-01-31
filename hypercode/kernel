@@ -354,21 +354,21 @@ class Redfoot(Graph):
 
         Currently, if not, Redfoot will attempt to load from uri.
         """
-        location = uri
-        uri = publicID or uri
-        if isinstance(uri, URIRef):
-            context_uri = self.context_id(uri)
-            if not (uri, None, None) in self:
+        publicID = publicID or uri
+        if isinstance(publicID, URIRef):
+            if not (publicID, None, None) in self:
+                location = uri.defrag()
+                context_uri = self.context_id(location)
                 if not (REDFOOT.Checked, RDFS.member, context_uri) in self: 
                     self.index.add((REDFOOT.Checked, RDFS.member, context_uri))
-                    if uri==location:
-                        self.log.info("loading: %s" % uri)
+                    if publicID==location:
+                        self.log.info("loading: %s" % publicID)
                     else:
                         self.log.info("loading: %s from %s" % (publicID, location))
                     try:
                         context = self.load(location, publicID=publicID, creator=redfoot_loader.program)
                     except Exception, e:
-                        self.log.warning("couldn't load %s while checking: %s\n" % (uri, e))
+                        self.log.warning("couldn't load %s while checking: %s\n" % (publicID, e))
 
     def scutter(self, location, creator, steps=SCUTTER_STEPS):
         """
