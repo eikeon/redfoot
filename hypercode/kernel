@@ -357,8 +357,8 @@ class Redfoot(Graph):
         if isinstance(uri, URIRef):
             location = uri.defrag()
             context_uri = self.context_id(location)
-            if not (REDFOOT.Checked, RDFS.member, context_uri) in self.index: 
-                self.index.add((REDFOOT.Checked, RDFS.member, context_uri))
+            if not (context_uri, RDF.type, REDFOOT.Context) in self.index: 
+                c = self.get_context(context_uri) #self.index.add((context_uri, RDF.type, REDFOOT.Context))
                 if uri==location:
                     self.log.info("loading: %s" % uri)
                 else:
