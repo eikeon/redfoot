@@ -58,7 +58,8 @@ context.serialize(destination=response, format="pretty-xml")
     <aspect:location>/ingredients/</aspect:location>
     <rdfs:label>Ingredients</rdfs:label>
     <template:section_rank>7.0</template:section_rank>    
-    <template:content rdf:parseType="Resource">
+    <template:content>
+     <server:PagePartHandler rdf:ID="ingredients_content_handler">
       <rdfs:label>Default main for Redfoot</rdfs:label>      
       <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
 <![CDATA[
@@ -79,6 +80,7 @@ ingredients.sort()
 
 ]]>
       </rdf:value>
+     <server:PagePartHandler>
     </template:content>    
   </template:Section>
 
