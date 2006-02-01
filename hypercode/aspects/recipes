@@ -80,7 +80,7 @@ ingredients.sort()
 
 ]]>
       </rdf:value>
-     <server:PagePartHandler>
+     </server:PagePartHandler>
     </template:content>    
   </template:Section>
 
