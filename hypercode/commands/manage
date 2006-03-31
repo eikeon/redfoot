@@ -604,10 +604,10 @@ except:
 if filename is not None:
     tar = open(filename, "r:gz")
 
+    source_index = Graph()
     for name in tar.getnames():
         root, scheme, netloc, path = name.split("/", 3)
         if path=="_index":
-            source_index = Graph()
             source_index.parse(tar.extractfile(tar.getmember(name)))
             break
     for tarinfo in tar:
