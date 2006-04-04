@@ -52,6 +52,12 @@ if action=="delete":
 </form>
 </p>
 
+<h3>Instances</h3>
+
+<ul>
+  <li kid:for="s in [s for s in uniq(context.subjects()) if isinstance(s, URIRef)]"><a href="${request.host}/;${s.concrete()}">${context.label(s, s)}</a></li>
+</ul>  
+
 </span>
 
 
