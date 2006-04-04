@@ -19,6 +19,7 @@
 <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
 <?python
 from urllib import quote
+from rdflib.util import uniq
 
 cid = request.uri.abstract()
 context = redfoot.get_context(cid)
