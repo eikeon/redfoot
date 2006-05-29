@@ -672,6 +672,10 @@ class Redfoot(Graph):
             self.log.info("running: %s ( %s )" % (self.label(program), program))
             self.execute(program, args=args)
 
+    def write(self, s, encoding="utf-8"):
+        sys.stdout.write(s.encoding(encoding=encoding))
+
+
 def add_func(store):
     orig_add = store.add
     def add((s, p, o), context, quoted=False):
