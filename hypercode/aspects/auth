@@ -85,6 +85,7 @@ else:
         <input type="hidden" name="return_uri" value="${request.headers.get('referer', '%s/login/' % request.host)}"/>
         <input type="hidden" name="login_uri" value="${request.uri}"/>
       </form>
+      <p>(<a href="/login/reset/">reset password</a>)</p>
     </span>
   </span>
  </span>
