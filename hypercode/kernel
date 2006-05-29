@@ -34,9 +34,6 @@ For help on Redfoot see:
 """
 
 import sys, getopt
-
-sys.setdefaultencoding('utf-8')
-
 import traceback
 from types import ModuleType
 from urlparse import urljoin, urldefrag, urlparse
