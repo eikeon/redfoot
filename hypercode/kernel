@@ -626,7 +626,7 @@ class Redfoot(Graph):
             if instance not in seen:
                 seen.add(instance)
                 yield instance
-        for subclass in self.subclasses(self, uri):
+        for subclass in self.subclasses(uri):
             for instance in self.subjects(RDF.type, subclass):
                 if instance not in seen:
                     seen.add(instance)
