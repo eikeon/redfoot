@@ -471,6 +471,7 @@ class Redfoot(Graph):
         absolute_location = self.absolutize(location)
         context.remove((None, None, None))
         if scutter is True and urlparse(absolute_location)[0] == 'http':
+            #priorEvent = self.index.value(predicate=SCUTTER.target, object=publicID, any=True)
             priorEvent = self.index.value(predicate=SCUTTER.fetch, object=absolute_location, any=True)
             if priorEvent:
                 priorEvent = HTTPGetEvent(self.index, absolute_location, self.log, priorEvent)
@@ -620,8 +621,16 @@ class Redfoot(Graph):
             yield subclass
 
     def instances(self, uri):
-	for instance in self.subjects(RDF.type, uri):
-	    yield instance
+        seen = set()
+        for instance in self.subjects(RDF.type, uri):
+            if instance not in seen:
+                seen.add(instance)
+                yield instance
+        for subclass in subclasses(self, uri):
+            for instance in self.subjects(RDF.type, subclass):
+                if instance not in seen:
+                    seen.add(instance)
+                    yield instance
 
     def types(self, subject):
 	"""
