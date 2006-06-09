@@ -606,19 +606,27 @@ class Redfoot(Graph):
         super(Redfoot, self).bind(prefix, namespace, override)
 
 
-    def subclasses(self, uri):
+    def subclasses(self, uri, direct=True):
         """
         Applies brute force RDFS entailment to infer additional classification 
         """
         if uri==RDFS.Resource:
+            # TODO: direct=False
             for subclass in self.subjects(RDF.type, RDFS.Class):
                 for c in self.objects(subclass, RDFS.subClassOf):
                     if c==RDFS.Resource or not (c, RDF.type, RDFS.Class) in self:
                         yield subclass
                         break
             return
-        for subclass in self.subjects(RDFS.subClassOf, uri):
-            yield subclass
+        if direct==True:
+            for subclass in self.subjects(RDFS.subClassOf, uri):
+                yield subclass
+        else:
+            seen = set()
+            for subclass in self.transitive_subjects(RDFS.subClassOf, uri):
+                if subclass not in seen:
+                    seen.add(subclass)
+                    yield subclass
 
     def instances(self, uri):
         seen = set()
@@ -626,7 +634,7 @@ class Redfoot(Graph):
             if instance not in seen:
                 seen.add(instance)
                 yield instance
-        for subclass in self.subclasses(uri):
+        for subclass in self.subclasses(uri, direct=False):
             for instance in self.subjects(RDF.type, subclass):
                 if instance not in seen:
                     seen.add(instance)
