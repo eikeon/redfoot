@@ -114,7 +114,7 @@ recipes.sort()
   <h3>Recipes containing ${redfoot.label(ingredient)}</h3>
   <ul>
     <li kid:for="label, recipe in recipes">
-      <a href="${recipe}">${label}</a>        
+      <a href="${request.relative(recipe.concrete())}">${label}</a>        
     </li>    
   </ul>
 
