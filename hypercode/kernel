@@ -512,24 +512,17 @@ class Redfoot(Graph):
         super(Redfoot, self).remove_context(identifier)
 
     def module(self, subject):
-        subject = URIRef(subject)
-        if not (subject, None, None) in self:
-            self.log.info("importing: %s" % subject)
-            try:
-                self.load(subject, creator=redfoot_loader.program)
-            except Exception, e:
-                raise Exception("Error trying to load module for %s\n%s" % (subject, e))
-                
-        value = self.value(subject)
-        assert value!=None, "No objects found for %s, %s" % (subject, RDF.value)
-
-        module_name = subject
-        safe_module_name = "subject_%s" % hash(subject)
-
+        if not isinstance(subject, URIRef):
+            subject = URIRef(subject)
+        module_name = subject       
         module = sys.modules.get(module_name, None)
         if module:
             return module
-
+        self.check(subject)
+        self.log.info("importing: %s" % subject)
+        value = self.value(subject)
+        assert value!=None, "No objects found for %s, %s" % (subject, RDF.value)
+        safe_module_name = "subject_%s" % hash(subject)
         module = ModuleType(safe_module_name)
         module.__name__ = module_name 
         module.__file__ = subject
@@ -539,7 +532,6 @@ class Redfoot(Graph):
         for key, value in self.__context.items():
             module.__dict__[key] = value
         module.__dict__["__uri__"] = subject
-
         exec code in module.__dict__
         return sys.modules[module_name]
 
@@ -690,7 +682,7 @@ class Redfoot(Graph):
             self.execute(program, args=args)
 
     def write(self, s, encoding="utf-8"):
-        sys.stdout.write(s.encoding(encoding=encoding))
+        sys.stdout.write(s.encode(encoding))
 
 
 def add_func(store):
