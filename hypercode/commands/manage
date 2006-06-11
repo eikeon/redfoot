@@ -156,7 +156,7 @@ for cid in redfoot.contexts():
     try:
         source = redfoot.index.value(cid, REDFOOT.source)
         if source is None or cid.startswith(source):
-            redfoot.write(cid)
+            redfoot.write(cid+"\n")
         else:
             print "%s\n   source: %s" % (cid, source) #, len(redfoot.get_context(cid))
     except Exception, e:
@@ -677,11 +677,14 @@ if startswith:
     # list is currently needed else not all will get removed due to
     # concurrency issues (removing while iterating over)
     for cid in list(redfoot.contexts()):
-        if cid.startswith(startswith):
-            print "Removing:", cid    
-            c = redfoot.get_context(cid)
-            c.remove((None, None, None))
-            redfoot.index.remove((REDFOOT.Checked, RDFS.member, cid))
+        try:
+            if cid.startswith(startswith):
+                redfoot.write("Removing: %s\n" % cid)
+                c = redfoot.get_context(cid)
+                c.remove((None, None, None))
+                redfoot.index.remove((REDFOOT.Checked, RDFS.member, cid))
+        except Exception, e:
+            print e
 
 ]]>
        </rdf:value>
