@@ -16,7 +16,7 @@
 <![CDATA[
 
 import re
-from urllib import quote
+from urllib import quote, unquote
 from xml.sax.saxutils import escape
 
 _url = re.compile(r'((http://|https://|ftp://|news://|irc://)[^\s,]+)', re.IGNORECASE)
@@ -24,7 +24,7 @@ _url = re.compile(r'((http://|https://|ftp://|news://|irc://)[^\s,]+)', re.IGNOR
 
 def url(match):
     url, scheme = match.groups()
-    url = URIRef(url)
+    url = URIRef(unquote(url))
     label = redfoot.label(url, url)
     return '<a href="%s">%s</a>' % (escape(url.concrete()), label)
 
