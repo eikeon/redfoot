@@ -492,7 +492,7 @@ class Redfoot(Graph):
         self.index.remove((context_id, REDFOOT.publicID, None))        
         self.index.add((context_id, REDFOOT.publicID, publicID))
         if format=="xml":
-            self.index.add((public_id.defrag(), RDF.type, URIRef("http://redfoot.net/rdf#RDFXMLDocument")))
+            self.index.add((publicID.defrag(), RDF.type, URIRef("http://redfoot.net/rdf#RDFXMLDocument")))
         return context
 
     def get_context(self, identifier, creator=None):
