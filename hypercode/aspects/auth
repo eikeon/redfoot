@@ -101,6 +101,15 @@ if request.method=='POST':
     import md5
 
     uid = request.parameters.get("uid", None)
+    # TODO: sync all username expansion code between here, register, and modules/auth
+    if "@" in uid:
+        if not uid.startswith("mailto:"):
+            uid = URIRef("mailto:%s" % uid)
+    elif "." in uid:
+        uid = URIRef(uid)
+    else:
+        uid = URIRef("%s/users/%s#" % (request.host, uid))
+
     password = request.parameters.get("password", None)
     return_uri = URIRef(request.parameters.get("return_uri", "%s/" % request.host))
     login_uri = URIRef(request.parameters.get("login_uri"))
