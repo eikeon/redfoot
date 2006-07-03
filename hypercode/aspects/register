@@ -27,7 +27,7 @@
     <template:content rdf:resource="#auth_register"/>
   </server:Page>
 
-  <server:Page rdf:about="register_process_page">
+  <server:Page rdf:ID="register_process_page">
     <aspect:location>/register/process/</aspect:location>
     <rdfs:label>Register Process</rdfs:label>
     <rdfs:comment></rdfs:comment>
