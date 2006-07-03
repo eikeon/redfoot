@@ -74,8 +74,6 @@ else:
     <input type="hidden" name="register_uri" value="${request.uri}"/>    
   </form>
 
-  <p>or TODO: via FOAF identifier</p>
-
  </span> 
       ]]></rdf:value>
   </server:PagePartHandler>
