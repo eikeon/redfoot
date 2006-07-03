@@ -1,11 +1,34 @@
-  <server:Page rdf:about="/register/">
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
+  xmlns:rdfs='http://www.w3.org/2000/01/rdf-schema#'
+  xmlns:rdfe="http://redfoot.net/rdf#"
+  xmlns:redfoot='http://redfoot.net/2005/redfoot#'
+  xmlns:server="http://redfoot.net/2005/server#"
+  xmlns:template='http://redfoot.net/2005/template#'
+  xmlns:aspect="http://redfoot.net/hypercode/aspect#"
+>
+
+  <rdfe:RDFXMLDocument rdf:about="">
+  </rdfe:RDFXMLDocument>
+  
+  <aspect:Aspect rdf:ID="aspect">
+    <rdfs:label>Register</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <aspect:item rdf:resource="#register_page"/>
+    <aspect:item rdf:resource="#register_process_page"/>
+  </aspect:Aspect>
+
+  <server:Page rdf:ID="register_page">
+    <aspect:location>/register/</aspect:location>
     <rdfs:label>Register</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
     <template:content rdf:resource="#auth_register"/>
   </server:Page>
 
-  <server:Page rdf:about="/register/process/">
+  <server:Page rdf:about="register_process_page">
+    <aspect:location>/register/process/</aspect:location>
     <rdfs:label>Register Process</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <server:page_handler rdf:resource="#register_process"/>
@@ -125,3 +148,4 @@ if request.method=='POST':
       ]]></rdf:value>
   </server:PageHandler>
 
+</rdf:RDF>
