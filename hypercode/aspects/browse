@@ -68,14 +68,16 @@ Browse class Tree.
 
 <?python
 skip = False
+subclasses = set()
 for subclass in redfoot.subclasses(uri):
     if (uri, RDFS.subClassOf, subclass):
         skip = True
+    else:
+        subclasses.add(subclass)
 
 if seen is None:
     seen = set()
-if skip==False:
-    seen.add(uri)
+seen.add(uri)
 
 ?>
 <li>
@@ -84,7 +86,7 @@ if skip==False:
     <span kid:strip="" kid:if="isinstance(uri, BNode)">${redfoot.label(uri, uri)}</span>
 </li>    
 
-  <ul kid:for="subclass in redfoot.subclasses(uri)">
+  <ul kid:for="subclass in subclasses">
 
   <span kid:strip="" kid:if="skip==False and subclass not in seen">
     ${display_class(subclass, seen=set(seen))}
