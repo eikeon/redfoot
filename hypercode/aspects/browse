@@ -73,7 +73,7 @@ seen.add(uri)
 
 skip = False
 for subclass in redfoot.subclasses(uri):
-    if (uri, RDF.subclassOf, subclass):
+    if (uri, RDFS.subClassOf, subclass):
         skip = True
 ?>
 <li>
