@@ -70,7 +70,7 @@ Browse class Tree.
 skip = False
 subclasses = set()
 for subclass in redfoot.subclasses(uri):
-    if (uri, RDFS.subClassOf, subclass) in redfoot:
+    if (uri, RDFS.subClassOf, subclass) not in redfoot:
         skip = True
     else:
         subclasses.add(subclass)
