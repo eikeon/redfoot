@@ -67,14 +67,16 @@ Browse class Tree.
   kid:def="display_class(uri, seen=None)">
 
 <?python
-if seen is None:
-    seen = set()
-seen.add(uri)
-
 skip = False
 for subclass in redfoot.subclasses(uri):
     if (uri, RDFS.subClassOf, subclass):
         skip = True
+
+if seen is None:
+    seen = set()
+if skip==False:
+    seen.add(uri)
+
 ?>
 <li>
     <a kid:if="isinstance(uri, URIRef)" 
