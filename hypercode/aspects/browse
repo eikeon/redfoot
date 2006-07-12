@@ -68,13 +68,13 @@ Browse class Tree.
 
 <?python
 skip = False
-subclasses = set()
-for subclass in redfoot.subclasses(uri):
-    if (uri, RDFS.subClassOf, subclass) not in redfoot:
-        skip = True
-    else:
-        subclasses.add(subclass)
 
+subclasses = set(redfoot.subclasses(uri))
+
+for subclass in redfoot.subclasses(uri):
+    for subsub in redfoot.subclasses(subclass):
+        if subclass not in redfoot.subclasses(subsub):
+            subclasses.remove(subsub)
 if seen is None:
     seen = set()
 seen.add(uri)
