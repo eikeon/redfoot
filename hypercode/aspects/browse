@@ -88,7 +88,7 @@ seen.add(uri)
 
   <ul kid:for="subclass in subclasses">
 
-  <span kid:strip="" kid:if="skip==False and subclass not in seen">
+  <span kid:strip="" kid:if="subclass not in seen">
     ${display_class(subclass, seen=set(seen))}
   </span>              
 
