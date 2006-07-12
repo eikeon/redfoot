@@ -75,6 +75,12 @@ for subclass in redfoot.subclasses(uri):
     for subsub in redfoot.subclasses(subclass):
         if subclass not in redfoot.subclasses(subsub):
             subclasses.remove(subsub)
+_subclasses = []
+for subclass in subclasses:
+    label = redfoot.label(subclass) or subclass
+    _subclasses.append((label, subclass))
+_subclasses.sort()
+
 if seen is None:
     seen = set()
 seen.add(uri)
@@ -86,7 +92,7 @@ seen.add(uri)
     <span kid:strip="" kid:if="isinstance(uri, BNode)">${redfoot.label(uri, uri)}</span>
 </li>    
 
-  <ul kid:for="subclass in subclasses">
+  <ul kid:for="label, subclass in _subclasses">
 
   <span kid:strip="" kid:if="subclass not in seen">
     ${display_class(subclass, seen=set(seen))}
