@@ -70,6 +70,11 @@ Browse class Tree.
 if seen is None:
     seen = set()
 seen.add(uri)
+
+skip = False
+for subclass in redfoot.subclasses(uri):
+    if (uri, RDF.subclassOf, subclass):
+        skip = True
 ?>
 <li>
     <a kid:if="isinstance(uri, URIRef)" 
@@ -79,7 +84,7 @@ seen.add(uri)
 
   <ul kid:for="subclass in redfoot.subclasses(uri)">
 
-  <span kid:strip="" kid:if="subclass not in seen">
+  <span kid:strip="" kid:if="skip==False and subclass not in seen">
     ${display_class(subclass, seen=set(seen))}
   </span>              
 
