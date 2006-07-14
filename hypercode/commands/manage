@@ -215,7 +215,8 @@ prefix = redfoot.absolutize(prefix, defrag=False)
 REDFOOT = redfoot.namespace("http://redfoot.net/2005/redfoot#")
 DC_creator = URIRef("http://purl.org/dc/elements/1.1/creator")
 
-for cid in redfoot.contexts():
+for context in redfoot.contexts():
+    cid = context.identifier
     if cid.startswith(prefix):
         try:
             source = redfoot.index.value(cid, REDFOOT.source)
