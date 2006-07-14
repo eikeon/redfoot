@@ -85,6 +85,7 @@ if len(args)==0 or len(args)>3:
 else:
     import os
     from urllib import pathname2url
+    from urlparse import urljoin
     url = URIRef(args[0], base="%s/" % urljoin("file:", pathname2url(os.getcwd())))
     try:
         publicID = URIRef(redfoot.absolutize(args[1], defrag=False))
