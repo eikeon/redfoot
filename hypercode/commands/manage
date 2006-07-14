@@ -83,7 +83,9 @@ redfoot.base = URIRef(args[0])
 if len(args)==0 or len(args)>3:
     print "usage: ./redfoot.py load <uri> [<publicID>]"
 else:
-    url = URIRef(args[0])
+    import os
+    from urllib import pathname2url
+    url = URIRef(args[0], base="%s/" % urljoin("file:", pathname2url(os.getcwd())))
     try:
         publicID = URIRef(redfoot.absolutize(args[1], defrag=False))
     except:
