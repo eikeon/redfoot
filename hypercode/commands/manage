@@ -152,8 +152,9 @@ for arg in args:
 
 REDFOOT = redfoot.namespace("http://redfoot.net/2005/redfoot#")
 
-for cid in redfoot.contexts():
+for context in redfoot.contexts():
     try:
+        cid = context.identifier
         source = redfoot.index.value(cid, REDFOOT.source)
         if source is None or cid.startswith(source):
             redfoot.write(cid+"\n")
@@ -182,12 +183,13 @@ for arg in args:
         uri = BNode(arg[1:])
     else:
         uri = URIRef(redfoot.absolutize(arg, defrag=0))
-    if uri in redfoot.contexts():
-        print "removing:", uri
-        redfoot.remove_context(uri) 
+    for context in redfoot.contexts():
+        if uri== context.identifier:
+            print "removing:", uri
+            redfoot.remove_context(context) 
     for cid in redfoot.index.subjects(REDFOOT.source, uri):
         print "removing: %s\n    source: %s" % (cid, uri)
-        redfoot.remove_context(cid)
+        redfoot.remove_context(redfoot.get_context(cid))
 
 ]]>
       </rdf:value>
@@ -677,7 +679,8 @@ except:
 if startswith:
     # list is currently needed else not all will get removed due to
     # concurrency issues (removing while iterating over)
-    for cid in list(redfoot.contexts()):
+    for context in list(redfoot.contexts()):
+        cid = context.identifier
         try:
             if cid.startswith(startswith):
                 redfoot.write("Removing: %s\n" % cid)
