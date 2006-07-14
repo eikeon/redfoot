@@ -40,14 +40,16 @@ from urlparse import urljoin, urldefrag, urlparse
 from urllib import pathname2url, url2pathname
 from itertools import chain
 import os
+import logging
 
-logging = redfoot_loader.log
+logger = logging.getLogger("redfoot.kernel")
 
-root = logging.getLogger()
-#root.setLevel(logging.DEBUG)
+import rdflib
+assert rdflib.__version__ > "2.3.0", "This kernel requires rdflib 2.3.2 or greater"
 
 from rdflib import RDF, RDFS, Namespace, StringInputSource
-from rdflib import Graph, URIRef, BNode, Literal
+from rdflib import URIRef, BNode, Literal
+from rdflib.Graph import Graph, ConjunctiveGraph
 from rdflib.util import first, date_time
 import urllib2, re
 from datetime import datetime, timedelta
@@ -229,7 +231,7 @@ class CacheableURLInputSource(InputSource, object):
             try:
                 httpStream = urllib2.urlopen(urllib2.Request(system_id, headers=hdrs))
             except urllib2.HTTPError, e:
-                logging.info("Recieved 304 status from server.  Cached content is sufficient")
+                logger.info("Recieved 304 status from server.  Cached content is sufficient")
                 self.modified = False
                 assert e.code == 304, "HTTP response code %s recieved after cacheable request to %s"%(e.code,self.url)
                 #HTTP Error 304: Not Modified, do nothing
@@ -252,24 +254,23 @@ class CacheableURLInputSource(InputSource, object):
         return self.url
 
 
-class Redfoot(Graph):
+class Redfoot(ConjunctiveGraph):
 
-    def __init__(self, backend):
-        super(Redfoot, self).__init__(backend)
+    def __init__(self, store):
+        super(Redfoot, self).__init__(store)
         self.scutterFailureCache = {}
 	self.__base = None # default to CWD
         self.__log = None        
         self.__index = None
         self.__config = None
-        # Note: we are currently being passed an open backend        
+        # Note: we are currently being passed an open store        
         global REDFOOT
         # bootstraping REDFOOT namespace        
         if not (NAMESPACE, None, None) in self:
             context = Graph()
             context.load(NAMESPACE)
         else:
-            context = super(Redfoot, self).get_context(self.context_id(NAMESPACE))
-            #context = self.get_context(self.context_id(NAMESPACE))            
+            context = Graph(store=self.store, identifier=self.context_id(NAMESPACE), namespace_manager=self)
         REDFOOT = self.namespace(NAMESPACE, context)
         self.check(NAMESPACE)
         
@@ -303,7 +304,7 @@ class Redfoot(Graph):
 
     def _get_log(self):
         if self.__log is None:
-            self.__log = logging
+            self.__log = logger
         return self.__log
     log = property(_get_log)
 
@@ -324,14 +325,11 @@ class Redfoot(Graph):
     config = property(__get_config)
 
     def __get_index(self):
-        index = self.__index
-        if index is None:
+        if self.__index is None:
             id = BNode("_index")
-            # To avoid recursion we call get_context on super then
-            # call get_context on self
-            index = self.__index = super(Redfoot, self).get_context(id) 
-            self.get_context(id, creator=redfoot_loader.program)  
-        return index
+            self.__index = Graph(store=self.store, identifier=id, namespace_manager=self)
+            self.get_context(id, creator=redfoot_loader.program) # to add creator and other bits that get_context adds
+        return self.__index
     # context where redfoot stores data about contexts
     index = property(__get_index)
             
@@ -498,7 +496,7 @@ class Redfoot(Graph):
     def get_context(self, identifier, creator=None):
         """ Returns a Context graph for the given identifier, which
         must be a URIRef or BNode."""
-        result = super(Redfoot, self).get_context(identifier)
+        result = Graph(store=self.store, identifier=identifier, namespace_manager=self)
         self.index.remove((identifier, RDF.type, REDFOOT.DeletedContext))
         self.index.add((identifier, RDF.type, REDFOOT.Context))
         if creator and not (identifier, DC_creator, None) in self.index:
@@ -697,10 +695,10 @@ def add_func(store):
 try:
     redfoot = redfoot_loader.redfoot
 except:
-    redfoot = Redfoot(redfoot_loader.backend)
+    redfoot = Redfoot(redfoot_loader.store)
     #redfoot.store.add = add_func(redfoot.store)
     redfoot_loader.redfoot = redfoot 
-    # NOTE: redfoot_loader is already dealing with opening and closing the backend
+    # NOTE: redfoot_loader is already dealing with opening and closing the store
 
 from optparse import OptionParser
 parser = OptionParser("usage: %prog")
