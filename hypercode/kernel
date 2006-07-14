@@ -505,11 +505,11 @@ class Redfoot(ConjunctiveGraph):
             self.index.add((identifier, DC_created, Literal(date_time())))
         return result
 
-    def remove_context(self, identifier):
+    def remove_context(self, context):
         """removes both the context and metadata about the context."""
-        self.index.remove((identifier, None, None))
-        self.index.add((identifier, RDF.type, REDFOOT.DeletedContext))        
-        super(Redfoot, self).remove_context(identifier)
+        self.index.remove((context.identifier, None, None))
+        self.index.add((context.identifier, RDF.type, REDFOOT.DeletedContext))        
+        super(Redfoot, self).remove_context(context)
 
     def module(self, subject):
         if not isinstance(subject, URIRef):

@@ -743,10 +743,9 @@ for t, cg in list(redfoot.store.triples((None, None, None), None)):
 
 # rename contexts (and checking again if there's any triples that need
 # renaming... probably can/should get rid of this redundant bit)
-for cid in list(redfoot.contexts()):
-    context = redfoot.get_context(cid)
-    if OLD in cid:
-        new_context = redfoot.get_context(URIRef(cid.replace(OLD, NEW)))
+for context in list(redfoot.contexts()):
+    if OLD in context.identifier:
+        new_context = redfoot.get_context(URIRef(context.identifier.replace(OLD, NEW)))
     else:
         new_context = context
 
@@ -761,7 +760,7 @@ for cid in list(redfoot.contexts()):
         new_context.add((s, p, o))
 
     if new_context!=context:
-        redfoot.remove_context(cid)
+        redfoot.remove_context(context.identifier)
 
 ]]>
        </rdf:value>
