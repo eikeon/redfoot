@@ -51,7 +51,8 @@ subclasses = set(redfoot.subclasses(uri))
 for subclass in redfoot.subclasses(uri):
     for subsub in redfoot.subclasses(subclass):
         if subclass not in redfoot.subclasses(subsub):
-            subclasses.remove(subsub)
+            if subsub in subclasses:
+                subclasses.remove(subsub)
 _subclasses = []
 for subclass in subclasses:
     label = redfoot.label(subclass) or subclass
