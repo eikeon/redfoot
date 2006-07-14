@@ -8,47 +8,21 @@
    xmlns:server="http://redfoot.net/2005/server#"
 >
 
-  <server:PagePartHandler rdf:ID="v1">
+  <rdfe:RDFXMLDocument rdf:about="">
+  </rdfe:RDFXMLDocument>
+  
+  <aspect:Aspect rdf:ID="aspect">
+    <rdfs:label>Comments</rdfs:label>
+    <aspect:item rdf:resource="#browse_page"/>
+  </aspect:Aspect>
+
+  <server:Page rdf:ID="browse_page">
+    <aspect:location>/browse/</aspect:location>
     <rdfs:label>Browse</rdfs:label>
-    <rdfs:comment>
-
-Browse class Tree.
-
-    </rdfs:comment>
-    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
-
-  <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
-
-<?python BROWSE = redfoot.namespace("http://redfoot.net/2005/browse#") ?>
-
-<ul kid:def="display_class(uri, seen=None)">
-  <span kid:if="not seen or uri not in seen">
-    <?python
-if seen is None:
-    seen = set()
-seen.add(uri)
-?>
-      <li kid:for="subclass in redfoot.subclasses(uri)">
-        <a kid:if="isinstance(subclass, URIRef)" 
-           href="${request.relative(subclass.concrete())}">${redfoot.label(subclass, subclass)}</a>
-        <span kid:strip="" kid:if="isinstance(subclass, BNode)">${redfoot.label(subclass, subclass)}</span>
-        ${display_class(subclass, seen=set(seen))}
-      </li>
-      <li kid:for="instance in redfoot.instances(uri)">
-        <a kid:if="isinstance(instance, URIRef)"
-           href="${request.relative(instance.concrete())}">${redfoot.label(instance, instance)}</a>
-        <span kid:strip="" kid:if="isinstance(instance, BNode)">${redfoot.label(instance, instance)}</span>
-      </li>
-  </span>      
-</ul>
-
-${display_class(redfoot.value(request.uri, BROWSE.root) or RDFS.Resource)}
-
-  </span>
-      
-]]>
-    </rdf:value>
-  </server:PagePartHandler>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
+    <template:content rdf:resource="#browse"/>
+  </server:Page>
 
   <server:PagePartHandler rdf:ID="browse">
     <rdfs:label>Browse</rdfs:label>
