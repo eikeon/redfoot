@@ -36,7 +36,7 @@ class BootLoader(ConjunctiveGraph):
         self.__config = None
 
     def __set_program(self, program):
-        self.config.remove((REDFOOT.Globals, REDFOOT.program, None))
+        self.remove((REDFOOT.Globals, REDFOOT.program, None))
         if program:
             self.config.add((REDFOOT.Globals, REDFOOT.program, program))
         self.commit()
