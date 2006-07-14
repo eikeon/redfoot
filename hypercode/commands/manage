@@ -85,7 +85,7 @@ if len(args)==0 or len(args)>3:
 else:
     url = URIRef(args[0])
     try:
-        publicID = URIRef(args[1])
+        publicID = URIRef(redfoot.absolutize(args[1], defrag=False))
     except:
         publicID = None
     print "loading: %s" % url
