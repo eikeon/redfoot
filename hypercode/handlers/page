@@ -116,6 +116,8 @@ accept = request.headers.get("accept")
 if accept and "application/rdf+xml" in accept:  
     if page_handler and (page_handler, SERVER.content_type, Literal("application/rdf+xml")) in redfoot:
         page_handler = page_handler
+    elif (request.uri, RDF.type, SERVER.StaticPage) in redfoot:
+        page_handler = page_handler
     else:
         page_handler = URIRef("#rdfxml_handler", base=redfoot_current)
 
