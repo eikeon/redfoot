@@ -111,6 +111,7 @@ if page_handler is None:
     response.write("No page handler found")
     response.finish()
 
+long_running = None
 accept = request.headers.get("accept")
 # TODO: check for best match
 if accept and "application/rdf+xml" in accept:  
@@ -118,6 +119,7 @@ if accept and "application/rdf+xml" in accept:
         page_handler = page_handler
     elif (request.uri, RDF.type, SERVER.StaticPage) in redfoot:
         page_handler = page_handler
+        long_running = "true"
     else:
         page_handler = URIRef("#rdfxml_handler", base=redfoot_current)
 
@@ -134,7 +136,7 @@ response.setHeader("Expires", datetimeToString(time()))
 redfoot.execute(lookup(SERVER.display_support), context=globals())
 
 # TODO allow the long running assertion to be on the page_handler or page_part_handler as well?
-long_running = redfoot.value(request.uri, SERVER.long_running)
+long_running = long_running or redfoot.value(request.uri, SERVER.long_running)
 if str(long_running)=="true": # TODO:
     def finish(_):
         response.finish()
