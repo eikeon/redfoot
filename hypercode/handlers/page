@@ -137,6 +137,7 @@ redfoot.execute(lookup(SERVER.display_support), context=globals())
 
 # TODO allow the long running assertion to be on the page_handler or page_part_handler as well?
 long_running = long_running or redfoot.value(request.uri, SERVER.long_running)
+long_running = "true"
 if str(long_running)=="true": # TODO:
     def finish(_):
         response.finish()
