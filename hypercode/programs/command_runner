@@ -46,6 +46,7 @@ code = commands.get(command, None)
 if code:
     redfoot.execute(code, args=args[1:])
 else:
+    import logging
     _logger = logging.getLogger("redfoot.%s" % redfoot_current)    
     if command:
         _logger.info("Command '%s' not found." % command)
