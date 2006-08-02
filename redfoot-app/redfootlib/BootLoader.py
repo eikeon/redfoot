@@ -18,8 +18,6 @@ else:
     if version < REQUIRED:
         show_install_message("rdflib %s or greater required. Found rdflib version %s" % ("%s.%s.%s" % REQUIRED, rdflib.__version__))        
 
-logger.info("rdflib version: %s" % rdflib.__version__)
-
 from rdflib import RDF, RDFS, URIRef, BNode, Namespace
 from rdflib.Graph import Graph, ConjunctiveGraph
 
@@ -62,9 +60,6 @@ class BootLoader(ConjunctiveGraph):
         super(BootLoader, self).open(path, create=True)
 
     def main(self, options, args):
-        if options.quiet:
-            logger.getLogger().setLevel(logging.WARNING)
-    
         update = options.update
         if options.clear_default:
             self.program = None                 
@@ -101,9 +96,9 @@ class BootLoader(ConjunctiveGraph):
         assert value, "No RDF.value found for: %s" % program
         assert value.datatype==REDFOOT.Python, "%s RDF.value is not of datatype REDFOOT.Python. This version of redfoot only supports REDFOOT.Python code values" % program
     
-        program_args = options.program_args
-        if program_args:
-            args = [program_args,] + args
+        program_options = options.program_options
+        if program_options:
+            args = [program_options,] + args
         try:
             c = compile(value+"\n", program, "exec")
             exec c in dict({"redfoot_loader": self, "args": args, "redfoot_program": program})
