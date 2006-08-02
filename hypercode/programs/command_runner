@@ -46,14 +46,11 @@ code = commands.get(command, None)
 if code:
     redfoot.execute(code, args=args[1:])
 else:
-    import logging
-    _logger = logging.getLogger("%s" % redfoot_current)    
     if command:
-        _logger.info("Command '%s' not found." % command)
-    _logger.info("")
+        redfoot.write("Command '%s' not found.\n" % command)
     command_list = commands.keys()
     command_list.sort()
-    _logger.info("available commands: %s" % " ".join(command_list))
+    redfoot.write("available commands: \n    %s\n" % ", ".join(command_list))
 
 ]]>
     </rdf:value>
