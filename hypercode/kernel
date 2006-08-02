@@ -42,7 +42,7 @@ from itertools import chain
 import os
 import logging
 
-logger = logging.getLogger("%s" % redfoot_loader.label(redfoot_program, "kernel"))
+logger = logging.getLogger("%s" % redfoot_loader.label(redfoot_program, redfoot_program))
 
 import rdflib
 assert rdflib.__version__ > "2.3.0", "This kernel requires rdflib 2.3.2 or greater"
