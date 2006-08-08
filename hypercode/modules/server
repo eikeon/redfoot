@@ -115,13 +115,14 @@ class Request(object):
 		return p
 	return default
 
-    #def objects(self, predicate):
-    #    sources = chain([self.uri], redfoot.types(self.uri), [self.host, redfoot.uri, REDFOOT.Globals]) 
-    #    if (self.uri, RDF.type, RDFS.Class) in redfoot:
-    #        sources.next() # ignore self.uri
-    #    for source in sources: 
-    #        for p in redfoot.objects(source, predicate):
-    #            yield p
+    def objects(self, predicate):
+        # being used in hypercode/handlers/page#put_handler
+        sources = chain([self.uri], redfoot.types(self.uri), [self.host, redfoot.uri, REDFOOT.Globals]) 
+        if (self.uri, RDF.type, RDFS.Class) in redfoot:
+            sources.next() # ignore self.uri
+        for source in sources: 
+            for p in redfoot.objects(source, predicate):
+                yield p
 
     def relative(self, uri):
         if not uri.startswith(self.host):
