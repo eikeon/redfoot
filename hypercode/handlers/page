@@ -261,8 +261,9 @@ if uid and uid in request.objects(REDFOOT.admin):
     cid = request.uri.abstract()
     if not (cid, RDF.type, REDFOOT.Context) in redfoot:
         cid = redfoot.context_id(cid) # default context
-    redfoot.remove_context(cid)
+    #redfoot.remove_context(cid)
     context = redfoot.get_context(cid, creator=uid)
+    context.remove((None, None, None))
     base = redfoot.context_id(cid, context_id="") # TODO: basically defrag... need better way.
     context.parse(request.content, publicID=base)
 else:
