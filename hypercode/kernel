@@ -508,7 +508,7 @@ class Redfoot(ConjunctiveGraph):
     def remove_context(self, context):
         """removes both the context and metadata about the context."""
         if isinstance(context, URIRef) or isinstance(context, BNode):
-            context = get_context(context)
+            context = self.get_context(context)
         self.index.remove((context.identifier, None, None))
         self.index.add((context.identifier, RDF.type, REDFOOT.DeletedContext))        
         super(Redfoot, self).remove_context(context)
