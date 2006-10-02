@@ -47,9 +47,17 @@
 
 REDFOOT = redfoot.namespace("http://redfoot.net/2005/redfoot#")
 
-assert len(args)==1, "expecting one argument that is the URIRef of an admin"
+#assert len(args)==1, "expecting one argument that is the URIRef of an admin"
 
-redfoot.config.add((REDFOOT.Globals, REDFOOT.admin, URIRef(args[0])))
+user = URIRef(args[0])
+
+redfoot.config.add((REDFOOT.Globals, REDFOOT.admin, user))
+
+if len(args)>1:
+    SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+    password = Literal(args[1].strip())
+    redfoot.config.add((user, RDF.type, SESSION.User))
+    redfoot.config.add((user, SESSION.hexdigest, password))
 
 ]]>
       </rdf:value>
