@@ -57,7 +57,9 @@ if len(args)>1:
     SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
     password = Literal(args[1].strip())
     redfoot.config.add((user, RDF.type, SESSION.User))
-    redfoot.config.add((user, SESSION.hexdigest, password))
+    import sha
+    hexdigest = Literal(sha.new(password).hexdigest())
+    redfoot.config.set((user, SESSION.hexdigest, hexdigest))
 
 ]]>
       </rdf:value>
