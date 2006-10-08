@@ -10,8 +10,8 @@ def show_install_message(msg): # TODO:
 
 try:
     import rdflib
-except:
-    show_install_message("rdflib not found")
+except ImportError, e:
+    show_install_message("rdflib not found: %s" % e)
 else:
     version = tuple([int(x) for x in rdflib.__version__.split(".", 2)])    
     REQUIRED = (2, 3, 1)
