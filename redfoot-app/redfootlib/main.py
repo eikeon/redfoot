@@ -9,12 +9,12 @@ For help on redfoot see:
 
 import optparse, logging
 
-parser = optparse.OptionParser(usage="usage: %prog [options] [args]")
+parser = optparse.OptionParser(usage="""usage: %prog [<%prog_options>] [program [<program_options>]][<program_args>]
+example: %prog --update program --help""")
 
 parser.allow_interspersed_args = False
 
 parser.add_option("--program", dest="program", help="URIRef of program to load and run. Defaults to program specified in http://redfoot.net/2005/redfoot#Defaults")
-parser.add_option("--program-options", dest="program_options", help="options to pass along to program.")
 parser.add_option("--set-default", action="store_true", dest="set_default", help="sets the current program as the default. Use with --program when also wanting to make the program the future default program.")
 parser.add_option("--clear-default", action="store_true", dest="clear_default", help="clears the current default program")
 parser.add_option("--update", action="store_true", dest="update", help="update cached version of program")    
@@ -22,12 +22,12 @@ parser.add_option("--verbose", "-v", action="store_true", dest="verbose", help="
 parser.add_option("--log-level", action="store", type="int", dest="log_level", help="numeric logger level (see Python's logging module for numeric values of the standard logging levels)")
 parser.add_option("--version", action="store_true", dest="version", help="Shows version of redfoot command line program and exits")    
 parser.add_option("--store", dest="store", help="name of rdflib store to use (name registered with rdflib's plugin module)")
-parser.add_option("--path", dest="path", help="path to database") # TODO: add alias called configuration... as that's what it's called now
+parser.add_option("--path", dest="path", help="path to database (defaults to __rfboot__)") # TODO: add alias called configuration... as that's what it's called now
 parser.add_option("--daemon", dest="daemon", action="store_true", help="run as a daemon")
 parser.add_option("--name", action="store", type="string", dest="name", help="name to use as base for log and PID files (when running with --daemon)")
 parser.add_option("--install-rdflib", dest="install_rdflib", action="store_true", help="download and install latest stable rdflib or version specified by URL or dev (for latest development version)")
 
-parser.set_defaults(path="__rfdb__", program = None, update=False, verbose=False, version=False, store=None, install_rdflib=False, set_default=False, clear_default=False, daemon=False, log_level=logging.WARNING, name="redfoot")
+parser.set_defaults(path="__rfboot__", program = None, update=False, verbose=False, version=False, store=None, install_rdflib=False, set_default=False, clear_default=False, daemon=False, log_level=logging.WARNING, name="redfoot")
 
 
 def main(command=None):
@@ -83,6 +83,8 @@ def main(command=None):
         _logger.info("opening with store=%s and configuration=%s" % (options.store, options.path))
         loader.open(options.path)
         try:
+            if len(args)>0 and args[0]=="program":
+                args = args[1:]
             loader.main(options, args)
         finally:
             _logger.info("closing store=%s with configuration=%s" % (options.store, options.path))

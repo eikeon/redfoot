@@ -87,9 +87,6 @@ class BootLoader(ConjunctiveGraph):
         assert value, "No RDF.value found for: %s" % program
         assert value.datatype==REDFOOT.Python, "%s RDF.value is not of datatype REDFOOT.Python. This version of redfoot only supports REDFOOT.Python code values" % program
     
-        program_options = options.program_options
-        if program_options:
-            args = [program_options,] + args
         try:
             c = compile(value+"\n", program, "exec")
             exec c in dict({"redfoot_loader": self, "args": args, "redfoot_program": program})
