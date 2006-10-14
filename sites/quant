@@ -163,7 +163,104 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
 ?>
   ${display(lookup(TEMPLATE.head))}
   <body>
-<h1>TODO</h1>
+    <table id="boundary" cellspacing="0px" cellpadding="0px" align="center">
+      <tr>
+        <td colspan="2">
+          <table id="header" cellspacing="0px" cellpadding="0px" border="0">
+            <tr><td id="headerTitle"><h1>Certus Investments</h1></td></tr>
+            <tr><td id="headerGraphic"><img id="headerGraphic" src="images/headerGraphic.gif" alt=""></td></tr>
+            <tr><td class="horizontalSpacer"></td></tr>
+            <tr>
+              <td>
+                <!-- Start the nav menu-->
+                <table id="headerMenu" cellspacing="0px" cellpadding="0px">
+                  <tr>
+                    <td class="menuItem" width="120">&nbsp</td>
+                    <td class="smallVerticalSpacer"></td>
+                    <td class="menuItem"><a class="menuItemLink" href="" target="">HOME</a></td>
+                    <td class="verticalSpacer"></td>
+                    <td class="menuItem"><a class="menuItemLink" href="" target="">BACKGROUND</a></td>
+                    <td class="verticalSpacer"></td>
+                    <td class="menuItem"><a class="menuItemLink" href="" target="">STRATEGIES</a></td>
+                    <td class="verticalSpacer"></td>
+                    <td class="menuItem"><a class="menuItemLink" href="" target="">PERFORMANCE</a></td>
+                    <td class="verticalSpacer"></td>
+                    <td class="menuItem"><a class="menuItemLink" href="" target="">CONTACT</a></td>
+                    <td class="smallVerticalSpacer"></td>
+                    <td class="menuItem" width="120">&nbsp</td>                  
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr><td class="horizontalSpacer" colspan="9"></td></tr>
+            </table>
+          </td>
+	</tr>
+      <tr>
+        <td>
+          <table id="main" cellspacing="0px" cellpadding="0px" border="0">
+            <tr>
+              <td id="contactSmallPanel" valign="top">
+                <table id="contactSmall" cellspacing="0px" cellpadding="3px" border="0">
+                  <tr>
+                    <td id="contactSmallTitle">
+                      Contact Info
+                    </td>
+                  </tr>
+                  <tr>
+                    <td id="address">
+                      1764 Church St. NW Ste. 3<BR />
+                      Washington, DC 20036<BR />                                   
+                      USA<BR />
+                      <BR />
+                    </td>
+                  </tr>
+                  
+                  <tr>
+                    <td id="contactSmallTitle">
+                      News
+                    </td>
+                  </tr>
+                  <tr>
+                    <td id="news">
+                      Official site launch October 2006.
+                    </td>
+                  </tr>
+                </table>
+              </td>
+              <td class="verticalSpacer"></td>
+              <td id="centerPanel" valign="top">
+                <b>Certus Investments is an independent consultancy specializing in the research and development of quantitative financial market modelling and investment strategies.</b>
+                
+                <p>
+                  For more details, please <a href="">register</a> or <a href="">contact us</a>.
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+      
+      <!-- Footer -->
+      
+      <table width="100%" id="footer" cellpadding="0" cellspacing="0" border="0" align="center">
+	<tr>
+	  <td height="5"></td>
+	</tr>
+	<tr>
+	  <td align="center" width="100%" align="left">Copyright 2006 &copy; Certus Investments. All Rights Reserved.</td>
+	</tr>
+	<tr>
+	  <td height="5"></td>
+	</tr>
+	<tr>
+	  <!--<td>Please read our <a class="disclaimer" href="Disclaimer.jsp">Disclaimer</a> and <a class="disclaimer" href="PrivacyPolicy.jsp">Privacy Policy</a>.</td>-->
+	</tr>
+	<tr>
+	  <td height="9"></td>
+	</tr>
+      </table>
+      <!-- Footer Ends -->
   </body>
 </html>
 ]]>
