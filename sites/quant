@@ -175,7 +175,7 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
                 <!-- Start the nav menu-->
                 <table id="headerMenu" cellspacing="0px" cellpadding="0px">
                   <tr>
-                    <td class="menuItem" width="120">&nbsp;</td>
+                    <td class="menuItem" width="120">&#160;</td>
                     <td class="smallVerticalSpacer"></td>
                     <td class="menuItem"><a class="menuItemLink" href="" target="">HOME</a></td>
                     <td class="verticalSpacer"></td>
@@ -187,7 +187,7 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
                     <td class="verticalSpacer"></td>
                     <td class="menuItem"><a class="menuItemLink" href="" target="">CONTACT</a></td>
                     <td class="smallVerticalSpacer"></td>
-                    <td class="menuItem" width="120">&nbsp;</td>                  
+                    <td class="menuItem" width="120">&#160;</td>                  
                   </tr>
                 </table>
               </td>
@@ -248,7 +248,7 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
 	  <td height="5"></td>
 	</tr>
 	<tr>
-	  <td align="center" width="100%" align="left">Copyright 2006 &copy; Certus Investments. All Rights Reserved.</td>
+	  <td align="center" width="100%" align="left">Copyright 2006 &#169; Certus Investments. All Rights Reserved.</td>
 	</tr>
 	<tr>
 	  <td height="5"></td>
