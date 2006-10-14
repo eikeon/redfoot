@@ -102,7 +102,7 @@ response.write("Symbols updated")
         </rdf:value>
       </template:Content>
     </template:content>
-  </rdfs:Class>
+  </rdf:Description>
 
   <rdfs:Class rdf:about="quant#Stock">
     <template:content>
