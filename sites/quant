@@ -29,6 +29,7 @@
   <server:Site rdf:about="">  
     <template:section rdf:resource="/"/>
     <template:section rdf:resource="/browse/"/>
+    <server:page_handler rdf:resource="#page"/>
   </server:Site>
   <!-- TODO: clean up what identifier we're using for server:Site instances "" or "data#Site -->
   <rdf:Description rdf:about="data#Site">  
@@ -137,5 +138,36 @@ symbol = redfoot.value(uri, QUANT.symbol)
       </template:Content>
     </template:content>
   </rdfs:Class>
+
+  <template:Template rdf:ID="page">
+    <rdfs:label>Quant Template</rdfs:label>
+    <template:content rdf:resource="#content"/>
+    <template:background_color>#B0C9BE</template:background_color>
+    <template:head rdf:resource="https://svn.redfoot.net/trunk/hypercode/templates/classic#head"/>
+    <template:css rdf:resource="#css"/>
+    <template:title rdf:resource="#title"/>
+    <template:shortcut_icon rdf:resource="http://redfoot.net/2002/11/25/favicon.ico"/>
+    <template:header rdf:resource="#header"/>
+    <template:navigation rdf:resource="#navigation"/>
+    <template:user_navigation rdf:resource="#user_navigation"/>
+    <template:footer rdf:resource="#footer"/>
+    <server:unauthorized_page_handler rdf:resource="#unauthorized_page_handler"/>
+    <server:unauthorized_content_handler rdf:resource="#unauthorized_content_handler"/>
+    <server:content_type>application/xhtml+xml</server:content_type>
+    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[<html xmlns="http://www.w3.org/1999/xhtml" xmlns:kid="http://purl.org/kid/ns#">
+<?python SERVER = redfoot.namespace("http://redfoot.net/2005/server#")?>
+<?python TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")?>
+<?python
+title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract(), None) or "-"
+?>
+  ${display(lookup(TEMPLATE.head))}
+  <body>
+<h1>TODO</h1>
+  </body>
+</html>
+]]>
+    </rdf:value>    
+  </template:Template>
 
 </rdf:RDF>
