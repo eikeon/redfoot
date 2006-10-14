@@ -3,6 +3,8 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
    xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:server="http://redfoot.net/2005/server#"
+   xmlns:template="http://redfoot.net/2005/template#"
 >  
 
   <redfoot:Namespace rdf:about="#">
@@ -15,6 +17,42 @@
     <rdfs:label>Comment</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/server#Class"/>
+    <template:content>
+     <server:PagePartHandler rdf:ID="comment_handler">
+      <rdfs:label>comment handler</rdfs:label>
+      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+<div xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:kid="http://purl.org/kid/ns#"
+     class="comment"
+>
+<?python
+import time
+from rdflib.util import parse_date_time
+
+COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")
+DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
+DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
+
+comment = request.uri.abstract()
+resource = redfoot.value(None, COMMENT.comment, comment)
+date = redfoot.value(comment, DCTERMS.created)
+
+creator =  redfoot.value(comment, DC.creator)
+creator_label = redfoot.label(creator) or creator.split('@')[0]
+?>
+
+<p>
+by ${creator_label}
+<span kid:if="date">on ${time.strftime("%A %d %B, %Y", time.gmtime(parse_date_time(date)))}</span> 
+regarding <a href="${request.relative(resource)}">${redfoot.label(resource, resource)}</a>:</p>
+<pre>${redfoot.value(comment, RDFS.comment)}</pre>
+
+</div>
+]]>
+      </rdf:value>
+     </server:PagePartHandler>
+    </template:content>
   </rdfs:Class>
 
   <rdf:Property rdf:ID="comment">

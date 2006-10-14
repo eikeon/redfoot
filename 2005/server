@@ -4,6 +4,7 @@
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
    xmlns:redfoot="http://redfoot.net/2005/redfoot#"
    xmlns:server="http://redfoot.net/2005/server#"
+   xmlns:template="http://redfoot.net/2005/template#"
 >  
 
   <redfoot:Namespace rdf:about="#">
@@ -43,6 +44,74 @@
     <rdfs:label>Site</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/redfoot#Resource"/>
+    <server:allow rdf:resource="#Admin"/>
+    <template:content>
+      <server:PagePartHandler rdf:ID="site_handler">
+        <rdfs:label>file handler</rdfs:label>
+        <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+<div xmlns:kid="http://purl.org/kid/ns#" kid:strip="">
+<?python
+Site = URIRef("http://redfoot.net/2005/server#Site")
+allowed = allow(Site)
+
+action = request.parameters.get("action")
+label = request.parameters.get("label")
+site = request.uri.abstract()
+if action=="set_label":
+    # TODO: ah... we should have get_context just do the context_id bit.
+    context = redfoot.get_context(redfoot.context_id(site, context_id="context"))
+    if allowed:
+        redfoot.remove((site, RDFS.label, None))
+        context.add((site, RDFS.label, Literal(label)))
+site_label = redfoot.value(site, RDFS.label, any=True)
+
+aspects = []
+for aspect in redfoot.subjects(RDF.type, URIRef("http://redfoot.net/hypercode/aspect#Aspect")):
+    redfoot.check(aspect)
+    label = redfoot.label(aspect) or aspect
+    aspects.append((label, aspect))
+aspects.sort()
+
+import rdflib, redfootlib, twisted, kid
+?>
+
+  <form kid:if="allowed" method="POST" action="" style="display: inline">
+    <p kid:if="allowed">Set Site Label:
+      <input type="text" name="label" value="${site_label}"/>
+      <input type="submit" name="action" value="set_label"/>
+    </p>
+  </form>
+
+  <span kid:if="allowed" kid:strip="">  
+  <h3>Aspects</h3>
+  <ul>
+    <li kid:for="label, aspect in aspects">
+      <a href="${request.relative(aspect.concrete())}">${label}</a>
+    </li>
+  </ul>
+  </span>
+
+  <h3>Version Info</h3>
+  <ul>
+    <li>redfoot: ${redfootlib.__version__}</li>
+    <li>rdflib: ${rdflib.__version__} (${rdflib.__date__})</li>
+    <li>kernel: ${redfoot_program}</li>
+    <li>twisted: ${twisted.__version__}</li>
+    <li>kid: ${kid.__version__}</li>
+  </ul>
+
+  <h3>Stats</h3>
+  <ul>
+    <li>Number of Triples: ${len(redfoot)}</li>
+    <li>Number of Contexts: ${len(list(redfoot.contexts()))}</li>
+  </ul>
+
+</div>
+]]>
+        </rdf:value>
+      </server:PagePartHandler>
+    </template:content>
   </rdfs:Class>
 
   <rdf:Property rdf:ID="site">

@@ -10,6 +10,11 @@
     <rdfs:comment>The Redfoot Handler namespace is...</rdfs:comment>
   </redfoot:Namespace>
 
+  <rdfs:Class rdf:ID="Section">
+    <rdfs:label>Section</rdfs:label>
+    <rdfs:subClassOf rdf:resource="server#Page"/>
+  </rdfs:Class>
+
   <rdf:Property rdf:ID="section">
     <rdfs:label>section</rdfs:label>
     <rdfs:comment></rdfs:comment>
