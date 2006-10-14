@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:rdfe="http://redfoot.net/rdf#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:server="http://redfoot.net/2005/server#"
+>
+
+  <rdfe:RDFXMLDocument rdf:about="">
+  </rdfe:RDFXMLDocument>
+  
+  <redfoot:Module rdf:about="#client">
+    <rdfs:label>XMPP Client</rdfs:label>      
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+from twisted.words.protocols.jabber import client, jid
+from twisted.words.xish import domish
+from twisted.internet import reactor
+        
+
+class Client(object):
+    def __init__(self, client_id, password, host, port):
+        self.client_id = client_id = jid.JID(client_id)
+        factory = client.basicClientFactory(client_id, password)
+        factory.addBootstrap('//event/stream/authd', self._authd)
+        reactor.connectTCP(host, port, factory)
+
+    def _authd(self, xmlstream):
+        print "authenticated" # TODO: change to _logger.info(
+        self.xmlstream = xmlstream
+
+        presence = domish.Element(('jabber:client','presence'))
+        xmlstream.send(presence)
+
+        xmlstream.addObserver('/message',  self.message)
+        xmlstream.addObserver('/presence', self.presence)
+        xmlstream.addObserver('/iq',       self.iq)   
+        #xmlstream.addObserver('/',       self.debug)   
+
+    def message(self, message):
+        # Echo for now
+        self.debug(message)
+        response = message
+        response["to"] = message["from"]
+        response["from"] = self.client_id.full()
+        self.xmlstream.send(response)
+    
+    def presence(self, presence):
+        self.debug(presence)
+        if presence["type"]=="subscribe":
+            response = domish.Element(('jabber:client','presence'))
+            response["to"] = presence["from"]
+            response["from"] = self.client_id.full()
+            response["type"] = "subscribed"
+            self.xmlstream.send(response)
+
+    def iq(self, iq):
+        self.debug(iq)
+        pass
+
+    def debug(self, element):
+        print element.toXml().encode('utf-8')
+        print "="*20
+            
+    def send(self, to, msg):
+        message = domish.Element(('jabber:client','message'))
+        message["to"] = to
+        message["from"] = self.client_id.full()
+        message["id"] = "%s" % __uri__ # uri of this module
+        message["type"] = "chat"
+        message.addElement("body", "jabber:client", msg)
+        self.xmlstream.send(message)
+        self.debug(message)
+
+
+#c = Client(JID('redfoot@eikeon.com', 'password_here', 'eikeon.com', 5222))
+#reactor.run()
+
+]]>
+    </rdf:value>
+  </redfoot:Module>
+
+</rdf:RDF>  
