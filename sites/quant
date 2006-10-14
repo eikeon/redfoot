@@ -170,4 +170,207 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
     </rdf:value>    
   </template:Template>
 
+  <server:PagePartHandler rdf:ID="css">
+    <rdfs:label>Quant css</rdfs:label>
+    <server:content_type>text/css</server:content_type>
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+
+TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")
+
+color = lookup(TEMPLATE.background_color) or "#cccccc"
+
+response.write("""
+
+body {
+    margin: 0px;
+    color: black;
+    background-color: #C0C0C0;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 10px;
+}
+
+
+#boundary {
+    width: 80%%;
+    border: 1px solid white;
+    color: black;
+    background-color: #F8F8F8;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 10px;
+}
+
+#headerTitle {
+   // border: medium none rgb(0,0,0);
+    //background-color: white;
+    background-color: #F8F8F8;
+    //width: 100%%;
+}
+
+
+#header {
+    border: medium none rgb(0,0,0);
+    //background-color: white;
+    background-color: #C0C0C0;
+    width: 100%%;
+}
+
+#headerLogo {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 40px;
+    height: 67px;
+    padding: 0px 0px 0px 20px;
+    color: rgb(62,114,141);
+    //background-color: white;
+    background-color: #C0C0C0;
+
+}
+
+#headerGraphic {
+    width: 100%%;
+    height: 90px;
+    //background-color: #999999;
+}
+
+#headerMenu {
+    width: 100%%;
+    border: medium none rgb(0,0,0);
+}
+
+TD.menuItem {
+    background-color: #999999;
+    text-align: center;
+}
+
+TD.menuItem a {
+font-family: Verdana, Arial, Helvetica, sans-serif;
+font-size: 10px;
+font-weight: normal;
+text-align: center; 
+text-decoration: none;
+display: block;
+color: white;
+background-color:#999999;
+margin:0px 0px 0px 0px;
+padding:5px 10px 5px 10px;
+}
+
+TD.menuItem a:hover {
+//color: #cc0000;
+color: #000066;
+}
+
+TD.horizontalSpacer {
+    height: 2px;
+    background-color: white;
+}
+
+TD.verticalSpacer {
+    width: 2px;
+    background-color: white;
+}
+
+TD.smallVerticalSpacer {
+    width: 1px;
+    background-color: white;
+}
+
+#contactSmall {
+    border: 1px solid #999999;
+    color: black;
+    background-color: #F8F8F8;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    height: 150px;
+}
+
+#contactSmallPanel {
+    width: 149px;
+    border: medium none rgb(0,0,0);
+    margin: 0px;
+    padding: 20px 20px 20px 20px;
+    color: black;
+    //background-color: rgb(193,193,193);
+}
+
+#contactSmallTitle {
+    margin: 0px;
+    padding: 3px 3px 3px 3px;
+    color: black;
+    background-color: #999999;
+    height: 20px;
+    font-weight: bold;
+    text-align: center
+}
+
+#narrowLeftPanel {
+    width: 149px;
+    border: medium none rgb(0,0,0);
+    margin: 0px;
+    padding: 20px 20px 20px 20px;
+    color: black;
+    background-color: rgb(159,185,198);
+}
+
+.leftPanelTitle {
+    font-weight: bold;
+    color:  rgb(62,114,141);
+}
+
+
+#address{
+    text-align: center;
+}
+
+
+
+#centerPanel {
+    width: 470px;
+    border: medium none rgb(0,0,0);
+    margin: 0px;
+    padding: 20px 50px 20px 50px;
+    color: black;
+    background-color: #F8F8F8;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 10px;
+}
+
+
+#footer {
+    margin: 0px;
+    color: #999999;
+    background-color: #C0C0C0;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 10px;
+}
+
+H1 {   
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 40px;
+
+    font-weight: normal;
+    height: 67px;
+    padding: 0px 0px 0px 20px;
+    color: #000066;
+    //background-color: white;
+    margin: 0em;
+    // padding 0em;
+}
+     
+
+A {
+    color: #999999;
+    font-weight: bold;
+    text-decoration: none;
+}                           
+
+A:hover {
+    //color: #CC0000;
+    color: #000066;
+}                        
+
+""" % {"color": color})
+    
+    </rdf:value>
+  </server:PagePartHandler>
+
 </rdf:RDF>
