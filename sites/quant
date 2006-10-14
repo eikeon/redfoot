@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
+  xmlns:rdfs='http://www.w3.org/2000/01/rdf-schema#'
+  xmlns:redfoot='http://redfoot.net/2005/redfoot#'
+  xmlns:server='http://redfoot.net/2005/server#'
+  xmlns:session='http://redfoot.net/2005/session#'
+  xmlns:browse='http://redfoot.net/2005/browse#'
+  xmlns:template='http://redfoot.net/2005/template#'
+  xmlns:commands='http://redfoot.net/2005/commands#'
+>
+
+  <session:User rdf:about="mailto:chalaschek@gmail.com">
+    <rdfs:label>Chris Halaschek-Wiener</rdfs:label>
+    <session:hexdigest>84072d8ca1dbe193b29678b88698d3c8</session:hexdigest>
+  </session:User>
+
+  <!-- TODO: load these from my "FOAF" info -->
+  <session:User rdf:about="mailto:eikeon@eikeon.com">
+    <rdfs:label>Daniel Krech</rdfs:label>
+    <session:hexdigest>334b473e8c2555d5eb722e0c932df793</session:hexdigest>
+  </session:User>
+
+  <rdf:Description rdf:about="http://redfoot.net/2005/redfoot#Globals">
+    <redfoot:admin rdf:resource="mailto:chalaschek@gmail.com"/>
+    <redfoot:admin rdf:resource="mailto:eikeon@eikeon.com"/>
+  </rdf:Description>
+
+  <server:Site rdf:about="">  
+    <template:section rdf:resource="/"/>
+    <template:section rdf:resource="/browse/"/>
+  </server:Site>
+  <!-- TODO: clean up what identifier we're using for server:Site instances "" or "data#Site -->
+  <rdf:Description rdf:about="data#Site">  
+    <rdfs:label>Certus Investments</rdfs:label>
+  </rdf:Description>
+
+  <rdf:Description rdf:about="/">
+    <rdfs:label>Home</rdfs:label>
+    <template:section_rank>0.0</template:section_rank>
+  </rdf:Description>
+
+  <rdf:Description rdf:about="/browse/">
+    <browse:root rdf:resource="http://qam.eikco.com/quant#Resource"/>
+  </rdf:Description>
+
+  <rdf:Description rdf:about="/update_symbols/">
+    <template:content>
+      <template:Content rdf:ID="update_symbols">
+        <rdfs:label>Update Symbols</rdfs:label>
+       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+import urllib2
+import csv
+
+from rdflib import Namespace
+
+QUANT = Namespace(URIRef("quant#", base=request.host))
+c = redfoot.get_context(URIRef("#symbols", base=request.host))
+
+class Symbols:
+    def __init__(self, name, url):
+        self.name = name
+        self.url = url
+        self.list = []
+        self._update(url)
+        
+    def _update(self, url):
+        c.remove((None, None, None))
+        f = urllib2.urlopen(url)
+        # "Name","Symbol","Market Value (millions)","Description (as filed with the SEC)"
+
+        i = 0
+        for row in csv.reader(f):
+            if len(row)==4:
+                i += 1
+                #if i>500:
+                #    break
+                try:
+                    name, symbol, market_value, description = row
+                    uri = URIRef("ticker#%s" % symbol.replace("/", "_"), base=request.host)
+                    c.add((uri, RDF.type, QUANT.Stock))
+                    c.add((uri, QUANT.symbol, Literal(symbol)))
+                    c.add((uri, RDFS.label, Literal(name)))
+                    c.add((uri, RDFS.comment, Literal(description)))
+                    c.add((uri, QUANT.market_value, Literal(market_value)))
+                    c.add((uri, QUANT.exchange, Literal(self.name)))
+                except Exception, e:
+                    redfoot.log.info("%s" % e)
+                    
+        f.close()
+
+exchanges = []
+exchanges.append(Symbols("Nasdaq", "http://www.nasdaq.com/asp/symbols.asp?exchange=Q&start=0"))
+
+#exchanges.append(Symbols("OTCBB", "http://www.nasdaq.com/asp/symbols.asp?exchange=O&start=0"))
+#exchanges.append(Symbols("NYSE", "http://www.nasdaq.com/asp/symbols.asp?exchange=N&start=0"))
+#exchanges.append(Symbols("AMEX", "http://www.nasdaq.com/asp/symbols.asp?exchange=1&start=0"))
+
+response.write("Symbols updated")
+]]>
+        </rdf:value>
+      </template:Content>
+    </template:content>
+  </rdfs:Class>
+
+  <rdfs:Class rdf:about="quant#Stock">
+    <template:content>
+      <template:Content rdf:ID="Company">
+        <rdfs:label>Company</rdfs:label>
+       <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+<div xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:kid="http://purl.org/kid/ns#"
+     kid:strip=""
+>
+<?python
+from rdflib import Namespace
+
+QUANT = Namespace(URIRef("quant#", base=request.host))
+
+uri = request.uri.abstract()
+
+symbol = redfoot.value(uri, QUANT.symbol)
+
+?>
+  <p>${redfoot.value(uri, RDFS.comment)}</p>
+
+<img src="http://bigcharts.marketwatch.com/charts/big.chart?symb=${symbol}"></img>
+
+<img src="http://bigcharts.marketwatch.com/charts/big.chart?symb=${symbol}&amp;time=18&amp;freq=9"></img>
+
+
+</div>
+]]>
+        </rdf:value>
+      </template:Content>
+    </template:content>
+  </rdfs:Class>
+
+</rdf:RDF>
