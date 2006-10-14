@@ -5,6 +5,7 @@
    xmlns:rdfe="http://redfoot.net/rdf#"
    xmlns:redfoot="http://redfoot.net/2005/redfoot#"
    xmlns:commands="http://redfoot.net/2005/commands#"
+   xmlns:server="http://redfoot.net/2005/server#" 
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
@@ -282,6 +283,7 @@ for cid, _, source in redfoot.index.triples((None, REDFOOT.source, None)):
     <rdfs:label>server</rdfs:label>
     <redfoot:code>
      <redfoot:Python rdf:ID="server_code">
+      <server:server rdf:resource="../modules/server#twisted"/>
       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
@@ -294,11 +296,12 @@ if len(args)>0:
     except:
 	print "invalid port of '%s'" % port
     
-server = redfoot.value(redfoot.uri, SERVER.server) 
-assert server, "%s does not have a %s" % (redfoot.uri, SERVER.server)
+server = redfoot.value(redfoot_current, SERVER.server) 
+assert server, "%s does not have a %s" % (redfoot_current, SERVER.server)
 
 print "running server on port %s" % port
-redfoot.module(server).Server(port=port).run()
+redfoot.execute(server, context=globals())
+Server(port=port).run()
 
 ]]>
       </rdf:value>

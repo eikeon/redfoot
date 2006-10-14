@@ -12,6 +12,8 @@
   
   <redfoot:Python rdf:about="#">
     <rdfs:label>Command Runner</rdfs:label>
+    <commands:config rdf:resource="../commands/manage#config"/>
+    <commands:config rdf:resource="../commands/static#config"/>
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
@@ -21,7 +23,7 @@ COMMANDS = redfoot.namespace("http://redfoot.net/2005/commands#")
 
 commands = {}
 
-for config in chain(redfoot.objects(redfoot.uri, COMMANDS.config), 
+for config in chain(redfoot.objects(redfoot_current, COMMANDS.config), 
 		    redfoot.objects(REDFOOT.Globals, COMMANDS.config)):
     redfoot.check(config)
 

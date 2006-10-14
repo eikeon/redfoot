@@ -4,8 +4,6 @@
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
    xmlns:rdfe="http://redfoot.net/rdf#"
    xmlns:redfoot="http://redfoot.net/2005/redfoot#"
-   xmlns:commands = "http://redfoot.net/2005/commands#"        
-   xmlns:server = "http://redfoot.net/2005/server#"        
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
@@ -17,10 +15,6 @@
     <rdfs:comment>
     </rdfs:comment> 
     <redfoot:program rdf:resource="programs/command_runner#"/>
-    <commands:config rdf:resource="commands/manage#config"/>
-    <commands:config rdf:resource="commands/static#config"/>
-    <server:server rdf:resource="modules/server#twisted"/>
-    <server:handler rdf:resource="handlers/page#"/>
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
@@ -51,6 +45,8 @@ from rdflib import RDF, RDFS, Namespace, StringInputSource
 from rdflib import URIRef, BNode, Literal
 from rdflib.Graph import Graph, ConjunctiveGraph
 from rdflib.util import first, date_time
+from rdflib.Journal import JournalReader, JournalWriter
+
 import urllib2, re
 from datetime import datetime, timedelta
 
@@ -263,23 +259,7 @@ class Redfoot(ConjunctiveGraph):
         self.__log = None        
         self.__index = None
         self.__config = None
-        # Note: we are currently being passed an open store        
-        global REDFOOT
-        # bootstraping REDFOOT namespace        
-        if not (NAMESPACE, None, None) in self:
-            context = Graph()
-            context.load(NAMESPACE)
-        else:
-            context = Graph(store=self.store, identifier=self.context_id(NAMESPACE), namespace_manager=self)
-        REDFOOT = self.namespace(NAMESPACE, context)
-        self.check(NAMESPACE)
-        
-        self.uri = redfoot_program # uri to the version of redfoot that's running
-        context = dict({"redfoot": self, "REDFOOT": REDFOOT, 
-                        "RDF": RDF, "RDFS": RDFS,
-                        "URIRef": URIRef, "BNode": BNode, "Literal": Literal
-                        })
-        self.__context = context
+        self.__xmpp = None
         
     def absolutize(self, uri, defrag=1):
         base = self.base
@@ -311,6 +291,7 @@ class Redfoot(ConjunctiveGraph):
     def __get_program(self):
         # redfoot_program is defined by the BootLoader and is the boot program
         program = self.value(redfoot_program, REDFOOT.program)
+        program = program or redfoot_loader.value(redfoot_program, REDFOOT.program)
         assert program, "No default program found"            
         return program
     # program resource redfoot will execute
@@ -334,7 +315,27 @@ class Redfoot(ConjunctiveGraph):
     index = property(__get_index)
             
     def open(self, path):
-        super(Redfoot, self).open(path)
+        #super(Redfoot, self).open(path) # TODO: why does this not work?
+        self.store.open(path)
+
+    def _bootstrap(self):
+        # Note: we are currently being passed an open store        
+        global REDFOOT
+        # bootstraping REDFOOT namespace        
+        if not (NAMESPACE, None, None) in self:
+            context = Graph()
+            context.load(NAMESPACE)
+        else:
+            context = Graph(store=self.store, identifier=self.context_id(NAMESPACE), namespace_manager=self)
+        REDFOOT = self.namespace(NAMESPACE, context)
+        self.check(NAMESPACE)
+        
+        self.uri = redfoot_program # uri to the version of redfoot that's running
+        context = dict({"redfoot": self, "REDFOOT": REDFOOT, 
+                        "RDF": RDF, "RDFS": RDFS,
+                        "URIRef": URIRef, "BNode": BNode, "Literal": Literal
+                        })
+        self.__context = context
 
     def label(self, subject, default=''):
         # TODO: push this subproperty support back down into rdflib
@@ -674,10 +675,14 @@ class Redfoot(ConjunctiveGraph):
 		    yield property
 
     def main(self, options, args):
-        program = self.program
+        self.check(redfoot_program) # to get default program
+        if options.program:
+            program = URIRef(options.program)
+        else:
+            program = self.program
         try:
             self.check(program)
-        except Exception, e:
+        except ImportError, e: # TODO: something more specific that Exception
             self.log.warning("could not find program for '%s': %s" % (program, e))
         else:
             self.log.info("running: %s ( %s )" % (self.label(program), program))
@@ -686,29 +691,43 @@ class Redfoot(ConjunctiveGraph):
     def write(self, s, encoding="utf-8"):
         sys.stdout.write(s.encode(encoding))
 
+    def _get_xmpp(self):
+        if self.__xmpp is None:
+            xmpp = self.module(URIRef("modules/xmpp#client", base=redfoot_program))
+            self.__xmpp = xmpp.Client('redfoot@eikeon.com', 'Aboo,', 'eikeon.com', 5222)
+        return self.__xmpp
+    xmpp = property(_get_xmpp)
 
-def add_func(store):
-    orig_add = store.add
-    def add((s, p, o), context, quoted=False):
-        print "add:", s, p, o
-        orig_add((s, p, o), context=context, quoted=quoted)
-    return add
 
-try:
-    redfoot = redfoot_loader.redfoot
-except:
-    redfoot = Redfoot(redfoot_loader.store)
-    #redfoot.store.add = add_func(redfoot.store)
-    redfoot_loader.redfoot = redfoot 
-    # NOTE: redfoot_loader is already dealing with opening and closing the store
 
 from optparse import OptionParser
-parser = OptionParser("usage: %prog")
+parser = OptionParser("usage: %prog program <program_options>")
+parser.add_option("--path", dest="path", help="path to database") 
+parser.add_option("--program", dest="program", help="URIRef of program for kernel to load and run. Defaults to command_runner")
+parser.add_option("--rebuild-from-journal", action="store_true", dest="rebuild_from_journal", help="rebuild the store from the journal file")    
+
 parser.allow_interspersed_args = False
 
 (options, args) = parser.parse_args(args)
 
+path = "__rfdb__"
+
+redfoot = Redfoot("Sleepycat")
+
+if options.rebuild_from_journal:
+    logger.info("rebuilding store from journal file...")
+    os.rename(path, "%s-backup-%s" % (path, date_time()))
+    redfoot.open(path)
+    JournalReader(redfoot.store, "%s-journal" % path)
+    redfoot.close()
+    logger.info("done rebuilding.")
+
+journal = JournalWriter(redfoot.store, filename="%s-journal" % path) 
+redfoot.open(path)
+redfoot._bootstrap()
+redfoot_loader.redfoot = redfoot 
 redfoot.main(options, args)
+redfoot.close()
 
 ]]>
     </rdf:value>
