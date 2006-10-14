@@ -1,10 +1,8 @@
 <?xml version="1.0"?>
 <rdf:RDF 
-        xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-        xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-        xmlns:redfoot="http://redfoot.net/2005/redfoot#"
-        xmlns:program="http://redfoot.net/2005/program#"
-        xmlns:server = "http://redfoot.net/2005/server#"        
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  xmlns:redfoot="http://redfoot.net/2005/redfoot#"
 >
 
   <redfoot:Namespace rdf:about="#">
@@ -13,6 +11,12 @@
      The core Redfoot namespace.
     </rdfs:comment>
   </redfoot:Namespace>
+
+  <rdfs:Class rdf:ID="Resource">
+    <rdfs:label>Redfoot Resource</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+  </rdfs:Class>
 
   <redfoot:Resource rdf:ID="Globals">
     <rdfs:label>Redfoot Globals</rdfs:label>
@@ -23,12 +27,6 @@
     <rdfs:label>Redfoot Defaults</rdfs:label>
     <redfoot:program rdf:resource="http://redfoot.net/2005/12/03/hypercode/kernel#"/>
   </redfoot:Resource>
-
-  <rdfs:Class rdf:ID="Resource">
-    <rdfs:label>Redfoot Resource</rdfs:label>
-    <rdfs:comment></rdfs:comment>
-    <rdfs:subClassOf rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
-  </rdfs:Class>
 
   <rdfs:Class rdf:ID="Code">
     <rdfs:label>Code</rdfs:label>
@@ -41,13 +39,6 @@
     <rdfs:comment></rdfs:comment>
     <rdfs:range rdf:resource="#Code"/>
   </rdf:Property>
-
-
-  <rdfs:Class rdf:ID="Module">
-    <rdfs:label>Module</rdfs:label>
-    <rdfs:comment></rdfs:comment>
-    <rdfs:subClassOf rdf:resource="#Code"/>
-  </rdfs:Class>
 
   <rdfs:Class rdf:ID="Program">
     <rdfs:label>Redfoot Program</rdfs:label>
@@ -65,6 +56,12 @@
     <rdfs:domain rdf:resource="#Globals"/>
     <rdfs:range rdf:resource="#Program"/>
   </rdf:Property>
+
+  <rdfs:Class rdf:ID="Module">
+    <rdfs:label>Module</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="#Code"/>
+  </rdfs:Class>
 
   <rdfs:Class rdf:ID="Kernel">
     <rdfs:label>Redfoot Kernel</rdfs:label>
