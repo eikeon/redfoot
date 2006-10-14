@@ -168,7 +168,7 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
         <td colspan="2">
           <table id="header" cellspacing="0px" cellpadding="0px" border="0">
             <tr><td id="headerTitle"><h1>Certus Investments</h1></td></tr>
-            <tr><td id="headerGraphic"><img id="headerGraphic" src="/images/headerGraphic.gif" alt=""/></td></tr>
+            <tr><td id="headerGraphic"><img id="headerGraphic" src="http://www.mindswap.org/~chris/quant/website/images/headerGraphic.gif" alt=""/></td></tr>
             <tr><td class="horizontalSpacer"></td></tr>
             <tr>
               <td>
