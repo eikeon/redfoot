@@ -781,7 +781,12 @@ try:
     time.sleep(2) # TODO: do we want / need this?
 
     xmpp = redfoot.module(URIRef("modules/xmpp#logging", base=redfoot_program))
-    xmpp.install(["eikeon@eikeon.com"])
+    users = []
+    for admin in redfoot.objects(REDFOOT.Globals, REDFOOT.admin):
+        xmpp_id = admin.split("mailto:")[-1]
+        if "@" in xmpp_id:
+            users.append(xmpp_id)
+    xmpp.install(users)
 except Exception, e:
     logger.error("Error installing XMPP bits: %s" % e)
 
