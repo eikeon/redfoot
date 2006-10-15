@@ -509,7 +509,7 @@ A:hover {
   <server:PagePartHandler rdf:ID="navigation">
     <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
 
-<div class="nav" xmlns:kid="http://purl.org/kid/ns#">
+
 <?python
 TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")
 sections = []
@@ -545,7 +545,7 @@ sections.sort()
     </tr>
   </table>
 
-</div>
+
     
       ]]></rdf:value>
   </server:PagePartHandler>
