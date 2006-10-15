@@ -199,11 +199,10 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
           ${display(lookup(TEMPLATE.user_navigation))}
         </div>
         </td>
-        </tr>
+      </tr>
     </table>
     
-    <table id="boundary" cellspacing="0px" cellpadding="0px" align="center">
-    </tr>    
+    <table id="boundary" cellspacing="0px" cellpadding="0px" align="center">  
       <tr>
         <td colspan="2">
           <table id="header" cellspacing="0px" cellpadding="0px" border="0">
