@@ -380,7 +380,7 @@ TD.usernavcontent {
     text-align: right;
 }
 
-#editcontent { 
+#edit_content { 
     text-align: right;
 }
 
