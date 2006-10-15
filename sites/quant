@@ -331,8 +331,8 @@ body {
 
 #headerGraphic {
     width: 100%%;
-    height: 92px;
-    //background-color: #999999;
+    height: 90px;
+
 }
 
 #headerMenu {
