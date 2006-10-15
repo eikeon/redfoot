@@ -11,7 +11,13 @@ def show_install_message(msg): # TODO:
 try:
     import rdflib
 except ImportError, e:
-    show_install_message("rdflib not found: %s" % e)
+    from redfootlib.install_rdflib import install_rdflib
+    try:
+        logger.warning("Could not find rdflib. Trying to install now.")
+        install_rdflib()
+    except Exception, e:
+        logger.critical("Could not install rdflib")
+        sys.exit(-1)
 else:
     version = tuple([int(x) for x in rdflib.__version__.split(".", 2)])    
     REQUIRED = (2, 3, 1)
