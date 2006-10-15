@@ -202,9 +202,9 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
               <td>
 
                 <!-- Start the nav menu-->
-                <div id="sitenav">
+
                   ${display(lookup(TEMPLATE.navigation))}
-                </div>
+
 
               </td>
             </tr>
