@@ -191,14 +191,16 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
 ?>
   ${display(lookup(TEMPLATE.head))}
   <body>
-
-    <table id="boundary" cellspacing="0px" cellpadding="0px" align="center">
+    <table id="usertable"  cellspacing="0px" cellpadding="0px" align="center">
       <tr>
         <td>
         <div id="usernav">
           ${display(lookup(TEMPLATE.user_navigation))}
         </div>
         </td>
+    </table>
+    
+    <table id="boundary" cellspacing="0px" cellpadding="0px" align="center">
     </tr>    
       <tr>
         <td colspan="2">
@@ -304,6 +306,14 @@ body {
     font-size: 10px;
 }
 
+#usertable {
+    width: 80%%;
+    //border: 1px solid white;
+    //color: black;
+    //background-color: #F8F8F8;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 10px;
+}
 
 #boundary {
     width: 80%%;
