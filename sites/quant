@@ -396,6 +396,10 @@ TD.menuItem a:hover {
 color: #000066;
 }
 
+#current{
+color: #000066;
+}
+
 TD.horizontalSpacer {
     height: 1px;
     background-color: white;
