@@ -9,7 +9,7 @@
 >
 
   <rdf:Description rdf:about="http://redfoot.net#">
-    <doap:release rdf:resource="#"/>
+    <doap:release rdf:resource="http://redfoot.net/2.1.0#"/>
   </rdf:Description>
 
   <doap:Version rdf:about="http://redfoot.net/2.1.0#">
