@@ -135,8 +135,8 @@ response.write("Symbols updated")
 
   <rdfs:Class rdf:about="quant#Stock">
     <template:content>
-      <template:Content rdf:ID="Company">
-        <rdfs:label>Company</rdfs:label>
+      <template:Content rdf:ID="Stock">
+        <rdfs:label>Stock</rdfs:label>
        <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
 <![CDATA[
 <div xmlns="http://www.w3.org/1999/xhtml"
