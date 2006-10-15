@@ -432,7 +432,7 @@ TD.smallVerticalSpacer {
 }
 
 #contactSmallPanel {
-    width: 200px;
+    width: 20%;
     border: medium none rgb(0,0,0);
     margin: 0px;
     padding: 20px 20px 20px 20px;
@@ -472,7 +472,7 @@ TD.smallVerticalSpacer {
 
 
 #centerPanel {
-    width: 470px;
+    width: 70%;
     border: medium none rgb(0,0,0);
     margin: 0px;
     padding: 20px 50px 20px 50px;
