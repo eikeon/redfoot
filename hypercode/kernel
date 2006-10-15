@@ -770,9 +770,9 @@ redfoot.open(path)
 redfoot._bootstrap()
 redfoot_loader.redfoot = redfoot 
 
+xmpp = redfoot.module(URIRef("modules/xmpp#logging", base=redfoot_program))
 if redfoot.xmpp:
     try:
-        xmpp = redfoot.module(URIRef("modules/xmpp#logging", base=redfoot_program))
         users = []
         for admin in redfoot.objects(REDFOOT.Globals, REDFOOT.admin):
             xmpp_id = admin.split("mailto:")[-1]
