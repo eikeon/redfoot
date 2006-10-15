@@ -256,7 +256,7 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
                   <div id="content" kid:if="authorized">
                     <!-- TODO: -->
 
-                    <h2 kid:if="request.path!='/' and request.path!='/background/'"><a href="${request.uri}">${title}</a></h2>
+                    <h2 kid:if="request.path!='/' and request.path!='/background/' and request.path!='/contact/'"><a href="${request.uri}">${title}</a></h2>
                     ${display(lookup(TEMPLATE.content))}
                     <?python COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")?>
                     <div class="comments" kid:if="lookup(TEMPLATE.comments) and (request.uri, RDFS.member, COMMENT.exclude) not in redfoot">
