@@ -148,7 +148,7 @@ symbol = redfoot.value(uri, QUANT.symbol)
     <template:title rdf:resource="#title"/>
     <template:shortcut_icon rdf:resource="http://redfoot.net/2002/11/25/favicon.ico"/>
     <template:header rdf:resource="#header"/>
-    <template:navigation rdf:resource="https://svn.redfoot.net/trunk/hypercode/templates/classic#navigation"/>
+    <template:navigation rdf:resource="#navigation"/>
     <template:user_navigation rdf:resource="#user_navigation"/>
     <template:footer rdf:resource="#footer"/>
     <server:unauthorized_page_handler rdf:resource="#unauthorized_page_handler"/>
@@ -173,30 +173,11 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
             <tr>
               <td>
 
-      <div id="sitenav">
-        ${display(lookup(TEMPLATE.navigation))}
-      </div>
-
                 <!-- Start the nav menu-->
-<!--
-                <table id="headerMenu" cellspacing="0px" cellpadding="0px">
-                  <tr>
-                    <td class="menuItem" width="120">&#160;</td>
-                    <td class="smallVerticalSpacer"></td>
-                    <td class="menuItem"><a class="menuItemLink" href="" target="">HOME</a></td>
-                    <td class="verticalSpacer"></td>
-                    <td class="menuItem"><a class="menuItemLink" href="" target="">BACKGROUND</a></td>
-                    <td class="verticalSpacer"></td>
-                    <td class="menuItem"><a class="menuItemLink" href="" target="">STRATEGIES</a></td>
-                    <td class="verticalSpacer"></td>
-                    <td class="menuItem"><a class="menuItemLink" href="" target="">PERFORMANCE</a></td>
-                    <td class="verticalSpacer"></td>
-                    <td class="menuItem"><a class="menuItemLink" href="" target="">CONTACT</a></td>
-                    <td class="smallVerticalSpacer"></td>
-                    <td class="menuItem" width="120">&#160;</td>                  
-                  </tr>
-                </table>
--->
+                <div id="sitenav">
+                  ${display(lookup(TEMPLATE.navigation))}
+                </div>
+
               </td>
             </tr>
             <tr><td class="horizontalSpacer" colspan="9"></td></tr>
@@ -497,6 +478,46 @@ A:hover {
 """ % {"color": color})
     
     </rdf:value>
+  </server:PagePartHandler>
+
+  <server:PagePartHandler rdf:ID="navigation">
+    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
+
+<div class="nav" xmlns:kid="http://purl.org/kid/ns#">
+<?python
+TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")
+sections = []
+for section in redfoot.objects(request.host, TEMPLATE.section):
+    label = redfoot.value(section, TEMPLATE.section_name) or redfoot.label(section)
+    comment = redfoot.comment(section)
+    try:
+        val = redfoot.value(section, TEMPLATE.section_rank)
+        if val is None:
+            val = redfoot.value(section, TEMPLATE.default_section_rank, any=True)            
+        rank = float(val)
+    except:
+        rank = 0.0
+    if allow(section):
+        sections.append((rank, label, section, comment))
+sections.sort()
+?>
+  <table id="headerMenu" cellspacing="0px" cellpadding="0px" kid:if="sections">
+    <tr>
+      <td class="menuItem" width="120">&#160;</td>
+      <td class="smallVerticalSpacer"></td>
+
+      <td kid:for="rank, label, section, comment in sections">
+        <a href="${section}" title="${comment}" id="${section==request.uri and 'current' or None}">${label}</a>
+      </td>
+
+      <td class="smallVerticalSpacer"></td>
+      <td class="menuItem" width="120">&#160;</td>                  
+    </tr>
+  </table>
+
+</div>
+    
+      ]]></rdf:value>
   </server:PagePartHandler>
 
 </rdf:RDF>
