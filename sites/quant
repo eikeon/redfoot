@@ -152,6 +152,20 @@ uri = request.uri.abstract()
 
 symbol = redfoot.value(uri, QUANT.symbol)
 
+try:
+    SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+    uid = redfoot.value(request.session_id, SESSION.uid)
+    if uid=="mailto:chalaschek@gmail.com":
+        to = "eikeon@eikeon.com"
+    elif uid=="mailto:eikeon@eikeon.com":
+        to = "chalaschek@gmail.com"
+    else:
+        to = None
+    if to:
+        redfoot.xmpp.send(to, "%s is looking at %s" % (uid, uri))
+except Exception, e:
+    redfoot.log.warning("unable to send alert: %s" % e)
+
 ?>
   <p>${redfoot.value(uri, RDFS.comment)}</p>
 
