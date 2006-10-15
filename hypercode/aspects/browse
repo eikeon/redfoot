@@ -18,14 +18,14 @@
     <aspect:item rdf:resource="#browse_page"/>
   </aspect:Aspect>
 
-  <server:Page rdf:ID="browse_page">
+  <template:Section rdf:ID="browse_page">
     <aspect:location>/browse/</aspect:location>
     <rdfs:label>Browse</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
     <template:default_section_rank>12.0</template:default_section_rank>
     <template:content rdf:resource="#browse"/>
-  </server:Page>
+  </template:Section>
 
   <server:PagePartHandler rdf:ID="browse">
     <rdfs:label>Browse</rdfs:label>
