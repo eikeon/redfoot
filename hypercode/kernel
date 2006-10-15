@@ -734,15 +734,10 @@ class Redfoot(ConjunctiveGraph):
     def _get_xmpp(self):
         if self.__xmpp is None:
             xmpp = self.module(URIRef("modules/xmpp#client", base=redfoot_program))
-            assert self.xmpp_id, "No xmpp_id"
-            print "id:", self.xmpp_id
-            assert self.xmpp_password, "No xmpp_password"
-            print "password:", self.xmpp_password
-            assert self.xmpp_host, "No xmpp_host"
-            print "host:", self.xmpp_host
-            assert self.xmpp_port, "No xmpp_port"
-            print "port:", self.xmpp_port
-            self.__xmpp = xmpp.Client(self.xmpp_id, self.xmpp_password, self.xmpp_host, int(self.xmpp_port))
+            if self.xmpp_id and self.xmpp_password and self.xmpp_host and self.xmpp_port:
+                self.__xmpp = xmpp.Client(self.xmpp_id, self.xmpp_password, self.xmpp_host, int(self.xmpp_port))
+            else:
+                self.log.info("To enable xmpp support use the redfoot xmpp_info command to set the needed information.")
         return self.__xmpp
     xmpp = property(_get_xmpp)
 
@@ -775,20 +770,17 @@ redfoot.open(path)
 redfoot._bootstrap()
 redfoot_loader.redfoot = redfoot 
 
-try:
-    redfoot.xmpp # to initiate the login
-    import time
-    time.sleep(2) # TODO: do we want / need this?
-
-    xmpp = redfoot.module(URIRef("modules/xmpp#logging", base=redfoot_program))
-    users = []
-    for admin in redfoot.objects(REDFOOT.Globals, REDFOOT.admin):
-        xmpp_id = admin.split("mailto:")[-1]
-        if "@" in xmpp_id:
-            users.append(xmpp_id)
-    xmpp.install(users)
-except Exception, e:
-    logger.error("Error installing XMPP bits: %s" % e)
+if redfoot.xmpp:
+    try:
+        xmpp = redfoot.module(URIRef("modules/xmpp#logging", base=redfoot_program))
+        users = []
+        for admin in redfoot.objects(REDFOOT.Globals, REDFOOT.admin):
+            xmpp_id = admin.split("mailto:")[-1]
+            if "@" in xmpp_id:
+                users.append(xmpp_id)
+        xmpp.install(users)
+    except Exception, e:
+        logger.warning("XMPP logger not installed: %s" % e)
 
 
 redfoot.main(options, args)

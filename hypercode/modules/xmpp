@@ -22,13 +22,15 @@ from twisted.internet import reactor
 
 class Client(object):
     def __init__(self, client_id, password, host, port):
+        self.xmlstream = None
+        self.pending = []
         self.client_id = client_id = jid.JID(client_id)
         factory = client.basicClientFactory(client_id, password)
         factory.addBootstrap('//event/stream/authd', self._authd)
         reactor.connectTCP(host, port, factory)
 
     def _authd(self, xmlstream):
-        print "authenticated" # TODO: change to _logger.info(
+        redfoot.log.info("XMPP Client Authenticated")
         self.xmlstream = xmlstream
 
         presence = domish.Element(('jabber:client','presence'))
@@ -38,6 +40,11 @@ class Client(object):
         xmlstream.addObserver('/presence', self.presence)
         xmlstream.addObserver('/iq',       self.iq)   
         #xmlstream.addObserver('/',       self.debug)   
+        if self.pending:
+            pending = list(self.pending)
+            self.pending = []
+            for message in pending:
+                self.xmlstream.send(message)
 
     def message(self, message):
         # Echo for now
@@ -45,7 +52,8 @@ class Client(object):
         response = message
         response["to"] = message["from"]
         response["from"] = self.client_id.full()
-        self.xmlstream.send(response)
+        if self.xmlstream:
+            self.xmlstream.send(response)
     
     def presence(self, presence):
         self.debug(presence)
@@ -71,7 +79,10 @@ class Client(object):
         message["id"] = "%s" % __uri__ # uri of this module
         message["type"] = "chat"
         message.addElement("body", "jabber:client", msg)
-        self.xmlstream.send(message)
+        if self.xmlstream:
+            self.xmlstream.send(message)
+        else:
+            self.pending.append(message)
         self.debug(message)
 
 
