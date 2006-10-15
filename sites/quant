@@ -204,7 +204,7 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
     
     <table id="boundary" cellspacing="0px" cellpadding="0px" align="center">  
     <tr>
-        <td>
+        <td class="usernavcontent">
         <div id="usernav">
           ${display(lookup(TEMPLATE.user_navigation))}
         </div>
@@ -373,6 +373,11 @@ TD.menuItem {
     text-align: center;
 }
 
+TD.usernavcontent {
+    
+    text-align: right;
+}
+
 TD.menuItem a {
 font-family: Verdana, Arial, Helvetica, sans-serif;
 font-size: 10px;
@@ -515,7 +520,7 @@ A:hover {
     float: right;
     background-color: transparent;
     display: inline;
-    align: right;
+    text-align: right;
 }
 
 #usernav ul {
