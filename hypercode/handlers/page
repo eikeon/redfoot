@@ -207,9 +207,12 @@ def display(uri, fragment=True, output=None, **args):
             assert uri, "No 'unauthorized_content' found for: %s" % uri
     value = redfoot.value(uri)
     if value and value.datatype==SERVER.Kid:
-        sio = StringIO(value.encode("utf-8"))
-        code = kid_compiler.compile(sio, uri, "utf-8")
-        # TODO: cache code objects for strings
+        if not hasattr(redfoot, "_kid_cache"):
+            redfoot._kid_cache = {}
+        code = redfoot._kid_cache.get(value)
+        if code is None:
+            code = kid_compiler.compile(StringIO(value.encode("utf-8")), uri, "utf-8")
+            redfoot._kid_cache[value] = code
         exec code in context
 	if write_to_response:
 	    write_to_response = False
