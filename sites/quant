@@ -172,7 +172,13 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
             <tr><td class="horizontalSpacer"></td></tr>
             <tr>
               <td>
+
+      <div id="sitenav">
+        ${display(lookup(TEMPLATE.navigation))}
+      </div>
+
                 <!-- Start the nav menu-->
+<!--
                 <table id="headerMenu" cellspacing="0px" cellpadding="0px">
                   <tr>
                     <td class="menuItem" width="120">&#160;</td>
@@ -190,6 +196,7 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
                     <td class="menuItem" width="120">&#160;</td>                  
                   </tr>
                 </table>
+-->
               </td>
             </tr>
             <tr><td class="horizontalSpacer" colspan="9"></td></tr>
