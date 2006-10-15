@@ -242,7 +242,7 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
                   <div id="content" kid:if="authorized">
                     <!-- TODO: -->
 
-                    <h2 kid:if="request.path!='/' and request.path!='/background'"><a href="${request.uri}">${title}</a></h2>
+                    <h2 kid:if="request.path!='/' and request.path!='/background/'"><a href="${request.uri}">${title}</a></h2>
                     ${display(lookup(TEMPLATE.content))}
                     <?python COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")?>
                     <div class="comments" kid:if="lookup(TEMPLATE.comments) and (request.uri, RDFS.member, COMMENT.exclude) not in redfoot">
@@ -475,7 +475,7 @@ TD.smallVerticalSpacer {
     width: 800px;
     border: medium none rgb(0,0,0);
     margin: 0px;
-    padding: 10px 20px 10px 20px;
+    padding: 20px 50px 20px 50px;
     color: black;
     background-color: #F8F8F8;
     font-family: Verdana, Arial, Helvetica, sans-serif;
