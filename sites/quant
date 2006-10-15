@@ -196,7 +196,7 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
         <td colspan="2">
           <table id="header" cellspacing="0px" cellpadding="0px" border="0">
             <tr><td id="headerTitle"><h1>Certus Investments</h1></td></tr>
-            <tr><td id="headerGraphic"><img id="headerGraphic" src="http://www.mindswap.org/~chris/quant/website/images/headerGraphic.gif" alt=""/></td></tr>
+            <tr><td height="100%" id="headerGraphic"><img id="headerGraphic" src="http://www.mindswap.org/~chris/quant/website/images/headerGraphic.gif" alt=""/></td></tr>
             <tr><td class="horizontalSpacer"></td></tr>
             <tr>
               <td>
@@ -543,7 +543,6 @@ sections.sort()
       <td class="smallVerticalSpacer"></td>
       <td class="menuItem" width="120">&#160;</td>                  
     </tr>
-    <tr><td class="horizontalSpacer" colspan="9"></td></tr>
   </table>
 
 </div>
