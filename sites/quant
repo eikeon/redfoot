@@ -191,6 +191,7 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
 ?>
   ${display(lookup(TEMPLATE.head))}
   <body>
+  
     <table id="usertable"  cellspacing="0px" cellpadding="0px" align="center">
       <tr>
         <td>
@@ -198,6 +199,7 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
           ${display(lookup(TEMPLATE.user_navigation))}
         </div>
         </td>
+        </tr>
     </table>
     
     <table id="boundary" cellspacing="0px" cellpadding="0px" align="center">
