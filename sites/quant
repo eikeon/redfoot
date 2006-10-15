@@ -191,10 +191,15 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
 ?>
   ${display(lookup(TEMPLATE.head))}
   <body>
-    <div id="usernav">
-      ${display(lookup(TEMPLATE.user_navigation))}
-    </div>
+
     <table id="boundary" cellspacing="0px" cellpadding="0px" align="center">
+      <tr>
+        <td>
+        <div id="usernav">
+          ${display(lookup(TEMPLATE.user_navigation))}
+        </div>
+        </td>
+    </tr>    
       <tr>
         <td colspan="2">
           <table id="header" cellspacing="0px" cellpadding="0px" border="0">
@@ -491,6 +496,7 @@ A:hover {
 #usernav {
     float: right;
     background-color: transparent;
+    display: inline;
 }
 
 #usernav ul {
