@@ -161,6 +161,8 @@ SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
 TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")
 
 import kid
+from kid import compiler as kid_compiler
+
 from StringIO import StringIO
 from itertools import chain
 
@@ -205,12 +207,14 @@ def display(uri, fragment=True, output=None, **args):
             assert uri, "No 'unauthorized_content' found for: %s" % uri
     value = redfoot.value(uri)
     if value and value.datatype==SERVER.Kid:
-        t_mod = kid.load_template(StringIO(value.encode("utf-8")))
-	t = t_mod.Template(**context)                  
+        sio = StringIO(value.encode("utf-8"))
+        code = kid_compiler.compile(sio, uri, "utf-8")
+        # TODO: cache code objects for strings
+        exec code in context
 	if write_to_response:
 	    write_to_response = False
             try:
-                t.write(response, encoding="utf-8", fragment=fragment, output=output or "xml")
+                write(response, encoding="utf-8", fragment=fragment, output=output or "xml")
             except Exception, e:
                 redfoot.log.exception("While trying to display %s (%s) the following exception occurred:\n" % (redfoot.label(uri), uri))
             request.sources.pop()
@@ -219,7 +223,7 @@ def display(uri, fragment=True, output=None, **args):
                 request.sources.pop()
                 if False:
                     yield None
-	    return chain(t, pop())
+	    return chain(pull(), pop())
     else:
 	write_to_response = True
 	redfoot.execute(uri, **context) # TODO: think we want context=context?
