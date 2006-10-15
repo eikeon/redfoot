@@ -161,6 +161,11 @@ SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
 TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")
 
 import kid
+
+version = tuple([int(x) for x in kid.__version__.split(".", 2)])    
+REQUIRED = (0, 9, 3)
+assert version >= REQUIRED, "Please install kid version 0.9.3 or higher. Found kid version: %s" % kid.__version__
+
 from kid import compiler as kid_compiler
 
 from StringIO import StringIO
