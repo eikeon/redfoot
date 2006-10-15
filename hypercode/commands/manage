@@ -36,6 +36,7 @@
     <commands:command rdf:resource="#rename"/>                
     <commands:command rdf:resource="#touch"/>                
     <commands:command rdf:resource="#update"/>                
+    <commands:command rdf:resource="#xmpp_info"/>                
   </redfoot:Configuration>>
 
   <commands:Command rdf:ID="add_admin">
@@ -794,6 +795,26 @@ out.serialize(destination=sys.stdout, base=base)
       </rdf:value>
      </redfoot:Python>
     </redfoot:code>      
+  </commands:Command>
+
+  <commands:Command rdf:ID="xmpp_info">
+    <rdfs:label>xmpp_info</rdfs:label>
+    <redfoot:code>
+     <redfoot:Python rdf:ID="xmpp_logger_code">
+      <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+assert len(args)==4, "expecting 4 arguments: xmpp_id, xmpp_password, xmpp_host, xmpp_port"
+
+redfoot.xmpp_id = args[0]
+redfoot.xmpp_password = args[1]
+redfoot.xmpp_host = args[2]
+redfoot.xmpp_port = args[3]
+
+]]>
+      </rdf:value>
+     </redfoot:Python>
+    </redfoot:code>
   </commands:Command>
 
 </rdf:RDF>  

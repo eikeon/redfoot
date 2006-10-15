@@ -260,6 +260,10 @@ class Redfoot(ConjunctiveGraph):
         self.__index = None
         self.__config = None
         self.__xmpp = None
+        self.__xmpp_id = None
+        self.__xmpp_password = None
+        self.__xmpp_host = None
+        self.__xmpp_port = None
         
     def absolutize(self, uri, defrag=1):
         base = self.base
@@ -691,10 +695,54 @@ class Redfoot(ConjunctiveGraph):
     def write(self, s, encoding="utf-8"):
         sys.stdout.write(s.encode(encoding))
 
+    def __get_xmpp_id(self):
+        if self.__xmpp_id is None:
+            self.__xmpp_id = redfoot_loader.value(REDFOOT.Globals, REDFOOT.xmpp_id)
+        return self.__xmpp_id
+    def __set_xmpp_id(self, xmpp_id):
+	redfoot_loader.remove((REDFOOT.Globals, REDFOOT.xmpp_id, None))
+	redfoot_loader.add((REDFOOT.Globals, REDFOOT.xmpp_id, xmpp_id))
+    xmpp_id = property(__get_xmpp_id, __set_xmpp_id)
+
+    def __get_xmpp_password(self):
+        if self.__xmpp_password is None:
+            self.__xmpp_password = redfoot_loader.value(REDFOOT.Globals, REDFOOT.xmpp_password)
+        return self.__xmpp_password
+    def __set_xmpp_password(self, xmpp_password):
+	redfoot_loader.remove((REDFOOT.Globals, REDFOOT.xmpp_password, None))
+	redfoot_loader.add((REDFOOT.Globals, REDFOOT.xmpp_password, xmpp_password))
+    xmpp_password = property(__get_xmpp_password, __set_xmpp_password)
+
+    def __get_xmpp_host(self):
+        if self.__xmpp_host is None:
+            self.__xmpp_host = redfoot_loader.value(REDFOOT.Globals, REDFOOT.xmpp_host)
+        return self.__xmpp_host
+    def __set_xmpp_host(self, xmpp_host):
+	redfoot_loader.remove((REDFOOT.Globals, REDFOOT.xmpp_host, None))
+	redfoot_loader.add((REDFOOT.Globals, REDFOOT.xmpp_host, xmpp_host))
+    xmpp_host = property(__get_xmpp_host, __set_xmpp_host)
+
+    def __get_xmpp_port(self):
+        if self.__xmpp_port is None:
+            self.__xmpp_port = redfoot_loader.value(REDFOOT.Globals, REDFOOT.xmpp_port)
+        return self.__xmpp_port
+    def __set_xmpp_port(self, xmpp_port):
+	redfoot_loader.remove((REDFOOT.Globals, REDFOOT.xmpp_port, None))
+	redfoot_loader.add((REDFOOT.Globals, REDFOOT.xmpp_port, xmpp_port))
+    xmpp_port = property(__get_xmpp_port, __set_xmpp_port)
+
     def _get_xmpp(self):
         if self.__xmpp is None:
             xmpp = self.module(URIRef("modules/xmpp#client", base=redfoot_program))
-            self.__xmpp = xmpp.Client('redfoot@eikeon.com', 'Aboo,', 'eikeon.com', 5222)
+            assert self.xmpp_id, "No xmpp_id"
+            print "id:", self.xmpp_id
+            assert self.xmpp_password, "No xmpp_password"
+            print "password:", self.xmpp_password
+            assert self.xmpp_host, "No xmpp_host"
+            print "host:", self.xmpp_host
+            assert self.xmpp_port, "No xmpp_port"
+            print "port:", self.xmpp_port
+            self.__xmpp = xmpp.Client(self.xmpp_id, self.xmpp_password, self.xmpp_host, int(self.xmpp_port))
         return self.__xmpp
     xmpp = property(_get_xmpp)
 
@@ -726,6 +774,18 @@ journal = JournalWriter(redfoot.store, filename="%s-journal" % path)
 redfoot.open(path)
 redfoot._bootstrap()
 redfoot_loader.redfoot = redfoot 
+
+try:
+    redfoot.xmpp # to initiate the login
+    import time
+    time.sleep(2) # TODO: do we want / need this?
+
+    xmpp = redfoot.module(URIRef("modules/xmpp#logging", base=redfoot_program))
+    xmpp.install(["eikeon@eikeon.com"])
+except Exception, e:
+    logger.error("Error installing XMPP bits: %s" % e)
+
+
 redfoot.main(options, args)
 redfoot.close()
 

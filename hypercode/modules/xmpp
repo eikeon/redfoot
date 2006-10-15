@@ -82,4 +82,41 @@ class Client(object):
     </rdf:value>
   </redfoot:Module>
 
+  <redfoot:Module rdf:about="#logging">
+    <rdfs:label>XMPP Loggin</rdfs:label>      
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+import logging
+
+
+class XMPPHandler(logging.Handler):
+    """
+    A handler class which sends an XMPP message for each logging event to a list of users.
+    """
+    def __init__(self, users=None):
+        logging.Handler.__init__(self)
+        self.users = users
+
+
+    def emit(self, record):
+        try:
+            msg = self.format(record)
+            for user in self.users:
+                redfoot.xmpp.send(user, msg)
+        except:
+            self.handleError(record)
+
+def install(users):
+    _root_logger = logging.getLogger()
+    _root_logger.setLevel(logging.INFO)
+    _root_formatter = logging.Formatter('[%(name)s] %(message)s')
+    _root_handler = XMPPHandler(users)
+    _root_handler.setFormatter(_root_formatter)
+    _root_logger.addHandler(_root_handler)
+
+]]>
+    </rdf:value>
+  </redfoot:Module>
+
 </rdf:RDF>  
