@@ -66,7 +66,7 @@
 
   <template:Section rdf:about="/contact/">
     <rdfs:label>Contact</rdfs:label>
-    <template:section_rank>90.0</template:section_rank>
+    <template:section_rank>60.0</template:section_rank>
   </template:Section>
 
   <rdf:Description rdf:about="/browse/">
@@ -249,7 +249,7 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
                         <a kid:if="(request.uri, None, None) not in redfoot" href="/edit/content/?uri=${quote(request.uri)}">Create</a>
                       </p>
                     </div>
-                    <h2><a href="${request.uri}">${title}</a></h2>
+                    <h2 kid:if="${request.path!="/" or request.path!="/background"}"><a href="${request.uri}">${title}</a></h2>
                     ${display(lookup(TEMPLATE.content))}
                     <?python COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")?>
                     <div class="comments" kid:if="lookup(TEMPLATE.comments) and (request.uri, RDFS.member, COMMENT.exclude) not in redfoot">
