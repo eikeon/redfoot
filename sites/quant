@@ -141,7 +141,7 @@ symbol = redfoot.value(uri, QUANT.symbol)
 
   <template:Template rdf:ID="page">
     <rdfs:label>Quant Template</rdfs:label>
-    <template:content rdf:resource="#content"/>
+    <template:content rdf:resource="https://svn.redfoot.net/trunk/hypercode/templates/classic#content"/>
     <template:background_color>#B0C9BE</template:background_color>
     <template:head rdf:resource="https://svn.redfoot.net/trunk/hypercode/templates/classic#head"/>
     <template:css rdf:resource="#css"/>
