@@ -27,9 +27,14 @@
   </rdf:Description>
 
   <server:Site rdf:about="">  
-    <template:section rdf:resource="/"/>
-    <template:section rdf:resource="/browse/"/>
     <server:page_handler rdf:resource="#page"/>
+
+    <template:section rdf:resource="/"/>
+    <!--<template:section rdf:resource="/browse/"/>-->
+    <template:section rdf:resource="/background/"/>
+    <template:section rdf:resource="/strategies/"/>
+    <template:section rdf:resource="/performance/"/>
+    <template:section rdf:resource="/contact/"/>
   </server:Site>
   <!-- TODO: clean up what identifier we're using for server:Site instances "" or "data#Site -->
   <rdf:Description rdf:about="data#Site">  
@@ -40,6 +45,26 @@
     <rdfs:label>Home</rdfs:label>
     <template:section_rank>0.0</template:section_rank>
   </rdf:Description>
+
+  <template:Section rdf:about="/background/">
+    <rdfs:label>Background</rdfs:label>
+    <template:section_rank>10.0</template:section_rank>
+  </template:Section>
+
+  <template:Section rdf:about="/strategies/">
+    <rdfs:label>Strategies</rdfs:label>
+    <template:section_rank>20.0</template:section_rank>
+  </template:Section>
+
+  <template:Section rdf:about="/performance/">
+    <rdfs:label>Performance</rdfs:label>
+    <template:section_rank>30.0</template:section_rank>
+  </template:Section>
+
+  <template:Section rdf:about="/contact/">
+    <rdfs:label>Contact</rdfs:label>
+    <template:section_rank>90.0</template:section_rank>
+  </template:Section>
 
   <rdf:Description rdf:about="/browse/">
     <browse:root rdf:resource="http://qam.eikco.com/quant#Resource"/>
