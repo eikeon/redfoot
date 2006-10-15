@@ -37,9 +37,12 @@
     <template:section rdf:resource="/contact/"/>
   </server:Site>
   <!-- TODO: clean up what identifier we're using for server:Site instances "" or "data#Site -->
+<!--
+    TODO: if we do this login functionality will not get loaded. For now, we won't do this ;)
   <rdf:Description rdf:about="data#Site">  
     <rdfs:label>Certus Investments</rdfs:label>
   </rdf:Description>
+-->
 
   <rdf:Description rdf:about="/">
     <rdfs:label>Home</rdfs:label>
