@@ -543,6 +543,7 @@ sections.sort()
       <td class="smallVerticalSpacer"></td>
       <td class="menuItem" width="120">&#160;</td>                  
     </tr>
+    <tr><td class="horizontalSpacer" colspan="9"></td></tr>
   </table>
 
 </div>
