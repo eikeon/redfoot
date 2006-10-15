@@ -21,7 +21,7 @@
   </aspect:Aspect>
 
   <template:Section rdf:ID="bookmarks">
-    <aspect:location>bookmarks/</aspect:location>
+    <aspect:location>/bookmarks/</aspect:location>
     <rdfs:label>Bookmarks</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>        
