@@ -77,6 +77,7 @@ bookmarks.reverse()
   </template:Section>
 
   <server:Page rdf:ID="add_bookmark">
+    <aspect:location>bookmarks/add_bookmark</aspect:location>
     <rdfs:label>Add Bookmark</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <server:allow rdf:resource="http://redfoot.net/2005/session#User"/>
