@@ -213,7 +213,7 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
         <td>
           <table id="main" cellspacing="0px" cellpadding="0px" border="0">
             <tr>
-              <td id="contactSmallPanel" valign="top">
+              <!--<td id="contactSmallPanel" valign="top">
                 <table id="contactSmall" cellspacing="0px" cellpadding="3px" border="0">
                   <tr>
                     <td id="contactSmallTitle">
@@ -240,7 +240,7 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
                     </td>
                   </tr>
                 </table>
-              </td>
+              </td>-->
               <td class="verticalSpacer"></td>
               <td id="centerPanel" valign="top">
 
