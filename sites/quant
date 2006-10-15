@@ -452,7 +452,7 @@ TD.smallVerticalSpacer {
     font-size: 10px;
 }
 
-H1 {   
+H1 A {   
     font-family: Verdana, Arial, Helvetica, sans-serif;
     font-size: 40px;
 
@@ -463,12 +463,8 @@ H1 {
     //background-color: white;
     margin: 0em;
     // padding 0em;
-}
-
-H1 A {
     text-decoration: underline;
 }
-     
 
 A {
     color: #999999;
