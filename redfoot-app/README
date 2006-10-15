@@ -12,7 +12,7 @@
     <doap:release rdf:resource="#"/>
   </rdf:Description>
 
-  <doap:Version rdf:about="#">
+  <doap:Version rdf:about="http://redfoot.net/2.1.0#">
     <rdfs:label>redfoot-2.1.0</rdfs:label>
     <rdfs:comment rdf:datatype="http://www.w3.org/1999/xhtml">
 <![CDATA[
@@ -82,7 +82,7 @@ On windows I think it goes in something like C:\Python25\Scripts\ and so you may
 <![CDATA[
 
     <p>
-      <a href="http://redfoot.net/2006/10/15/redfoot-2.1.0/README/">redfoot-2.1.0 release</a>
+      <a href="http://redfoot.net/2.1.0/">redfoot-2.1.0 release</a>
     </p> 
 
 ]]>
