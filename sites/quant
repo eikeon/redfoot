@@ -515,6 +515,7 @@ A:hover {
     float: right;
     background-color: transparent;
     display: inline;
+    align: right;
 }
 
 #usernav ul {
