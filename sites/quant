@@ -213,61 +213,33 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
         <td>
           <table id="main" cellspacing="0px" cellpadding="0px" border="0">
             <tr>
-              <!--<td id="contactSmallPanel" valign="top">
-                <table id="contactSmall" cellspacing="0px" cellpadding="3px" border="0">
-                  <tr>
-                    <td id="contactSmallTitle">
-                      Contact Info
-                    </td>
-                  </tr>
-                  <tr>
-                    <td id="address">
-                      1764 Church St. NW Ste. 3<BR />
-                      Washington, DC 20036<BR />                                   
-                      USA<BR />
-                      <BR />
-                    </td>
-                  </tr>
-                  
-                  <tr>
-                    <td id="contactSmallTitle">
-                      News
-                    </td>
-                  </tr>
-                  <tr>
-                    <td id="news">
-                      Official site launch October 2006.
-                    </td>
-                  </tr>
-                </table>
-              </td>-->
               <td class="verticalSpacer"></td>
               <td id="centerPanel" valign="top">
 
-      <!-- begin content bits -->
-      <?python authorized = allow(request.uri)?>
-      <div id="content" kid:if="authorized">
-        <!-- TODO: -->
-        <?python edit_content_uri = URIRef('%s/edit/content/' % request.host)?>
-        <div kid:if="(edit_content_uri, None, None) in redfoot and allow(edit_content_uri)" id="edit_content">
-          <?python from urllib import quote?>
-          <p> 
-            <a kid:if="(request.uri, None, None) in redfoot" href="/edit/content/?uri=${quote(request.uri)}">Edit Content</a>
-            <a kid:if="(request.uri, None, None) not in redfoot" href="/edit/content/?uri=${quote(request.uri)}">Create</a>
-          </p>
-        </div>
-        <h2><a href="${request.uri}">${title}</a></h2>
-        ${display(lookup(TEMPLATE.content))}
-        <?python COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")?>
-        <div class="comments" kid:if="lookup(TEMPLATE.comments) and (request.uri, RDFS.member, COMMENT.exclude) not in redfoot">
-           ${display(lookup(TEMPLATE.comments))}
-           ${display(lookup(TEMPLATE.add_comment))}
-        </div>
-      </div>
-      <div id="content" kid:if="authorized is False">
-        <h2>Unauthorized Page</h2>
-      </div>
-      <!-- end content bits -->
+                  <!-- begin content bits -->
+                  <?python authorized = allow(request.uri)?>
+                  <div id="content" kid:if="authorized">
+                    <!-- TODO: -->
+                    <?python edit_content_uri = URIRef('%s/edit/content/' % request.host)?>
+                    <div kid:if="(edit_content_uri, None, None) in redfoot and allow(edit_content_uri)" id="edit_content">
+                      <?python from urllib import quote?>
+                      <p> 
+                        <a kid:if="(request.uri, None, None) in redfoot" href="/edit/content/?uri=${quote(request.uri)}">Edit Content</a>
+                        <a kid:if="(request.uri, None, None) not in redfoot" href="/edit/content/?uri=${quote(request.uri)}">Create</a>
+                      </p>
+                    </div>
+                    <h2><a href="${request.uri}">${title}</a></h2>
+                    ${display(lookup(TEMPLATE.content))}
+                    <?python COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")?>
+                    <div class="comments" kid:if="lookup(TEMPLATE.comments) and (request.uri, RDFS.member, COMMENT.exclude) not in redfoot">
+                       ${display(lookup(TEMPLATE.comments))}
+                       ${display(lookup(TEMPLATE.add_comment))}
+                    </div>
+                  </div>
+                  <div id="content" kid:if="authorized is False">
+                    <h2>Unauthorized Page</h2>
+                  </div>
+                  <!-- end content bits -->
 
               </td>
             </tr>
@@ -359,7 +331,7 @@ body {
 
 #headerGraphic {
     width: 100%%;
-    height: 90px;
+    height: 92px;
     //background-color: #999999;
 }
 
