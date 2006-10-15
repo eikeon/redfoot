@@ -472,10 +472,10 @@ TD.smallVerticalSpacer {
 
 
 #centerPanel {
-   // width: 470px;
+    width: 800px;
     border: medium none rgb(0,0,0);
     margin: 0px;
-    padding: 20px 50px 20px 50px;
+    padding: 10px 20px 10px 20px;
     color: black;
     background-color: #F8F8F8;
     font-family: Verdana, Arial, Helvetica, sans-serif;
