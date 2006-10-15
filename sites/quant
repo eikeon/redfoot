@@ -174,9 +174,23 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
               <td>
 
                 <!-- Start the nav menu-->
-                <div id="sitenav">
-                  ${display(lookup(TEMPLATE.navigation))}
-                </div>
+                <table id="headerMenu" cellspacing="0px" cellpadding="0px" kid:if="sections">
+                    <tr>
+                    <td class="menuItem" width="120">&#160;</td>
+                    <td class="smallVerticalSpacer"></td>
+                    
+                    <span kid:strip="" kid:for="rank, label, section, comment in sections">
+                    <td class="menuItem">
+                    <a class="menuItemLink" href="${section}" title="${comment}" id="${section==request.uri and 'current' or None}">${label}</a>
+                    </td>
+                    <td class="smallVerticalSpacer"></td>
+                    </span>
+                    
+                    <td class="smallVerticalSpacer"></td>
+                    <td class="menuItem" width="120">&#160;</td> 
+                    </tr>
+                </table>
+
 
               </td>
             </tr>
