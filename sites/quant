@@ -174,7 +174,7 @@ symbol = redfoot.value(uri, QUANT.symbol)
     <template:shortcut_icon rdf:resource="http://redfoot.net/2002/11/25/favicon.ico"/>
     <template:header rdf:resource="#header"/>
     <template:navigation rdf:resource="#navigation"/>
-    <template:user_navigation rdf:resource="#user_navigation"/>
+    <template:user_navigation rdf:resource="https://svn.redfoot.net/trunk/hypercode/templates/classic#user_navigation"/>
     <template:footer rdf:resource="#footer"/>
     <server:unauthorized_page_handler rdf:resource="#unauthorized_page_handler"/>
     <server:unauthorized_content_handler rdf:resource="#unauthorized_content_handler"/>
@@ -188,6 +188,9 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
 ?>
   ${display(lookup(TEMPLATE.head))}
   <body>
+    <div id="usernav">
+      ${display(lookup(TEMPLATE.user_navigation))}
+    </div>
     <table id="boundary" cellspacing="0px" cellpadding="0px" align="center">
       <tr>
         <td colspan="2">
@@ -471,6 +474,33 @@ A:hover {
     //color: #CC0000;
     color: #000066;
 }                        
+
+// usernav bits copied from classic css
+
+#usernav {
+    float: right;
+    background-color: transparent;
+}
+
+#usernav ul {
+    margin: 0;
+    padding: 0;
+    display: inline;
+    list-style: none;
+}
+
+#usernav li {
+    display: inline;
+    margin: 0;
+    padding: 0;
+}
+
+#usernav li a, #header li a:visited {
+    display: inline;
+    font-weight: bold;
+    padding: 0 1.5em;
+    font-size: 0.8em;
+}
 
 """ % {"color": color})
     
