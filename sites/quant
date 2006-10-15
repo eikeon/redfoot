@@ -194,7 +194,7 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
   
     <table id="usertable"  cellspacing="0px" cellpadding="0px" align="center">
       <tr>
-        <td id="usernavcontent">
+        <td class="usernavcontent">
         <div id="usernav">
           ${display(lookup(TEMPLATE.user_navigation))}
         </div>
