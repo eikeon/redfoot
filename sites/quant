@@ -241,6 +241,15 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
                   <?python authorized = allow(request.uri)?>
                   <div id="content" kid:if="authorized">
                     <!-- TODO: -->
+
+                    <h2 kid:if="request.path!='/' and request.path!='/background'"><a href="${request.uri}">${title}</a></h2>
+                    ${display(lookup(TEMPLATE.content))}
+                    <?python COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")?>
+                    <div class="comments" kid:if="lookup(TEMPLATE.comments) and (request.uri, RDFS.member, COMMENT.exclude) not in redfoot">
+                       ${display(lookup(TEMPLATE.comments))}
+                       ${display(lookup(TEMPLATE.add_comment))}
+                    </div>
+                    
                     <?python edit_content_uri = URIRef('%s/edit/content/' % request.host)?>
                     <div kid:if="(edit_content_uri, None, None) in redfoot and allow(edit_content_uri)" id="edit_content">
                       <?python from urllib import quote?>
@@ -248,13 +257,6 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
                         <a kid:if="(request.uri, None, None) in redfoot" href="/edit/content/?uri=${quote(request.uri)}">Edit Content</a>
                         <a kid:if="(request.uri, None, None) not in redfoot" href="/edit/content/?uri=${quote(request.uri)}">Create</a>
                       </p>
-                    </div>
-                    <h2 kid:if="request.path!='/' and request.path!='/background'"><a href="${request.uri}">${title}</a></h2>
-                    ${display(lookup(TEMPLATE.content))}
-                    <?python COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")?>
-                    <div class="comments" kid:if="lookup(TEMPLATE.comments) and (request.uri, RDFS.member, COMMENT.exclude) not in redfoot">
-                       ${display(lookup(TEMPLATE.comments))}
-                       ${display(lookup(TEMPLATE.add_comment))}
                     </div>
                   </div>
                   <div id="content" kid:if="authorized is False">
