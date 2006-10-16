@@ -166,8 +166,10 @@ try:
         xmpp_id = admin.split("mailto:")[-1]
         if "@" in xmpp_id:
             users.append(xmpp_id)
+    who_label = redfoot.label(uid) or "unknown"
+    message = "%s is looking at <a href='%s'>%s</a>" % (who_label, uri.concrete(), redfoot.label(uri))
     for user in users:
-        redfoot.xmpp.send(user, "%s is looking at %s" % (uid or "unknown", uri.concrete()))
+        redfoot.xmpp.send(user, message)
 except Exception, e:
     redfoot.log.exception("unable to send alert: %s" % e)
 
