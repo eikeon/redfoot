@@ -279,6 +279,7 @@ if uid and uid in request.objects(REDFOOT.admin):
     #redfoot.remove_context(cid)
     context = redfoot.get_context(cid, creator=uid)
     context.remove((None, None, None))
+    context.add((cid.defrag, RDF.type, URIRef("http://redfoot.net/rdf#RDFXMLDocument")))
     base = redfoot.context_id(cid, context_id="") # TODO: basically defrag... need better way.
     context.parse(request.content, publicID=base)
 else:
