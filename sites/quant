@@ -168,7 +168,7 @@ try:
     if to:
         redfoot.xmpp.send(to, "%s is looking at %s" % (uid, uri))
 except Exception, e:
-    redfoot.log.warning("unable to send alert: %s" % e)
+    redfoot.log.exception("unable to send alert: %s" % e)
 
 ?>
   <p>${redfoot.value(uri, RDFS.comment)}</p>
