@@ -139,7 +139,7 @@ redfoot.log.info("Symbols updated")
 
   <rdfs:Class rdf:about="quant#Stock">
     <template:content>
-      <template:Content rdf:ID="Stock">
+      <template:Content rdf:ID="StockPagePartHandler">
         <rdfs:label>Stock</rdfs:label>
        <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
 <![CDATA[
