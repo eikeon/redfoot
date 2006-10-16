@@ -158,13 +158,14 @@ symbol = redfoot.value(uri, QUANT.symbol)
 
 try:
     SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+    uid = None
+    if request.session_id:
+        uid = redfoot.value(request.session_id, SESSION.uid)
     users = []
     for admin in redfoot.objects(REDFOOT.Globals, REDFOOT.admin):
         xmpp_id = admin.split("mailto:")[-1]
         if "@" in xmpp_id:
             users.append(xmpp_id)
-
-    uid = None
     for user in users:
         redfoot.xmpp.send(user, "%s is looking at %s" % (uid or "unknown", uri.concrete()))
 except Exception, e:
