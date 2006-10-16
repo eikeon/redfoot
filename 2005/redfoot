@@ -187,4 +187,37 @@
     <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
   </rdf:Property>
 
+  <rdfs:Class rdf:about="http://redfoot.net/rdf#RDFXMLDocument">
+    <rdfs:label>RDFXMLDocument</rdfs:label>
+    <server:page_handler>
+     <server:PageHandler rdf:ID="RDFXMLDocumentPageHandler">
+      <rdfs:label>RDFXMLDocument PageHandler</rdfs:label>
+      <server:content_type>application/rdf+xml</server:content_type>            
+      <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+document = request.uri
+
+from rdflib.Graph import Graph
+g = Graph(namespace_manager=redfoot.namespace_manager)
+
+prefix = "%s#" % document
+
+for s, p, o in redfoot:
+    if s==document or (isinstance(s, unicode) and s.startswith(prefix)):
+        g.add((s, p, o))
+    ##
+    # This was nice for somethings, but in the case of trying to round
+    # trip an Ontology via HTTP PUT / GET from an editor... we end up
+    # with instances from other contexts. Trying without for now.
+    #if o==document or (isinstance(o, unicode) and o.startswith(prefix)):
+    #    g.add((s, p, o))
+
+response.setHeader('Content-Type', 'application/rdf+xml')            
+g.serialize(destination=response)#, base=document)
+]]>
+      </rdf:value>
+     </server:PageHandler>
+    </server:page_handler>
+  </rdfs:Class>
+
 </rdf:RDF>  
