@@ -169,7 +169,7 @@ try:
     if uid:
         who_label = redfoot.label(uid)
     else:
-        who_label = "Unknown"
+        who_label = "Someone"
     message = "<body>%s is looking at <a href='%s'>%s</a></body>" % (who_label, uri.concrete(), redfoot.label(uri))
     for user in users:
         redfoot.xmpp.send(user, message)
