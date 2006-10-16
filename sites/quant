@@ -88,12 +88,7 @@ QUANT = Namespace(URIRef("quant#", base=request.host))
 c = redfoot.get_context(URIRef("#symbols", base=request.host))
 
 
-import codecs
-def decode(input, errors='strict'):
-    return codecs.utf_8_decode(input, errors, True)
-
-class StreamReader(codecs.StreamReader):
-    decode = codecs.utf_8_decode
+from codecs import EncodedFile
 
 
 class Symbols:
@@ -105,7 +100,7 @@ class Symbols:
         
     def _update(self, url):
         c.remove((None, None, None))
-        f = StreamReader(urllib2.urlopen(url))
+        f = EncodedFile(urllib2.urlopen(url), 'latin-1', 'utf-8')
         # "Name","Symbol","Market Value (millions)","Description (as filed with the SEC)"
 
         i = 0
@@ -136,6 +131,8 @@ exchanges.append(Symbols("Nasdaq", "http://www.nasdaq.com/asp/symbols.asp?exchan
 #exchanges.append(Symbols("AMEX", "http://www.nasdaq.com/asp/symbols.asp?exchange=1&start=0"))
 
 response.write("Symbols updated")
+redfoot.log.info("Symbols updated")
+
 ]]>
         </rdf:value>
       </template:Content>
