@@ -3,6 +3,7 @@
   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+  xmlns:server="http://redfoot.net/2005/server#"
 >
 
   <redfoot:Namespace rdf:about="#">
