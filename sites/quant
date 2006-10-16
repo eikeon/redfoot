@@ -169,9 +169,9 @@ except Exception, e:
 ?>
   <p>${redfoot.value(uri, RDFS.comment)}</p>
 
-<img src="http://bigcharts.marketwatch.com/charts/big.chart?symb=${symbol}"></img>
+<img src="http://bigcharts.marketwatch.com/charts/big.chart?symb=${symbol}&amp;size=1"></img>
 
-<img src="http://bigcharts.marketwatch.com/charts/big.chart?symb=${symbol}&amp;time=18&amp;freq=9"></img>
+<img src="http://bigcharts.marketwatch.com/charts/big.chart?symb=${symbol}&amp;time=18&amp;freq=9&amp;size=1"></img>
 
 
 </div>
