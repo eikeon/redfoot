@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:rdfe="http://redfoot.net/rdf#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:server="http://redfoot.net/2005/server#"
+   xmlns:session="http://redfoot.net/2005/session#"
+   xmlns:template="http://redfoot.net/2005/template#"
+   xmlns:aspect="http://redfoot.net/hypercode/aspect#"
+>
+
+  <rdfe:RDFXMLDocument rdf:about="">
+    <rdfs:label>List of redfoot aspects RDF/XML</rdfs:label>
+  </rdfe:RDFXMLDocument>
+
+  <aspect:Aspect rdf:about="bookmark#aspect"/>
+  <aspect:Aspect rdf:about="browse#aspect"/>
+  <aspect:Aspect rdf:about="comments#aspect"/>
+  <aspect:Aspect rdf:about="contexts#aspect"/>
+  <aspect:Aspect rdf:about="edit_content#aspect"/>
+  <aspect:Aspect rdf:about="generic#aspect"/>
+  <aspect:Aspect rdf:about="recipes#aspect"/>
+  <aspect:Aspect rdf:about="register#aspect"/>
+  <aspect:Aspect rdf:about="auth_invite#aspect"/>
+  <aspect:Aspect rdf:about="blog#aspect"/>
+
+</rdf:RDF>
