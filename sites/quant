@@ -166,7 +166,7 @@ try:
 
     uid = None
     for user in users:
-        redfoot.xmpp.send(to, "%s is looking at %s" % (uid or "unknown", uri.concrete()))
+        redfoot.xmpp.send(user, "%s is looking at %s" % (uid or "unknown", uri.concrete()))
 except Exception, e:
     redfoot.log.exception("unable to send alert: %s" % e)
 
