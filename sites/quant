@@ -100,7 +100,7 @@ class Symbols:
         
     def _update(self, url):
         c.remove((None, None, None))
-        f = EncodedFile(urllib2.urlopen(url), 'latin-1', 'utf-8')
+        f = EncodedFile(urllib2.urlopen(url), 'latin-1', 'utf-8', errors="replace")
         # "Name","Symbol","Market Value (millions)","Description (as filed with the SEC)"
 
         i = 0
