@@ -87,6 +87,15 @@ from rdflib import Namespace
 QUANT = Namespace(URIRef("quant#", base=request.host))
 c = redfoot.get_context(URIRef("#symbols", base=request.host))
 
+
+import codecs
+def decode(input, errors='strict'):
+    return codecs.utf_8_decode(input, errors, True)
+
+class StreamReader(codecs.StreamReader):
+    decode = codecs.utf_8_decode
+
+
 class Symbols:
     def __init__(self, name, url):
         self.name = name
@@ -96,7 +105,7 @@ class Symbols:
         
     def _update(self, url):
         c.remove((None, None, None))
-        f = urllib2.urlopen(url)
+        f = StreamReader(urllib2.urlopen(url))
         # "Name","Symbol","Market Value (millions)","Description (as filed with the SEC)"
 
         i = 0
