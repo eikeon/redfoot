@@ -73,70 +73,6 @@
     <browse:root rdf:resource="http://qam.eikco.com/quant#Resource"/>
   </rdf:Description>
 
-  <rdf:Description rdf:about="/update_symbols/">
-    <template:content>
-      <template:Content rdf:ID="update_symbols">
-        <rdfs:label>Update Symbols</rdfs:label>
-       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
-<![CDATA[
-import urllib2
-import csv
-
-from rdflib import Namespace
-
-QUANT = Namespace(URIRef("quant#", base=request.host))
-c = redfoot.get_context(URIRef("#symbols", base=request.host))
-
-
-orig_reader = csv.reader
-def unicode_csv_reader(f, dialect=csv.excel, encoding="latin-1", **kwargs):
-    # csv.py doesn't do Unicode; encode temporarily as UTF-8:
-    for row in orig_reader(f, dialect=dialect, **kwargs):
-        # decode "encoding" back to Unicode, cell by cell:
-        yield [unicode(cell, encoding) for cell in row]
-csv.reader = unicode_csv_reader
-
-
-class Symbols:
-    def __init__(self, name, url):
-        self.name = name
-        self.url = url
-        self.list = []
-        self._update(url)
-        
-    def _update(self, url):
-        c.remove((None, None, None))
-        f = urllib2.urlopen(url)
-        # "Name","Symbol","Market Value (millions)","Description (as filed with the SEC)"
-
-        for row in csv.reader(f):
-            if len(row)==4:
-                name, symbol, market_value, description = row
-                uri = URIRef("ticker#%s" % symbol.replace("/", "_"), base=request.host)
-                c.add((uri, RDF.type, QUANT.Stock))
-                c.add((uri, QUANT.symbol, Literal(symbol)))
-                c.add((uri, RDFS.label, Literal(name)))
-                c.add((uri, RDFS.comment, Literal(description)))
-                c.add((uri, QUANT.market_value, Literal(market_value)))
-                c.add((uri, QUANT.exchange, Literal(self.name)))
-        f.close()
-
-exchanges = []
-exchanges.append(Symbols("Nasdaq", "http://www.nasdaq.com/asp/symbols.asp?exchange=Q&start=0"))
-
-#exchanges.append(Symbols("OTCBB", "http://www.nasdaq.com/asp/symbols.asp?exchange=O&start=0"))
-#exchanges.append(Symbols("NYSE", "http://www.nasdaq.com/asp/symbols.asp?exchange=N&start=0"))
-#exchanges.append(Symbols("AMEX", "http://www.nasdaq.com/asp/symbols.asp?exchange=1&start=0"))
-
-response.write("Symbols updated")
-redfoot.log.info("Symbols updated")
-
-]]>
-        </rdf:value>
-      </template:Content>
-    </template:content>
-  </rdf:Description>
-
   <rdfs:Class rdf:about="quant#Stock">
     <template:content>
       <template:Content rdf:ID="StockPagePartHandler">
@@ -635,5 +571,79 @@ sections.sort()
     
       ]]></rdf:value>
   </server:PagePartHandler>
+
+  <rdf:Description rdf:about="http://redfoot.net/2005/redfoot#Globals">
+    <commands:config>
+      <redfoot:Configuration rdf:ID="quant_config">    
+        <commands:command rdf:resource="#quant_info"/>                
+      </redfoot:Configuration>
+    </commands:config>
+  </rdf:Description>
+
+  <commands:Command rdf:ID="update_symbols">
+    <rdfs:label>quant_info</rdfs:label>
+    <redfoot:code>
+     <redfoot:Python rdf:ID="update_symbols_code">
+        <rdfs:label>Update Symbols</rdfs:label>
+      <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+import urllib2
+import csv
+
+from rdflib import Namespace
+
+QUANT = Namespace(URIRef("quant#", base=request.host))
+c = redfoot.get_context(URIRef("#symbols", base=request.host))
+
+
+orig_reader = csv.reader
+def unicode_csv_reader(f, dialect=csv.excel, encoding="latin-1", **kwargs):
+    # csv.py doesn't do Unicode; encode temporarily as UTF-8:
+    for row in orig_reader(f, dialect=dialect, **kwargs):
+        # decode "encoding" back to Unicode, cell by cell:
+        yield [unicode(cell, encoding) for cell in row]
+csv.reader = unicode_csv_reader
+
+
+class Symbols:
+    def __init__(self, name, url):
+        self.name = name
+        self.url = url
+        self.list = []
+        self._update(url)
+        
+    def _update(self, url):
+        c.remove((None, None, None))
+        f = urllib2.urlopen(url)
+        # "Name","Symbol","Market Value (millions)","Description (as filed with the SEC)"
+
+        for row in csv.reader(f):
+            if len(row)==4:
+                name, symbol, market_value, description = row
+                uri = URIRef("ticker#%s" % symbol.replace("/", "_"), base=request.host)
+                c.add((uri, RDF.type, QUANT.Stock))
+                c.add((uri, QUANT.symbol, Literal(symbol)))
+                c.add((uri, RDFS.label, Literal(name)))
+                c.add((uri, RDFS.comment, Literal(description)))
+                c.add((uri, QUANT.market_value, Literal(market_value)))
+                c.add((uri, QUANT.exchange, Literal(self.name)))
+        f.close()
+
+exchanges = []
+exchanges.append(Symbols("Nasdaq", "http://www.nasdaq.com/asp/symbols.asp?exchange=Q&start=0"))
+
+#exchanges.append(Symbols("OTCBB", "http://www.nasdaq.com/asp/symbols.asp?exchange=O&start=0"))
+#exchanges.append(Symbols("NYSE", "http://www.nasdaq.com/asp/symbols.asp?exchange=N&start=0"))
+#exchanges.append(Symbols("AMEX", "http://www.nasdaq.com/asp/symbols.asp?exchange=1&start=0"))
+
+response.write("Symbols updated")
+redfoot.log.info("Symbols updated")
+
+]]>
+      </rdf:value>
+     </redfoot:Python>
+    </redfoot:code>
+  </commands:Command>
 
 </rdf:RDF>
