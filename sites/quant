@@ -618,7 +618,7 @@ def update(name, url):
             c.add((uri, RDFS.label, Literal(name)))
             c.add((uri, RDFS.comment, Literal(description)))
             c.add((uri, QUANT.market_value, Literal(market_value)))
-            c.add((uri, QUANT.exchange, Literal(self.name)))
+            c.add((uri, QUANT.exchange, Literal(name)))
     f.close()
 
 update("Nasdaq", "http://www.nasdaq.com/asp/symbols.asp?exchange=Q&start=0")
