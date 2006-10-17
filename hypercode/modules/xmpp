@@ -73,7 +73,17 @@ class Client(object):
                 redfoot.main(options, args)
                 sys.stdout = orig
                 # TODO: pipe command stdout back to user
-                xmpp.send(from_id, sio.getvalue())
+                result = sio.getvalue()
+                i = 0
+                page = ""
+                for line in result.split("\n"):
+                    page += line
+                    if i>20:
+                        i = 0
+                        xmpp.send(from_id, page)
+                        page = ""
+                if page:
+                    xmpp.send(from_id, page)
                 xmpp.send(from_id, "Done running: %s" % command_line)
 
             t = Thread(target=run_command, args=(command_line, from_id, self))
