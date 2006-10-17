@@ -48,7 +48,7 @@ class Client(object):
                 self.xmlstream.send(message)
 
     def message(self, message):
-        self.debug(message)
+        #self.debug(message)
         import sys
         from optparse import OptionParser
         from StringIO import StringIO
@@ -59,7 +59,7 @@ class Client(object):
         e = message.firstChildElement()
         if e.name=="body":
             command_line = "%s" % e
-        if False and command_line and command_line.startswith("redfoot"):
+        if command_line and command_line.startswith("redfoot"):
             def run_command(command_line, from_id, xmpp):
                 xmpp.send(from_id, "running: %s" % command_line)
                 parser = OptionParser("usage: command <options>")
@@ -76,15 +76,22 @@ class Client(object):
                 # TODO: pipe command stdout back to user
                 result = sio.getvalue()
                 i = 0
-                page = ""
+                page = """
+<body xmlns='http://www.w3.org/1999/xhtml' style='background-color:#E8A630;color:#000000'>
+  <span style='font-family:Verdana'>
+"""
                 for line in result.split("\n"):
-                    page += "%s\n" % line
+                    page += "%s<br/>" % line
                     if i>20:
                         i = 0
                         xmpp.send(from_id, page)
                         import time
                         time.sleep(1)
                         page = ""
+                page += """
+  </span>
+</body>
+"""
                 if page:
                     xmpp.send(from_id, page)
                 xmpp.send(from_id, "Done running: %s" % command_line)
