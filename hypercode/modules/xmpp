@@ -48,6 +48,7 @@ class Client(object):
                 self.xmlstream.send(message)
 
     def message(self, message):
+        self.debug(message)
         import sys
         from optparse import OptionParser
         from StringIO import StringIO
@@ -58,7 +59,7 @@ class Client(object):
         e = message.firstChildElement()
         if e.name=="body":
             command_line = "%s" % e
-        if command_line and command_line.startswith("redfoot"):
+        if False and command_line and command_line.startswith("redfoot"):
             def run_command(command_line, from_id, xmpp):
                 xmpp.send(from_id, "running: %s" % command_line)
                 parser = OptionParser("usage: command <options>")
