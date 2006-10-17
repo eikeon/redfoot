@@ -575,7 +575,7 @@ sections.sort()
   <rdf:Description rdf:about="http://redfoot.net/2005/redfoot#Globals">
     <commands:config>
       <redfoot:Configuration rdf:ID="quant_config">    
-        <commands:command rdf:resource="#quant_info"/>                
+        <commands:command rdf:resource="#update_symbols"/>                
       </redfoot:Configuration>
     </commands:config>
   </rdf:Description>
