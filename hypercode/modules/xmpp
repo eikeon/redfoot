@@ -51,14 +51,15 @@ class Client(object):
         from optparse import OptionParser
         from threading import Thread
         from_id = message["from"]
-        def run_command(command_line="%s" % message, from_id=from_id, xmpp=self):
+        def run_command(command_line, from_id, xmpp):
             parser = OptionParser("usage: command <options>")
             parser.allow_interspersed_args = False
-            (options, args) = parser.parse_args("%s" % command_line)
+            args = command_line.split()
+            (options, args) = parser.parse_args(args)
             redfoot.main(options, args)
             # TODO: pipe command stdout back to user
             xmpp.send(from_id, "Done running: %s" % command_line)
-        t = Thread(target=run_command)
+        t = Thread(target=run_command, args=("%s" % message, from_id, self))
         t.start()
 
         if False:
