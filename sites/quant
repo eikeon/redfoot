@@ -14,7 +14,7 @@
     <rdfs:label>Quant User</rdfs:label>
     <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/session#User"/>
     <template:content>
-      <template:Content rdf:ID="StockPagePartHandler">
+      <template:Content rdf:ID="UserPagePartHandler">
         <rdfs:label>Stock</rdfs:label>
        <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
 <![CDATA[
