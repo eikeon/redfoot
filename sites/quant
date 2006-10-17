@@ -637,7 +637,6 @@ exchanges.append(Symbols("Nasdaq", "http://www.nasdaq.com/asp/symbols.asp?exchan
 #exchanges.append(Symbols("NYSE", "http://www.nasdaq.com/asp/symbols.asp?exchange=N&start=0"))
 #exchanges.append(Symbols("AMEX", "http://www.nasdaq.com/asp/symbols.asp?exchange=1&start=0"))
 
-response.write("Symbols updated")
 redfoot.log.info("Symbols updated")
 
 ]]>
