@@ -52,10 +52,9 @@ class Client(object):
         from threading import Thread
         from_id = message["from"]
         command_line = None
-        for child in message.children:
-            if child.name=="body":
-                command_line = "%s" % child
-                break
+        e = message.firstChildElement()
+        if e.name=="body"
+            command_line = "%s" % e
         if command_line and command_line.startswith("redfoot"):
             def run_command(command_line, from_id, xmpp):
                 xmpp.send(from_id, "running: %s" % command_line)
