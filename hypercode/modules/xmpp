@@ -92,18 +92,9 @@ class Client(object):
             t.start()
         else:
             print "command line: '%s'" % command_line
-        if False:
-            # Echo for now
-            self.debug(message)
-            response = message
-            response["to"] = message["from"]
-            response["from"] = self.client_id.full()
-            if self.xmlstream:
-                self.xmlstream.send(response)
-
     
     def presence(self, presence):
-        self.debug(presence)
+        #self.debug(presence)
         if presence["type"]=="subscribe":
             response = domish.Element(('jabber:client','presence'))
             response["to"] = presence["from"]
@@ -112,7 +103,7 @@ class Client(object):
             self.xmlstream.send(response)
 
     def iq(self, iq):
-        self.debug(iq)
+        #self.debug(iq)
         pass
 
     def debug(self, element):
@@ -133,7 +124,7 @@ class Client(object):
             self.xmlstream.send(message)
         else:
             self.pending.append(message)
-        self.debug(message)
+        #self.debug(message)
 
 
 #c = Client(JID('redfoot@eikeon.com', 'password_here', 'eikeon.com', 5222))
