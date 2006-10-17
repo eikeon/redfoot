@@ -52,7 +52,7 @@ class Client(object):
         from threading import Thread
         from_id = message["from"]
         command_line = "%s" % message
-        if from_id!=self.client_id.full() and command_line.startswith("redfoot"):
+        if command_line.startswith("redfoot"):
             def run_command(command_line, from_id, xmpp):
                 xmpp.send(from_id, "running: %s" % command_line)
                 parser = OptionParser("usage: command <options>")
@@ -65,7 +65,8 @@ class Client(object):
                 xmpp.send(from_id, "Done running: %s" % command_line)
             t = Thread(target=run_command, args=(command_line, from_id, self))
             t.start()
-
+        else:
+            print "command line: '%s'" % command_line
         if False:
             # Echo for now
             self.debug(message)
