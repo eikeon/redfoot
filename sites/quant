@@ -29,14 +29,14 @@
 
 
   <session:User rdf:about="mailto:chalaschek@gmail.com">
-    <rdfs:subClassOf rdf:resource="#User"/>
+    <rdf:type rdf:resource="#User"/>
     <rdfs:label>Chris Halaschek-Wiener</rdfs:label>
     <session:hexdigest>84072d8ca1dbe193b29678b88698d3c8</session:hexdigest>
   </session:User>
 
   <!-- TODO: load these from my "FOAF" info -->
   <session:User rdf:about="mailto:eikeon@eikeon.com">
-    <rdfs:subClassOf rdf:resource="#User"/>
+    <rdf:type rdf:resource="#User"/>
     <rdfs:label>Daniel Krech</rdfs:label>
     <session:hexdigest>334b473e8c2555d5eb722e0c932df793</session:hexdigest>
   </session:User>
