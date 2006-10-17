@@ -610,7 +610,7 @@ c.remove((None, None, None))
 def update(name, url):
     f = urllib2.urlopen(url)
     # "Name","Symbol","Market Value (millions)","Description (as filed with the SEC)"
-     for row in csv.reader(f):
+    for row in csv.reader(f):
         if len(row)==4:
             name, symbol, market_value, description = row
             uri = URIRef("ticker#%s" % symbol.replace("/", "_"), base=redfoot.base)
