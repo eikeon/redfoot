@@ -604,15 +604,6 @@ def unicode_csv_reader(f, dialect=csv.excel, encoding="latin-1", **kwargs):
 csv.reader = unicode_csv_reader
 
 
-class Symbols:
-    def __init__(self, name, url):
-        self.name = name
-        self.url = url
-        self._update(url)
-        
-    def _update(self, url):
-
-
 c = redfoot.get_context(URIRef("#symbols", base=redfoot.base))
 c.remove((None, None, None))
 
