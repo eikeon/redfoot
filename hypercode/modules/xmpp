@@ -77,10 +77,12 @@ class Client(object):
                 i = 0
                 page = ""
                 for line in result.split("\n"):
-                    page += line
+                    page += "%s\n" % line
                     if i>20:
                         i = 0
                         xmpp.send(from_id, page)
+                        import time
+                        time.sleep(1)
                         page = ""
                 if page:
                     xmpp.send(from_id, page)
