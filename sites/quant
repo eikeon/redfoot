@@ -108,7 +108,7 @@ try:
         who_label = "Someone"
     message = "%s is looking at %s ( %s )</body>" % (who_label, redfoot.label(uri), uri.concrete())
     try:
-        from twisted.words.xish.domish import 
+        from twisted.words.xish.domish import  escapeToXml
         html = """
 <body xmlns='http://www.w3.org/1999/xhtml' style='background-color:#E8A630;color:#000000'>
   <span style='font-family:Verdana'>
