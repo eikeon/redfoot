@@ -49,6 +49,7 @@ class Client(object):
 
     def message(self, message):
         from optparse import OptionParser
+        from StringIO import StringIO
         #import threading
         from threading import Thread
         from_id = message["from"]
