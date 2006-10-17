@@ -48,13 +48,30 @@ class Client(object):
                 self.xmlstream.send(message)
 
     def message(self, message):
-        # Echo for now
-        self.debug(message)
-        response = message
-        response["to"] = message["from"]
-        response["from"] = self.client_id.full()
-        if self.xmlstream:
-            self.xmlstream.send(response)
+        from optparse import OptionParser
+        from threading import Thread
+        from_id = message["from"]
+        def run_command(command_line, from_id=from_id, xmpp=self):
+            parser = OptionParser("usage: command <options>")
+            parser.allow_interspersed_args = False
+            (options, args) = parser.parse_args("%s" % command_line)
+            redfoot.main(options, args)
+            # TODO: pipe command stdout back to user
+            xmpp.send(from_id, "Done running: %s" % command_line)
+        t = Thread(target=run_command, args=("%s" % message))
+        t.start()
+
+
+
+        if False:
+            # Echo for now
+            self.debug(message)
+            response = message
+            response["to"] = message["from"]
+            response["from"] = self.client_id.full()
+            if self.xmlstream:
+                self.xmlstream.send(response)
+
     
     def presence(self, presence):
         self.debug(presence)
