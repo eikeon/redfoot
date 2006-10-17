@@ -68,18 +68,18 @@ class Client(object):
                 (options, args) = parser.parse_args(args[1:])
                 options.program = None
                 #d = threading.locals()
-                sio = StringIO()
-                orig = sys.stdout
-                sys.stdout = sio
+                #sio = StringIO()
+                #orig = sys.stdout
+                #sys.stdout = sio
                 redfoot.main(options, args)
-                sys.stdout = orig
+                #sys.stdout = orig
                 # TODO: pipe command stdout back to user
-                result = sio.getvalue()
-                redfoot.log.info(result)
+                #result = sio.getvalue()
+                #redfoot.log.info(result)
                 #html = """<body xmlns='http://www.w3.org/1999/xhtml' style='background-color:#E8A630;color:#000000'><span style='font-family:Verdana'>%s</span></body>""" % "<br/>".join(result.split("\n"))
 
                 #xmpp.send(from_id, "--", html)
-                #xmpp.send(from_id, "Done running: %s" % command_line)
+                xmpp.send(from_id, "Done running: %s" % command_line)
 
             t = Thread(target=run_command, args=(command_line, from_id, self))
             t.start()
