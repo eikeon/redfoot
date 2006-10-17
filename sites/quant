@@ -632,9 +632,9 @@ class Symbols:
 
 exchanges = []
 exchanges.append(Symbols("Nasdaq", "http://www.nasdaq.com/asp/symbols.asp?exchange=Q&start=0"))
+exchanges.append(Symbols("NYSE", "http://www.nasdaq.com/asp/symbols.asp?exchange=N&start=0"))
 
 #exchanges.append(Symbols("OTCBB", "http://www.nasdaq.com/asp/symbols.asp?exchange=O&start=0"))
-#exchanges.append(Symbols("NYSE", "http://www.nasdaq.com/asp/symbols.asp?exchange=N&start=0"))
 #exchanges.append(Symbols("AMEX", "http://www.nasdaq.com/asp/symbols.asp?exchange=1&start=0"))
 
 redfoot.log.info("Symbols updated")
