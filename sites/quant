@@ -107,13 +107,18 @@ try:
     else:
         who_label = "Someone"
     message = "%s is looking at %s ( %s )</body>" % (who_label, redfoot.label(uri), uri.concrete())
-    html = """
+    try:
+        from twisted.words.xish.domish import 
+        html = """
 <body xmlns='http://www.w3.org/1999/xhtml' style='background-color:#E8A630;color:#000000'>
   <span style='font-family:Verdana'>
     %s is looking at <a href="%s">%s</a>
   </span>
 </body>
-""" % (who_label, uri.concrete(), redfoot.label(uri))
+""" % (who_label, escapeToXml(uri.concrete(), isattrib=True), escapeToXml(redfoot.label(uri)))
+     except Exception, e:
+         redfoot.log.exception(e)
+         html = None    
     for user in users:
         redfoot.xmpp.send(user, message, html)
 except Exception, e:
