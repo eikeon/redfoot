@@ -73,13 +73,16 @@ class Client(object):
         print element.toXml().encode('utf-8')
         print "="*20
             
-    def send(self, to, msg):
+    def send(self, to, msg, html=None):
         message = domish.Element(('jabber:client','message'))
         message["to"] = to
         message["from"] = self.client_id.full()
         message["id"] = "%s" % __uri__ # uri of this module
         message["type"] = "chat"
         message.addElement("body", "jabber:client", msg)
+        if html:
+            e = message.addElement("html", "http://jabber.org/protocol/xhtml-im")
+            e.addRawXml(html)
         if self.xmlstream:
             self.xmlstream.send(message)
         else:
