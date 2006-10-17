@@ -593,8 +593,8 @@ import csv
 
 from rdflib import Namespace
 
-QUANT = Namespace(URIRef("quant#", base=request.host))
-c = redfoot.get_context(URIRef("#symbols", base=request.host))
+QUANT = Namespace(URIRef("quant#", base=redfoot.base))
+c = redfoot.get_context(URIRef("#symbols", base=redfoot.base))
 
 
 orig_reader = csv.reader
@@ -621,7 +621,7 @@ class Symbols:
         for row in csv.reader(f):
             if len(row)==4:
                 name, symbol, market_value, description = row
-                uri = URIRef("ticker#%s" % symbol.replace("/", "_"), base=request.host)
+                uri = URIRef("ticker#%s" % symbol.replace("/", "_"), base=redfoot.base)
                 c.add((uri, RDF.type, QUANT.Stock))
                 c.add((uri, QUANT.symbol, Literal(symbol)))
                 c.add((uri, RDFS.label, Literal(name)))
