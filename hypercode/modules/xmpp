@@ -61,7 +61,7 @@ class Client(object):
                 parser = OptionParser("usage: command <options>")
                 parser.allow_interspersed_args = False
                 args = command_line.split()
-                (options, args) = parser.parse_args(args)
+                (options, args) = parser.parse_args(args[1:])
                 options.program = None
                 redfoot.main(options, args)
                 # TODO: pipe command stdout back to user
