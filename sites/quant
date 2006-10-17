@@ -581,7 +581,7 @@ sections.sort()
   </rdf:Description>
 
   <commands:Command rdf:ID="update_symbols">
-    <rdfs:label>quant_info</rdfs:label>
+    <rdfs:label>update_symbols</rdfs:label>
     <redfoot:code>
      <redfoot:Python rdf:ID="update_symbols_code">
         <rdfs:label>Update Symbols</rdfs:label>
