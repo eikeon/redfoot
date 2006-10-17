@@ -86,7 +86,7 @@ class Client(object):
                 t = Thread(target=run_command, args=(command_line, from_id, self))
                 t.start()
             else:
-                xmpp.send(from_id, "You need to be an admin to run commands, David!")
+                self.send(from_id, "You need to be an admin to run commands, David!")
         else:
             print "command line: '%s'" % command_line
     
