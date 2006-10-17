@@ -76,23 +76,26 @@ class Client(object):
                 # TODO: pipe command stdout back to user
                 result = sio.getvalue()
                 i = 0
-                page = """
+                page_start = """
 <body xmlns='http://www.w3.org/1999/xhtml' style='background-color:#E8A630;color:#000000'>
   <span style='font-family:Verdana'>
 """
+                page_end = """
+  </span>
+</body>
+"""
+                page = page_start
                 for line in result.split("\n"):
                     page += "%s<br/>" % line
                     if i>20:
                         i = 0
-                        xmpp.send(from_id, page)
+                        page += page_end
+                        xmpp.send(from_id, "--", page)
                         import time
                         time.sleep(1)
-                        page = ""
-                page += """
-  </span>
-</body>
-"""
+                        page = page_start
                 if page:
+                    page += page_end
                     xmpp.send(from_id, page)
                 xmpp.send(from_id, "Done running: %s" % command_line)
 
