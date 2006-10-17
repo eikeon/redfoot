@@ -52,7 +52,8 @@ class Client(object):
         from threading import Thread
         from_id = message["from"]
         redfoot.log.info("message from %s" % from_id)
-        if from_id!=self.client_id.full():
+        command_line = "%s" % message
+        if from_id!=self.client_id.full() and command_line.startswith("redfoot"):
             def run_command(command_line, from_id, xmpp):
                 parser = OptionParser("usage: command <options>")
                 parser.allow_interspersed_args = False
@@ -62,7 +63,7 @@ class Client(object):
                 redfoot.main(options, args)
                 # TODO: pipe command stdout back to user
                 xmpp.send(from_id, "Done running: %s" % command_line)
-            t = Thread(target=run_command, args=("%s" % message, from_id, self))
+            t = Thread(target=run_command, args=(command_line, from_id, self))
             t.start()
 
         if False:
