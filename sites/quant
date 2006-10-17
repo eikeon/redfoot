@@ -116,9 +116,9 @@ try:
   </span>
 </body>
 """ % (who_label, escapeToXml(uri.concrete(), isattrib=True), escapeToXml(redfoot.label(uri)))
-     except Exception, e:
-         redfoot.log.exception(e)
-         html = None    
+    except Exception, e:
+        redfoot.log.exception(e)
+        html = None    
     for user in users:
         redfoot.xmpp.send(user, message, html)
 except Exception, e:
