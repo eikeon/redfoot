@@ -770,7 +770,10 @@ redfoot.open(path)
 redfoot._bootstrap()
 redfoot_loader.redfoot = redfoot 
 
-xmpp = redfoot.module(URIRef("modules/xmpp#logging", base=redfoot_program))
+try:
+    xmpp = redfoot.module(URIRef("modules/xmpp#logging", base=redfoot_program))
+except Exception, e:
+    redfoot.log.exception(e)
 if redfoot.xmpp:
     try:
         users = []
