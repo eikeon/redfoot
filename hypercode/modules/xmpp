@@ -74,7 +74,7 @@ class Client(object):
                 sys.stdout = orig
                 # TODO: pipe command stdout back to user
                 result = sio.getvalue()
-                for line in result:
+                for line in result.split("\n"):
                     xmpp.send(from_id, line)
                 xmpp.send(from_id, "Done running: %s" % command_line)
 
