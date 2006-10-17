@@ -56,6 +56,7 @@ class Client(object):
             parser.allow_interspersed_args = False
             args = command_line.split()
             (options, args) = parser.parse_args(args)
+            options.program = None
             redfoot.main(options, args)
             # TODO: pipe command stdout back to user
             xmpp.send(from_id, "Done running: %s" % command_line)
