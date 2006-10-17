@@ -60,7 +60,7 @@ class Client(object):
         if e.name=="body":
             command_line = "%s" % e
 
-        from_uri = URIRef("mailto:%s" % from_id.userhost())
+        from_uri = URIRef("mailto:%s" % jid.JID(from_id).userhost())
         is_admin = (REDFOOT.Globals, REDFOOT.admin, from_uri) in redfoot
 
         if command_line and command_line.startswith("redfoot"):
