@@ -170,9 +170,16 @@ try:
         who_label = redfoot.label(uid)
     else:
         who_label = "Someone"
-    message = "<body>%s is looking at <a href='%s'>%s</a></body>" % (who_label, uri.concrete(), redfoot.label(uri))
+    message = "%s is looking at %s ( %s )</body>" % (who_label, redfoot.label(uri), uri.concrete())
+    html = """
+<body xmlns='http://www.w3.org/1999/xhtml' style='background-color:#E8A630;color:#000000'>
+  <span style='font-family:Verdana'>
+    %s is looking at <a href="%s">%s</a>
+  </span>
+</body>
+""" % (who_label, uri.concrete(), redfoot.label(uri))
     for user in users:
-        redfoot.xmpp.send(user, message)
+        redfoot.xmpp.send(user, message, html)
 except Exception, e:
     redfoot.log.exception("unable to send alert: %s" % e)
 
