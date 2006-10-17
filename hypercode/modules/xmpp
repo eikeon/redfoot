@@ -48,6 +48,7 @@ class Client(object):
                 self.xmlstream.send(message)
 
     def message(self, message):
+        import sys
         from optparse import OptionParser
         from StringIO import StringIO
         #import threading
