@@ -58,7 +58,7 @@ class Client(object):
             redfoot.main(options, args)
             # TODO: pipe command stdout back to user
             xmpp.send(from_id, "Done running: %s" % command_line)
-        t = Thread(target=run_command, args=("%s" % message))
+        t = Thread(target=run_command, args=("%s" % message,))
         t.start()
 
 
