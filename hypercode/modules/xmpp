@@ -96,7 +96,7 @@ class Client(object):
                         page = page_start
                 if page:
                     page += page_end
-                    xmpp.send(from_id, page)
+                    xmpp.send(from_id, "--", page)
                 xmpp.send(from_id, "Done running: %s" % command_line)
 
             t = Thread(target=run_command, args=(command_line, from_id, self))
