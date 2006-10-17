@@ -595,13 +595,12 @@ from rdflib import Namespace
 
 QUANT = Namespace(URIRef("quant#", base=redfoot.base))
 
-orig_reader = csv.reader
 def unicode_csv_reader(f, dialect=csv.excel, encoding="latin-1", **kwargs):
     # csv.py doesn't do Unicode; encode temporarily as UTF-8:
     for row in orig_reader(f, dialect=dialect, **kwargs):
         # decode "encoding" back to Unicode, cell by cell:
         yield [unicode(cell, encoding) for cell in row]
-csv.reader = unicode_csv_reader
+csv.unicode_reader = unicode_csv_reader
 
 
 c = redfoot.get_context(URIRef("#symbols", base=redfoot.base))
@@ -610,7 +609,7 @@ c.remove((None, None, None))
 def update(name, url):
     f = urllib2.urlopen(url)
     # "Name","Symbol","Market Value (millions)","Description (as filed with the SEC)"
-    for row in csv.reader(f):
+    for row in csv.unicode_reader(f):
         if len(row)==4:
             name, symbol, market_value, description = row
             uri = URIRef("ticker#%s" % symbol.replace("/", "_"), base=redfoot.base)
