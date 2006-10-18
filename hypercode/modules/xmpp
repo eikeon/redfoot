@@ -35,12 +35,14 @@ class Client(object):
         self.xmlstream = xmlstream
 
         presence = domish.Element(('jabber:client','presence'))
+        photo = presence.addElement("photo", "vcard-temp:x:update", "0709d4740da5b3325678f2ee1062993c9a7113fa")
+        presence.addElement("x", 'vcard-temp:x:update', photo)
         xmlstream.send(presence)
 
         xmlstream.addObserver('/message',  self.message)
         xmlstream.addObserver('/presence', self.presence)
         xmlstream.addObserver('/iq',       self.iq)   
-        #xmlstream.addObserver('/',       self.debug)   
+        xmlstream.addObserver('/*',       self.debug)   
         if self.pending:
             pending = list(self.pending)
             self.pending = []
@@ -48,7 +50,6 @@ class Client(object):
                 self.xmlstream.send(message)
 
     def message(self, message):
-        #self.debug(message)
         import sys
         from optparse import OptionParser
         from StringIO import StringIO
@@ -91,8 +92,7 @@ class Client(object):
             print "command line: '%s'" % command_line
     
     def presence(self, presence):
-        #self.debug(presence)
-        if presence["type"]=="subscribe":
+        if presence.hasAttribute("type") and presence["type"]=="subscribe":
             response = domish.Element(('jabber:client','presence'))
             response["to"] = presence["from"]
             response["from"] = self.client_id.full()
@@ -100,7 +100,6 @@ class Client(object):
             self.xmlstream.send(response)
 
     def iq(self, iq):
-        #self.debug(iq)
         pass
 
     def debug(self, element):
@@ -121,8 +120,6 @@ class Client(object):
             self.xmlstream.send(message)
         else:
             self.pending.append(message)
-        #self.debug(message)
-
 
 #c = Client(JID('redfoot@eikeon.com', 'password_here', 'eikeon.com', 5222))
 #reactor.run()

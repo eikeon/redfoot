@@ -631,7 +631,7 @@ csv.unicode_reader = unicode_csv_reader
 c = redfoot.get_context(URIRef("#symbols", base=redfoot.base))
 c.remove((None, None, None))
 
-def update(name, url):
+def update(exchange, url):
     f = urllib2.urlopen(url)
     # "Name","Symbol","Market Value (millions)","Description (as filed with the SEC)"
     for row in csv.unicode_reader(f):
@@ -643,7 +643,7 @@ def update(name, url):
             c.add((uri, RDFS.label, Literal(name)))
             c.add((uri, RDFS.comment, Literal(description)))
             c.add((uri, QUANT.market_value, Literal(market_value)))
-            c.add((uri, QUANT.exchange, Literal(name)))
+            c.add((uri, QUANT.exchange, Literal(exchange)))
     f.close()
 
 update("Nasdaq", "http://www.nasdaq.com/asp/symbols.asp?exchange=Q&start=0")

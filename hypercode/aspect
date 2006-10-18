@@ -8,6 +8,48 @@
     <rdfs:label>Aspect</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/redfoot#Code"/>
+
+<!--
+aspect#install
+
+# input: 
+#   aspect -- uri of aspect to install
+#   base -- xml:base at which to install aspect
+site = base # TODO: calc site from base
+
+
+#ASPECT = redfoot.namespace("http://redfoot.net/hypercode/aspect#")
+from rdflib.Namespace import Namespace
+ASPECT = Namespace("http://redfoot.net/hypercode/aspect#")
+
+TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")
+SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+
+cid = redfoot.context_id(aspect, context_id="context")
+redfoot.check(cid)
+
+label = redfoot.label(aspect) or aspect
+
+from urllib import quote
+frag = quote(label.lower().replace(" ", "_"))
+
+context = redfoot.get_context(URIRef("%s#%s_aspect" % (base, frag)))
+context.remove((None, None, None))
+
+for item in redfoot.objects(aspect, ASPECT.item):
+    if (item, RDF.type, SERVER.Site) in redfoot:
+        for p, o in redfoot.predicate_objects(item):
+            context.add((site, p, o))
+    location = redfoot.value(item, ASPECT.location)
+    if location:
+        uri = URIRef(location, base=base)
+        if (item, RDF.type, TEMPLATE.Section) in redfoot:
+            context.add((site, TEMPLATE.section, uri))
+        for p, o in redfoot.predicate_objects(item):
+            context.add((uri, p, o))
+-->
+
+
   </rdfs:Class>
 
 </rdf:RDF>
