@@ -716,7 +716,7 @@ try:
     p = Popen(command)#, stdout=log_file, stderr=log_file)
     p.wait()
 except Exception, e:
-    _logger.error("Could not run command: %s" % e)
+    redfoot.log.exception("Could not run command: %s" % e)
 
 ]]>
       </rdf:value>
