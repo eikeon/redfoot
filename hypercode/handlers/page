@@ -106,7 +106,12 @@ if (site, None, None) not in redfoot:
 def lookup(property, default=None):
     return request.lookup(property) or redfoot.value(redfoot_current, property) or default
 
-page_handler = lookup(SERVER.page_handler)
+# TODO: this is tmp... change lookup to find first page_handler that has the correct server:content_type instead.
+if request.get("content-type")=="text/csv":
+    page_handler = lookup(URIRef("%s_text_csv" % SERVER.page_handler)
+
+if page_handler is None:
+    page_handler = lookup(SERVER.page_handler)
 if page_handler is None:
     response.setStatus(404, "Not Found")            
     response.write("No page handler found")

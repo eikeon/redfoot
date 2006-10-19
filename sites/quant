@@ -162,6 +162,23 @@ except Exception, e:
   </rdfs:Class>
 
   <rdfs:Class rdf:about="quant#Basket">
+    <server:page_handler_text_csv>
+      <server:PageHandler rdf:ID="BasketCSVPageHandler">
+        <rdfs:label>Basket CSV Page Handler</rdfs:label>
+       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+symbols = set()
+for item in redfoot.objects(basket_uri, QUANT.basketItem):
+    symbol = redfoot.value(item, QUANT.symbol, any=True)
+    symbols.add(symbol)
+
+response.write(",".join(symbols))
+
+]]>
+        </rdf:value>
+      </server:PageHandler>
+    </server:page_handler_text_csv>
     <template:content>
       <template:Content rdf:ID="BasketPagePartHandler">
         <rdfs:label>Basket</rdfs:label>
