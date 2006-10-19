@@ -107,7 +107,7 @@ def lookup(property, default=None):
     return request.lookup(property) or redfoot.value(redfoot_current, property) or default
 
 page_handler = None
-content_type = request.parameters.get("content-type")
+content_type = request.parameters.get("content-type") or "application/xhtml+xml"
 # TODO: accept header bits
 for handler in request.objects(SERVER.page_handler):
     if content_type:
