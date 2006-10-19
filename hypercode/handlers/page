@@ -107,7 +107,7 @@ def lookup(property, default=None):
     return request.lookup(property) or redfoot.value(redfoot_current, property) or default
 
 # TODO: this is tmp... change lookup to find first page_handler that has the correct server:content_type instead.
-if request.get("content-type")=="text/csv":
+if request.parameters.get("content-type")=="text/csv":
     page_handler = lookup(URIRef("%s_text_csv" % SERVER.page_handler))
 
 if page_handler is None:
