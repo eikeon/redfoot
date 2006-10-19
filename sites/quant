@@ -185,7 +185,7 @@ response.write(",".join(symbols))
 ]]>
         </rdf:value>
       </server:PageHandler>
-    </server:page_handler_text_csv>
+    </server:page_handler>
     <template:content>
       <template:Content rdf:ID="BasketPagePartHandler">
         <rdfs:label>Basket</rdfs:label>
