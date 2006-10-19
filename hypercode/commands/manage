@@ -47,19 +47,36 @@
 
 REDFOOT = redfoot.namespace("http://redfoot.net/2005/redfoot#")
 
-#assert len(args)==1, "expecting one argument that is the URIRef of an admin"
+from optparse import OptionParser
+parser = OptionParser("""
+This command is for adding a Redfoot admin and expects one argument, the user identifier.""")
+parser.add_option("--password", dest="password", help="password for the admin being added")
 
-user = URIRef(args[0])
+try:
+    options, args = parser.parse_args(args)
+    done = False
+except SystemExit, e:
+    done = True
 
-redfoot.config.add((REDFOOT.Globals, REDFOOT.admin, user))
+if not done:
+    if len(args)>=1:
+        user = args[0]
+        if not user.startswith("mailto:") and "@" in user:
+            user = "mailto:%s" % user
+        user = URIRef(user)
 
-if len(args)>1:
-    SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
-    password = Literal(args[1].strip())
-    redfoot.config.add((user, RDF.type, SESSION.User))
-    import sha
-    hexdigest = Literal(sha.new(password).hexdigest())
-    redfoot.config.set((user, SESSION.hexdigest, hexdigest))
+        redfoot.config.add((REDFOOT.Globals, REDFOOT.admin, user))
+
+        if options.password:
+            SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+            password = Literal(options.password.strip())
+            redfoot.config.add((user, RDF.type, SESSION.User))
+            import sha
+            hexdigest = Literal(sha.new(password).hexdigest())
+            redfoot.config.set((user, SESSION.hexdigest, hexdigest))
+    else:
+        redfoot.write("No user identifier specified.\n")
+        parser.print_help()
 
 ]]>
       </rdf:value>
