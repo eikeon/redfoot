@@ -787,7 +787,7 @@ if not done:
         xmpp_id = admin.split("mailto:")[-1]
         if "@" in xmpp_id:
             users.append(xmpp_id)
-    def send(message)
+    def send(message):
         for user in users:
             redfoot.xmpp.send()
 
