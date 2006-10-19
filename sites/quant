@@ -669,6 +669,7 @@ sections.sort()
       <redfoot:Configuration rdf:ID="quant_config">    
         <commands:command rdf:resource="#update_symbols"/>                
         <commands:command rdf:resource="#certus"/>                
+        <commands:command rdf:resource="#strategies"/>                
       </redfoot:Configuration>
     </commands:config>
   </rdf:Description>
