@@ -168,6 +168,8 @@ except Exception, e:
        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
+basket_uri = request.uri.abstract()
+
 symbols = set()
 for item in redfoot.objects(basket_uri, QUANT.basketItem):
     symbol = redfoot.value(item, QUANT.symbol, any=True)
