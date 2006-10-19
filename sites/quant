@@ -718,7 +718,7 @@ from os.path import abspath
 
 command = [abspath("Certus.sh")] + args
 try:
-    p = Popen(command), stdout=sys.stdout, stderr=sys.stdout)
+    p = Popen(command, stdout=sys.stdout, stderr=sys.stdout)
     p.wait()
 except Exception, e:
     redfoot.log.exception("Could not run command '%s': %s" % (command, e))
