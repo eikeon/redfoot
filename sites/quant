@@ -15,7 +15,7 @@
     <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/session#User"/>
     <template:content>
       <template:Content rdf:ID="UserPagePartHandler">
-        <rdfs:label>Stock</rdfs:label>
+        <rdfs:label>Quant User Page Part Handler</rdfs:label>
        <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
 <![CDATA[
 
@@ -154,6 +154,51 @@ except Exception, e:
 <img src="http://bigcharts.marketwatch.com/charts/big.chart?symb=${symbol}&amp;time=18&amp;freq=9&amp;size=1"></img>
 
 
+</div>
+]]>
+        </rdf:value>
+      </template:Content>
+    </template:content>
+  </rdfs:Class>
+
+  <rdfs:Class rdf:about="quant#Basket">
+    <template:content>
+      <template:Content rdf:ID="BasketPagePartHandler">
+        <rdfs:label>Basket</rdfs:label>
+       <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+<div xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:kid="http://purl.org/kid/ns#"
+     kid:strip=""
+>
+<?python
+from rdflib import Namespace
+
+QUANT = Namespace(URIRef("quant#", base=request.host))
+
+uri = request.uri.abstract()
+
+items = []
+for item in redfoot.objects(uri, QUANT.basketItem):
+    label = redfoot.label(item)
+    symbol = redfoot.value(item, QUANT.symbol, any=True)
+    items.append((label, uri, symbol))
+items.sort()
+
+?>
+
+  <div kid:for="label, uri, symbol in items">
+    <h3><a href="${uri.concrete()}">${label}</a></h3>
+    <p>Market Value: ${redfoot.value(uri, QUANT.market_value)}</p>
+
+    <p>
+    <img src="http://bigcharts.marketwatch.com/charts/big.chart?symb=${symbol}&amp;time=1dy&amp;freq=5mi&amp;lf=1&amp;type=256&amp;style=1538&amp;size=3"/>
+    <img src="http://bigcharts.marketwatch.com/charts/big.chart?symb=${symbol}&amp;time=5dy&amp;freq=5mi&amp;lf=1&amp;type=256&amp;style=1538&amp;size=3"/>
+    <img src="http://bigcharts.marketwatch.com/charts/big.chart?symb=${symbol}&amp;time=6mo&amp;freq=1dy&amp;lf=1&amp;type=256&amp;style=1538&amp;size=3"/>
+    <img src="http://bigcharts.marketwatch.com/charts/big.chart?symb=${symbol}&amp;time=1yr&amp;freq=1dy&amp;lf=1&amp;type=256&amp;style=1538&amp;size=3"/>
+    </p>
+
+  </div>
 </div>
 ]]>
         </rdf:value>
