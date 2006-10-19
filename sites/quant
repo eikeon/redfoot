@@ -794,15 +794,17 @@ if not done:
             redfoot.xmpp.send()
 
     if options.stop:
+        redfoot.log.info("requesting strategies loop to stop")
         strat.active = False
     else:
+        redfoot.log.info("requesting strategies loop to start")
         def main():
-            redfoot.log("Starting strategies main loop")
+            redfoot.log.info("Starting strategies main loop")
             strat.active = True
             while strat.active:
                 send("Buy AAPL!")
                 sleep(30)
-            redfoot.log("strategies main loop stopped")
+            redfoot.log.info("strategies main loop stopped")
 
         t = threading.Thread(target=main)
         t.start()
