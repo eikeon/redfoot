@@ -713,7 +713,9 @@ redfoot.log.info("Symbols updated")
 
 from subprocess import Popen
 
-command = ["Certus.sh"] + args
+from os.path import abspath
+
+command = [abspath("Certus.sh")] + args
 try:
     p = Popen(command)#, stdout=log_file, stderr=log_file)
     p.wait()
