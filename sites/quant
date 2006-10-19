@@ -182,7 +182,7 @@ items = []
 for item in redfoot.objects(basket_uri, QUANT.basketItem):
     label = redfoot.label(item)
     symbol = redfoot.value(item, QUANT.symbol, any=True)
-    items.append((label, uri, symbol))
+    items.append((label, item, symbol))
 items.sort()
 
 ?>
