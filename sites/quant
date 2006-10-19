@@ -168,6 +168,8 @@ except Exception, e:
        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
+from rdflib import Namespace
+
 QUANT = Namespace(URIRef("quant#", base=request.host))
 
 basket_uri = request.uri.abstract()
