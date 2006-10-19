@@ -186,6 +186,7 @@ for item in redfoot.objects(basket_uri, QUANT.basketItem):
 items.sort()
 
 ?>
+  <p>${redfoot.value(basket_uri, RDFS.comment)}</p>
 
   <div kid:for="label, uri, symbol in items">
     <h3><a href="${uri.concrete()}">${label}</a></h3>
