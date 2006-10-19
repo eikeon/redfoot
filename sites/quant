@@ -768,6 +768,7 @@ from optparse import OptionParser
 parser = OptionParser("""
 a temporary way for us to kick of the strategies main loop. Will restart to loop if one is already running.""")
 parser.add_option("--stop", action="store_true", dest="stop", help="stop the strategies main loop")
+parser.set_defaults(stop=False)
 
 try:
     options, args = parser.parse_args(args)
