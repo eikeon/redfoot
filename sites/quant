@@ -754,5 +754,57 @@ except Exception, e:
     </redfoot:code>
   </commands:Command>
 
+  <commands:Command rdf:ID="strategies">
+    <rdfs:label>strategies</rdfs:label>
+    <redfoot:code>
+     <redfoot:Python rdf:ID="strategies_code">
+        <rdfs:label>stragegies code</rdfs:label>
+      <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+from optparse import OptionParser
+parser = OptionParser("""
+a temporary way for us to kick of the strategies main loop. Will restart to loop if one is already running.""")
+parser.add_option("--stop", action="store_true", dest="stop", help="stop the strategies main loop")
+
+try:
+    options, args = parser.parse_args(args)
+    done = False
+except SystemExit, e:
+    done = True
+
+if not done:
+    
+    if not hasattr(redfoot, "_strategies_main"):
+        import new
+        strat = redfoot._strategies_main = new.module()
+    else:
+        strat = redfoot._strategies_main
+
+    users = []
+    for admin in redfoot.objects(REDFOOT.Globals, REDFOOT.admin):
+        xmpp_id = admin.split("mailto:")[-1]
+        if "@" in xmpp_id:
+            users.append(xmpp_id)
+    def send(message)
+        for user in users:
+            redfoot.xmpp.send()
+
+    if options.stop:
+        strat.active = False
+    else:
+        def main():
+            redfoot.log("Starting strategies main loop")
+            while strat.active:
+                send("Buy AAPL!")
+                sleep(30)
+            redfoot.log("strategies main loop stopped")
+
+]]>
+      </rdf:value>
+     </redfoot:Python>
+    </redfoot:code>
+  </commands:Command>
+
 
 </rdf:RDF>
