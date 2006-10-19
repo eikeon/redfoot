@@ -106,52 +106,66 @@ if (site, None, None) not in redfoot:
 def lookup(property, default=None):
     return request.lookup(property) or redfoot.value(redfoot_current, property) or default
 
-# TODO: this is tmp... change lookup to find first page_handler that has the correct server:content_type instead.
 page_handler = None
-if request.parameters.get("content-type")=="text/csv":
-    page_handler = lookup(URIRef("%s_text_csv" % SERVER.page_handler))
-
+content_type = request.parameters.get("content-type")
+# TODO: accept header bits
+for handler in request.objects(SERVER.page_handler):
+    if content_type:
+        if (handler, SERVER.content_type, Literal(content_type)) in redfoot:
+            page_handler = handler
+            break
+    else:
+        page_handler = handler
+        break
 if page_handler is None:
-    page_handler = lookup(SERVER.page_handler)
+    for handler in redfoot.objects(redfoot_current,SERVER.page_handler):
+        if content_type:
+            if (handler, SERVER.content_type, Literal(content_type)) in redfoot:     
+                page_handler = handler
+                break
+        else:
+            page_handler = handler
+            break
+
 if page_handler is None:
     response.setStatus(404, "Not Found")            
     response.write("No page handler found")
     response.finish()
-
-long_running = None
-accept = request.headers.get("accept")
-# TODO: check for best match
-if accept and "application/rdf+xml" in accept:  
-    if page_handler and (page_handler, SERVER.content_type, Literal("application/rdf+xml")) in redfoot:
-        page_handler = page_handler
-    elif (request.uri, RDF.type, SERVER.StaticPage) in redfoot:
-        page_handler = page_handler
-        long_running = "true"
-    else:
-        page_handler = URIRef("#rdfxml_handler", base=redfoot_current)
-
-response.cache_body = True # So that server's request.finish will add content-length, Content-MD5 and ETag headers
-
-# TODO: if resource has last-modified then say so...
-#response.setHeader("last-modified", datetimeToString(now))
-
-# TODO: do at end of request processing?
-response.setHeader("Cache-Control", "s-maxage=0, must-revalidate")
-response.setHeader("Expires", datetimeToString(time()))
-#response.setHeader("Vary", "Accept-Encoding")
-
-redfoot.execute(lookup(SERVER.display_support), context=globals())
-
-# TODO allow the long running assertion to be on the page_handler or page_part_handler as well?
-long_running = long_running or redfoot.value(request.uri, SERVER.long_running)
-if str(long_running)=="true": # TODO:
-    def finish(_):
-        response.finish()
-    d = deferToThread(display, page_handler, fragment=False)
-    d.addCallbacks(callback=finish, errback=finish)
 else:
-    display(page_handler, fragment=False)
-    response.finish()
+    long_running = None
+    accept = request.headers.get("accept")
+    # TODO: check for best match
+    if accept and "application/rdf+xml" in accept:  
+        if page_handler and (page_handler, SERVER.content_type, Literal("application/rdf+xml")) in redfoot:
+            page_handler = page_handler
+        elif (request.uri, RDF.type, SERVER.StaticPage) in redfoot:
+            page_handler = page_handler
+            long_running = "true"
+        else:
+            page_handler = URIRef("#rdfxml_handler", base=redfoot_current)
+    
+    response.cache_body = True # So that server's request.finish will add content-length, Content-MD5 and ETag headers
+    
+    # TODO: if resource has last-modified then say so...
+    #response.setHeader("last-modified", datetimeToString(now))
+    
+    # TODO: do at end of request processing?
+    response.setHeader("Cache-Control", "s-maxage=0, must-revalidate")
+    response.setHeader("Expires", datetimeToString(time()))
+    #response.setHeader("Vary", "Accept-Encoding")
+    
+    redfoot.execute(lookup(SERVER.display_support), context=globals())
+    
+    # TODO allow the long running assertion to be on the page_handler or page_part_handler as well?
+    long_running = long_running or redfoot.value(request.uri, SERVER.long_running)
+    if str(long_running)=="true": # TODO:
+        def finish(_):
+            response.finish()
+        d = deferToThread(display, page_handler, fragment=False)
+        d.addCallbacks(callback=finish, errback=finish)
+    else:
+        display(page_handler, fragment=False)
+        response.finish()
 
 ]]>
     </rdf:value>
