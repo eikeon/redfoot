@@ -711,14 +711,14 @@ redfoot.log.info("Symbols updated")
       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
-from subprocess import Popen
+import subprocess
 
 import sys
 from os.path import abspath
 
 command = [abspath("Certus.sh")] + args
 try:
-    p = Popen(command, stdout=sys.stdout, stderr=sys.stdout)
+    p = subprocess.Popen(command, stdout = subprocess.PIPE) #stdout=sys.stdout, stderr=sys.stdout)
     p.wait()
 except Exception, e:
     redfoot.log.exception("Could not run command '%s': %s" % (command, e))
