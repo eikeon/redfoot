@@ -176,10 +176,10 @@ from rdflib import Namespace
 
 QUANT = Namespace(URIRef("quant#", base=request.host))
 
-uri = request.uri.abstract()
+basket_uri = request.uri.abstract()
 
 items = []
-for item in redfoot.objects(uri, QUANT.basketItem):
+for item in redfoot.objects(basket_uri, QUANT.basketItem):
     label = redfoot.label(item)
     symbol = redfoot.value(item, QUANT.symbol, any=True)
     items.append((label, uri, symbol))
