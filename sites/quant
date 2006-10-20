@@ -706,18 +706,24 @@ c.remove((None, None, None))
 def update(exchange, url):
     f = urllib2.urlopen(url)
     # "Name","Symbol","Market Value (millions)","Description (as filed with the SEC)"
+    "Name","Symbol","Market Value (millions)","Shares Outstanding","Description (as filed with the SEC)"
+    redfoot.log.debug("ignoring first line: %s" % f.readline() )
     for row in csv.unicode_reader(f):
         if len(row)==4:        
             name, symbol, market_value, description = row
-            uri = URIRef("ticker#%s" % symbol.replace("/", "_"), base=redfoot.base)
-            c.add((uri, RDF.type, QUANT.Stock))
-            c.add((uri, QUANT.symbol, Literal(symbol)))
-            c.add((uri, RDFS.label, Literal(name)))
-            c.add((uri, RDFS.comment, Literal(description)))
-            c.add((uri, QUANT.market_value, Literal(market_value)))
-            c.add((uri, QUANT.exchange, Literal(exchange)))
+        elif len(row)==5:
+            name, symbol, market_value, description = row
         else:
-            redfoot.log.warning("Row does not have 4 items: %s" % str(row))
+            redfoot.log.warning("Row does not have 4 or 5 items: %s" % str(row))
+            continue
+        uri = URIRef("ticker#%s" % symbol.replace("/", "_"), base=redfoot.base)
+        c.add((uri, RDF.type, QUANT.Stock))
+        c.add((uri, QUANT.symbol, Literal(symbol)))
+        c.add((uri, RDFS.label, Literal(name)))
+        c.add((uri, RDFS.comment, Literal(description)))
+        c.add((uri, QUANT.market_value, Literal(market_value)))
+        c.add((uri, QUANT.exchange, Literal(exchange)))
+
     f.close()
 
 update("Nasdaq", "http://www.nasdaq.com/asp/symbols.asp?exchange=Q&start=0")
