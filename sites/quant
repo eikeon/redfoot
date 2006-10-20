@@ -903,6 +903,7 @@ if not done:
         else:
             redfoot.log.info("strategies main loop already running. Restarting.")
             l.stop()
+            strat.l = l = task.LoopingCall(main) # create a new LoopingCall
             l.start(30.0)
 
 ]]>
