@@ -105,7 +105,6 @@
 >
 <?python
 from rdflib import Namespace
-
 QUANT = Namespace(URIRef("quant#", base=request.host))
 
 uri = request.uri.abstract()
@@ -763,6 +762,9 @@ except Exception, e:
       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 import  threading, time
+
+from rdflib import Namespace
+QUANT = Namespace(URIRef("quant#", base=request.host))
 
 from optparse import OptionParser
 parser = OptionParser("""
