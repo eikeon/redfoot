@@ -837,6 +837,7 @@ def send(message):
 
 import sys, csv, time, md5
 from os.path import abspath
+from StringIO import StringIO
 
 def process_cci_results(data):
     sio = StringIO(data)
