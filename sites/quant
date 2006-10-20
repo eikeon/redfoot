@@ -755,7 +755,7 @@ class CertusPP(protocol.ProcessProtocol):
         self.data = self.data + data
 
     def errReceived(self, data):
-        redfoot.log.error("%s" % data)
+        redfoot.log.debug("CertusPP stderr: %s" % data)
 
     def inConnectionLost(self):
         redfoot.log.debug("inConnectionLost! stdin is closed! (we probably did it)")
@@ -843,7 +843,8 @@ def process_cci_results(data):
             c.add((trade, QUANT.maxLossAllowed, Literal(max_loss)))
             send("Recommended trade: %s ( %s )" % (trade.concrete(), row))
 
-args = ["-s", "cci", "-b", "http://qam.eikco.com/document/2006/10/19/02:28:51/?content-type=text/csv"]
+arg_string = "-s cci -b http://qam.eikco.com/document/2006/10/19/02:28:51/?content-type=text/csv"
+args = arg_string.split()
 redfoot.execute(URIRef("#certus_code", base=redfoot.base), args=args, action=process_cci_results) 
 
 ]]>
