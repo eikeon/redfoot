@@ -133,7 +133,7 @@ if not content_type:
         accept = request.headers.get("accept")
         mimeparse = redfoot.module(URIRef("modules/mimeparse#module", base=redfoot_program))
         content_type = mimeparse.best_match(supported, accept)
-        redfoot.log.info("supported: %s accept: %s best_match: %s" % (supported, accept, content_type))
+        redfoot.log.debug("supported: %s accept: %s best_match: %s" % (supported, accept, content_type))
     else:
         content_type = None
 
