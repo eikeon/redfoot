@@ -755,6 +755,7 @@ except Exception, e:
   </commands:Command>
 
   <rdf:Description rdf:ID="cci">
+    <rdf:type rdf:resource="/quant#TradingStrategy"/>
     <rdfs:label>cci</rdfs:label>
     <redfoot:code> <!-- TODO: -->
       <redfoot:Python rdf:ID="cci_code">
@@ -814,7 +815,7 @@ certus(["-s", "cci", "-b", "http://qam.eikco.com/document/2006/10/19/02:28:51/?c
       </rdf:value>
      </redfoot:Python>
     </redfoot:code>
-  </commands:Command>
+  </rdf:Description>
 
   <commands:Command rdf:ID="strategies">
     <rdfs:label>strategies</rdfs:label>
