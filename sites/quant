@@ -894,7 +894,7 @@ if not done:
                     redfoot.execute(URIRef("#cci_code", base=redfoot.base)) 
                 except Exception, e:
                     redfoot.log.exception(e)
-                time.sleep(300) # once per 5 minutes for now.
+                time.sleep(30) # once per 5 minutes for now.
             redfoot.log.info("strategies main loop stopped")
         if strat.active:
             redfoot.log.info("strategies main loop already running... restarting.")
