@@ -762,7 +762,7 @@ except Exception, e:
         <rdfs:label>stragegies code</rdfs:label>
       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
-import  threading
+import  threading, time
 
 from optparse import OptionParser
 parser = OptionParser("""
@@ -804,7 +804,7 @@ if not done:
                 strat.active = True
                 while strat.active:
                     send("Buy AAPL!")
-                    sleep(30)
+                    time.sleep(30)
                 redfoot.log.info("strategies main loop stopped")
             except Exception, e:
                 redfoot.log.exception(e)
