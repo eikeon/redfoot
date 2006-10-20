@@ -178,9 +178,12 @@ basket_uri = request.uri.abstract()
 symbols = set()
 for item in redfoot.objects(basket_uri, QUANT.basketItem):
     symbol = redfoot.value(item, QUANT.symbol, any=True)
-    symbols.add(symbol)
+    if symbol:
+        symbols.add(symbol)
+    else:
+        redfoot.log.debug("item %s does not have a symbol" % item.concrete())
 
-response.write(",".join(symbols) or "")
+response.write(",".join(symbols))
 
 ]]>
         </rdf:value>
@@ -859,14 +862,14 @@ if not done:
         redfoot.log.info("requesting strategies loop to start")
         def main():
             redfoot.log.info("Starting strategies main loop")
-            try:
-                strat.active = True
-                while strat.active:
-                    # TODO: query to see what things need to run how often... for now hard code:
+            strat.active = True
+            while strat.active:
+                # TODO: query to see what things need to run how often... for now hard code:
+                try:
                     redfoot.execute(URIRef("#cci_code", base=redfoot.base)) 
-                    time.sleep(300) # once per 5 minutes for now.
-            except Exception, e:
-                redfoot.log.exception(e)
+                except Exception, e:
+                    redfoot.log.exception(e)
+                time.sleep(300) # once per 5 minutes for now.
             redfoot.log.info("strategies main loop stopped")
         if strat.active:
             redfoot.log.info("strategies main loop already running... restarting.")
