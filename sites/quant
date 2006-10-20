@@ -753,7 +753,7 @@ import re
 
 import logging
 _logger = logging.getLogger(redfoot_current)
-_logger.setLevel(logging.DEBUG)
+#_logger.setLevel(logging.DEBUG)
 
 class CertusPP(protocol.ProcessProtocol):
     def __init__(self, action=None):
@@ -761,8 +761,7 @@ class CertusPP(protocol.ProcessProtocol):
         self.action = action
 
     def connectionMade(self):
-        _logger.info("connectionMade!")
-        redfoot.log.info("HELLO?")
+        _logger.debug("connectionMade!")
         #self.transport.write("send to process")
         self.transport.closeStdin() # tell them we're done
 
