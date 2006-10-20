@@ -81,6 +81,7 @@ else:
   <server:Handler rdf:about="#get_handler">
     <rdfs:label>Default GET handler</rdfs:label>      
     <server:page_handler rdf:resource="../templates/classic#page"/>
+    <server:supported_content_types>application/xhtml+xml</server:supported_content_types>
     <server:display_support rdf:resource="#display_support"/>
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
@@ -131,6 +132,7 @@ if not content_type:
         accept = request.headers.get("accept")
         mimeparse = redfoot.module(URIRef("modules/mimeparse#module", base=redfoot_program))
         content_type = mimparse.best_match(supported, accept)
+        redfoot.log.info("supported: %s accept: %s best_match: %s" % (supported, accept, content_type))
     else:
         content_type = None
 

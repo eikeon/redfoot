@@ -161,6 +161,7 @@ except Exception, e:
   </rdfs:Class>
 
   <rdfs:Class rdf:about="quant#Basket">
+    <server:supported_content_types>application/xhtml+xml,text/csv</server:supported_content_types>
     <server:page_handler>
       <server:PageHandler rdf:ID="BasketCSVPageHandler">
         <rdfs:label>Basket CSV Page Handler</rdfs:label>
