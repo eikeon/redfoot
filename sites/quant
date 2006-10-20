@@ -902,7 +902,10 @@ if not done:
             strat.l.start(30.0)
         else:
             redfoot.log.info("strategies main loop already running. Restarting.")
-            strat.l.stop()
+            try:
+                strat.l.stop()
+            except Exception, e:
+                redfoot.log.exception(e)
             strat.l = task.LoopingCall(main) # create a new LoopingCall
             strat.l.start(30.0)
 
