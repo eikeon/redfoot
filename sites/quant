@@ -874,39 +874,34 @@ except SystemExit, e:
     done = True
 
 
+def main():
+    redfoot.log.info("Running strategies")
+    try:
+        redfoot.execute(URIRef("#cci_code", base=redfoot.ba
+    except Exception, e:
+        redfoot.log.exception(e)
+    redfoot.log.info("done running strategies")
+
 if not done:
     
     if not hasattr(redfoot, "_strategies_main"):
         import new
         strat = redfoot._strategies_main = new.module("strategies")
-        strat.active = False
+        strat.l = None
     else:
         strat = redfoot._strategies_main
 
     if options.stop:
         redfoot.log.info("requesting strategies loop to stop")
-        strat.active = False
+        if strat.l:
+            strat.l.cancel()
     else:
-        redfoot.log.info("requesting strategies loop to start")
-        def main():
-            redfoot.log.info("Starting strategies main loop")
-            strat.active = True
-            while strat.active:
-                # TODO: query to see what things need to run how often... for now hard code:
-                try:
-                    redfoot.execute(URIRef("#cci_code", base=redfoot.base)) 
-                except Exception, e:
-                    redfoot.log.exception(e)
-                time.sleep(30) # once per 5 minutes for now.
-            redfoot.log.info("strategies main loop stopped")
-        if strat.active:
-            redfoot.log.info("strategies main loop already running... restarting.")
-            strat.active = False
-            strat.t.join()
-
-        t = threading.Thread(target=main)
-        t.start()
-        strat.t = t
+        if strat.l is None:
+            redfoot.log.info("requesting strategies loop to start")
+            strat.l = l = task.LoopingCall(main)
+            l.start(30.0)
+        else:
+            redfoot.log.info("strategies main loop already running.")
 
 ]]>
       </rdf:value>
