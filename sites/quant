@@ -791,7 +791,7 @@ if not done:
             users.append(xmpp_id)
     def send(message):
         for user in users:
-            redfoot.xmpp.send(message)
+            redfoot.xmpp.send(user, message)
 
     if options.stop:
         redfoot.log.info("requesting strategies loop to stop")
