@@ -781,14 +781,15 @@ class CertusPP(protocol.ProcessProtocol):
         _logger.debug("errConnectionLost! The child closed their stderr.")
 
     def processEnded(self, status_object):
-        self.log.redfoot("process ended")
+        _logger.debug("process ended")
         if self.action: # TODO: only call action on successful run
             try:
-                self.log.redfoot("calling action: %s with: %s" % (self.action, self.data))
+                _logger.debug("calling action: %s with: %s" % (self.action, self.data))
                 self.action(seld.data)
             except Exception, e:
                 _logger.exception(e)
         else:
+            self.redfoot.write(self.data)
             _logger.debug("processEnded, status %d" % status_object.value.exitCode)
 
 
