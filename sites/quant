@@ -754,29 +754,13 @@ except Exception, e:
     </redfoot:code>
   </commands:Command>
 
-  <commands:Command rdf:ID="strategies">
-    <rdfs:label>strategies</rdfs:label>
-    <redfoot:code>
-     <redfoot:Python rdf:ID="strategies_code">
-        <rdfs:label>stragegies code</rdfs:label>
+  <rdf:Description rdf:ID="cci">
+    <rdfs:label>cci</rdfs:label>
+    <redfoot:code> <!-- TODO: -->
+      <redfoot:Python rdf:ID="cci_code">
+        <rdfs:label>cci code</rdfs:label>
       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
-import  threading, time
-
-from rdflib import Namespace
-QUANT = Namespace(URIRef("/quant#", base=redfoot.base))
-
-from optparse import OptionParser
-parser = OptionParser("""
-a temporary way for us to kick off the strategies main loop.""")
-parser.add_option("--stop", action="store_true", dest="stop", help="stop the strategies main loop")
-parser.set_defaults(stop=False)
-
-try:
-    options, args = parser.parse_args(args)
-    done = False
-except SystemExit, e:
-    done = True
 
 import subprocess
 
@@ -824,6 +808,39 @@ def certus(args):
     except Exception, e:
         redfoot.log.exception("Could not run command '%s': %s" % (command, e))
 
+certus(["-s", "cci", "-b", "http://qam.eikco.com/document/2006/10/19/02:28:51/?content-type=text/csv"])
+
+]]>
+      </rdf:value>
+     </redfoot:Python>
+    </redfoot:code>
+  </commands:Command>
+
+  <commands:Command rdf:ID="strategies">
+    <rdfs:label>strategies</rdfs:label>
+    <redfoot:code>
+     <redfoot:Python rdf:ID="strategies_code">
+        <rdfs:label>stragegies code</rdfs:label>
+      <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+import  threading, time
+
+from rdflib import Namespace
+QUANT = Namespace(URIRef("/quant#", base=redfoot.base))
+
+from optparse import OptionParser
+parser = OptionParser("""
+a temporary way for us to kick off the strategies main loop.""")
+parser.add_option("--stop", action="store_true", dest="stop", help="stop the strategies main loop")
+parser.set_defaults(stop=False)
+
+try:
+    options, args = parser.parse_args(args)
+    done = False
+except SystemExit, e:
+    done = True
+
+
 if not done:
     
     if not hasattr(redfoot, "_strategies_main"):
@@ -843,7 +860,8 @@ if not done:
                 redfoot.log.info("Starting strategies main loop")
                 strat.active = True
                 while strat.active:
-                    certus(["-s", "cci", "-b", "http://qam.eikco.com/document/2006/10/19/02:28:51/?content-type=text/csv"])
+                    # TODO: query to see what things need to run how often... for now hard code:
+                    redfoot.execute(URIRef("#cci_code", base=redfoot.base)) 
                     time.sleep(30)
                 redfoot.log.info("strategies main loop stopped")
             except Exception, e:
