@@ -248,6 +248,11 @@ if ".." not in path:
     <rdfs:comment></rdfs:comment>
   </rdf:Property>
 
+  <rdf:Property rdf:ID="supported_content_types">
+    <rdfs:label>supported_content_types</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+  </rdf:Property>
+
   <rdf:Property rdf:ID="alternate">
     <rdfs:label>alternate</rdfs:label>
     <rdfs:comment></rdfs:comment>
