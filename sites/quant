@@ -850,10 +850,13 @@ if not done:
                 redfoot.log.exception(e)
 
         if strat.active:
-            redfoot.log.info("strategies main loop already running")
-        else:
-            t = threading.Thread(target=main)
-            t.start()
+            redfoot.log.info("strategies main loop already running... restarting.")
+            strat.active = False
+            strat.t.join()
+
+        t = threading.Thread(target=main)
+        t.start()
+        strat.t = t
 
 ]]>
       </rdf:value>
