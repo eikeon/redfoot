@@ -786,8 +786,9 @@ class CertusPP(protocol.ProcessProtocol):
 
 from os.path import abspath
 
-if "action" not in globals():
+if "action" not in locals():
     action = None
+redfoot.log.info("action: %s" % action)
 pp = CertusPP(action)
 executable = abspath("Certus.sh")
 reactor.spawnProcess(pp, executable, [executable] + args, env={})
