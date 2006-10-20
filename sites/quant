@@ -894,7 +894,7 @@ if not done:
     if options.stop:
         redfoot.log.info("requesting strategies loop to stop")
         if strat.l:
-            strat.l.cancel()
+            strat.l.stop()
     else:
         if strat.l is None:
             redfoot.log.info("requesting strategies loop to start")
