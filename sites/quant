@@ -763,6 +763,9 @@ except Exception, e:
       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
+from rdflib import Namespace
+QUANT = Namespace(URIRef("/quant#", base=redfoot.base))
+
 import subprocess
 
 users = []
@@ -825,9 +828,6 @@ certus(["-s", "cci", "-b", "http://qam.eikco.com/document/2006/10/19/02:28:51/?c
       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 import  threading, time
-
-from rdflib import Namespace
-QUANT = Namespace(URIRef("/quant#", base=redfoot.base))
 
 from optparse import OptionParser
 parser = OptionParser("""
