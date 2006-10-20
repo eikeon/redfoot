@@ -789,7 +789,7 @@ def send(message):
 
 
 def certus(args):
-    import sys, csv
+    import sys, csv, time
     from os.path import abspath
 
     command = [abspath("Certus.sh")] + args
@@ -801,25 +801,24 @@ def certus(args):
             stock = redfoot.value(predicate=QUANT.symbol, object=Literal(symbol))
 
             # see if we have a trade for this stock            
-            trade = redfoot.value(predicate=QUANT.underlyingInstrument, stock)
+            trade = redfoot.value(predicate=QUANT.underlyingInstrument, object=stock)
 
             if trade:
                 send("Update on trade: %s ( %s )" % (trade, row))
             else:
                 # TODO: different URI?
-                trade = URIRef("trade#%s" % md5.new("%s"%time.time()).hexdigest())
+                trade = URIRef("trade#%s" % md5.new("%s" % time.time()).hexdigest())
                 c = redfoot.context_id(trade)
                 c.add((trade, RDF.type, QUANT.CertisRecommendedTrade))
                 c.add((trade, RDF.type, QUANT.CCITrade))
                 c.add((trade, QUANT.tradeType, Literal(trade_type)))
                 c.add((trade, QUANT.underlyingInstrument, stock))
                 c.add((trade, QUANT.underlyingPriceWhenRecommended, Literal(stock_price)))
-                c.add((trade, QUANT.tradeRecommendedAt, Literal(date))
+                c.add((trade, QUANT.tradeRecommendedAt, Literal(date)))
                 c.add((trade, QUANT.numPeriodsCCI, Literal(num_periods)))
                 c.add((trade, QUANT.recommendedCCIForExit, Literal(cci_exit_value)))
                 c.add((trade, QUANT.maxLossAllowed, Literal(max_loss)))
                 send("Recommended trade: %s ( %s )" % (trade, row))
-
     except Exception, e:
         redfoot.log.exception("Could not run command '%s': %s" % (command, e))
 
