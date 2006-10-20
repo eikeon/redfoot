@@ -766,7 +766,7 @@ import  threading, time
 
 from optparse import OptionParser
 parser = OptionParser("""
-a temporary way for us to kick of the strategies main loop. Will restart to loop if one is already running.""")
+a temporary way for us to kick off the strategies main loop.""")
 parser.add_option("--stop", action="store_true", dest="stop", help="stop the strategies main loop")
 parser.set_defaults(stop=False)
 
@@ -776,22 +776,39 @@ try:
 except SystemExit, e:
     done = True
 
+import subprocess
+
+users = []
+for admin in redfoot.objects(REDFOOT.Globals, REDFOOT.admin):
+    xmpp_id = admin.split("mailto:")[-1]
+    if "@" in xmpp_id:
+        users.append(xmpp_id)
+def send(message):
+    for user in users:
+        redfoot.xmpp.send(user, message)
+
+
+def certus(args):
+    import sys
+    from os.path import abspath
+
+    command = [abspath("Certus.sh")] + args
+    try:
+        p = subprocess.Popen(command, stdout = subprocess.PIPE)
+        p.wait()
+        for row in csv.reader(p.stdout):
+            send("%s" % row)            
+    except Exception, e:
+        redfoot.log.exception("Could not run command '%s': %s" % (command, e))
+
 if not done:
     
     if not hasattr(redfoot, "_strategies_main"):
         import new
         strat = redfoot._strategies_main = new.module("strategies")
+        strat.active = False
     else:
         strat = redfoot._strategies_main
-
-    users = []
-    for admin in redfoot.objects(REDFOOT.Globals, REDFOOT.admin):
-        xmpp_id = admin.split("mailto:")[-1]
-        if "@" in xmpp_id:
-            users.append(xmpp_id)
-    def send(message):
-        for user in users:
-            redfoot.xmpp.send(user, message)
 
     if options.stop:
         redfoot.log.info("requesting strategies loop to stop")
@@ -803,14 +820,17 @@ if not done:
                 redfoot.log.info("Starting strategies main loop")
                 strat.active = True
                 while strat.active:
-                    send("Buy AAPL!")
+                    certus(["-s", "cci", "-b", "http://qam.eikco.com/document/2006/10/19/02:28:51/?content-type=text/csv"])
                     time.sleep(30)
                 redfoot.log.info("strategies main loop stopped")
             except Exception, e:
                 redfoot.log.exception(e)
 
-        t = threading.Thread(target=main)
-        t.start()
+        if strat.active:
+            redfoot.log.info("strategies main loop already running")
+        else:
+            t = threading.Thread(target=main)
+            t.start()
 
 ]]>
       </rdf:value>

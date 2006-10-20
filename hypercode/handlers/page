@@ -107,25 +107,40 @@ def lookup(property, default=None):
     return request.lookup(property) or redfoot.value(redfoot_current, property) or default
 
 page_handler = None
-content_type = request.parameters.get("content-type") or "application/xhtml+xml"
+
+content_types = []
+
+content_type = request.parameters.get("content-type")
+if content_type:
+    content_types.append(content_type)
+else:
+    content_types_string = lookup(SERVER.content_types) 
+
+    for content_type in content_types_string.split(","):
+        content_types.append(content_type)
+    content_types.append(None)
+
 # TODO: accept header bits
-for handler in request.objects(SERVER.page_handler):
-    if content_type:
-        if (handler, SERVER.content_type, Literal(content_type)) in redfoot:
-            page_handler = handler
-            break
-    else:
-        page_handler = handler
-        break
-if page_handler is None:
-    for handler in redfoot.objects(redfoot_current,SERVER.page_handler):
+for content_type in content_types:    
+    for handler in request.objects(SERVER.page_handler):
         if content_type:
-            if (handler, SERVER.content_type, Literal(content_type)) in redfoot:     
+            if (handler, SERVER.content_type, Literal(content_type)) in redfoot:
                 page_handler = handler
                 break
         else:
             page_handler = handler
             break
+    if page_handler is None:
+        for handler in redfoot.objects(redfoot_current,SERVER.page_handler):
+            if content_type:
+                if (handler, SERVER.content_type, Literal(content_type)) in redfoot:     
+                    page_handler = handler
+                    break
+            else:
+                page_handler = handler
+                break
+    if page_handler:
+        break
 
 if page_handler is None:
     response.setStatus(404, "Not Found")            
@@ -156,8 +171,7 @@ else:
     
     redfoot.execute(lookup(SERVER.display_support), context=globals())
     
-    # TODO allow the long running assertion to be on the page_handler or page_part_handler as well?
-    long_running = long_running or redfoot.value(request.uri, SERVER.long_running)
+    long_running = long_running or redfoot.value(request.uri, SERVER.long_running) or redfoot.value(page_handler, SERVER.long_running)
     if str(long_running)=="true": # TODO:
         def finish(_):
             response.finish()
