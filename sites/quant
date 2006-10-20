@@ -755,7 +755,7 @@ except Exception, e:
   </commands:Command>
 
   <rdf:Description rdf:ID="cci">
-    <rdf:type rdf:resource="/quant#TradingStrategy"/>
+    <rdf:type rdf:resource="/quant#TechnicalTradingStrategy"/>
     <rdfs:label>cci</rdfs:label>
     <redfoot:code> <!-- TODO: -->
       <redfoot:Python rdf:ID="cci_code">
@@ -863,7 +863,7 @@ if not done:
                 while strat.active:
                     # TODO: query to see what things need to run how often... for now hard code:
                     redfoot.execute(URIRef("#cci_code", base=redfoot.base)) 
-                    time.sleep(30)
+                    time.sleep(300) # once per 5 minutes for now.
                 redfoot.log.info("strategies main loop stopped")
             except Exception, e:
                 redfoot.log.exception(e)
