@@ -751,12 +751,16 @@ from twisted.internet import protocol
 from twisted.internet import reactor
 import re
 
+import logging
+_logger = logging.getLogger(redfoot_current)
+_logger.setLevel(logging.DEBUG)
+
 class CertusPP(protocol.ProcessProtocol):
     def __init__(self, action=None):
         self.data = ""
 
     def connectionMade(self):
-        redfoot.log.debug("connectionMade!")
+        _logger.info("connectionMade!")
         #self.transport.write("send to process")
         self.transport.closeStdin() # tell them we're done
 
@@ -764,16 +768,16 @@ class CertusPP(protocol.ProcessProtocol):
         self.data = self.data + data
 
     def errReceived(self, data):
-        redfoot.log.debug("CertusPP stderr: %s" % data)
+        _logger.debug("CertusPP stderr: %s" % data)
 
     def inConnectionLost(self):
-        redfoot.log.debug("inConnectionLost! stdin is closed! (we probably did it)")
+        _logger.debug("inConnectionLost! stdin is closed! (we probably did it)")
 
     def outConnectionLost(self):
-        redfoot.log.debug("outConnectionLost! The child closed their stdout!")
+        _logger.debug("outConnectionLost! The child closed their stdout!")
 
     def errConnectionLost(self):
-        redfoot.log.debug("errConnectionLost! The child closed their stderr.")
+        _logger.debug("errConnectionLost! The child closed their stderr.")
 
     def processEnded(self, status_object):
         self.log.redfoot("process ended")
@@ -782,16 +786,16 @@ class CertusPP(protocol.ProcessProtocol):
                 self.log.redfoot("calling action: %s with: %s" % (self.action, self.data))
                 self.action(seld.data)
             except Exception, e:
-                redfoot.log.exception(e)
+                _logger.exception(e)
         else:
-            redfoot.log.debug("processEnded, status %d" % status_object.value.exitCode)
+            _logger.debug("processEnded, status %d" % status_object.value.exitCode)
 
 
 from os.path import abspath
 
 if "action" not in locals():
     action = None
-redfoot.log.info("action: %s" % action)
+_logger.info("action: %s" % action)
 pp = CertusPP(action)
 executable = abspath("Certus.sh")
 reactor.spawnProcess(pp, executable, [executable] + args, env={})
