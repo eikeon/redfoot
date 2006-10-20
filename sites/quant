@@ -708,7 +708,7 @@ def update(exchange, url):
     # "Name","Symbol","Market Value (millions)","Description (as filed with the SEC)"
     for row in csv.unicode_reader(f):
         if len(row)!=4:
-            redfoot.log.warning("Row does not have 4 items: %s" % row)
+            redfoot.log.warning("Row does not have 4 items: %s" % str(row))
         name, symbol, market_value, description = row
         uri = URIRef("ticker#%s" % symbol.replace("/", "_"), base=redfoot.base)
         c.add((uri, RDF.type, QUANT.Stock))
