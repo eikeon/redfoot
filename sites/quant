@@ -761,6 +761,7 @@ class CertusPP(protocol.ProcessProtocol):
 
     def connectionMade(self):
         _logger.info("connectionMade!")
+        redfoot.log.info("HELLO?")
         #self.transport.write("send to process")
         self.transport.closeStdin() # tell them we're done
 
