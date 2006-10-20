@@ -122,7 +122,7 @@ def best_match(supported, header):
     'text/xml'
     """
     parsed_header = [parse_media_range(r) for r in header.split(",")]
-    weighted_matches = [(quality_parsed(mime_type, i, parsed_header), mime_type)\
+    weighted_matches = [(quality_parsed(mime_type, parsed_header), i, mime_type)\
             for i, mime_type in enumerate(supported)]
     weighted_matches.sort()
     return weighted_matches[-1][0] and weighted_matches[-1][2] or ''
