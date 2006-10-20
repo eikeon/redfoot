@@ -898,13 +898,13 @@ if not done:
     else:
         if strat.l is None:
             redfoot.log.info("requesting strategies loop to start")
-            strat.l = l = task.LoopingCall(main)
-            l.start(30.0)
+            strat.l = task.LoopingCall(main)
+            strat.l.start(30.0)
         else:
             redfoot.log.info("strategies main loop already running. Restarting.")
-            l.stop()
-            strat.l = l = task.LoopingCall(main) # create a new LoopingCall
-            l.start(30.0)
+            strat.l.stop()
+            strat.l = task.LoopingCall(main) # create a new LoopingCall
+            strat.l.start(30.0)
 
 ]]>
       </rdf:value>
