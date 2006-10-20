@@ -758,6 +758,7 @@ _logger.setLevel(logging.DEBUG)
 class CertusPP(protocol.ProcessProtocol):
     def __init__(self, action=None):
         self.data = ""
+        self.action = action
 
     def connectionMade(self):
         _logger.info("connectionMade!")
