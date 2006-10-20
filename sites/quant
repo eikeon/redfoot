@@ -739,18 +739,53 @@ redfoot.log.info("Symbols updated")
       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
-import subprocess
+# import subprocess
 
-import sys
+# import sys
 from os.path import abspath
 
-command = [abspath("Certus.sh")] + args
-try:
-    p = subprocess.Popen(command, stdout = subprocess.PIPE)
-    p.wait()
-    redfoot.write("%s" % p.stdout.read())
-except Exception, e:
-    redfoot.log.exception("Could not run command '%s': %s" % (command, e))
+executable = abspath("Certus.sh")
+command = [executable] + args
+
+# try:
+#     p = subprocess.Popen(command, stdout = subprocess.PIPE)
+#     p.wait()
+#     redfoot.write("%s" % p.stdout.read())
+# except Exception, e:
+#     redfoot.log.exception("Could not run command '%s': %s" % (command, e))
+
+from twisted.internet import protocol
+from twisted.internet import reactor
+import re
+
+class CertusPP(protocol.ProcessProtocol):
+    def __init__(self):
+        self.data = ""
+    def connectionMade(self):
+        print "connectionMade!"
+        #self.transport.write("send to process")
+        self.transport.closeStdin() # tell them we're done
+
+    def outReceived(self, data):
+        self.data = self.data + data
+
+    def errReceived(self, data):
+        redfoot.log.error("%s" % data)
+
+    def inConnectionLost(self):
+        redfoot.log.debug("inConnectionLost! stdin is closed! (we probably did it)")
+
+    def outConnectionLost(self):
+        redfoot.log.debug("outConnectionLost! The child closed their stdout!")
+
+    def errConnectionLost(self):
+        redfoot.log.debug("errConnectionLost! The child closed their stderr.")
+
+    def processEnded(self, status_object):
+        redfoot.log.debug("processEnded, status %d" % status_object.value.exitCode)
+
+pp = CertusPP()
+reactor.spawnProcess(pp, executable, [executable] + args, env={})
 
 ]]>
       </rdf:value>
