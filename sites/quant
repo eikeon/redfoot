@@ -753,7 +753,7 @@ import re
 
 import logging
 _logger = logging.getLogger(redfoot_current)
-_logger.setLevel(logging.INFO)
+
 
 class CertusPP(protocol.ProcessProtocol):
     def __init__(self, action=None):
@@ -797,7 +797,7 @@ from os.path import abspath
 
 if "action" not in locals():
     action = None
-_logger.info("action: %s" % action)
+_logger.debug("action: %s" % action)
 pp = CertusPP(action)
 executable = abspath("Certus.sh")
 reactor.spawnProcess(pp, executable, [executable] + args, env={})
@@ -822,8 +822,6 @@ redfoot.log.exception("Runing CCI strategy")
 from rdflib import Namespace
 QUANT = Namespace(URIRef("/quant#", base=redfoot.base))
 
-import subprocess
-
 users = []
 for admin in redfoot.objects(REDFOOT.Globals, REDFOOT.admin):
     xmpp_id = admin.split("mailto:")[-1]
@@ -834,8 +832,7 @@ def send(message):
         redfoot.xmpp.send(user, message)
 
 
-import sys, csv, time, md5
-from os.path import abspath
+import csv, time, md5
 from StringIO import StringIO
 
 def process_cci_results(data):
