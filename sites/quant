@@ -739,30 +739,15 @@ redfoot.log.info("Symbols updated")
       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
-# import subprocess
-
-# import sys
-from os.path import abspath
-
-executable = abspath("Certus.sh")
-command = [executable] + args
-
-# try:
-#     p = subprocess.Popen(command, stdout = subprocess.PIPE)
-#     p.wait()
-#     redfoot.write("%s" % p.stdout.read())
-# except Exception, e:
-#     redfoot.log.exception("Could not run command '%s': %s" % (command, e))
-
 from twisted.internet import protocol
 from twisted.internet import reactor
 import re
 
 class CertusPP(protocol.ProcessProtocol):
-    def __init__(self):
+    def __init__(self, action=None):
         self.data = ""
     def connectionMade(self):
-        print "connectionMade!"
+        redfoot.log.debug("connectionMade!")
         #self.transport.write("send to process")
         self.transport.closeStdin() # tell them we're done
 
@@ -782,9 +767,18 @@ class CertusPP(protocol.ProcessProtocol):
         redfoot.log.debug("errConnectionLost! The child closed their stderr.")
 
     def processEnded(self, status_object):
-        redfoot.log.debug("processEnded, status %d" % status_object.value.exitCode)
+        if self.action: # TODO: only call action on successful run
+            self.action(seld.data)
+        else:
+            redfoot.log.debug("processEnded, status %d" % status_object.value.exitCode)
 
-pp = CertusPP()
+
+from os.path import abspath
+
+if "action" not in globals():
+    action = None
+pp = CertusPP(action)
+executable = abspath("Certus.sh")
 reactor.spawnProcess(pp, executable, [executable] + args, env={})
 
 ]]>
@@ -802,6 +796,8 @@ reactor.spawnProcess(pp, executable, [executable] + args, env={})
       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
+redfoot.log.exception("Runing CCI strategy")
+
 from rdflib import Namespace
 QUANT = Namespace(URIRef("/quant#", base=redfoot.base))
 
@@ -817,41 +813,35 @@ def send(message):
         redfoot.xmpp.send(user, message)
 
 
-def certus(args):
-    import sys, csv, time, md5
-    from os.path import abspath
+import sys, csv, time, md5
+from os.path import abspath
 
-    command = [abspath("Certus.sh")] + args
-    try:
-        p = subprocess.Popen(command, stdout = subprocess.PIPE)
-        p.wait()
-        for row in csv.reader(p.stdout):
-            trade_type, symbol, cci, stock_price, date, num_periods, cci_exit_value, max_loss = row
-            stock = redfoot.value(predicate=QUANT.symbol, object=Literal(symbol))
+def process_cci_results(data):
+    sio = StringIO(data)
+    for row in csv.reader(sio):
+        trade_type, symbol, cci, stock_price, date, num_periods, cci_exit_value, max_loss = row
+        stock = redfoot.value(predicate=QUANT.symbol, object=Literal(symbol))
+         # see if we have a trade for this stock            
+        trade = redfoot.value(predicate=QUANT.underlyingInstrument, object=stock)
+         if trade:
+            send("Update on trade: %s ( %s )" % (trade.concrete(), row))
+        else:
+            # TODO: different URI?
+            trade = URIRef("trade#%s" % md5.new("%s" % time.time()).hexdigest(), base=redfoot.base)
+            c = redfoot.get_context(redfoot.context_id(trade, context_id="context"))
+            c.add((trade, RDF.type, QUANT.CertisRecommendedTrade))
+            c.add((trade, RDF.type, QUANT.CCITrade))
+            c.add((trade, QUANT.tradeType, Literal(trade_type)))
+            c.add((trade, QUANT.underlyingInstrument, stock))
+            c.add((trade, QUANT.underlyingPriceWhenRecommended, Literal(stock_price)))
+            c.add((trade, QUANT.tradeRecommendedAt, Literal(date)))
+            c.add((trade, QUANT.numPeriodsCCI, Literal(num_periods)))
+            c.add((trade, QUANT.recommendedCCIForExit, Literal(cci_exit_value)))
+            c.add((trade, QUANT.maxLossAllowed, Literal(max_loss)))
+            send("Recommended trade: %s ( %s )" % (trade.concrete(), row))
 
-            # see if we have a trade for this stock            
-            trade = redfoot.value(predicate=QUANT.underlyingInstrument, object=stock)
-
-            if trade:
-                send("Update on trade: %s ( %s )" % (trade.concrete(), row))
-            else:
-                # TODO: different URI?
-                trade = URIRef("trade#%s" % md5.new("%s" % time.time()).hexdigest(), base=redfoot.base)
-                c = redfoot.get_context(redfoot.context_id(trade, context_id="context"))
-                c.add((trade, RDF.type, QUANT.CertisRecommendedTrade))
-                c.add((trade, RDF.type, QUANT.CCITrade))
-                c.add((trade, QUANT.tradeType, Literal(trade_type)))
-                c.add((trade, QUANT.underlyingInstrument, stock))
-                c.add((trade, QUANT.underlyingPriceWhenRecommended, Literal(stock_price)))
-                c.add((trade, QUANT.tradeRecommendedAt, Literal(date)))
-                c.add((trade, QUANT.numPeriodsCCI, Literal(num_periods)))
-                c.add((trade, QUANT.recommendedCCIForExit, Literal(cci_exit_value)))
-                c.add((trade, QUANT.maxLossAllowed, Literal(max_loss)))
-                send("Recommended trade: %s ( %s )" % (trade.concrete(), row))
-    except Exception, e:
-        redfoot.log.exception("Could not run command '%s': %s" % (command, e))
-
-certus(["-s", "cci", "-b", "http://qam.eikco.com/document/2006/10/19/02:28:51/?content-type=text/csv"])
+args = ["-s", "cci", "-b", "http://qam.eikco.com/document/2006/10/19/02:28:51/?content-type=text/csv"]
+redfoot.execute(URIRef("#cci_code", base=redfoot.base), args=args, action=process_cci_results) 
 
 ]]>
       </rdf:value>
