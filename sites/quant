@@ -810,7 +810,7 @@ def certus(args):
             else:
                 # TODO: different URI?
                 trade = URIRef("trade#%s" % md5.new("%s" % time.time()).hexdigest())
-                c = redfoot.context_id(trade)
+                c = redfoot.get_context(redfoot.context_id(trade))
                 c.add((trade, RDF.type, QUANT.CertisRecommendedTrade))
                 c.add((trade, RDF.type, QUANT.CCITrade))
                 c.add((trade, QUANT.tradeType, Literal(trade_type)))
