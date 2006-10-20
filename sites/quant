@@ -764,7 +764,7 @@ except Exception, e:
 import  threading, time
 
 from rdflib import Namespace
-QUANT = Namespace(URIRef("quant#", base=request.host))
+QUANT = Namespace(URIRef("/quant#", base=redfoot.base))
 
 from optparse import OptionParser
 parser = OptionParser("""
