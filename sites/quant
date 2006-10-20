@@ -768,7 +768,10 @@ class CertusPP(protocol.ProcessProtocol):
 
     def processEnded(self, status_object):
         if self.action: # TODO: only call action on successful run
-            self.action(seld.data)
+            try:
+                self.action(seld.data)
+            except Exception, e:
+                redfoot.log.exception(e)
         else:
             redfoot.log.debug("processEnded, status %d" % status_object.value.exitCode)
 
