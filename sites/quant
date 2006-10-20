@@ -809,7 +809,7 @@ def certus(args):
                 send("Update on trade: %s ( %s )" % (trade, row))
             else:
                 # TODO: different URI?
-                trade = URIRef("trade#%s" % md5.new("%s" % time.time()).hexdigest())
+                trade = URIRef("trade#%s" % md5.new("%s" % time.time()).hexdigest(), base=redfoot.base)
                 c = redfoot.get_context(redfoot.context_id(trade))
                 c.add((trade, RDF.type, QUANT.CertisRecommendedTrade))
                 c.add((trade, RDF.type, QUANT.CCITrade))
