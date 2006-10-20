@@ -877,7 +877,7 @@ except SystemExit, e:
 def main():
     redfoot.log.info("Running strategies")
     try:
-        redfoot.execute(URIRef("#cci_code", base=redfoot.ba
+        redfoot.execute(URIRef("#cci_code", base=redfoot.base))
     except Exception, e:
         redfoot.log.exception(e)
     redfoot.log.info("done running strategies")
