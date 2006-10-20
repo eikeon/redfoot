@@ -81,6 +81,7 @@ else:
   <server:Handler rdf:about="#get_handler">
     <rdfs:label>Default GET handler</rdfs:label>      
     <server:page_handler rdf:resource="../templates/classic#page"/>
+    <server:page_handler rdf:resource="#RDFXMLDocumentPageHandler"/>
     <server:supported_content_types>application/xhtml+xml</server:supported_content_types>
     <server:display_support rdf:resource="#display_support"/>
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
@@ -159,18 +160,6 @@ if page_handler is None:
     response.write("No page handler found")
     response.finish()
 else:
-    long_running = None
-    accept = request.headers.get("accept")
-    # TODO: check for best match
-    if accept and "application/rdf+xml" in accept:  
-        if page_handler and (page_handler, SERVER.content_type, Literal("application/rdf+xml")) in redfoot:
-            page_handler = page_handler
-        elif (request.uri, RDF.type, SERVER.StaticPage) in redfoot:
-            page_handler = page_handler
-            long_running = "true"
-        else:
-            page_handler = URIRef("#rdfxml_handler", base=redfoot_current)
-    
     response.cache_body = True # So that server's request.finish will add content-length, Content-MD5 and ETag headers
     
     # TODO: if resource has last-modified then say so...
@@ -337,5 +326,33 @@ response.finish()
 ]]>
     </rdf:value>
   </server:Handler>
+
+     <server:PageHandler rdf:ID="RDFXMLDocumentPageHandler">
+      <rdfs:label>RDFXMLDocument PageHandler</rdfs:label>
+      <server:content_type>application/rdf+xml</server:content_type>            
+      <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+document = request.uri
+
+from rdflib.Graph import Graph
+g = Graph(namespace_manager=redfoot.namespace_manager)
+
+prefix = "%s#" % document
+
+for s, p, o in redfoot:
+    if s==document or (isinstance(s, unicode) and s.startswith(prefix)):
+        g.add((s, p, o))
+    ##
+    # This was nice for somethings, but in the case of trying to round
+    # trip an Ontology via HTTP PUT / GET from an editor... we end up
+    # with instances from other contexts. Trying without for now.
+    #if o==document or (isinstance(o, unicode) and o.startswith(prefix)):
+    #    g.add((s, p, o))
+
+response.setHeader('Content-Type', 'application/rdf+xml')            
+g.serialize(destination=response)#, base=document)
+]]>
+      </rdf:value>
+     </server:PageHandler>
 
 </rdf:RDF>  
