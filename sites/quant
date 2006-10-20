@@ -754,6 +754,7 @@ import re
 class CertusPP(protocol.ProcessProtocol):
     def __init__(self, action=None):
         self.data = ""
+
     def connectionMade(self):
         redfoot.log.debug("connectionMade!")
         #self.transport.write("send to process")
@@ -775,8 +776,10 @@ class CertusPP(protocol.ProcessProtocol):
         redfoot.log.debug("errConnectionLost! The child closed their stderr.")
 
     def processEnded(self, status_object):
+        self.log.redfoot("process ended")
         if self.action: # TODO: only call action on successful run
             try:
+                self.log.redfoot("calling action: %s with: %s" % (self.action, self.data))
                 self.action(seld.data)
             except Exception, e:
                 redfoot.log.exception(e)
