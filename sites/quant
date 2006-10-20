@@ -844,7 +844,7 @@ def process_cci_results(data):
             send("Recommended trade: %s ( %s )" % (trade.concrete(), row))
 
 args = ["-s", "cci", "-b", "http://qam.eikco.com/document/2006/10/19/02:28:51/?content-type=text/csv"]
-redfoot.execute(URIRef("#cci_code", base=redfoot.base), args=args, action=process_cci_results) 
+redfoot.execute(URIRef("#certus_code", base=redfoot.base), args=args, action=process_cci_results) 
 
 ]]>
       </rdf:value>
