@@ -806,7 +806,7 @@ def certus(args):
             trade = redfoot.value(predicate=QUANT.underlyingInstrument, object=stock)
 
             if trade:
-                send("Update on trade: %s ( %s )" % (trade, row))
+                send("Update on trade: %s ( %s )" % (trade.concrete(), row))
             else:
                 # TODO: different URI?
                 trade = URIRef("trade#%s" % md5.new("%s" % time.time()).hexdigest(), base=redfoot.base)
@@ -820,7 +820,7 @@ def certus(args):
                 c.add((trade, QUANT.numPeriodsCCI, Literal(num_periods)))
                 c.add((trade, QUANT.recommendedCCIForExit, Literal(cci_exit_value)))
                 c.add((trade, QUANT.maxLossAllowed, Literal(max_loss)))
-                send("Recommended trade: %s ( %s )" % (trade, row))
+                send("Recommended trade: %s ( %s )" % (trade.concrete(), row))
     except Exception, e:
         redfoot.log.exception("Could not run command '%s': %s" % (command, e))
 
