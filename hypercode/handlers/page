@@ -172,7 +172,7 @@ else:
     
     redfoot.execute(lookup(SERVER.display_support), context=globals())
     
-    long_running = long_running or redfoot.value(request.uri, SERVER.long_running) or redfoot.value(page_handler, SERVER.long_running)
+    long_running = redfoot.value(request.uri, SERVER.long_running) or redfoot.value(page_handler, SERVER.long_running)
     if str(long_running)=="true": # TODO:
         def finish(_):
             response.finish()
