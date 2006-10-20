@@ -797,7 +797,29 @@ def certus(args):
         p = subprocess.Popen(command, stdout = subprocess.PIPE)
         p.wait()
         for row in csv.reader(p.stdout):
-            send("%s" % row)            
+            trade_type, symbol, cci, stock_price, date, num_periods, cci_exit_value, max_loss = row
+            stock = redfoot.value(predicate=QUANT.symbol, object=Literal(symbol))
+
+            # see if we have a trade for this stock            
+            trade = redfoot.value(predicate=QUANT.underlyingInstrument, stock)
+
+            if trade:
+                send("Update on trade: %s ( %s )" % (trade, row))
+            else:
+                # TODO: different URI?
+                trade = URIRef("trade#%s" % md5.new("%s"%time.time()).hexdigest())
+                c = redfoot.context_id(trade)
+                c.add((trade, RDF.type, QUANT.CertisRecommendedTrade))
+                c.add((trade, RDF.type, QUANT.CCITrade))
+                c.add((trade, QUANT.tradeType, Literal(trade_type)))
+                c.add((trade, QUANT.underlyingInstrument, stock))
+                c.add((trade, QUANT.underlyingPriceWhenRecommended, Literal(stock_price)))
+                c.add((trade, QUANT.tradeRecommendedAt, Literal(date))
+                c.add((trade, QUANT.numPeriodsCCI, Literal(num_periods)))
+                c.add((trade, QUANT.recommendedCCIForExit, Literal(cci_exit_value)))
+                c.add((trade, QUANT.maxLossAllowed, Literal(max_loss)))
+                send("Recommended trade: %s ( %s )" % (trade, row))
+
     except Exception, e:
         redfoot.log.exception("Could not run command '%s': %s" % (command, e))
 
