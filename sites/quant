@@ -823,7 +823,7 @@ def process_cci_results(data):
         stock = redfoot.value(predicate=QUANT.symbol, object=Literal(symbol))
          # see if we have a trade for this stock            
         trade = redfoot.value(predicate=QUANT.underlyingInstrument, object=stock)
-         if trade:
+        if trade:
             send("Update on trade: %s ( %s )" % (trade.concrete(), row))
         else:
             # TODO: different URI?
