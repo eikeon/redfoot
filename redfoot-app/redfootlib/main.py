@@ -47,6 +47,7 @@ def main(command=None):
     _root_logger.setLevel(log_level)
     _root_formatter = logging.Formatter('[%(name)s] %(message)s')
     _root_handler = logging.StreamHandler()
+    _root_handler.setLevel(log_level)
     _root_handler.setFormatter(_root_formatter)
     _root_logger.addHandler(_root_handler)
 
