@@ -712,7 +712,7 @@ def update(exchange, url):
         if len(row)==4:        
             name, symbol, market_value, description = row
         elif len(row)==5:
-            name, symbol, market_value, description = row
+            name, symbol, market_value, _, description = row
         else:
             redfoot.log.warning("Row does not have 4 or 5 items: %s" % str(row))
             continue
