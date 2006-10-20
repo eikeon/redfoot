@@ -791,7 +791,7 @@ def send(message):
 
 
 def certus(args):
-    import sys, csv, time
+    import sys, csv, time, md5
     from os.path import abspath
 
     command = [abspath("Certus.sh")] + args
