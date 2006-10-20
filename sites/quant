@@ -786,7 +786,7 @@ class CertusPP(protocol.ProcessProtocol):
         if self.action: # TODO: only call action on successful run
             try:
                 _logger.debug("calling action: %s with: %s" % (self.action, self.data))
-                self.action(seld.data)
+                self.action(self.data)
             except Exception, e:
                 _logger.exception(e)
         else:
