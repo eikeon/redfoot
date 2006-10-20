@@ -859,7 +859,7 @@ redfoot.execute(URIRef("#cci_code", base=redfoot.base), args=args, action=proces
         <rdfs:label>stragegies code</rdfs:label>
       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
-import  threading, time
+from twisted.internet import task
 
 from optparse import OptionParser
 parser = OptionParser("""
