@@ -124,9 +124,9 @@ content_type = request.parameters.get("content-type")
 if not content_type:
      # TODO: is this how we want to determine supported content types?
     supported_content_types = lookup(SERVER.supported_content_types)
-    if available_content_types:
+    if supported_content_types:
         supported = set()
-        for type in available_content_types.split(","):
+        for type in supported_content_types.split(","):
             supported.add(type.strip())
         accept = request.headers.get("accept")
         mimeparse = redfoot.module(URIRef("modules/mimeparse#module", base=redfoot_program))
