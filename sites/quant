@@ -789,7 +789,7 @@ def send(message):
 
 
 def certus(args):
-    import sys
+    import sys, csv
     from os.path import abspath
 
     command = [abspath("Certus.sh")] + args
