@@ -82,7 +82,7 @@ else:
     <rdfs:label>Default GET handler</rdfs:label>      
     <server:page_handler rdf:resource="../templates/classic#page"/>
     <server:page_handler rdf:resource="#RDFXMLDocumentPageHandler"/>
-    <server:supported_content_types>application/xhtml+xml</server:supported_content_types>
+    <server:supported_content_types>application/xhtml+xml, application/rdf+xml</server:supported_content_types>
     <server:display_support rdf:resource="#display_support"/>
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
