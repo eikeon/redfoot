@@ -753,7 +753,7 @@ import re
 
 import logging
 _logger = logging.getLogger(redfoot_current)
-#_logger.setLevel(logging.DEBUG)
+_logger.setLevel(logging.INFO)
 
 class CertusPP(protocol.ProcessProtocol):
     def __init__(self, action=None):
