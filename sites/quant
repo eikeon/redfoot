@@ -791,7 +791,7 @@ if not done:
             users.append(xmpp_id)
     def send(message):
         for user in users:
-            redfoot.xmpp.send()
+            redfoot.xmpp.send(message)
 
     if options.stop:
         redfoot.log.info("requesting strategies loop to stop")
@@ -799,12 +799,15 @@ if not done:
     else:
         redfoot.log.info("requesting strategies loop to start")
         def main():
-            redfoot.log.info("Starting strategies main loop")
-            strat.active = True
-            while strat.active:
-                send("Buy AAPL!")
-                sleep(30)
-            redfoot.log.info("strategies main loop stopped")
+            try:
+                redfoot.log.info("Starting strategies main loop")
+                strat.active = True
+                while strat.active:
+                    send("Buy AAPL!")
+                    sleep(30)
+                redfoot.log.info("strategies main loop stopped")
+            except Exception, e:
+                redfoot.log.exception(e)
 
         t = threading.Thread(target=main)
         t.start()
