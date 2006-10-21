@@ -23,7 +23,7 @@ from twisted.internet import reactor
 from zope.interface import Attribute, implements
 
 import redfootlib
-
+import rdflib
 from rdflib import URIRef, BNode, RDF, RDFS
 from rdflib.util import date_time
 
@@ -237,7 +237,9 @@ class _Resource(object):
 
         handler = redfoot.value(request.uri, SERVER.handler) or redfoot.value(request.host, SERVER.handler) or redfoot.value(redfoot_current, SERVER.handler)
 
-        response.setHeader("Server", "%s via Redfoot/%s using %s)" % (version, redfootlib.__version__, handler))
+        # For Server header format see: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.38
+        response.setHeader("Server", "Redfoot/%s rdflib/%s %s Kernel/%s Server/%s Handler/%s)" % 
+                           (redfootlib.__version__, rdflib.__version__, version, redfoot.uri, redfoot_current, handler))
         redfoot.execute(handler, request=request, response=response)
 
         # Note: it is the handler's job to call response.finish()
