@@ -39,7 +39,12 @@ import logging
 logger = logging.getLogger("%s" % redfoot_loader.label(redfoot_program, redfoot_program))
 
 import rdflib
-assert rdflib.__version__ > "2.3.0", "This kernel requires rdflib 2.3.2 or greater"
+
+version = tuple([int(x) for x in rdflib.__version__.split(".", 2)])    
+MINIMUM = (2, 3, 3)
+if version < MINIMUM:
+    logger.critical("This kernel requires rdflib %s or greater required. Found rdflib version %s. Run redfoot --install-rdflib or see http://rdflib.net/ for information on downloading and installing rdflib." % ("%s.%s.%s" % MINIMUM, rdflib.__version__))
+    sys.exit(-1)
 
 from rdflib import RDF, RDFS, Namespace, StringInputSource
 from rdflib import URIRef, BNode, Literal
