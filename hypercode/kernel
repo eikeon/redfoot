@@ -29,6 +29,7 @@ For help on Redfoot see:
 
 import sys, getopt
 import traceback
+import warnings
 from types import ModuleType
 from urlparse import urljoin, urldefrag, urlparse
 from urllib import pathname2url, url2pathname
@@ -36,14 +37,14 @@ from itertools import chain
 import os
 import logging
 
-logger = logging.getLogger("%s" % redfoot_loader.label(redfoot_program, redfoot_program))
+_logger = logging.getLogger("%s" % redfoot_loader.label(redfoot_program, redfoot_program))
 
 import rdflib
 
 version = tuple([int(x) for x in rdflib.__version__.split(".", 2)])    
 MINIMUM = (2, 3, 3)
 if version < MINIMUM:
-    logger.critical("This kernel requires rdflib %s or greater required. Found rdflib version %s. Run redfoot --install-rdflib or see http://rdflib.net/ for information on downloading and installing rdflib." % ("%s.%s.%s" % MINIMUM, rdflib.__version__))
+    _logger.critical("This kernel requires rdflib %s or greater required. Found rdflib version %s. Run redfoot --install-rdflib or see http://rdflib.net/ for information on downloading and installing rdflib." % ("%s.%s.%s" % MINIMUM, rdflib.__version__))
     sys.exit(-1)
 
 from rdflib import RDF, RDFS, Namespace, StringInputSource
@@ -89,8 +90,7 @@ class HTTPGetEvent:
     Represents a prior HTTP GET by a scutter (a dated event).  Provides functionality for
     managing HTTP headers for subsequent fetches (to the same location)
     """
-    def __init__(self,provenanceGraph,location,log,publicID=None,eventId=None):
-        self.log = log
+    def __init__(self,provenanceGraph,location,publicID=None,eventId=None):
         if eventId:
             assert isinstance(eventId,BNode),"Scutter event identifiers should be BNodes, not %s"%(type(eventId))
             self.identifier = eventId
@@ -112,7 +112,7 @@ class HTTPGetEvent:
     def __get_expiration_date(self):
         now=datetime.now().isoformat().split('.')[0]
         expiration = first(self.provenanceGraph.objects(self.identifier,SCUTTER.httpCacheExpiration))
-        #self.log.info(" ".join([now,expiration,str(expiration > now)]))
+        #_logger.info(" ".join([now,expiration,str(expiration > now)]))
         return first(self.provenanceGraph.objects(self.identifier,SCUTTER.httpCacheExpiration))
     expirationDate = property( __get_expiration_date)
 
@@ -130,10 +130,10 @@ class HTTPGetEvent:
         parseFormat is the format (xml or n3) that was used to successfully parse.  Setup the cache expiration
         the RDF graph and is used as a fallback if the content-type doesn't match (text/plain, for instance)
         """
-        #self.log.info("Caching HTTP headers for URL: %s"%(first(self.provenanceGraph.objects(self.identifier,SCUTTER.fetch))))
+        #_logger.info("Caching HTTP headers for URL: %s"%(first(self.provenanceGraph.objects(self.identifier,SCUTTER.fetch))))
         now = datetime.now()
         expirationDT = (now + timedelta(seconds = HTTP_CACHE_TTL)).isoformat().split('.')[0]
-        #self.log.info(" ".join([now.isoformat(),str(HTTP_CACHE_TTL),expirationDT]))
+        #_logger.info(" ".join([now.isoformat(),str(HTTP_CACHE_TTL),expirationDT]))
         self.provenanceGraph.remove((self.identifier,SCUTTER.httpCacheExpiration,None))
         self.provenanceGraph.add((self.identifier, SCUTTER.httpCacheExpiration, Literal(expirationDT)))
         for header_key in HEADER_KEYS:
@@ -146,7 +146,7 @@ class HTTPGetEvent:
                     val = 'application/rdf+xml'
                 
             if val:
-                #self.log.info("Caching HTTP header (%s): %s"%(header_key,val))
+                #_logger.info("Caching HTTP header (%s): %s"%(header_key,val))
                 self.provenanceGraph.add((self.identifier,HTTP[header_key],Literal(val)))
 
     def invalidateCache(self):
@@ -221,7 +221,7 @@ class UnknownURLInputSource(InputSource, object):
                 self.format = 'n3'
             self.setByteStream(httpStream)
         except Exception, e:
-            self.log.warning("Unable to connect to %s: %s\n"%(linkURL,e))
+            _logger.warning("Unable to connect to %s: %s\n"%(linkURL,e))
         
 class CacheableURLInputSource(InputSource, object):
     def __init__(self, priorEvent):
@@ -232,7 +232,7 @@ class CacheableURLInputSource(InputSource, object):
             try:
                 httpStream = urllib2.urlopen(urllib2.Request(system_id, headers=hdrs))
             except urllib2.HTTPError, e:
-                logger.info("Recieved 304 status from server.  Cached content is sufficient")
+                _logger.info("Recieved 304 status from server.  Cached content is sufficient")
                 self.modified = False
                 assert e.code == 304, "HTTP response code %s recieved after cacheable request to %s"%(e.code,self.url)
                 #HTTP Error 304: Not Modified, do nothing
@@ -293,7 +293,9 @@ class Redfoot(ConjunctiveGraph):
 
     def _get_log(self):
         if self.__log is None:
-            self.__log = logger
+            warnings.warn("Use a local logger. Ex. _logger = logging.getLogger('my_module')",
+                          DeprecationWarning, stacklevel=2)
+            self.__log = _logger
         return self.__log
     log = property(_get_log)
 
@@ -368,13 +370,13 @@ class Redfoot(ConjunctiveGraph):
             if not (context_uri, RDF.type, REDFOOT.Context) in self.index: 
                 c = self.get_context(context_uri) #self.index.add((context_uri, RDF.type, REDFOOT.Context))
                 if uri==location:
-                    self.log.info("loading: %s" % uri)
+                    _logger.info("loading: %s" % uri)
                 else:
-                    self.log.info("loading: %s from %s" % (uri, location))
+                    _logger.info("loading: %s from %s" % (uri, location))
                 try:
                     context = self.load(location, creator=redfoot_loader.program)
                 except Exception, e:
-                    self.log.warning("couldn't load %s while checking: %s\n" % (uri, e))
+                    _logger.warning("couldn't load %s while checking: %s\n" % (uri, e))
 
     def scutter(self, location, creator, steps=SCUTTER_STEPS):
         """
@@ -384,7 +386,7 @@ class Redfoot(ConjunctiveGraph):
         this no more than SCUTTER_STEPS times.  Content negotiation is used to perform discovery of uknown URLs in order
         to determine how to parse remote content.
         """
-        self.log.info("Scuttering from %s"%location)
+        _logger.info("Scuttering from %s"%location)
         visitedNodes = []
         sourceGraph = self.get_context(self.context_id(location),creator=creator)
         for linkPredicate in LINK_PREDICATES:
@@ -392,7 +394,7 @@ class Redfoot(ConjunctiveGraph):
             try:
                 linkedURLs = sourceGraph.objects(predicate=linkPredicate)
             except Exception,e:
-                self.log.info(e)
+                _logger.info(e)
 
             for linkURL in linkedURLs:
                 #If the link is to itself or it has been attempted before, ignore
@@ -409,9 +411,9 @@ class Redfoot(ConjunctiveGraph):
                 #Check if linkURL has already been loaded
                 priorEvent = self.index.value(predicate=SCUTTER.fetch, object=linkURL, any=True)
                 if priorEvent:
-                    priorEvent = HTTPGetEvent(self.index, linkURL, self.log, priorEvent)
+                    priorEvent = HTTPGetEvent(self.index, linkURL, priorEvent)
                     if priorEvent.expirationDate < datetime.now().isoformat().split('.')[0]:
-                        self.log.info("%s has already been loaded previously but the cache has expired"%linkURL)
+                        _logger.info("%s has already been loaded previously but the cache has expired"%linkURL)
                         #Aleady loaded, attempt a cacheable, content-negotiated load with HTTP provenance data on RDF graph URL
                         cacheableSource = CacheableURLInputSource(priorEvent)
                         if cacheableSource.modified:
@@ -423,7 +425,7 @@ class Redfoot(ConjunctiveGraph):
                     steps -= 1
 
                 else:
-                    #self.log.info("URL %s (linked by %s) has not been loaded before.. Attempting RESTful discovery"%(linkURL,linkPredicate))
+                    #_logger.info("URL %s (linked by %s) has not been loaded before.. Attempting RESTful discovery"%(linkURL,linkPredicate))
                     #Hasn't been loaded.  Need to perform 'RESTful' scutter discovery
                     #Try to connect, first
                     unknownURL = UnknownURLInputSource(linkURL)
@@ -434,7 +436,7 @@ class Redfoot(ConjunctiveGraph):
                     #the server, otherwise ignore the URL (Perhaps this is too strict?)
                     if unknownURL.format:
                         if unknownURL.format=="html":
-                            #self.log.warning("Ignoring html formatted url: %s" % (linkURL))
+                            #_logger.warning("Ignoring html formatted url: %s" % (linkURL))
                             self.scutterFailureCache[linkURL]=None
                         else:
                             try:
@@ -442,7 +444,7 @@ class Redfoot(ConjunctiveGraph):
                                 visitedNodes.append(linkURL)
                                 steps -= 1
                             except:
-                                self.log.warning("Couldn't parse %s using the given format: %s" % (linkURL,unknownURL.format))
+                                _logger.warning("Couldn't parse %s using the given format: %s" % (linkURL,unknownURL.format))
                                 self.scutterFailureCache[linkURL]=None
                     else:
                         #Need to attempt an Notation 3 parse first, then an RDF/XML parse
@@ -456,7 +458,7 @@ class Redfoot(ConjunctiveGraph):
                                 visitedNodes.append(linkURL)
                                 steps -= 1                                
                             except Exception,e:
-                                self.log.warning("Unable to parse %s as either N3 or RDF/XML: %s" % (linkURL, e))
+                                _logger.warning("Unable to parse %s as either N3 or RDF/XML: %s" % (linkURL, e))
                                 self.scutterFailureCache[linkURL]=None
                                 
         visitedNodes = dict([(location,None) for location in visitedNodes]).keys()                   
@@ -482,12 +484,12 @@ class Redfoot(ConjunctiveGraph):
             #priorEvent = self.index.value(predicate=SCUTTER.target, object=publicID, any=True)
             priorEvent = self.index.value(predicate=SCUTTER.fetch, object=absolute_location, any=True)
             if priorEvent:
-                priorEvent = HTTPGetEvent(self.index, absolute_location, self.log, priorEvent)
+                priorEvent = HTTPGetEvent(self.index, absolute_location, priorEvent)
                 httpStream = urllib2.urlopen(urllib2.Request(absolute_location, headers=priorEvent.createHTTPHeaders()[0]))
                 priorEvent.invalidateCache()
                 priorEvent.cacheEvent(httpStream, format)
             else:
-                newEvent = HTTPGetEvent(self.index, absolute_location, self.log)
+                newEvent = HTTPGetEvent(self.index, absolute_location)
                 httpStream = urllib2.urlopen(urllib2.Request(absolute_location))
                 newEvent.cacheEvent(httpStream, format)
             context.load(httpStream, publicID=publicID, format=format)
@@ -531,7 +533,7 @@ class Redfoot(ConjunctiveGraph):
         if module:
             return module
         self.check(subject)
-        self.log.info("importing: %s" % subject)
+        _logger.info("importing: %s" % subject)
         value = self.value(subject)
         assert value!=None, "No objects found for %s, %s" % (subject, RDF.value)
         safe_module_name = "subject_%s" % hash(subject)
@@ -565,7 +567,7 @@ class Redfoot(ConjunctiveGraph):
             c = compile(value+"\n", code, "exec")
             exec c in context
         except Exception, e:
-            self.log.exception("While trying to exec %s the following exception occurred:\n" % code)
+            _logger.exception("While trying to exec %s the following exception occurred:\n" % code)
         return context
 
     def context_id(self, uri, context_id=None):
@@ -692,9 +694,9 @@ class Redfoot(ConjunctiveGraph):
         try:
             self.check(program)
         except ImportError, e: # TODO: something more specific that Exception
-            self.log.warning("could not find program for '%s': %s" % (program, e))
+            _logger.warning("could not find program for '%s': %s" % (program, e))
         else:
-            self.log.info("running: %s ( %s )" % (self.label(program), program))
+            _logger.info("running: %s ( %s )" % (self.label(program), program))
             self.execute(program, args=args)
 
     def write(self, s, encoding="utf-8"):
@@ -742,7 +744,7 @@ class Redfoot(ConjunctiveGraph):
             if self.xmpp_id and self.xmpp_password and self.xmpp_host and self.xmpp_port:
                 self.__xmpp = xmpp.Client(self.xmpp_id, self.xmpp_password, self.xmpp_host, int(self.xmpp_port))
             else:
-                self.log.info("To enable xmpp support use the redfoot xmpp_info command to set the needed information.")
+                _logger.info("To enable xmpp support use the redfoot xmpp_info command to set the needed information.")
         return self.__xmpp
     xmpp = property(_get_xmpp)
 
@@ -763,12 +765,12 @@ path = "__rfdb__"
 redfoot = Redfoot("Sleepycat")
 
 if options.rebuild_from_journal:
-    logger.info("rebuilding store from journal file...")
+    _logger.info("rebuilding store from journal file...")
     os.rename(path, "%s-backup-%s" % (path, date_time()))
     redfoot.open(path)
     JournalReader(redfoot.store, "%s-journal" % path)
     redfoot.close()
-    logger.info("done rebuilding.")
+    _logger.info("done rebuilding.")
 
 journal = JournalWriter(redfoot.store, filename="%s-journal" % path) 
 redfoot.open(path)
@@ -786,7 +788,7 @@ try:
                 users.append(xmpp_id)
         xmpp.install(users)
 except Exception, e:
-    logger.exception("XMPP logger not installed: %s" % e)
+    _logger.exception("XMPP logger not installed: %s" % e)
 
 
 redfoot.main(options, args)
