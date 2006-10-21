@@ -87,6 +87,10 @@ else:
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
+import logging
+
+_logger = logging.getLogger(redfoot_current)
+
 from twisted.internet.threads import deferToThread
 from twisted.web.http import datetimeToString
 from time import time
@@ -133,22 +137,32 @@ if not content_type:
         accept = request.headers.get("accept")
         mimeparse = redfoot.module(URIRef("modules/mimeparse#module", base=redfoot_program))
         content_type = mimeparse.best_match(supported, accept)
-        redfoot.log.debug("supported: %s accept: %s best_match: %s" % (supported, accept, content_type))
+        if content_type:
+            content_type = Literal(content_type)
+        _logger.debug("supported: %s accept: %s best_match: %s" % (supported, accept, content_type))
     else:
         content_type = None
 
 for handler in request.objects(SERVER.page_handler):
+    redfoot.check(handler)  
     if content_type:
-        if (handler, SERVER.content_type, Literal(content_type)) in redfoot:
+        handler_content_type = redfoot.value(handler, SERVER.content_type)
+        if handler_content_type is None:
+            _logger.error("handler '%s' must have a content_type" % handler)
+        if handler_content_type == content_type:
             page_handler = handler
             break
     else:
         page_handler = handler
         break
 if page_handler is None:
-    for handler in redfoot.objects(redfoot_current,SERVER.page_handler):
+    for handler in redfoot.objects(redfoot_current, SERVER.page_handler):
+        redfoot.check(handler)
         if content_type:
-            if (handler, SERVER.content_type, Literal(content_type)) in redfoot:     
+            handler_content_type = redfoot.value(handler, SERVER.content_type)
+            if handler_content_type is None:
+                _logger.error("handler '%s' must have a content_type" % handler)
+            if handler_content_type == content_type:
                 page_handler = handler
                 break
         else:
