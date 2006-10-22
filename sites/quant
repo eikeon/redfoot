@@ -90,7 +90,7 @@
   </template:Section>
 
   <rdf:Description rdf:about="/browse/">
-    <browse:root rdf:resource="http://qam.eikco.com/quant#Resource"/>
+    <browse:root rdf:resource="/quant#Resource"/>
   </rdf:Description>
 
   <rdfs:Class rdf:about="quant#Stock">
@@ -705,9 +705,11 @@ c.remove((None, None, None))
 
 def update(exchange, url):
     f = urllib2.urlopen(url)
-    # "Name","Symbol","Market Value (millions)","Description (as filed with the SEC)"
-    "Name","Symbol","Market Value (millions)","Shares Outstanding","Description (as filed with the SEC)"
+    # "Description of file", "", "", ""
     redfoot.log.debug("ignoring first line: %s" % f.readline() )
+    # "Name","Symbol","Market Value (millions)","Description (as filed with the SEC)"
+    # "Name","Symbol","Market Value (millions)","Shares Outstanding","Description (as filed with the SEC)"
+    redfoot.log.debug("ignoring second line: %s" % f.readline() )
     for row in csv.unicode_reader(f):
         if len(row)==4:        
             name, symbol, market_value, description = row
@@ -747,12 +749,11 @@ redfoot.log.info("Symbols updated")
       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
-from twisted.internet import protocol
-from twisted.internet import reactor
-import re
-
 import logging
 _logger = logging.getLogger(redfoot_current)
+
+from twisted.internet import protocol
+from twisted.internet import reactor
 
 
 class CertusPP(protocol.ProcessProtocol):
