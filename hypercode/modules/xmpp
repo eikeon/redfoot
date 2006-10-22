@@ -91,7 +91,7 @@ class Client(object):
             else:
                 self.send(from_id, "You need to be an admin to run commands.")
         else:
-            _logger.warning("ignoring input: '%s'" % command_line)
+            self.send(from_id, "Thank you for your input. But I'm going to ignore it.")
     
     def presence(self, presence):
         if presence.hasAttribute("type") and presence["type"]=="subscribe":
