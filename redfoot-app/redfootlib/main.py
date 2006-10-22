@@ -27,7 +27,7 @@ parser.add_option("--daemon", dest="daemon", action="store_true", help="run as a
 parser.add_option("--name", action="store", type="string", dest="name", help="name to use as base for log and PID files (when running with --daemon)")
 parser.add_option("--install-rdflib", dest="install_rdflib", action="store_true", help="download and install latest stable rdflib or version specified by URL or dev (for latest development version)")
 
-parser.set_defaults(path="__rfboot__", program = None, update=False, verbose=False, version=False, store=None, install_rdflib=False, set_default=False, clear_default=False, daemon=False, log_level=logging.WARNING, name="redfoot")
+parser.set_defaults(path="__rfboot__", program = None, update=False, verbose=False, version=False, store=None, install_rdflib=False, set_default=False, clear_default=False, daemon=False, log_level=logging.INFO, name="redfoot")
 
 
 def main(command=None):
