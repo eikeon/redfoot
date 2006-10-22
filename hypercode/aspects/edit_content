@@ -120,6 +120,8 @@ datatype = URIRef(request.parameters.get("format") or "")
 content_value = Literal(content_value, datatype=datatype)
 if uri:
     uri = URIRef(uri)
+    # We do the following get context to create the default context if one's not already created.
+    redfoot.get_context(redfoot.context_id(uri.abstract(), context_id="#content")) 
     context = redfoot.get_context(redfoot.context_id(uri.abstract(), context_id="#edit_content"))
     if title:
         label = Literal(title)
