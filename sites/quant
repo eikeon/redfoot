@@ -838,9 +838,10 @@ def process_cci_results(data):
             c.add((trade, QUANT.maxLossAllowed, Literal(max_loss)))
             redfoot.xmpp.send(REDFOOT.Admin, "Recommended trade: %s ( %s )" % (trade.concrete(), row))
 
-arg_string = "-s cci -b http://qam.eikco.com/document/2006/10/19/02:28:51/?content-type=text/csv"
-args = arg_string.split()
-redfoot.execute(URIRef("#certus_code", base=redfoot.base), args=args, action=process_cci_results) 
+for basket in redfoot.subjects(RDF.type, QUANT.Basket):
+    arg_string = "-s cci -b %s?content-type=text/csv" % basket.concrete()
+    args = arg_string.split()
+    redfoot.execute(URIRef("#certus_code", base=redfoot.base), args=args, action=process_cci_results) 
 
 ]]>
       </rdf:value>
