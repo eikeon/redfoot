@@ -119,6 +119,7 @@ else:
   </server:PagePartHandler>
 
   <server:PageHandler rdf:ID="login_process">
+    <server:content_type>application/xhtml+xml</server:content_type>
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python"><![CDATA[
 
 if request.method=='POST':
@@ -146,6 +147,7 @@ if request.method=='POST':
   </server:PageHandler>
 
   <server:PageHandler rdf:ID="logout_process">
+    <server:content_type>application/xhtml+xml</server:content_type>
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python"><![CDATA[
 
 SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
@@ -168,6 +170,7 @@ response.setHeader('Location', return_uri)
 
 
   <server:PageHandler rdf:ID="register_process">
+    <server:content_type>application/xhtml+xml</server:content_type>
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python"><![CDATA[
 import md5
 

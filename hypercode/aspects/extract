@@ -66,7 +66,8 @@
   </server:Page>
 
 
-      <server:PagePartHandler rdf:ID="extract">
+      <server:PageHandler rdf:ID="extract">
+        <server:content_type>application/xhtml+xml</server:content_type>
         <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
         <![CDATA[
 
@@ -193,6 +194,6 @@ else:
 ]]>
 
         </rdf:value>
-      </server:PagePartHandler>
+      </server:PageHandler>
 
 </rdf:RDF>  

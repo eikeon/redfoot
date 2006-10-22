@@ -53,7 +53,8 @@
     <rdfs:label>Create Instance</rdfs:label>
     <server:allow rdf:resource="#Admin"/>
     <server:page_handler>
-      <rdf:Description rdf:ID="create">
+      <server:PageHandler rdf:ID="create">
+        <server:content_type>application/xhtml+xml</server:content_type>
         <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python"><![CDATA[
 
 from time import gmtime
@@ -81,7 +82,7 @@ else:
     pass # TODO: bad request
 
       ]]></rdf:value>
-      </rdf:Description>
+      </server:PageHandler>
     </server:page_handler>
     <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>    
   </rdf:Description>

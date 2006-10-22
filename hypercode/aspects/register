@@ -79,6 +79,7 @@ else:
   </server:PagePartHandler>
 
   <server:PageHandler rdf:ID="register_process">
+    <server:content_type>application/xhtml+xml</server:content_type>
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python"><![CDATA[
 
 if request.method=='POST':

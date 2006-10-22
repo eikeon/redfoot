@@ -64,7 +64,7 @@ contexts.sort()
     <rdfs:label>rdfxml</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <server:page_handler>
-      <redfoot:Python rdf:about="rdfxml">
+      <server:PageHandler rdf:about="rdfxml">
         <server:content_type>application/rdf+xml</server:content_type>      
         <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python"><![CDATA[
 
@@ -90,7 +90,7 @@ g = redfoot.get_context(cid)
 g.serialize(destination=response, format="pretty-xml")
 
       ]]></rdf:value>
-      </redfoot:Python>
+      </server:PageHandler>
     </server:page_handler>
   </server:Page>
 
