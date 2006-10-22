@@ -144,6 +144,12 @@
     <rdfs:comment></rdfs:comment>
   </rdfs:Datatype>
 
+  <rdfs:Class rdf:ID="Admin">
+    <rdfs:label>Admin</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="session#User"/>
+  </rdfs:Class>
+
   <rdf:Property rdf:ID="admin">
     <rdfs:label>admin</rdfs:label>
     <rdfs:comment></rdfs:comment>
