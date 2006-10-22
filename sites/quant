@@ -98,6 +98,10 @@
      kid:strip=""
 >
 <?python
+import logging
+
+_logger = logging.getLogger(uri)
+
 from rdflib import Namespace
 QUANT = Namespace(URIRef("quant#", base=request.host))
 
@@ -115,21 +119,17 @@ try:
     else:
         who_label = "Someone"
     message = "%s is looking at %s ( %s )</body>" % (who_label, redfoot.label(uri), uri.concrete())
-    try:
-        from twisted.words.xish.domish import  escapeToXml
-        html = """
+    from twisted.words.xish.domish import  escapeToXml
+    html = """
 <body xmlns='http://www.w3.org/1999/xhtml' style='background-color:#E8A630;color:#000000'>
   <span style='font-family:Verdana'>
     %s is looking at <a href="%s">%s</a>
   </span>
 </body>
 """ % (who_label, escapeToXml(uri.concrete(), isattrib=True), escapeToXml(redfoot.label(uri)))
-    except Exception, e:
-        redfoot.log.exception(e)
-        html = None    
     redfoot.xmpp.send(REDFOOT.Admin, message, html)
 except Exception, e:
-    redfoot.log.exception("unable to send alert: %s" % e)
+    _logger.exception("unable to send alert: %s" % e)
 
 ?>
   <p>${redfoot.value(uri, RDFS.comment)}</p>
@@ -157,6 +157,10 @@ except Exception, e:
        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
+import logging
+
+_logger = logging.getLogger(uri)
+
 from rdflib import Namespace
 
 QUANT = Namespace(URIRef("quant#", base=request.host))
@@ -169,7 +173,7 @@ for item in redfoot.objects(basket_uri, QUANT.basketItem):
     if symbol:
         symbols.add(symbol)
     else:
-        redfoot.log.debug("item %s does not have a symbol" % item.concrete())
+        _logger.debug("item %s does not have a symbol" % item.concrete())
 
 response.write(",".join(symbols))
 
@@ -673,6 +677,10 @@ sections.sort()
       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
+import logging
+
+_logger = logging.getLogger(redfoot_current)
+
 import urllib2
 import csv
 
@@ -694,17 +702,17 @@ c.remove((None, None, None))
 def update(exchange, url):
     f = urllib2.urlopen(url)
     # "Description of file", "", "", ""
-    redfoot.log.debug("ignoring first line: %s" % f.readline() )
+    _logger.debug("ignoring first line: %s" % f.readline() )
     # "Name","Symbol","Market Value (millions)","Description (as filed with the SEC)"
     # "Name","Symbol","Market Value (millions)","Shares Outstanding","Description (as filed with the SEC)"
-    redfoot.log.debug("ignoring second line: %s" % f.readline() )
+    _logger.debug("ignoring second line: %s" % f.readline() )
     for row in csv.unicode_reader(f):
         if len(row)==4:        
             name, symbol, market_value, description = row
         elif len(row)==5:
             name, symbol, market_value, _, description = row
         else:
-            redfoot.log.warning("Row does not have 4 or 5 items: %s" % str(row))
+            _logger.warning("Row does not have 4 or 5 items: %s" % str(row))
             continue
         uri = URIRef("ticker#%s" % symbol.replace("/", "_"), base=redfoot.base)
         c.add((uri, RDF.type, QUANT.Stock))
@@ -721,7 +729,7 @@ update("NYSE", "http://www.nasdaq.com/asp/symbols.asp?exchange=N&start=0")
 #update("OTCBB", "http://www.nasdaq.com/asp/symbols.asp?exchange=O&start=0")
 #update("AMEX", "http://www.nasdaq.com/asp/symbols.asp?exchange=1&start=0")
 
-redfoot.log.info("Symbols updated")
+_logger.info("Symbols updated")
 
 ]]>
       </rdf:value>
@@ -806,7 +814,7 @@ reactor.spawnProcess(pp, executable, [executable] + args, env={})
       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
-redfoot.log.exception("Runing CCI strategy")
+_logger.exception("Runing CCI strategy")
 
 from rdflib import Namespace
 QUANT = Namespace(URIRef("/quant#", base=redfoot.base))
@@ -856,6 +864,10 @@ for basket in redfoot.subjects(RDF.type, QUANT.Basket):
         <rdfs:label>stragegies code</rdfs:label>
       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
+import logging
+
+_logger = logging.getLogger(redfoot_current)
+
 from twisted.internet import task
 
 from optparse import OptionParser
@@ -872,12 +884,12 @@ except SystemExit, e:
 
 
 def main():
-    redfoot.log.info("Running strategies")
+    _logger.info("Running strategies")
     try:
         redfoot.execute(URIRef("#cci_code", base=redfoot.base))
     except Exception, e:
-        redfoot.log.exception(e)
-    redfoot.log.info("done running strategies")
+        _logger.exception(e)
+    _logger.info("done running strategies")
 
 if not done:
     
@@ -889,20 +901,20 @@ if not done:
         strat = redfoot._strategies_main
 
     if options.stop:
-        redfoot.log.info("requesting strategies loop to stop")
+        _logger.info("requesting strategies loop to stop")
         if strat.l:
             strat.l.stop()
     else:
         if strat.l is None:
-            redfoot.log.info("requesting strategies loop to start")
+            _logger.info("requesting strategies loop to start")
             strat.l = task.LoopingCall(main)
             strat.l.start(30.0)
         else:
-            redfoot.log.info("strategies main loop already running. Restarting.")
+            _logger.info("strategies main loop already running. Restarting.")
             try:
                 strat.l.stop()
             except Exception, e:
-                redfoot.log.exception(e)
+                _logger.exception(e)
             strat.l = task.LoopingCall(main) # create a new LoopingCall
             strat.l.start(30.0)
 
