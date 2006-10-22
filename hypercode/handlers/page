@@ -212,7 +212,7 @@ TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")
 
 import kid
 
-version = tuple([int(x) for x in kid.__version__.split(".", 2)])    
+version = tuple([int(x) for x in kid.__version__[0:5].split(".")])    
 REQUIRED = (0, 9, 3)
 assert version >= REQUIRED, "Please install kid version 0.9.3 or higher. Found kid version: %s" % kid.__version__
 
@@ -266,7 +266,7 @@ def display(uri, fragment=True, output=None, **args):
             redfoot._kid_cache = {}
         code = redfoot._kid_cache.get(value)
         if code is None:
-            code = kid_compiler.compile(StringIO(value.encode("utf-8")), uri, "utf-8")
+            code = kid_compiler.compile(StringIO(value.encode("utf-8")), filename=uri, encoding="utf-8")
             redfoot._kid_cache[value] = code
         exec code in context
 	if write_to_response:
@@ -281,11 +281,25 @@ def display(uri, fragment=True, output=None, **args):
                 request.sources.pop()
                 if False:
                     yield None
-	    return chain(pull(), pop())
+
+            class CleanupElementStream(kid.ElementStream):
+                def __iter__(self):
+                    return chain(ElementStream.__iter__(self), pop())
+            return CleanupElementStream(pull())
+         
     else:
-	write_to_response = True
-	redfoot.execute(uri, **context) # TODO: think we want context=context?
-        request.sources.pop()
+	#write_to_response = True
+        if write_to_response:
+            redfoot.execute(uri, **context) # TODO: think we want context=context?
+            request.sources.pop()
+        else:
+            def d():
+                redfoot.execute(uri, **context)
+                request.sources.pop()
+                if False:
+                    yield None
+            return d()
+
 ]]>
     </rdf:value>
   </rdf:Description>
