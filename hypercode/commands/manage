@@ -690,8 +690,14 @@ redfoot.index.remove((REDFOOT.Checked, RDFS.member, None))
        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
     
+import logging
+
+_logger = logging.getLogger(redfoot_current)
+
 OLD = args[0]
 NEW = args[1]
+
+nothing_renamed = True
 
 # rename any occurrences in any context
 for t, cg in list(redfoot.store.triples((None, None, None), None)):
@@ -710,29 +716,39 @@ for t, cg in list(redfoot.store.triples((None, None, None), None)):
         oo = o
     if (ss, pp, oo) != t:
         for c in list(cg):
+            nothing_renamed = False
             c.remove(t)
             c.add((ss, pp, oo))
 
-# rename contexts (and checking again if there's any triples that need
-# renaming... probably can/should get rid of this redundant bit)
+# rename contexts
 for context in list(redfoot.contexts()):
     if OLD in context.identifier:
         new_context = redfoot.get_context(URIRef(context.identifier.replace(OLD, NEW)))
+        nothing_renamed = False
     else:
         new_context = context
 
+    # (and checking again if there's any triples that need
+    # renaming... should get rid of this redundant bit... added error
+    # message for now to see if it's getting hit)
     for s, p, o in context:
-        context.remove((s, p, o))
         if isinstance(s, URIRef) and OLD in s:
-            s = URIRef(s.replace(OLD, NEW))
+            ss = URIRef(s.replace(OLD, NEW))
         if isinstance(p, URIRef) and OLD in p:
-            p = URIRef(p.replace(OLD, NEW))
+            pp = URIRef(p.replace(OLD, NEW))
         if isinstance(o, URIRef) and OLD in o:
-            o = URIRef(o.replace(OLD, NEW))
-        new_context.add((s, p, o))
+            oo = URIRef(o.replace(OLD, NEW))
+        if (ss, pp, oo)!=(s, p, o):
+            if new_context!=context:
+                _logger.error("Triple %s, %s, %s should have already been renamed" % (s, p, o))
+                context.remove((s, p, o))
+                new_context.add((ss, pp, oo))
 
     if new_context!=context:
         redfoot.remove_context(context.identifier)
+
+if nothing_renamed:
+    _logger.warning("nothing renamed.")
 
 ]]>
        </rdf:value>
