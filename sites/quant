@@ -100,7 +100,7 @@
 <?python
 import logging
 
-_logger = logging.getLogger(uri)
+_logger = logging.getLogger(redfoot_current)
 
 from rdflib import Namespace
 QUANT = Namespace(URIRef("quant#", base=request.host))
@@ -159,7 +159,7 @@ except Exception, e:
 
 import logging
 
-_logger = logging.getLogger(uri)
+_logger = logging.getLogger(redfoot_current) # TODO: we may need to set redfoot_current or define another var
 
 from rdflib import Namespace
 
