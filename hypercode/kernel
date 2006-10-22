@@ -533,7 +533,7 @@ class Redfoot(ConjunctiveGraph):
         if module:
             return module
         self.check(subject)
-        _logger.info("importing: %s" % subject)
+        _logger.debug("importing: %s" % subject)
         value = self.value(subject)
         assert value!=None, "No objects found for %s, %s" % (subject, RDF.value)
         safe_module_name = "subject_%s" % hash(subject)
@@ -781,17 +781,23 @@ redfoot_loader.redfoot = redfoot
 try:
     if redfoot.xmpp:
         xmpp = redfoot.module(URIRef("modules/xmpp#logging", base=redfoot_program))
-        users = []
-        for admin in redfoot.objects(REDFOOT.Globals, REDFOOT.admin):
-            xmpp_id = admin.split("mailto:")[-1]
-            if "@" in xmpp_id:
-                users.append(xmpp_id)
-        xmpp.install(users)
+        _root_logger = logging.getLogger()
+        _xmpp_handler = xmpp.XMPPHandler(REDFOOT.Admin)
+        _xmpp_formatter = logging.Formatter('[%(name)s] %(message)s')
+        _xmpp_handler.setFormatter(_xmpp_formatter)
+        _root_logger.addHandler(_xmpp_handler)
+    else:
+        _xmpp_handler = None
+
 except Exception, e:
     _logger.exception("XMPP logger not installed: %s" % e)
 
-
 redfoot.main(options, args)
+
+# The XMPPHandler relies on the store being open. So we must remove it before closing the store.
+if _xmpp_handler:
+    _root_logger.removeHandler(_xmpp_handler)
+
 redfoot.close()
 
 ]]>

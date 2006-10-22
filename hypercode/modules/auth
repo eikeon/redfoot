@@ -98,7 +98,7 @@ def allow(request, uri=None):
 	    uid = redfoot.value(session_id, SESSION.uid)
 	    if uid is None:
 		return False
-            if (REDFOOT.Globals, REDFOOT.admin, uid) in redfoot:
+            if (uid, RDF.type, REDFOOT.Admin) in redfoot:
                 return True
 	    for allow in redfoot.objects(uri, SERVER.allow):
 		if allow==uid:

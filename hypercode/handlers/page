@@ -319,7 +319,7 @@ context.serialize(destination=response, base=base)
 
 auth = redfoot.module(URIRef("modules/auth#module", base=redfoot_program))
 uid = auth.authenticate(request)
-if uid and uid in request.objects(REDFOOT.admin):
+if uid and (uid, RDF.type, REDFOOT.Admin) in redfoot:
     #acid = request.uri.abstract()
     #if (acid, RDF.type, REDFOOT.Context) in redfoot:
     #    cid = redfoot.context_id(acid) # default context

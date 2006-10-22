@@ -59,13 +59,13 @@ except SystemExit, e:
     done = True
 
 if not done:
-    if len(args)>=1:
+    if len(args)==1:
         user = args[0]
         if not user.startswith("mailto:") and "@" in user:
             user = "mailto:%s" % user
         user = URIRef(user)
 
-        redfoot.config.add((REDFOOT.Globals, REDFOOT.admin, user))
+        redfoot.config.add((user, RDF.type, REDFOOT.Admin))
 
         if options.password:
             SESSION = redfoot.namespace("http://redfoot.net/2005/session#")

@@ -16,6 +16,10 @@
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
+import logging
+
+_logger = logging.getLogger(__uri__)
+
 from twisted.words.protocols.jabber import client, jid
 from twisted.words.xish import domish
 from twisted.internet import reactor
@@ -31,7 +35,7 @@ class Client(object):
         reactor.connectTCP(host, port, factory)
 
     def _authd(self, xmlstream):
-        redfoot.log.info("XMPP Client Authenticated")
+        _logger.info("XMPP Client Authenticated")
         self.xmlstream = xmlstream
 
         presence = domish.Element(('jabber:client','presence'))
@@ -62,34 +66,32 @@ class Client(object):
             command_line = "%s" % e
 
         from_uri = URIRef("mailto:%s" % jid.JID(from_id).userhost())
-        is_admin = (REDFOOT.Globals, REDFOOT.admin, from_uri) in redfoot
+        is_admin = (from_uri, RDF.type, REDFOOT.Admin) in redfoot
 
         if command_line and command_line.startswith("redfoot"):
             def run_command(command_line, from_id, xmpp):
-                xmpp.send(from_id, "running: %s" % command_line)
+                sio = StringIO()
+                orig = sys.stdout, sys.stderr
+                sys.stdout = sio
+                sys.stderr = sio
                 parser = OptionParser("usage: command <options>")
                 parser.allow_interspersed_args = False
                 args = command_line.split()
                 (options, args) = parser.parse_args(args[1:])
                 options.program = None
-                sio = StringIO()
-                orig = sys.stdout
-                sys.stdout = sio
                 redfoot.main(options, args)
-                sys.stdout = orig
+                sys.stdout, sys.stderr = orig
                 # TODO: pipe command stdout back to user
                 result = sio.getvalue()
                 for line in result.split("\n"):
                     xmpp.send(from_id, line)
-                xmpp.send(from_id, "Done running: %s" % command_line)
-
             if is_admin:
                 t = Thread(target=run_command, args=(command_line, from_id, self))
                 t.start()
             else:
-                self.send(from_id, "You need to be an admin to run commands, David!")
+                self.send(from_id, "You need to be an admin to run commands.")
         else:
-            print "command line: '%s'" % command_line
+            _logger.warning("ignoring input: '%s'" % command_line)
     
     def presence(self, presence):
         if presence.hasAttribute("type") and presence["type"]=="subscribe":
@@ -103,23 +105,36 @@ class Client(object):
         pass
 
     def debug(self, element):
-        print element.toXml().encode('utf-8')
-        print "="*20
+        _logger.debug(element.toXml().encode('utf-8'))
             
     def send(self, to, msg, html=None):
-        message = domish.Element(('jabber:client','message'))
-        message["to"] = to
-        message["from"] = self.client_id.full()
-        message["id"] = "%s" % __uri__ # uri of this module
-        message["type"] = "chat"
-        message.addElement("body", "jabber:client", msg)
-        if html:
-            e = message.addElement("html", "http://jabber.org/protocol/xhtml-im")
-            e.addRawXml(html)
-        if self.xmlstream:
-            self.xmlstream.send(message)
+        """to is an identifier of a person or a class of people. msg is the
+        text message to send and html is an html version of the message. """
+        users = []
+        if isinstance(to, URIRef):
+            if (to, RDF.type, RDFS.Class) in redfoot:
+                for user in redfoot.subjects(RDF.type, to):
+                    xmpp_id = user.split("mailto:")[-1]
+                    if "@" in xmpp_id:
+                        users.append(xmpp_id)
+            else:
+                users.append(to)
         else:
-            self.pending.append(message)
+            users.append(to)
+        for user in users:
+            message = domish.Element(('jabber:client','message'))
+            message["to"] = user
+            message["from"] = self.client_id.full()
+            message["id"] = "%s" % __uri__ # uri of this module
+            message["type"] = "chat"
+            message.addElement("body", "jabber:client", msg)
+            if html:
+                e = message.addElement("html", "http://jabber.org/protocol/xhtml-im")
+                e.addRawXml(html)
+            if self.xmlstream:
+                self.xmlstream.send(message)
+            else:
+                self.pending.append(message)
 
 #c = Client(JID('redfoot@eikeon.com', 'password_here', 'eikeon.com', 5222))
 #reactor.run()
@@ -140,24 +155,23 @@ class XMPPHandler(logging.Handler):
     """
     A handler class which sends an XMPP message for each logging event to a list of users.
     """
-    def __init__(self, users=None):
+    def __init__(self, who=None):
         logging.Handler.__init__(self)
-        self.users = users
+        self.who = who
 
 
     def emit(self, record):
         try:
             msg = self.format(record)
-            for user in self.users:
-                redfoot.xmpp.send(user, msg)
+            redfoot.xmpp.send(self.who, msg)
         except:
             self.handleError(record)
 
-def install(users):
+def install(who):
     _root_logger = logging.getLogger()
     _root_logger.setLevel(logging.INFO)
     _root_formatter = logging.Formatter('[%(name)s] %(message)s')
-    _root_handler = XMPPHandler(users)
+    _root_handler = XMPPHandler(who)
     _root_handler.setFormatter(_root_formatter)
     _root_logger.addHandler(_root_handler)
 
