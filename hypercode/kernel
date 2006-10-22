@@ -287,8 +287,8 @@ class Redfoot(ConjunctiveGraph):
                 self.__base = URIRef("%s/" % urljoin("file:", pathname2url(os.getcwd())))
         return self.__base
     def __set_base(self, base):
-	self.remove((REDFOOT.Globals, REDFOOT.base, None))
-	self.add((REDFOOT.Globals, REDFOOT.base, base))
+	self.config.remove((REDFOOT.Globals, REDFOOT.base, None))
+	self.config.add((REDFOOT.Globals, REDFOOT.base, base))
     base = property(__get_base, __set_base)
 
     def _get_log(self):
