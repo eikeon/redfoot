@@ -519,10 +519,9 @@ try:
 except:
     prefix = ""
 
-for cid in redfoot.contexts():
+for context in redfoot.contexts():
+    cid = context.identifier
     if cid.startswith(prefix):
-        context = redfoot.get_context(cid)
-
         try:
             sio = StringIO(context.serialize())
         except Exception, e:
