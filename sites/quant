@@ -110,11 +110,6 @@ try:
     uid = None
     if request.session_id:
         uid = redfoot.value(request.session_id, SESSION.uid)
-    users = []
-    for admin in redfoot.objects(REDFOOT.Globals, REDFOOT.admin):
-        xmpp_id = admin.split("mailto:")[-1]
-        if "@" in xmpp_id:
-            users.append(xmpp_id)
     if uid:
         who_label = redfoot.label(uid)
     else:
@@ -132,8 +127,7 @@ try:
     except Exception, e:
         redfoot.log.exception(e)
         html = None    
-    for user in users:
-        redfoot.xmpp.send(user, message, html)
+    redfoot.xmpp.send(REDFOOT.Admin, message, html)
 except Exception, e:
     redfoot.log.exception("unable to send alert: %s" % e)
 
@@ -817,16 +811,6 @@ redfoot.log.exception("Runing CCI strategy")
 from rdflib import Namespace
 QUANT = Namespace(URIRef("/quant#", base=redfoot.base))
 
-users = []
-for admin in redfoot.objects(REDFOOT.Globals, REDFOOT.admin):
-    xmpp_id = admin.split("mailto:")[-1]
-    if "@" in xmpp_id:
-        users.append(xmpp_id)
-def send(message):
-    for user in users:
-        redfoot.xmpp.send(user, message)
-
-
 import csv, time, md5
 from StringIO import StringIO
 
@@ -838,7 +822,7 @@ def process_cci_results(data):
          # see if we have a trade for this stock            
         trade = redfoot.value(predicate=QUANT.underlyingInstrument, object=stock)
         if trade:
-            send("Update on trade: %s ( %s )" % (trade.concrete(), row))
+            redfoot.xmpp.send(REDFOOT.Admin, "Update on trade: %s ( %s )" % (trade.concrete(), row))
         else:
             # TODO: different URI?
             trade = URIRef("trade#%s" % md5.new("%s" % time.time()).hexdigest(), base=redfoot.base)
@@ -852,7 +836,7 @@ def process_cci_results(data):
             c.add((trade, QUANT.numPeriodsCCI, Literal(num_periods)))
             c.add((trade, QUANT.recommendedCCIForExit, Literal(cci_exit_value)))
             c.add((trade, QUANT.maxLossAllowed, Literal(max_loss)))
-            send("Recommended trade: %s ( %s )" % (trade.concrete(), row))
+            redfoot.xmpp.send(REDFOOT.Admin, "Recommended trade: %s ( %s )" % (trade.concrete(), row))
 
 arg_string = "-s cci -b http://qam.eikco.com/document/2006/10/19/02:28:51/?content-type=text/csv"
 args = arg_string.split()
