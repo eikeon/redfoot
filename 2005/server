@@ -133,7 +133,7 @@ import rdflib, redfootlib, twisted, kid
     <server:page_handler>
       <server:PageHandler rdf:ID="file_handler">
         <rdfs:label>file handler</rdfs:label>
-        <server:long_running>true<server:long_running>
+        <server:long_running>true</server:long_running>
         <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 import os
