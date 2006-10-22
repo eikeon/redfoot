@@ -535,7 +535,7 @@ for context in redfoot.contexts():
                 print "WARNING: params and query are being ignored"
             if fragment:
                 url = "%s#%s" % (url, fragment)
-            ti = TarInfo("%s/%s/%s/%s" % (root, scheme, netloc, url2pathname(url)))
+            ti = TarInfo(str("%s/%s/%s/%s" % (root, scheme, netloc, url2pathname(url))))
             ti.size = len(sio.getvalue())
             # TODO: real last modified time
             ti.mtime = int(time.time())#redfoot.value(cid, DCTERMS.created)
