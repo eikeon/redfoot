@@ -135,6 +135,9 @@ if not content_type:
         for type in supported_content_types.split(","):
             supported.append(type.strip())
         accept = request.headers.get("accept")
+        if not accept:
+            accept = "*/*"
+            _logger.debug("headers: %s" % request.headers)
         mimeparse = redfoot.module(URIRef("modules/mimeparse#module", base=redfoot_program))
         content_type = mimeparse.best_match(supported, accept)
         if content_type:
