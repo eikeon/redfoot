@@ -929,7 +929,7 @@ if not done:
     </redfoot:code>
   </commands:Command>
 
-  <quant:Basket rdf:resource="basket#dow">
+  <quant:Basket rdf:about="basket#dow">
     <rdfs:label>DOW</rdfs:label>
     <quant:basketItem rdf:resource="/ticker/MMM"/>
     <quant:basketItem rdf:resource="/ticker/T"/>
