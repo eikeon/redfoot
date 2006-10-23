@@ -158,7 +158,7 @@ user_nav = login_support # TODO: check each of the user_nav bits
 <ul kid:if="user_nav">
   <li kid:if="allow(request.site)"><a href="/data/Site">Edit Site</a></li>
   <!-- TODO: -->
-  <?python edit_uri = URIRef('%s/edit/content/' % request.host)?>
+  <?python edit_uri = URIRef('%s/edit/resource/' % request.host)?>
   <li kid:if="(edit_uri, None, None) in redfoot and allow(URIRef('%s/edit/resource' % request.host))"
        id="edit_page">
    <?python from urllib import quote?>
