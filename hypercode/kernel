@@ -779,6 +779,7 @@ redfoot_loader.redfoot = redfoot
 
 
 try:
+    _xmpp_handler = None
     if redfoot.xmpp:
         xmpp = redfoot.module(URIRef("modules/xmpp#logging", base=redfoot_program))
         _root_logger = logging.getLogger()
@@ -786,11 +787,8 @@ try:
         _xmpp_formatter = logging.Formatter('[%(name)s] %(message)s')
         _xmpp_handler.setFormatter(_xmpp_formatter)
         _root_logger.addHandler(_xmpp_handler)
-    else:
-        _xmpp_handler = None
-
 except Exception, e:
-    _logger.exception("XMPP logger not installed: %s" % e)
+    _logger.warning("XMPP logger not installed: %s" % e)
 
 redfoot.main(options, args)
 
