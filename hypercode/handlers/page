@@ -139,7 +139,11 @@ if not content_type:
             accept = "*/*"
             _logger.debug("headers: %s" % request.headers)
         mimeparse = redfoot.module(URIRef("modules/mimeparse#module", base=redfoot_program))
-        content_type = mimeparse.best_match(supported, accept)
+        try:
+            content_type = mimeparse.best_match(supported, accept)
+        except Exception, e:
+            _logger.exception("While trying to find best_match(%s, %s): %s" % (supported, accept, e))
+            content_type = mimeparse.best_match(supported, "*/*")
         if content_type:
             content_type = Literal(content_type)
         _logger.debug("supported: %s accept: %s best_match: %s" % (supported, accept, content_type))
