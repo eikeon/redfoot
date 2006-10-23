@@ -740,8 +740,8 @@ class Redfoot(ConjunctiveGraph):
 
     def _get_xmpp(self):
         if self.__xmpp is None:
-            xmpp = self.module(URIRef("modules/xmpp#client", base=redfoot_program))
             if self.xmpp_id and self.xmpp_password and self.xmpp_host and self.xmpp_port:
+                xmpp = self.module(URIRef("modules/xmpp#client", base=redfoot_program))
                 self.__xmpp = xmpp.Client(self.xmpp_id, self.xmpp_password, self.xmpp_host, int(self.xmpp_port))
             else:
                 _logger.info("To enable xmpp support use the redfoot xmpp_info command to set the needed information.")
