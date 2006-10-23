@@ -928,5 +928,38 @@ if not done:
     </redfoot:code>
   </commands:Command>
 
+  <quant:Basket>
+    <rdfs:label>DOW</rdfs:label>
+    <quant:basketItem rdf:resource="/ticker/MMM"/>
+    <quant:basketItem rdf:resource="/ticker/T"/>
+    <quant:basketItem rdf:resource="/ticker/AA"/>
+    <quant:basketItem rdf:resource="/ticker/MO"/>
+    <quant:basketItem rdf:resource="/ticker/AIG"/>
+    <quant:basketItem rdf:resource="/ticker/AXP"/>
+    <quant:basketItem rdf:resource="/ticker/BA"/>
+    <quant:basketItem rdf:resource="/ticker/CAT"/>
+    <quant:basketItem rdf:resource="/ticker/C"/>
+    <quant:basketItem rdf:resource="/ticker/KO"/>
+    <quant:basketItem rdf:resource="/ticker/DIS"/>
+    <quant:basketItem rdf:resource="/ticker/DD"/>
+    <quant:basketItem rdf:resource="/ticker/XOM"/>
+    <quant:basketItem rdf:resource="/ticker/GE"/>
+    <quant:basketItem rdf:resource="/ticker/GM"/>
+    <quant:basketItem rdf:resource="/ticker/HPQ"/>
+    <quant:basketItem rdf:resource="/ticker/HD"/>
+    <quant:basketItem rdf:resource="/ticker/HON"/>
+    <quant:basketItem rdf:resource="/ticker/IBM"/>
+    <quant:basketItem rdf:resource="/ticker/INTC"/>
+    <quant:basketItem rdf:resource="/ticker/JNJ"/>
+    <quant:basketItem rdf:resource="/ticker/JPM"/>
+    <quant:basketItem rdf:resource="/ticker/MCD"/>
+    <quant:basketItem rdf:resource="/ticker/MRK"/>
+    <quant:basketItem rdf:resource="/ticker/MSFT"/>
+    <quant:basketItem rdf:resource="/ticker/PFE"/>
+    <quant:basketItem rdf:resource="/ticker/PG"/>
+    <quant:basketItem rdf:resource="/ticker/UTX"/>
+    <quant:basketItem rdf:resource="/ticker/VZ"/>
+    <quant:basketItem rdf:resource="/ticker/WMT"/>
+  </quant:Basket>
 
 </rdf:RDF>
