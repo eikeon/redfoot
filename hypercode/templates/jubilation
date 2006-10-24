@@ -16,7 +16,7 @@
     <template:content rdf:resource="classic#content"/>
     <template:background_color>#B0C9BE</template:background_color>
     <template:css rdf:resource="#css"/>
-    <template:title rdf:resource="classic#title"/>
+    <template:head rdf:resource="classic#head"/>
     <template:shortcut_icon rdf:resource="http://redfoot.net/2002/11/25/favicon.ico"/>
     <template:header rdf:resource="#header"/>
     <template:navigation rdf:resource="classic#navigation"/>
