@@ -2,15 +2,52 @@
 <rdf:RDF
   xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
   xmlns:rdfs='http://www.w3.org/2000/01/rdf-schema#'
+  xmlns:redfoot='http://redfoot.net/2005/redfoot#'
+  xmlns:template='http://redfoot.net/2005/template#'
 >
 
   <rdfs:Class rdf:ID="Aspect">
     <rdfs:label>Aspect</rdfs:label>
-    <rdfs:comment></rdfs:comment>
+    <rdfs:comment>An aspect is a set of functionality that is intented to be added to a site.</rdfs:comment>
     <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/redfoot#Code"/>
+    <template:content>
 
-<!--
-aspect#install
+      <template:Content rdf:ID="UserPagePartHandler">
+        <rdfs:label>Quant User Page Part Handler</rdfs:label>
+       <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+
+<div xmlns:kid="http://purl.org/kid/ns#" kid:strip="">
+<?python
+install = URIRef("http://redfoot.net/hypercode/aspect#install")
+
+action = request.parameters.get("action")
+aspect = request.parameters.get("aspect")
+if action=="install" and aspect:
+    print "installing:", aspect
+    if allow(install):
+        print "running:", install
+        redfoot.execute(install, aspect=URIRef(aspect), base=request.host)
+
+?>
+
+  <form kid:if="allow(install)" method="POST" action="" style="display: inline">
+    <input type="hidden" name="aspect" value="${request.uri.abstract()}"/>
+    <input type="submit" name="action" value="install"/>
+  </form>
+
+</div>
+
+]]>
+        </rdf:value>
+      </template:Content>
+    </template:content>
+  </rdfs:Class>
+
+  <redfoot:Python rdf:ID="install">
+    <rdfs:label>Aspect</rdfs:label>
+      <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
 
 # input: 
 #   aspect -- uri of aspect to install
@@ -47,9 +84,9 @@ for item in redfoot.objects(aspect, ASPECT.item):
             context.add((site, TEMPLATE.section, uri))
         for p, o in redfoot.predicate_objects(item):
             context.add((uri, p, o))
--->
 
-
-  </rdfs:Class>
+]]>
+      </rdf:value>
+  </redfoot:Python>
 
 </rdf:RDF>
