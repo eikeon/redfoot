@@ -723,6 +723,7 @@ for context in list(redfoot.contexts()):
         new_context = context
 
     for s, p, o in context:
+        ss, pp, oo = s, p, o
         if isinstance(s, URIRef) and OLD in s:
             ss = URIRef(s.replace(OLD, NEW))
         if isinstance(p, URIRef) and OLD in p:
