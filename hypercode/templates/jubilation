@@ -20,6 +20,7 @@
     <template:shortcut_icon rdf:resource="http://redfoot.net/2002/11/25/favicon.ico"/>
     <template:header rdf:resource="#header"/>
     <template:navigation rdf:resource="classic#navigation"/>
+    <template:user_navigation rdf:resource="classic#user_navigation"/>
     <template:footer rdf:resource="classic#footer"/>
     <server:content_type>application/xhtml+xml</server:content_type>
     <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
@@ -31,6 +32,10 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
 ?>
   ${display(lookup(TEMPLATE.head))}
   <body>
+    <div id="usernav">
+      ${display(lookup(TEMPLATE.user_navigation))}
+    </div>
+
     <div class="header">
       ${display(lookup(TEMPLATE.header))}
     </div>
@@ -215,6 +220,31 @@ div.comments {
     background-color: #ddddee;
     margin: 0em;
     padding: 0.25em 1em;
+}
+
+#usernav {
+    float: right;
+    background-color: transparent;
+}
+
+#usernav ul {
+    margin: 0;
+    padding: 0;
+    display: inline;
+    list-style: none;
+}
+
+#usernav li {
+    display: inline;
+    margin: 0;
+    padding: 0;
+}
+
+#usernav li a, #header li a:visited {
+    display: inline;
+    font-weight: bold;
+    padding: 0 1.5em;
+    font-size: 0.8em;
 }
 
 """ % {"color": color})
