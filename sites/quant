@@ -8,7 +8,7 @@
   xmlns:browse='http://redfoot.net/2005/browse#'
   xmlns:template='http://redfoot.net/2005/template#'
   xmlns:commands='http://redfoot.net/2005/commands#'
-  xmlns:quant='http://qam.eikco.com/quant#'
+  xmlns:quant='http://www.certusinvestments.com/quant#'
 >
 
   <redfoot:Admin rdf:about="mailto:chalaschek@gmail.com">
