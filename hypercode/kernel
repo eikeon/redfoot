@@ -53,6 +53,16 @@ from rdflib.Graph import Graph, ConjunctiveGraph
 from rdflib.util import first, date_time
 from rdflib.Journal import JournalReader, JournalWriter
 
+redfoot_base = redfoot_loader.program.split("hypercode/kernel#")[0]
+
+def logical_to_physical(uri):
+    return URIRef(uri.replace("http://redfoot.net/", redfoot_base, 1))
+
+def physical_to_logical(uri):
+    return URIRef(uri.replace(redfoot_base, "http://redfoot.net/", 1))
+
+redfoot_program = physical_to_logical(redfoot_program)
+
 import urllib2, re
 from datetime import datetime, timedelta
 
@@ -268,7 +278,7 @@ class Redfoot(ConjunctiveGraph):
         self.__xmpp_id = None
         self.__xmpp_password = None
         self.__xmpp_host = None
-        self.__xmpp_port = None
+        self.__xmpp_port = None 
         
     def absolutize(self, uri, defrag=1):
         base = self.base
@@ -335,7 +345,7 @@ class Redfoot(ConjunctiveGraph):
         # bootstraping REDFOOT namespace        
         if not (NAMESPACE, None, None) in self:
             context = Graph()
-            context.load(NAMESPACE)
+            context.load(logical_to_physical(NAMESPACE), publicID=NAMESPACE)
         else:
             context = Graph(store=self.store, identifier=self.context_id(NAMESPACE), namespace_manager=self)
         REDFOOT = self.namespace(NAMESPACE, context)
@@ -372,7 +382,7 @@ class Redfoot(ConjunctiveGraph):
                 if uri==location:
                     _logger.info("loading: %s" % uri)
                 else:
-                    _logger.info("loading: %s from %s" % (uri, location))
+                    _logger.info("loading: %s from %s" % (uri, logical_to_physical(location)))
                 try:
                     context = self.load(location, creator=redfoot_loader.program)
                 except Exception, e:
@@ -473,8 +483,10 @@ class Redfoot(ConjunctiveGraph):
         """
         if "#" in location:
             location = URIRef(urldefrag(location)[0])
+        location = logical_to_physical(location)
         publicID = publicID or self.absolutize(location)
         publicID = self.absolutize(publicID, defrag=False)
+        publicID = physical_to_logical(publicID)
         context_id = self.context_id(publicID)
         context = self.get_context(context_id, creator=creator)
 
@@ -777,6 +789,7 @@ if options.rebuild_from_journal:
 journal = JournalWriter(redfoot.store, filename="%s-journal" % path) 
 redfoot.open(path)
 redfoot._bootstrap()
+redfoot.load(redfoot_loader.program)
 redfoot_loader.redfoot = redfoot 
 
 
