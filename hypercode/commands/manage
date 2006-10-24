@@ -613,9 +613,13 @@ if filename is not None:
             print "loading:", context_id
             context = redfoot.get_context(context_id)
             if len(context)==0:
-                context.parse(tar.extractfile(tarinfo), publicID=publicID, preserve_bnode_ids=True)
+                # clear context metadata about context we just created
+                # above when calling redfoot.get_context
+                redfoot.index.remove((context_id, None, None)) 
+                # copy context metadata from that in backup file
                 for t in source_index.triples((context_id, None, None)):
                     redfoot.index.add(t)
+                context.parse(tar.extractfile(tarinfo), publicID=publicID, preserve_bnode_ids=True)
             else:
                 print "skipping: %s (already exists)" % url
         elif tarinfo.isdir():
