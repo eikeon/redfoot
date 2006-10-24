@@ -700,43 +700,28 @@ import logging
 
 _logger = logging.getLogger(redfoot_current)
 
+from rdflib.Graph import Graph
+
 OLD = args[0]
 NEW = args[1]
 
 nothing_renamed = True
 
-# rename any occurrences in any context
-for t, cg in list(redfoot.store.triples((None, None, None), None)):
-    s, p, o = t
-    if isinstance(s, URIRef) and OLD in s:
-        ss = URIRef(s.replace(OLD, NEW))
-    else:
-        ss = s
-    if isinstance(p, URIRef) and OLD in p:
-        pp = URIRef(p.replace(OLD, NEW))
-    else:
-        pp = p
-    if isinstance(o, URIRef) and OLD in o:
-        oo = URIRef(o.replace(OLD, NEW))
-    else:
-        oo = o
-    if (ss, pp, oo) != t:
-        for c in list(cg):
-            nothing_renamed = False
-            c.remove(t)
-            c.add((ss, pp, oo))
-
 # rename contexts
 for context in list(redfoot.contexts()):
     if OLD in context.identifier:
-        new_context = redfoot.get_context(URIRef(context.identifier.replace(OLD, NEW)))
+        if isinstance(context.identifier, URIRef):
+            identifier = URIRef(context.identifier.replace(OLD, NEW))
+        elif isinstance(context.identifier, BNode):
+            identifier = BNode(context.identifier.replace(OLD, NEW))
+        else:
+            _logger.warning("Unexpected identifier type. Skipping context '%s'" % context.identifier)
+            continue
+        new_context = Graph(store=redfoot.store, identifier=identifier, namespace_manager=redfoot)
         nothing_renamed = False
     else:
         new_context = context
 
-    # (and checking again if there's any triples that need
-    # renaming... should get rid of this redundant bit... added error
-    # message for now to see if it's getting hit)
     for s, p, o in context:
         if isinstance(s, URIRef) and OLD in s:
             ss = URIRef(s.replace(OLD, NEW))
@@ -744,11 +729,10 @@ for context in list(redfoot.contexts()):
             pp = URIRef(p.replace(OLD, NEW))
         if isinstance(o, URIRef) and OLD in o:
             oo = URIRef(o.replace(OLD, NEW))
-        if (ss, pp, oo)!=(s, p, o):
-            if new_context!=context:
-                _logger.error("Triple %s, %s, %s should have already been renamed" % (s, p, o))
-                context.remove((s, p, o))
-                new_context.add((ss, pp, oo))
+        if (ss, pp, oo)!=(s, p, o) or context!=new_context:
+            nothing_renamed = False
+            context.remove((s, p, o))
+            new_context.add((ss, pp, oo))
 
     if new_context!=context:
         redfoot.remove_context(context.identifier)
