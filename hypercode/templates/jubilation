@@ -23,28 +23,13 @@
     <template:footer rdf:resource="classic#footer"/>
     <server:content_type>application/xhtml+xml</server:content_type>
     <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
-<![CDATA[
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:kid="http://purl.org/kid/ns#">
-<?python 
-TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")
-SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+<![CDATA[<html xmlns="http://www.w3.org/1999/xhtml" xmlns:kid="http://purl.org/kid/ns#">
+<?python SERVER = redfoot.namespace("http://redfoot.net/2005/server#")?>
+<?python TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")?>
+<?python
+title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract(), None) or "-"
 ?>
-  <head>
-    <title>${display(lookup(TEMPLATE.title))}</title>
-    <meta http-equiv="Content-Type" content="text/xhtml; charset=UTF-8"/>
-    <meta name="keywords" content=""/>
-    <link rel="shortcut icon" href="${lookup(TEMPLATE.shortcut_icon)}"/>
-    <style type="text/css">
-      ${display(lookup(TEMPLATE.css))}
-    </style>
-    <span kid:for="alternate in redfoot.objects(request.uri, SERVER.alternate)" kid:strip="" >
-    <link rel="alternate"
-      href="${alternate}" title="${redfoot.label(alternate)}"
-      type="${redfoot.value(alternate, SERVER.content_type)}" />
-    </span> 
-  </head>
-
+  ${display(lookup(TEMPLATE.head))}
   <body>
     <div class="header">
       ${display(lookup(TEMPLATE.header))}
