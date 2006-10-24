@@ -8,7 +8,7 @@
   xmlns:browse='http://redfoot.net/2005/browse#'
   xmlns:template='http://redfoot.net/2005/template#'
   xmlns:commands='http://redfoot.net/2005/commands#'
-  xmlns:quant='http://www.certusinvestments.com/quant#'
+  xmlns:quant='http://certusinvestments.com/quant#'
 >
 
   <redfoot:Admin rdf:about="mailto:chalaschek@gmail.com">
@@ -226,15 +226,15 @@ items.sort()
 
   <template:Template rdf:ID="page">
     <rdfs:label>Quant Template</rdfs:label>
-    <template:content rdf:resource="https://svn.redfoot.net/trunk/hypercode/templates/classic#content"/>
+    <template:content rdf:resource="http://redfoot.net/hypercode/templates/classic#content"/>
     <template:background_color>#B0C9BE</template:background_color>
-    <template:head rdf:resource="https://svn.redfoot.net/trunk/hypercode/templates/classic#head"/>
+    <template:head rdf:resource="http://redfoot.net/hypercode/templates/classic#head"/>
     <template:css rdf:resource="#css"/>
     <template:title rdf:resource="#title"/>
     <template:shortcut_icon rdf:resource="http://redfoot.net/2002/11/25/favicon.ico"/>
     <template:header rdf:resource="#header"/>
     <template:navigation rdf:resource="#navigation"/>
-    <template:user_navigation rdf:resource="https://svn.redfoot.net/trunk/hypercode/templates/classic#user_navigation"/>
+    <template:user_navigation rdf:resource="http://redfoot.net/hypercode/templates/classic#user_navigation"/>
     <template:footer rdf:resource="#footer"/>
     <server:unauthorized_page_handler rdf:resource="#unauthorized_page_handler"/>
     <server:unauthorized_content_handler rdf:resource="#unauthorized_content_handler"/>
