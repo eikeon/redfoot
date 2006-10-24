@@ -32,10 +32,6 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
 ?>
   ${display(lookup(TEMPLATE.head))}
   <body>
-    <div id="usernav">
-      ${display(lookup(TEMPLATE.user_navigation))}
-    </div>
-
     <div class="header">
       ${display(lookup(TEMPLATE.header))}
     </div>
@@ -68,6 +64,10 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
 
     <div class="footer">
       ${display(lookup(TEMPLATE.footer))}
+    </div>
+
+    <div id="usernav">
+      ${display(lookup(TEMPLATE.user_navigation))}
     </div>
 
   <?python edit_uri = URIRef('%s/edit/content/' % request.host)?>
