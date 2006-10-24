@@ -70,14 +70,6 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
       ${display(lookup(TEMPLATE.user_navigation))}
     </div>
 
-  <?python edit_uri = URIRef('%s/edit/content/' % request.host)?>
-  <div kid:if="(edit_uri, None, None) in redfoot and allow(URIRef('%s/edit/resource' % request.host))"
-       class="content_nav">
-   <?python from urllib import quote?>
-    <a kid:if="(request.uri, None, None) in redfoot" href="/edit/resource?uri=${quote(request.uri)}">Edit Page</a>
-    <a kid:if="(request.uri.abstract(), None, None) in redfoot" href="/edit/resource?uri=${quote(request.uri.abstract())}">Edit Page (abstract)</a>
-  </div>
-
   </body>
 </html>
 ]]>
