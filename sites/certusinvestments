@@ -128,7 +128,8 @@ try:
   </span>
 </body>
 """ % (who_label, escapeToXml(uri.concrete(), isattrib=True), escapeToXml(redfoot.label(uri)))
-    redfoot.xmpp.send(REDFOOT.Admin, message, html)
+    if uid: # only if user is logged in (not in the "Someone" case)
+        redfoot.xmpp.send(REDFOOT.Admin, message, html)
 except Exception, e:
     _logger.exception("unable to send alert: %s" % e)
 

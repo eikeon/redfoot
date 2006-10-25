@@ -660,7 +660,7 @@ if startswith:
             if cid.startswith(startswith):
                 redfoot.write("Removing: %s\n" % cid)
                 redfoot.remove_context(context)
-                redfoot.index.remove((REDFOOT.Checked, RDFS.member, cid))
+                redfoot.index.remove((cid, None, None))
         except Exception, e:
             print e
 
