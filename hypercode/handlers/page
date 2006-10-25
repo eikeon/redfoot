@@ -217,11 +217,16 @@ else:
 SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
 TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")
 
-import kid
+REQUIRED = "0.9.3"
+def version_tuple(s):
+    return tuple([int(x) for x in s[0:5].split(".")])    
+try:
+    import kid
+except ImportError, e:
+    raise ImportError("kid is not installed. Please install kid-%s ( http://kid-templating.org/ )" % REQUIRED)
 
-version = tuple([int(x) for x in kid.__version__[0:5].split(".")])    
-REQUIRED = (0, 9, 3)
-assert version >= REQUIRED, "Please install kid version 0.9.3 or higher. Found kid version: %s" % kid.__version__
+
+assert version_tuple(version) >= version_tuple(REQUIRED), "Please install kid version %s or higher. Found kid version: %s" % (REQUIRED, kid.__version__)
 
 from kid import compiler as kid_compiler
 
