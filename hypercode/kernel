@@ -577,11 +577,10 @@ class Redfoot(ConjunctiveGraph):
 
         value = value.replace("\r\n", "\n")        
         value = value.replace("\r", "\n")        
-        try:
-            c = compile(value+"\n", code, "exec")
-            exec c in context
-        except Exception, e:
-            _logger.exception("While trying to exec %s the following exception occurred:\n" % code)
+
+        c = compile(value+"\n", code, "exec")
+        exec c in context
+
         return context
 
     def context_id(self, uri, context_id=None):
