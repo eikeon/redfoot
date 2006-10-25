@@ -16,6 +16,15 @@
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
+import logging
+
+_logger = logging.getLogger(redfoot_current)
+
+try:
+    import twisted
+except ImportError, e:
+    raise ImportError("twisted not installed. Please install Twisted-2.4.0 ( http://twistedmatrix.com/trac/#Downloading )")
+
 from twisted.web.server import Site, NOT_DONE_YET, version
 from twisted.web.resource import IResource
 from twisted.internet import reactor
@@ -240,7 +249,12 @@ class _Resource(object):
         # For Server header format see: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.38
         response.setHeader("Server", "Redfoot/%s rdflib/%s %s Kernel/%s Server/%s Handler/%s)" % 
                            (redfootlib.__version__, rdflib.__version__, version, redfoot.uri, redfoot_current, handler))
-        redfoot.execute(handler, request=request, response=response)
+        try:
+            redfoot.execute(handler, request=request, response=response)
+        except Exception, e:
+            _logger.exception(e)
+            response.setStatus(500, "Internal Server Error -- this is hopefully a temporary issue.")
+            return "%s" % e
 
         # Note: it is the handler's job to call response.finish()
         # handlers can also do deferToThread (For example see handlers/page#)
