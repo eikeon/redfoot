@@ -150,6 +150,10 @@ except Exception, e:
     </template:content>
   </rdfs:Class>
 
+  <rdf:Description rdf:about="quant#Resource">
+    <server:allow rdf:resource="http://redfoot.net/2005/redfoot#Admin"/>
+  </rdf:Description>
+
   <rdfs:Class rdf:about="quant#Basket">
     <server:supported_content_types>application/xhtml+xml,text/csv</server:supported_content_types>
     <server:page_handler>
