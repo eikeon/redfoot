@@ -619,7 +619,10 @@ class Redfoot(ConjunctiveGraph):
         """
         namespace = URIRef(namespace)
         if not (namespace, RDF.type, REDFOOT.Namespace) in self.index:
-            self.check(namespace)             
+            try:
+                self.check(namespace)
+            except Exception, e:
+                _logger.exception(e)
             self.index.add((namespace, RDF.type, REDFOOT.Namespace))
         super(Redfoot, self).bind(prefix, namespace, override)
 
