@@ -92,6 +92,7 @@
     <template:content>
       <template:Content rdf:ID="StockPagePartHandler">
         <rdfs:label>Stock</rdfs:label>
+        <server:allow rdf:resource="http://redfoot.net/2005/redfoot#Admin"/>
        <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
 <![CDATA[
 <div xmlns="http://www.w3.org/1999/xhtml"
@@ -150,16 +151,13 @@ except Exception, e:
     </template:content>
   </rdfs:Class>
 
-  <rdf:Description rdf:about="quant#Resource">
-    <server:allow rdf:resource="http://redfoot.net/2005/redfoot#Admin"/>
-  </rdf:Description>
-
   <rdfs:Class rdf:about="quant#Basket">
     <server:supported_content_types>application/xhtml+xml,text/csv</server:supported_content_types>
     <server:page_handler>
       <server:PageHandler rdf:ID="BasketCSVPageHandler">
         <rdfs:label>Basket CSV Page Handler</rdfs:label>
         <server:content_type>text/csv</server:content_type>
+        <server:allow rdf:resource="http://redfoot.net/2005/redfoot#Admin"/>
        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
