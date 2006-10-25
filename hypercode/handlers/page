@@ -226,7 +226,7 @@ except ImportError, e:
     raise ImportError("kid is not installed. Please install kid-%s ( http://kid-templating.org/ )" % REQUIRED)
 
 
-assert version_tuple(version) >= version_tuple(REQUIRED), "Please install kid version %s or higher. Found kid version: %s" % (REQUIRED, kid.__version__)
+assert version_tuple(kid.__version__) >= version_tuple(REQUIRED), "Please install kid version %s or higher. Found kid version: %s" % (REQUIRED, kid.__version__)
 
 from kid import compiler as kid_compiler
 
