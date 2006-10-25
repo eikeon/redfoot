@@ -343,13 +343,15 @@ class Redfoot(ConjunctiveGraph):
         # Note: we are currently being passed an open store        
         global REDFOOT
         # bootstraping REDFOOT namespace        
-        if not (NAMESPACE, None, None) in self:
-            context = Graph()
-            context.load(logical_to_physical(NAMESPACE), publicID=NAMESPACE)
-        else:
-            context = Graph(store=self.store, identifier=self.context_id(NAMESPACE), namespace_manager=self)
-        REDFOOT = self.namespace(NAMESPACE, context)
+        #if not (NAMESPACE, None, None) in self:
+        #    context = Graph()
+        #    context.load(logical_to_physical(NAMESPACE), publicID=NAMESPACE)
+        #else:
+        #    context = Graph(store=self.store, identifier=self.context_id(NAMESPACE), namespace_manager=self)
+        #REDFOOT = self.namespace(NAMESPACE, context)
+        REDFOOT = Namespace(NAMESPACE)
         self.check(NAMESPACE)
+        REDFOOT = self.namespace(NAMESPACE)
         
         self.uri = redfoot_program # uri to the version of redfoot that's running
         context = dict({"redfoot": self, "REDFOOT": REDFOOT, 
