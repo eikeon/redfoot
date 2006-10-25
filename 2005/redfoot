@@ -25,7 +25,7 @@
 
   <redfoot:Resource rdf:ID="Defaults">
     <rdfs:label>Redfoot Defaults</rdfs:label>
-    <redfoot:program rdf:resource="https://svn.redfoot.net/trunk/hypercode/kernel#"/>
+    <redfoot:program rdf:resource="https://svn.redfoot.net/tags/2.1.1/hypercode/kernel#"/>
   </redfoot:Resource>
 
   <rdfs:Class rdf:ID="Code">
