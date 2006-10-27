@@ -34,6 +34,15 @@ def install_rdflib(args=[]):
 	    setup = member.name
 	tar.extract(member)
 
+    expected_version = None
+    f = file(setup, "r")
+    for line in f:
+        if line.startswith("__version__"):
+            d = {}
+            exec line in d
+            expected_version = d{"__version__"}
+    assert expected_version
+
     log_file = file("redfoot-install-rdflib-log", "w")
 
     dir, file_name = os.path.split(setup)

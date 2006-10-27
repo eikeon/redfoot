@@ -97,6 +97,4 @@ class BootLoader(ConjunctiveGraph):
             c = compile(value+"\n", program, "exec")
             exec c in dict({"redfoot_loader": self, "args": args, "redfoot_program": program})
         except Exception, e:
-            tb = sys.exc_traceback
-            tb = tb.tb_next
-            logger.error(traceback.print_exception(sys.exc_type, sys.exc_value, tb))
+            logger.exception(e)
