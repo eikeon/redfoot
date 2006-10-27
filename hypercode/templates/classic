@@ -207,7 +207,7 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
     <style type="text/css">
       ${display(lookup(TEMPLATE.css))}
     </style>
-    <link rel="alternate" title "RDF DATA" href="${request.uri.abstract()}" type="application/rdf+xml"/>
+    <link rel="alternate" title="RDF DATA" href="${request.uri.abstract()}" type="application/rdf+xml"/>
     <span kid:for="alternate in redfoot.objects(request.uri, SERVER.alternate)" kid:strip="" >
     <link rel="alternate"
       href="${alternate}" title="${redfoot.label(alternate)}"
