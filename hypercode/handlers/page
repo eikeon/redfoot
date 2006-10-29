@@ -122,7 +122,7 @@ if referer:
         c.add((request.uri, REFERER.referer, referer))
         xmpp = redfoot.xmpp
         if xmpp:
-            xmpp.send(REDFOOT.Admin, "Found new referer '%s' for page '%s'" % (referer, request.uri))
+            xmpp.send(REDFOOT.Admin, "Found new referer %s for page %s" % (referer, request.uri))
 
 
 page_handler = None
