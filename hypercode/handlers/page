@@ -287,7 +287,7 @@ def display(uri, fragment=True, output=None, **args):
             try:
                 write(response, encoding="utf-8", fragment=fragment, output=output or "xml")
             except Exception, e:
-                redfoot.log.exception("While trying to display %s (%s) the following exception occurred:\n" % (redfoot.label(uri), uri))
+                redfoot.log.exception("While handling request for '%s' and trying to display %s (%s) the following exception occurred:\n" % (request.uri, redfoot.label(uri), uri))
             request.sources.pop()
 	else:
             def pop():
