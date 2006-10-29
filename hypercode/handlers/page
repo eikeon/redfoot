@@ -112,17 +112,18 @@ if (site, None, None) not in redfoot:
 def lookup(property, default=None):
     return request.lookup(property) or redfoot.value(redfoot_current, property) or default
 
-# Stock Page
-# Stock Page requesting content-type=text/csv
-# /dump/ (page meant to return rdf/xml)
+referer = request.headers.get("referer")
+if referer:
+    from rdflib.Namespace import Namespace
+    REFERER = Namespace("http://redfoot.net/2005/referer#")
+    referer = URIRef(referer)
+    c = redfoot.get_context(URIRef("referers", base=request.host))
+    if (request.uri, REFERER.referer, referer) not in redfoot:
+        c.add((request.uri, REFERER.referer, referer))
+        xmpp = redfoot.xmpp
+        if xmpp:
+            xmpp.send("Found new referer '%s' for page '%s'" % (referer, request.uri))
 
-# need a way to declare that the application/xhtml+xml page handler
-
-# if a specific content-type is requested, great.
-#     check that client accepts type it's requesting... else tell the client it's an idiot ;)
-# else 
-#     if client requested go through the requested content types in order
-# else 
 
 page_handler = None
 
