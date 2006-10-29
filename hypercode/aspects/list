@@ -22,6 +22,7 @@
   <aspect:Aspect rdf:about="generic#aspect"/>
   <aspect:Aspect rdf:about="recipes#aspect"/>
   <aspect:Aspect rdf:about="register#aspect"/>
+  <aspect:Aspect rdf:about="auth#aspect"/>
   <aspect:Aspect rdf:about="auth_invite#aspect"/>
   <aspect:Aspect rdf:about="blog#aspect"/>
 
