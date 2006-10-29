@@ -239,8 +239,8 @@ items.sort()
     <template:navigation rdf:resource="#navigation"/>
     <template:user_navigation rdf:resource="http://redfoot.net/hypercode/templates/classic#user_navigation"/>
     <template:footer rdf:resource="#footer"/>
-    <server:unauthorized_page_handler rdf:resource="#unauthorized_page_handler"/>
-    <server:unauthorized_content_handler rdf:resource="#unauthorized_content_handler"/>
+    <server:unauthorized_page_handler rdf:resource="http://redfoot.net/hypercode/templates/classic#unauthorized_page_handler"/>
+    <server:unauthorized_content_handler rdf:resource="http://redfoot.net/hypercode/templates/classic#unauthorized_content_handler"/>
     <server:content_type>application/xhtml+xml</server:content_type>
     <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
 <![CDATA[<html xmlns="http://www.w3.org/1999/xhtml" xmlns:kid="http://purl.org/kid/ns#">
