@@ -128,6 +128,7 @@ recipes.sort()
   <rdf:Description rdf:about="http://donnafales.com/2002/07/28/recipe-schema#RecipeOriginal">
     <rdfs:label>Recipe Original</rdfs:label>
     <rdfs:comment>Alternative view of recipe, namely, the original</rdfs:comment>
+    <server:supported_content_types>text/plain</server:supported_content_types>
     <server:page_handler>
      <server:PageHandler rdf:ID="RecipeOriginalContent">
       <rdfs:label>Recipe Original</rdfs:label>
