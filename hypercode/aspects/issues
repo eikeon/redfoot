@@ -134,7 +134,8 @@ from urllib import quote
     <aspect:location>/issues/</aspect:location>
     <rdfs:label>Issues</rdfs:label>
     <rdfs:issue></rdfs:issue>
-    <template:default_section_rank>20.0</template:default_section_rank>
+    <template:default_section_rank>23.0</template:default_section_rank>
+    <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
     <template:content>
       <server:PagePartHandler rdf:ID="all_issues">
         <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
@@ -164,6 +165,7 @@ issues.sort()
 issues.reverse()
 
 ?>
+    <a href="#add_issue">add issue</a>
     <ul class="issues">
       <li kid:for="c, created, issue, label, comment in issues">
         <h3><a href="${issue.concrete()}">${label}</a></h3>
@@ -171,18 +173,19 @@ issues.reverse()
           <a href="${issue.concrete()}">issue</a> 
           <span kid:if="created">created on ${created}</span>.
         </div>
-        <p>${comment}</p>
+        <pre>${comment}</pre>
       </li>
     </ul>
 
 <div class="add_issue">
+
 
 <?python 
 allowed = allow(URIRef("%s/issues/add/" % request.host))
 from urllib import quote
 ?>
 
-  <h3>Add Issue</h3>
+  <h3><a name="add_issue">Add Issue</a></h3>
 
 
   <div kid:if="allowed" kid:strip="">
