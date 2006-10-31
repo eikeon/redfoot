@@ -117,13 +117,13 @@ if referer:
     from rdflib.Namespace import Namespace
     REFERER = Namespace("http://redfoot.net/2005/referer#")
     referer = URIRef(referer)
-    c = redfoot.get_context(URIRef("referers", base=request.host))
-    if (request.uri, REFERER.referer, referer) not in redfoot:
-        c.add((request.uri, REFERER.referer, referer))
-        xmpp = redfoot.xmpp
-        if xmpp:
-            xmpp.send(REDFOOT.Admin, "Found new referer %s for page %s" % (referer, request.uri))
-
+    c = redfoot.get_context(URIRef("referers", base=request.host), creator=redfoot_current)
+    if not request.uri.startswith(request.host):
+        if (request.uri, REFERER.referer, referer) not in redfoot:
+            c.add((request.uri, REFERER.referer, referer))
+            xmpp = redfoot.xmpp
+            if xmpp:
+                xmpp.send(REDFOOT.Admin, "Found new referer %s for page %s" % (referer, request.uri))
 
 page_handler = None
 
