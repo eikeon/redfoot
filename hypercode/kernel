@@ -348,10 +348,10 @@ class Redfoot(ConjunctiveGraph):
         #    context.load(logical_to_physical(NAMESPACE), publicID=NAMESPACE)
         #else:
         #    context = Graph(store=self.store, identifier=self.context_id(NAMESPACE), namespace_manager=self)
-        #REDFOOT = self.namespace(NAMESPACE, context)
+        #REDFOOT = self.namespace(NAMESPACE, context=context)
         REDFOOT = Namespace(NAMESPACE)
-        self.check(NAMESPACE)
-        REDFOOT = self.namespace(NAMESPACE)
+        self.check(NAMESPACE, creator=physical_to_logical(redfoot_loader.program))
+        REDFOOT = self.namespace(NAMESPACE, creator=physical_to_logical(redfoot_loader.program))
         
         self.uri = redfoot_program # uri to the version of redfoot that's running
         context = dict({"redfoot": self, "REDFOOT": REDFOOT, 
@@ -370,7 +370,7 @@ class Redfoot(ConjunctiveGraph):
                     return label
         return label or default
 
-    def check(self, uri):
+    def check(self, uri, creator=None):
         """
         Checks to see if redfoot knows anything about uri
 
@@ -386,7 +386,7 @@ class Redfoot(ConjunctiveGraph):
                 else:
                     _logger.info("loading: %s from %s" % (uri, logical_to_physical(location)))
                 try:
-                    context = self.load(location, creator=redfoot_loader.program)
+                    context = self.load(location, creator=creator)
                 except Exception, e:
                     _logger.warning("couldn't load %s while checking: %s\n" % (uri, e))
 
@@ -591,7 +591,7 @@ class Redfoot(ConjunctiveGraph):
             frag = frag[1:]
         return URIRef("%s#%s" % (uri, frag))
 
-    def namespace(self, uri, context=None):
+    def namespace(self, uri, creator=None, context=None):
         uri = URIRef(uri)
         module = sys.modules.get(uri, None)
         if module is None:
@@ -600,9 +600,9 @@ class Redfoot(ConjunctiveGraph):
             module.__file__ = uri
             module.__ispkg__ = 0
             if context is None:
-                self.check(uri)
+                self.check(uri, creator=creator)
                 context_uri = self.context_id(uri)            
-                context = self.get_context(context_uri, creator=redfoot_loader.program)            
+                context = self.get_context(context_uri, creator=creator)            
             d = module.__dict__
             d["NS"] = uri
             # TODO: module.__getattribute__ = module.__dict__.__getitem__ 
