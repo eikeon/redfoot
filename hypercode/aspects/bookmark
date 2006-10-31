@@ -47,7 +47,7 @@ for bookmark in redfoot.subjects(RDF.type, BOOKMARK.Bookmark):
         c = redfoot.value(bookmark, DC_created)
         try:
             created = time.strftime("%A %d %B, %Y", time.gmtime(float(c)))
-        except:
+        except Exception, e:
             redfoot.log.warning("Couldn't format timestamp: %s" % e)
             created = None
         bookmarks.add((c, created, label, uri, bookmark))
