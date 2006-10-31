@@ -159,7 +159,7 @@ for handler in request.objects(SERVER.page_handler):
     if content_type:
         handler_content_type = redfoot.value(handler, SERVER.content_type)
         if handler_content_type is None:
-            _logger.error("handler '%s' must have a content_type" % handler)
+            _logger.error("handler '%s' must have a content_type. request.uri: %s" % (handler, request.uri))
         if handler_content_type == content_type:
             page_handler = handler
             break
@@ -172,7 +172,7 @@ if page_handler is None:
         if content_type:
             handler_content_type = redfoot.value(handler, SERVER.content_type)
             if handler_content_type is None:
-                _logger.error("handler '%s' must have a content_type" % handler)
+                _logger.error("handler '%s' must have a content_type. request.uri: %s" % (handler, request.uri))
             if handler_content_type == content_type:
                 page_handler = handler
                 break
