@@ -121,7 +121,7 @@ else:
     print "loading: %s" % url
     if publicID:
         print " with publicID: %s" % publicID
-    redfoot.load(url, publicID=publicID, creator=redfoot.uri)
+    redfoot.load(url, publicID=publicID, creator=redfoot_current)
 
 ]]>
       </rdf:value>
@@ -356,7 +356,7 @@ while 1:
                     redfoot.remove((cid, DC.date, None))
                     redfoot.index.add((cid, DC.date, Literal(ts)))
                     print "loading: %s" % path, ts
-                    redfoot.load(source, publicID=cid, creator=redfoot.uri)
+                    redfoot.load(source, publicID=cid, creator=redfoot_current)
 
 ]]>
        </rdf:value>
@@ -383,7 +383,7 @@ for context in g.subjects(RDF.type, REDFOOT.Context):
     print context
     source = "%s?uri=%s" % (uri, quote(context))
     try:
-        redfoot.load(source, publicID=context, creator=redfoot.uri)
+        redfoot.load(source, publicID=context, creator=redfoot_current)
     except Exception, e:
         print e
 

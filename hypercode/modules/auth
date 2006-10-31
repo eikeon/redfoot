@@ -48,7 +48,7 @@ def authenticate(request, username=None, password=None):
             except Exception, e:
                 message = "%s while trying to load from %s " % (str(e), username)
 	    cid = redfoot.context_id(username, context_id="#user")
-	    c = redfoot.get_context(cid)
+	    c = redfoot.get_context(cid, creator=__uri__)
 	    c.add((username, RDF.type, SESSION.User))
 	    c.remove((username, SESSION.hexdigest, None))
 	    for hexdigest in g.objects(username, SESSION.hexdigest):
@@ -70,7 +70,7 @@ def authenticate(request, username=None, password=None):
             match = False
     if password and match:
         if session_id:
-	    c = redfoot.get_context(redfoot.context_id(session_id))
+	    c = redfoot.get_context(redfoot.context_id(session_id), creator=__uri__)
 	    redfoot.remove((session_id, SESSION.authenticated, None))
 	    c.add((session_id, SESSION.authenticated, Literal("True")))
 	    redfoot.remove((session_id, SESSION.uid, None))
@@ -79,7 +79,7 @@ def authenticate(request, username=None, password=None):
         return username
     else:
         if session_id:
-	    c = redfoot.get_context(redfoot.context_id(session_id))
+	    c = redfoot.get_context(redfoot.context_id(session_id), creator=__uri__)
 	    redfoot.remove((session_id, SESSION.authenticated, None))
 	    redfoot.remove((session_id, SESSION.uid, None))
 	    c.add((session_id, SESSION.authenticated, Literal("False")))
