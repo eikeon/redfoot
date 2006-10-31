@@ -118,9 +118,9 @@ if referer:
     REFERER = Namespace("http://redfoot.net/2005/referer#")
     referer = URIRef(referer)
     c = redfoot.get_context(URIRef("referers", base=request.host), creator=redfoot_current)
-    if not (c, RDFS.label, None) in redfoot:
-        c.add((c, RDFS.label, Literal("Referers")))
-        c.add((c, RDFS.comment, Literal("A context used to keep track of HTTP Referers")))
+    if not (c.identifier, RDFS.label, None) in redfoot:
+        c.add((c.identifier, RDFS.label, Literal("Referers")))
+        c.add((c.identifier, RDFS.comment, Literal("A context used to keep track of HTTP Referers")))
     if not request.uri.startswith(request.host):
         if (request.uri, REFERER.referer, referer) not in redfoot:
             c.add((request.uri, REFERER.referer, referer))
