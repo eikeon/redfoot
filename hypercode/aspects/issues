@@ -61,7 +61,7 @@ if label and comment and uid:
     redfoot.index.add((context.identifier, RDFS.label, label))
     context.add((uri, RDF.type, ISSUE.Issue))
     context.add((uri, DC.creator, uid))
-    context.add((uri, DCTERMS.created, Literal(date_time())))
+    context.add((uri, DCTERMS.created, Literal("%s" % time())))
     context.add((uri, RDFS.label, label))
     context.add((uri, RDFS.comment, comment))
 
@@ -181,6 +181,9 @@ issues.reverse()
 allowed = allow(URIRef("%s/issues/add/" % request.host))
 from urllib import quote
 ?>
+
+  <h3>Add Issue</h3>
+
 
   <div kid:if="allowed" kid:strip="">
     <form action="/issues/add/" method="post">
