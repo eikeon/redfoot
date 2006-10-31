@@ -280,9 +280,7 @@ if not done:
                     print "reloading: %s" % (cid,)
                 else:
                     print "reloading: %s\n    source: %s" % (cid, source)
-                c = redfoot.get_context(cid)
-                c.remove((None, None, None))
-                c.load(source, publicID=publicID)
+                redfoot.load(source, publicID=publicID)
 
 ]]>
       </rdf:value>
