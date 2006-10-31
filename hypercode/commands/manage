@@ -242,7 +242,7 @@ _logger = logging.getLogger(redfoot_current)
 from optparse import OptionParser
 parser = OptionParser("""
 This command is for reloading all redfoot contexts that start with a prefix.""")
-parser.add_option("--ignore-source", action="store_true" dest="ignore_source", help="ignore-source when reloading ")
+parser.add_option("--ignore-source", action="store_true", dest="ignore_source", help="ignore-source when reloading ")
 
 from rdflib import exceptions
 
