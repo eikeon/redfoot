@@ -184,8 +184,8 @@ from urllib import quote
 
   <div kid:if="allowed" kid:strip="">
     <form action="/issues/add/" method="post">
-      <p><input name="name" type="" style="width: 100%"></input></p>
-      <p><textarea name="issue" cols="" rows="10" style="width: 100%"></textarea></p>
+      <p><input name="label" type="" style="width: 100%"></input></p>
+      <p><textarea name="comment" cols="" rows="10" style="width: 100%"></textarea></p>
       <p><input name="submit" type="submit" value="Submit Issue" /></p>
     </form>    
   </div>
