@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<rdf:RDF 
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+    xmlns:template="http://redfoot.net/2005/template#"
+    xmlns:server="http://redfoot.net/2005/server#"
+>
+
+  <redfoot:Namespace rdf:about="#">
+    <rdfs:label>Issue Namespace</rdfs:label>
+    <rdfs:comment>
+     An Issue namespace.
+    </rdfs:comment>
+  </redfoot:Namespace>
+
+  <owl:Ontology rdf:ID="Ontology">
+    <rdfs:label xml:lang="en">An ontology for Issues.</rdfs:label>
+  </owl:Ontology>
+
+  <owl:Class rdf:ID="Issue">
+    <rdfs:label>Issue</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+    <template:content>
+     <server:PagePartHandler rdf:ID="IssueHandler">
+      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+  <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
+<?python
+import time
+
+issue = request.uri.abstract()
+
+ISSUE = redfoot.namespace("http://redfoot.net/2006/issue#")
+DC_created = URIRef("http://purl.org/dc/terms/created")
+DC_creator = URIRef("http://purl.org/dc/elements/1.1/creator")
+
+creator = redfoot.value(issue, DC_creator)
+c = redfoot.value(issue, DC_created)
+try:
+    created = time.strftime("%A %d %B, %Y", time.gmtime(float(c)))
+except:
+    created = None
+
+?>
+
+    <p>
+      <span kid:if="created">The issue was created on ${created}.</span>
+      <span kid:if="creator">The issue was added by 
+            <a href="${request.relative(creator.concrete())}">${redfoot.label(creator) or creator}</a>.
+      </span> 
+    </p>
+    <p>${redfoot.comment(issue)}</p>
+
+  </span>
+]]>
+      </rdf:value>
+     </server:PagePartHandler> 
+    </template:content>
+  </owl:Class>
+
+</rdf:RDF>  

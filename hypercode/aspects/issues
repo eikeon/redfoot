@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:rdfe="http://redfoot.net/rdf#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:commands="http://redfoot.net/2005/commands#"
+   xmlns:server="http://redfoot.net/2005/server#"
+   xmlns:session="http://redfoot.net/2005/session#"
+   xmlns:template='http://redfoot.net/2005/template#'
+   xmlns:aspect="http://redfoot.net/hypercode/aspect#"
+>
+
+  <rdfe:RDFXMLDocument rdf:about="">
+  </rdfe:RDFXMLDocument>
+  
+  <aspect:Aspect rdf:ID="aspect">
+    <rdfs:label>Issues</rdfs:label>
+    <aspect:item rdf:resource="#site"/>
+    <aspect:item rdf:resource="#issues_page"/>
+    <aspect:item rdf:resource="#issues_add_page"/>
+  </aspect:Aspect>
+
+  <server:Page rdf:ID="issues_add_page">
+    <aspect:location>/issues/add/</aspect:location>
+    <rdfs:label>Add Issue</rdfs:label>
+    <rdfs:issue></rdfs:issue>
+    <rdfs:member rdf:resource="http://redfoot.net/2005/issue#exclude"/>
+    <server:allow rdf:resource="http://redfoot.net/2005/session#User"/>
+    <template:content>
+     <server:PagePartHandler rdf:ID="issues_add_content">
+      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+  <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
+<?python
+from rdflib.util import date_time
+from time import gmtime, time
+from urllib import quote
+
+SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+ISSUE = redfoot.namespace("http://redfoot.net/2006/issue#")
+DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
+DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
+SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+
+label = Literal(request.parameters.get("label"))
+comment = Literal(request.parameters.get("comment"))
+
+sid = request.session_id
+if sid:
+    uid = redfoot.value(sid, SESSION.uid)    
+else:
+    uid = None
+
+if label and comment and uid:
+    year, month, date, h, m, s, _, _, _ = gmtime()
+    path = quote(label.lower().replace(" ", "_"))
+    uri = URIRef("issues/%04d/%02d/%02d/%s" % (year, month, date, path) + "#issue", base=request.host)
+    context = redfoot.get_context(uri, creator=redfoot_current)
+    # check if context already in use?
+    redfoot.index.add((context.identifier, RDFS.label, label))
+    context.add((uri, RDF.type, ISSUE.Issue))
+    context.add((uri, DC.creator, uid))
+    context.add((uri, DCTERMS.created, Literal(date_time())))
+    context.add((uri, RDFS.label, label))
+    context.add((uri, RDFS.comment, comment))
+
+
+    redfoot.remove((uri, SERVER.last_modified, None))
+    context.add((uri, SERVER.last_modified, Literal("%s" % time())))
+?>
+
+<div kid:if="not label">
+  <h2>Error: No label submitted</h2>
+</div>
+
+<div kid:if="not comment">
+  <h2>Error: No comment submitted</h2>
+</div>
+
+<div kid:if="not uid">
+  <h2>Error: Must be logged in</h2>
+</div>
+
+<div kid:if="label and comment and uid">
+
+<h2>Thank you for your issue</h2>
+
+<h3>${label}</h3>
+<pre>${comment}</pre>
+
+<p>Return to <a href="/issues/}">Issues</a></p>
+
+</div>
+
+  </span>
+
+]]>
+      </rdf:value>
+     </server:PagePartHandler> 
+    </template:content>
+  </server:Page>
+
+  <server:PagePartHandler rdf:ID="issues_add">
+    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+<div xmlns:kid="http://purl.org/kid/ns#" 
+     class="issues_add">
+
+<?python 
+allowed = allow(URIRef("%s/issues/add/" % request.host))
+from urllib import quote
+?>
+
+  <div kid:if="allowed" kid:strip="">
+    <form action="/issues/add/" method="post">
+      <input type="hidden" name="uri" value="${request.uri}"/>
+      <p><textarea name="issue" cols="" rows="10" style="width: 100%"></textarea></p>
+      <p><input name="submit" type="submit" value="Submit Issue" /></p>
+    </form>    
+  </div>
+
+  <div kid:if="not allowed" kid:strip="">
+    <p kid:if="allow(URIRef('%s/login/'% request.host))">
+      <a href="/login/?return_uri=${quote(request.uri)}">Login</a> to submit a issue.
+    </p>
+  </div>
+</div>
+]]>    
+    </rdf:value>      
+  </server:PagePartHandler>
+
+  <template:Section rdf:ID="issues_page">
+    <aspect:location>/issues/</aspect:location>
+    <rdfs:label>Issues</rdfs:label>
+    <rdfs:issue></rdfs:issue>
+    <template:default_section_rank>20.0</template:default_section_rank>
+    <template:content>
+      <server:PagePartHandler rdf:ID="all_issues">
+        <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+  <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
+<?python 
+import time
+
+ISSUE = redfoot.namespace("http://redfoot.net/2006/issue#")
+SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+DC_creator = URIRef("http://purl.org/dc/elements/1.1/creator")
+DC_created = URIRef("http://purl.org/dc/terms/created")
+
+issues = set()
+for issue in redfoot.subjects(RDF.type, ISSUE.Issue): 
+    label = redfoot.label(issue) or issue
+    comment = redfoot.comment(issue)
+    c = redfoot.value(issue, DC_created)
+    try:
+        created = time.strftime("%A %d %B, %Y", time.gmtime(float(c)))
+    except:
+        redfoot.log.warning("Couldn't format timestamp: %s" % e)
+        created = None
+    issues.add((c, created, issue, label, comment))
+issues = list(issues)
+issues.sort()
+issues.reverse()
+
+?>
+    <ul class="issues">
+      <li kid:for="c, created, issue, label, comment in issues">
+        <h3><a href="${issue.concrete()}">${label}</a></h3>
+        <div class="meta">
+          <a href="${issue.concrete()}">issue</a> 
+          <span kid:if="created">created on ${created}</span>.
+        </div>
+        <p>${comment}</p>
+      </li>
+    </ul>
+  </span>
+]]>    
+        </rdf:value>      
+      </server:PagePartHandler>
+    </template:content>  
+    
+    <rdfs:member rdf:resource="http://redfoot.net/2005/issue#exclude"/>    
+  </template:Section>
+
+</rdf:RDF>  
