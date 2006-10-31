@@ -104,6 +104,7 @@ redfoot.base = URIRef(args[0])
     <rdfs:label>load</rdfs:label>
     <redfoot:code>
      <redfoot:Python rdf:ID="load_code">
+      <rdfs:label>load command</rdfs:label>
       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
