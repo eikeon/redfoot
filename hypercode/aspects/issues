@@ -56,7 +56,7 @@ if label and comment and uid:
     year, month, date, h, m, s, _, _, _ = gmtime()
     path = quote(label.lower().replace(" ", "_"))
     uri = URIRef("issues/%04d/%02d/%02d/%s" % (year, month, date, path) + "#issue", base=request.host)
-    context = redfoot.get_context(uri, creator=redfoot_current)
+    context = redfoot.get_context(redfoot.context_id(uri, "context"), creator=redfoot_current)
     # check if context already in use?
     redfoot.index.add((context.identifier, RDFS.label, label))
     context.add((uri, RDF.type, ISSUE.Issue))
@@ -89,7 +89,7 @@ if label and comment and uid:
 <h3>${label}</h3>
 <pre>${comment}</pre>
 
-<p>Return to <a href="/issues/}">Issues</a></p>
+<p>Return to <a href="/issues/">Issues</a></p>
 
 </div>
 
