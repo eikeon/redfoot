@@ -272,6 +272,7 @@ class CacheableURLInputSource(InputSource, object):
 ################################################################################
 
 from rdflib.Namespace import Namespace
+from rdflib.Variable import Variable
 
 try:
     from pychinko import terms
