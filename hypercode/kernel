@@ -345,6 +345,7 @@ class Redfoot(ConjunctiveGraph):
         self.__xmpp_password = None
         self.__xmpp_host = None
         self.__xmpp_port = None 
+        self.__interp = None
         
     def absolutize(self, uri, defrag=1):
         base = self.base
