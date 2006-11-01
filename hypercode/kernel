@@ -880,8 +880,6 @@ class PychinkoInc(object):
     def __init__(self, store,):
         dispatcher = store.dispatcher
         dispatcher.subscribe(TripleAddedEvent, self.add)
-        self._dumps = store.node_pickler.dumps
-        self._write = stream.write
 
     def add(self, event):
         s, p, o = event.triple
