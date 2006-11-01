@@ -890,9 +890,9 @@ class PychinkoInc(object):
             redfoot.interp.addFacts(set(fact))
         except Exception, e:
             _logger.exception(e)
-        _logger.info("# inferred: %s" % len(interp.inferredFacts))
+        _logger.info("# inferred: %s" % len(redfoot.interp.inferredFacts))
         redfoot.interp.run()
-        _logger.info("# inferred: %s" % len(interp.inferredFacts))
+        _logger.info("# inferred: %s" % len(redfoot.interp.inferredFacts))
 
 
 pyinc = PychinkoInc(redfoot.store)
