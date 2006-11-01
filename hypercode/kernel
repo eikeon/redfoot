@@ -871,6 +871,8 @@ redfoot._bootstrap()
 redfoot.load(redfoot_loader.program)
 redfoot_loader.redfoot = redfoot 
 
+from rdflib.store import TripleAddedEvent, TripleRemovedEvent, StoreCreatedEvent
+
 class PychinkoInc(object):
     """
     """
