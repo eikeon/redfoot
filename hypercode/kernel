@@ -840,7 +840,7 @@ class Redfoot(ConjunctiveGraph):
             self.__interp = Interpreter(rules)
             facts = get_facts(redfoot)
             _logger.debug("Facts: %s" % facts)
-            self.__interp.addRules(facts)
+            self.__interp.addFacts(facts)
         return self.__interp
     interp = property(_get_interp)
 
