@@ -52,7 +52,7 @@ except:
             <a href="${request.relative(creator.concrete())}">${redfoot.label(creator) or creator}</a>.
       </span> 
     </p>
-    <p>${redfoot.comment(issue)}</p>
+    <pre>${redfoot.comment(issue)}</pre>
 
   </span>
 ]]>
