@@ -887,7 +887,7 @@ class PychinkoInc(object):
         s, p, o = event.triple
         fact = terms.Fact(_convert(s), _convert(p), _convert(o))
         try:
-            redfoot.interp.addFacts(set(fact))
+            redfoot.interp.addFacts(set(fact), initialSet=True)
         except Exception, e:
             _logger.exception(e)
         _logger.info("# inferred: %s" % len(redfoot.interp.inferredFacts))
