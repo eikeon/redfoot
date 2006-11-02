@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:rdfe="http://redfoot.net/rdf#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:server="http://redfoot.net/2005/server#"
+   xmlns:commands="http://redfoot.net/2005/commands#"
+>
+
+  <rdfe:RDFXMLDocument rdf:about="">
+  </rdfe:RDFXMLDocument>
+  
+  <redfoot:Module rdf:about="#module">
+    <rdfs:label>Rules Module</rdfs:label>      
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+from rdflib.Namespace import Namespace
+from rdflib.Variable import Variable
+
+try:
+    from pychinko import terms
+    from pychinko.interpreter import Interpreter
+except Exception, e:
+    _logger.exception(e)
+
+LOG = Namespace("http://www.w3.org/2000/10/swap/log#")
+
+def _convert(node):
+    if isinstance(node, Variable):
+        return terms.Variable(node)
+        #return node
+    elif isinstance(node, BNode):
+        return terms.Exivar(node)
+    elif isinstance(node, URIRef):
+        #return terms.URI(node)
+        return node
+    elif isinstance(node, Literal):
+        return node
+    else:
+        raise Exception("Unexpected Type: %s" % type(node))
+
+def _convert_from(node):
+    if isinstance(node, terms.Variable):
+        return URIRef(node)
+    if isinstance(node, terms.Exivar):
+        return BNode(node)
+    else:
+        return node
+
+from rdflib.Graph import Graph
+
+def get_patterns(g):
+    for s, p, o in g:
+        yield terms.Pattern(_convert(s), _convert(p), _convert(o))
+
+
+def get_facts(g):
+    for s, p, o in g:
+        if p!=LOG.implies and not isinstance(s, BNode) and not isinstance(o, BNode):
+            if isinstance(s, Graph) or isinstance(o, Graph):
+                continue
+            if s is not None and p is not None and o is not None: # To work around None's in Graph bug
+                yield terms.Fact(_convert(s), _convert(p), _convert(o))
+
+def get_rules(g):
+    rules = []
+    for s, p, o in g.triples((None, LOG.implies, None)):
+        lhs = list(get_patterns(s))
+        rhs = list(get_patterns(o))
+        rules.append(terms.Rule(lhs, rhs, (s, p, o)))
+    return rules
+
+from rdflib.store import TripleAddedEvent, TripleRemovedEvent, StoreCreatedEvent
+
+class RuleEngine(object)
+    def __init__(self):
+        rules = get_rules(redfoot)
+        _logger.info("Rules: %s" % len(rules))
+        self.__interp = Interpreter(rules)
+        facts = set(get_facts(redfoot))
+        _logger.info("Facts: %s" % len(facts))
+        self.__interp.addFacts(facts, initialSet=True)
+
+
+class PychinkoInc(object):
+    """
+    """
+
+    def __init__(self, store,):
+        dispatcher = store.dispatcher
+        dispatcher.subscribe(TripleAddedEvent, self.add)
+
+    def add(self, event):
+        s, p, o = event.triple
+        fact = terms.Fact(_convert(s), _convert(p), _convert(o))
+        facts = set()
+        facts.add(fact)
+        try:
+            redfoot.interp.addFacts(facts)
+        except Exception, e:
+            _logger.exception(e)
+        _logger.info("# inferred: %s" % len(redfoot.interp.inferredFacts))
+        redfoot.interp.run()
+        _logger.info("# inferred: %s" % len(redfoot.interp.inferredFacts))
+
+]]>
+    </rdf:value>
+  </redfoot:Module>
+
+</rdf:RDF>  

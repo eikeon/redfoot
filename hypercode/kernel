@@ -27,10 +27,6 @@ For help on Redfoot see:
 
 """
 
-################################################################################
-
-
-
 import sys, getopt
 import traceback
 import warnings
@@ -269,68 +265,6 @@ class CacheableURLInputSource(InputSource, object):
         return self.url
 
 
-################################################################################
-
-from rdflib.Namespace import Namespace
-from rdflib.Variable import Variable
-
-try:
-    from pychinko import terms
-    from pychinko.interpreter import Interpreter
-except Exception, e:
-    _logger.exception(e)
-
-LOG = Namespace("http://www.w3.org/2000/10/swap/log#")
-
-def _convert(node):
-    if isinstance(node, Variable):
-        return terms.Variable(node)
-        #return node
-    elif isinstance(node, BNode):
-        return terms.Exivar(node)
-    elif isinstance(node, URIRef):
-        #return terms.URI(node)
-        return node
-    elif isinstance(node, Literal):
-        return node
-    else:
-        raise Exception("Unexpected Type: %s" % type(node))
-
-def _convert_from(node):
-    if isinstance(node, terms.Variable):
-        return URIRef(node)
-    if isinstance(node, terms.Exivar):
-        return BNode(node)
-    else:
-        return node
-
-from rdflib.Graph import Graph
-
-def get_patterns(g):
-    for s, p, o in g:
-        yield terms.Pattern(_convert(s), _convert(p), _convert(o))
-
-
-def get_facts(g):
-    for s, p, o in g:
-        if p!=LOG.implies and not isinstance(s, BNode) and not isinstance(o, BNode):
-            if isinstance(s, Graph) or isinstance(o, Graph):
-                continue
-            if s is not None and p is not None and o is not None: # To work around None's in Graph bug
-                yield terms.Fact(_convert(s), _convert(p), _convert(o))
-
-def get_rules(g):
-    rules = []
-    for s, p, o in g.triples((None, LOG.implies, None)):
-        lhs = list(get_patterns(s))
-        rhs = list(get_patterns(o))
-        rules.append(terms.Rule(lhs, rhs, (s, p, o)))
-    return rules
-
-
-################################################################################
-
-
 class Redfoot(ConjunctiveGraph):
 
     def __init__(self, store):
@@ -345,7 +279,7 @@ class Redfoot(ConjunctiveGraph):
         self.__xmpp_password = None
         self.__xmpp_host = None
         self.__xmpp_port = None 
-        self.__interp = None
+        self.__rule_engine = None
         
     def absolutize(self, uri, defrag=1):
         base = self.base
@@ -833,16 +767,14 @@ class Redfoot(ConjunctiveGraph):
         return self.__xmpp
     xmpp = property(_get_xmpp)
 
-    def _get_interp(self):
-        if self.__interp is None:
+    def _get_rule_engine(self):
+        if self.__rule_engine is None:
+            rules_uri = URIRef("modules/rules", base=redfoot_program)
+            rule_module = self.module(URIRef("#module", base=rules_uri))            
             rules = set(get_rules(redfoot))
-            _logger.info("Rules: %s" % len(rules))
-            self.__interp = Interpreter(rules)
-            facts = set(get_facts(redfoot))
-            _logger.info("Facts: %s" % len(facts))
-            self.__interp.addFacts(facts, initialSet=True)
-        return self.__interp
-    interp = property(_get_interp)
+            self.__rule_engine = rule_module.RuleEngine(redfoot)
+        return self.__rule_engine
+    rule_engine = property(_get_rule_engine)
 
 
 from optparse import OptionParser
@@ -873,31 +805,7 @@ redfoot._bootstrap()
 redfoot.load(redfoot_loader.program)
 redfoot_loader.redfoot = redfoot 
 
-from rdflib.store import TripleAddedEvent, TripleRemovedEvent, StoreCreatedEvent
-
-class PychinkoInc(object):
-    """
-    """
-
-    def __init__(self, store,):
-        dispatcher = store.dispatcher
-        dispatcher.subscribe(TripleAddedEvent, self.add)
-
-    def add(self, event):
-        s, p, o = event.triple
-        fact = terms.Fact(_convert(s), _convert(p), _convert(o))
-        facts = set()
-        facts.add(fact)
-        try:
-            redfoot.interp.addFacts(facts)
-        except Exception, e:
-            _logger.exception(e)
-        _logger.info("# inferred: %s" % len(redfoot.interp.inferredFacts))
-        redfoot.interp.run()
-        _logger.info("# inferred: %s" % len(redfoot.interp.inferredFacts))
-
-
-pyinc = PychinkoInc(redfoot.store)
+#pyinc = PychinkoInc(redfoot.store)
 
 
 
