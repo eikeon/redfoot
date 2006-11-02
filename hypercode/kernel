@@ -889,7 +889,7 @@ class PychinkoInc(object):
         facts = set()
         facts.add(fact)
         try:
-            redfoot.interp.addFacts(factss, initialSet=True)
+            redfoot.interp.addFacts(facts, initialSet=True)
         except Exception, e:
             _logger.exception(e)
         _logger.info("# inferred: %s" % len(redfoot.interp.inferredFacts))
