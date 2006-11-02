@@ -101,6 +101,13 @@ class Request(object):
 
     parameters = property(_getParameters)
 
+    def getParameterValues(self, name):
+        """ Returns all the values """
+        if name in self.__request.args:
+            return self.__request.args[name]
+        else:
+            return None
+
     def __getUser(self):
         return self.__request.getUser()
     user = property(__getUser)
