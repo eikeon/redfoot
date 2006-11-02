@@ -836,10 +836,10 @@ class Redfoot(ConjunctiveGraph):
     def _get_interp(self):
         if self.__interp is None:
             rules = set(get_rules(redfoot))
-            _logger.info("Rules: %s" % rules)
+            _logger.info("Rules: %s" % len(rules))
             self.__interp = Interpreter(rules)
             facts = set(get_facts(redfoot))
-            _logger.info("Facts: %s" % facts)
+            _logger.info("Facts: %s" % len(facts))
             self.__interp.addFacts(facts, initialSet=True)
         return self.__interp
     interp = property(_get_interp)
