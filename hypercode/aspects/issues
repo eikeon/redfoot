@@ -70,7 +70,7 @@ if label and comment and uid:
     context.add((uri, SERVER.last_modified, Literal("%s" % time())))
 
     try:
-        redfoot.xmpp.send(REDFOOT.Admin, "%s just added a new issue: '%s'. See: %s" % (redfoot.label(uid) or uid, redfoot.label(uri), uri))
+        redfoot.xmpp.send(REDFOOT.Admin, "%s just added a new issue: '%s'. See: %s" % (redfoot.label(uid) or uid, redfoot.label(uri), uri.concrete()))
     except Exception, e:
         _logger.exception(e)
 
