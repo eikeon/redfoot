@@ -40,17 +40,14 @@
 <?python
 contexts = []
 for context in redfoot.contexts():
-    if isinstance(context, URIRef):
-        label = redfoot.label(context) or context
-        #if not label:
-        #    abstract = URIRef("%s#" % redfoot.context_id(context, context_id=""))
-        #    label = redfoot.label(abstract) or context
-        contexts.append((label, context))
+    if isinstance(context.identifier, URIRef):
+        label = redfoot.label(context.identifier) or context.identifier
+        contexts.append((label, context.identifier))
 contexts.sort()
 ?>
   <ul>
-    <li kid:for="label, context in contexts">
-      <a href="${request.relative(context.concrete())}">
+    <li kid:for="label, context_id in contexts">
+      <a href="${request.relative(context_id.concrete())}">
         ${label}
       </a>
     </li>
