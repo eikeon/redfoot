@@ -35,11 +35,13 @@ if action=="reload":
 if action=="delete":
     print "Deleting:", cid
     redfoot.remove_context(cid)   
+
+from urllib import quote
 ?>
   <p>Creator: ${redfoot.value(cid, DC.creator, any=True)}</p>
   <p>Length: ${len(context)}</p>
   <p>Source: ${",".join(redfoot.objects(cid, REDFOOT.source))}</p>
-  <p>View: <a href="${request.relative('%s?content-type=application/rdf+xml' % cid.defrag())}">RDF/XML</a></p>
+  <p>View: <a href="${request.relative('%s?content-type=%s' % (cid.defrag(), quote('application/rdf+xml')))}">RDF/XML</a></p>
 
 <p>
 <form method="POST" action="">
