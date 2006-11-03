@@ -23,11 +23,6 @@ in which case "" should be a server:Site
       -->
   </rdf:Description>
 
-  <rdfs:Class rdf:ID="Admin">
-    <rdfs:label>Admin</rdfs:label>
-    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/session#User"/>
-  </rdfs:Class>
-
   <rdfs:Class rdf:ID="User">
     <rdfs:label>User</rdfs:label>
     <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/session#User"/>

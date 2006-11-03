@@ -20,11 +20,6 @@
     <aspect:item rdf:resource="#logout_page"/>
   </aspect:Aspect>
 
-  <rdfs:Class rdf:ID="Admin">
-    <rdfs:label>Admin</rdfs:label>
-    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/session#User"/>
-  </rdfs:Class>
-
   <server:Page rdf:ID="login_page">
     <aspect:location>/login/</aspect:location>
     <rdfs:label>Login</rdfs:label>
