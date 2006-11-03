@@ -759,7 +759,7 @@ class Redfoot(ConjunctiveGraph):
         if self.__xmpp is None:
             xmpp_uri = URIRef("modules/xmpp", base=redfoot_program)
             redfoot.check(xmpp_uri) # to pull in xmpp_info command
-            if self.xmpp_id and self.xmpp_password and self.xmpp_host and self.xmpp_port:
+            if self.xmpp_id and self.xmpp_password:
                 xmpp = self.module(URIRef("#client", base=xmpp_uri))
                 self.__xmpp = xmpp.Client(self.xmpp_id, self.xmpp_password, self.xmpp_host, int(self.xmpp_port))
             else:
