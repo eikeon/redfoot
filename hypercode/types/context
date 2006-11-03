@@ -39,7 +39,7 @@ if action=="delete":
   <p>Creator: ${redfoot.value(cid, DC.creator, any=True)}</p>
   <p>Length: ${len(context)}</p>
   <p>Source: ${",".join(redfoot.objects(cid, REDFOOT.source))}</p>
-  <p>View: <a href="${request.relative(cid)}">RDF/XML</a></p>
+  <p>View: <a href="${request.relative('%s?content-type=application/rdf+xml' % cid.defrag())}">RDF/XML</a></p>
 
 <p>
 <form method="POST" action="">
