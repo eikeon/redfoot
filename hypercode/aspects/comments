@@ -39,6 +39,10 @@
 <![CDATA[
   <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
 <?python
+import logging
+
+_logger = logging.getLogger(redfoot_current)
+
 from rdflib.util import date_time
 from urlparse import urljoin
 from time import gmtime, time
@@ -73,6 +77,11 @@ if uri is not None and comment:
 
     redfoot.remove((uri, SERVER.last_modified, None))
     context.add((uri, SERVER.last_modified, Literal("%s" % time())))
+
+    try:
+        redfoot.xmpp.send(REDFOOT.Admin, "Comment by %s regarding %s. See %s" % (redfoot.label(uid) or uid, redfoot.label(uri) or uri, c_uri.concrete()))
+    except Exception, e:
+        _logger.exception(e)
 ?>
 
 <div kid:if="uri is None">
