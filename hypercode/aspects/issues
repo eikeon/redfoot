@@ -68,6 +68,12 @@ if label and comment and uid:
 
     redfoot.remove((uri, SERVER.last_modified, None))
     context.add((uri, SERVER.last_modified, Literal("%s" % time())))
+
+    try:
+        redfoot.xmpp.send(REDFOOT.Admin, "%s just added a new issue. See: %s" % (redfoot.label(uid) or uid, redfoot.label(uri) or uri))
+    except Exception, e:
+        _logger.exception(e)
+
 ?>
 
 <div kid:if="not label">

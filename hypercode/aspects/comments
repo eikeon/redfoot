@@ -79,7 +79,7 @@ if uri is not None and comment:
     context.add((uri, SERVER.last_modified, Literal("%s" % time())))
 
     try:
-        redfoot.xmpp.send(REDFOOT.Admin, "Comment by %s regarding %s. See %s" % (redfoot.label(uid) or uid, redfoot.label(uri) or uri, c_uri.concrete()))
+        redfoot.xmpp.send(REDFOOT.Admin, "%s just added a comment regarding %s. See: %s" % (redfoot.label(uid) or uid, redfoot.label(uri) or uri, c_uri.concrete()))
     except Exception, e:
         _logger.exception(e)
 ?>
