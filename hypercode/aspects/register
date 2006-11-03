@@ -124,6 +124,12 @@ if request.method=='POST':
                 context.remove((sid, SESSION.message, None))        
                 response.setStatus(302, 'found')
                 response.setHeader('Location', return_uri)
+
+                try:
+                    redfoot.xmpp.send(REDFOOT.Admin, "Registered new user: %s ( %s )" % (redfoot.label(uid), uid))
+                except Exception, e:
+                    _logger.exception(e)
+
             else:
                 message = "User already exists"
                 context.remove((sid, SESSION.message, None))
