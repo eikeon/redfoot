@@ -131,6 +131,8 @@ if referer:
 page_handler = None
 
 content_type = request.parameters.get("content-type") 
+_logger.debug("content_type: '%s'" % content_type)
+
 if not content_type:
      # TODO: is this how we want to determine supported content types?
     supported_content_types = lookup(SERVER.supported_content_types)
