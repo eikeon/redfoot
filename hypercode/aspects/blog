@@ -242,7 +242,7 @@ from urllib import quote
     <aspect:location>/blog/atom/</aspect:location>
     <rdfs:label>Blog Atom Feed</rdfs:label>
     <server:page_handler rdf:resource="#atom_1.0"/>
-    <server:supported_content_types>application/x.atom+xml</server:supported_content_types>
+    <server:supported_content_types>application/atom+xml</server:supported_content_types>
   </server:Page>
 
   <server:PageHandler rdf:ID="atom_1.0">
