@@ -54,7 +54,13 @@ else:
 
 if label and comment and uid:
     year, month, date, h, m, s, _, _, _ = gmtime()
+
+    # TODO: create a method somewhere for turning a label into a path
+    # suitable for use in a URIRef
     path = label.lower().replace(" ", "_")
+    path.replace("#", "_")
+    path.replace("/", "_") 
+
     uri = URIRef("issues/%04d/%02d/%02d/%s" % (year, month, date, path) + "#issue", base=request.host)
     context = redfoot.get_context(redfoot.context_id(uri, "context"), creator=redfoot_current)
     # check if context already in use?
