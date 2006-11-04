@@ -233,8 +233,7 @@ else:
     <aspect:location>/comments/atom/</aspect:location>
     <rdfs:label>Comments Atom Feed</rdfs:label>
     <server:page_handler rdf:resource="#comments_atom_0.3"/>
-    <!-- TODO: infer from page eventually... currently both are needed explicitly. -->
-    <server:content_type>application/x.atom+xml</server:content_type>    
+    <server:supported_content_types>application/x.atom+xml</server:supported_content_types>
   </server:Page>
 
   <server:PageHandler rdf:ID="comments_atom_0.3">
