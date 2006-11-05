@@ -24,7 +24,8 @@ in which case "" should be a server:Site
   </rdf:Description>
 
   <rdfs:Class rdf:ID="User">
-    <rdfs:label>User</rdfs:label>
+    <rdfs:label>Invitor User</rdfs:label>
+    <rdfs:comment>A class of user that can invite other users to become members of the site.</rdfs:comment>
     <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/session#User"/>
   </rdfs:Class>
 
