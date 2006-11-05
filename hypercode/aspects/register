@@ -110,7 +110,7 @@ if request.method=='POST':
         users_context = redfoot.get_context(redfoot.context_id("%s/users" % request.host))
 
         if password==verify:
-            if not (uid, SESSION.hexdigest, None) in redfoot:
+            if not (uid, None, None) in redfoot:
                 hexdigest = Literal(md5.new(password).hexdigest())
                 redfoot.remove((sid, SESSION.authenticated, None))
                 redfoot.remove((sid, SESSION.uid, None))
