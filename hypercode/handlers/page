@@ -114,8 +114,7 @@ def lookup(property, default=None):
 
 referer = request.headers.get("referer")
 if referer:
-    from rdflib.Namespace import Namespace
-    REFERER = Namespace("http://redfoot.net/2005/referer#")
+    REFERER = redfoot.namespace("http://redfoot.net/2005/referer#")
     referer = URIRef(referer)
     c = redfoot.get_context(URIRef("referers", base=request.host), creator=redfoot_current)
     if not (c.identifier, RDFS.label, None) in redfoot:
