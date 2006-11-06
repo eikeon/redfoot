@@ -338,7 +338,7 @@ _logger.info("xmpp_auth %s" % sys.stdin)
 SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
 
 def authenticate_user(username, hostname, password):
-    _logger.debug("username '%s' hostname '%s'" % (username, hostname))
+    _logger.debug("username '%s' hostname '%s' password '%s'" % (username, hostname, password))
     user_uri = URIRef("mailto:%s@%s" % (username, hostname))
     hexdigest = sha.new(password).hexdigest()
     md5_digest = md5.new(password).hexdigest()
