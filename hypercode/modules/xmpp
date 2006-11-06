@@ -331,16 +331,14 @@ import logging
 
 _logger = logging.getLogger(redfoot_current)
 
-# TODO: usage and error handling
-hostname = args[0] 
-
 import sys, traceback, struct, time, sha, md5
 
 _logger.info("xmpp_auth %s" % sys.stdin)
 
 SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
 
-def authenticate_user(username, password):
+def authenticate_user(username, hostname, password):
+    _logger.debug("username '%s' hostname '%s'" % (username, hostname))
     user_uri = URIRef("mailto:%s@%s" % (username, hostname))
     hexdigest = sha.new(password).hexdigest()
     md5_digest = md5.new(password).hexdigest()
@@ -380,7 +378,7 @@ def main():
                     user, host, password = rest.split(":", 2)
                 except Exception, e:
                     _logger.exception(e)
-                result = authenticate_user(user, password)
+                result = authenticate_user(user, host, password)
                 _logger.info("authenticate_user: %s -> %s\n" % (user, result))
                 if result:
                     sys.stdout.write(struct.pack('>hh', 2, 1))
