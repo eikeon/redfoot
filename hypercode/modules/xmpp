@@ -286,12 +286,14 @@ def install(who):
     <commands:config>
       <redfoot:Configuration rdf:ID="xmpp_config">    
         <commands:command rdf:resource="#xmpp_info"/>                
+        <commands:command rdf:resource="#xmpp_auth"/>                
       </redfoot:Configuration>
     </commands:config>
   </rdf:Description>
 
   <commands:Command rdf:ID="xmpp_info">
     <rdfs:label>xmpp_info</rdfs:label>
+    <rdfs:comment>A command for setting the jabber id and password redfoot will try to connect using.</rdfs:comment>
     <redfoot:code>
      <redfoot:Python rdf:ID="xmpp_logger_code">
       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
@@ -299,7 +301,7 @@ def install(who):
 
 import twisted 
 
-if twisted.__version__.startswith("2.4.0+"):
+if twisted.__version__.startswith("2.5.0"):
     assert len(args)==2, "expecting 2 arguments: xmpp_id, xmpp_password"
     redfoot.xmpp_id = args[0]
     redfoot.xmpp_password = args[1]
@@ -316,5 +318,99 @@ else:
     </redfoot:code>
   </commands:Command>
 
+  <commands:Command rdf:ID="xmpp_auth">
+    <rdfs:label>xmpp_auth</rdfs:label>
+    <rdfs:comment>An ejabberd external authentication script</rdfs:comment>
+    <redfoot:code>
+     <redfoot:Python rdf:ID="xmpp_auth_code">
+        <rdfs:label>Update Symbols</rdfs:label>
+      <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+import logging
+
+_logger = logging.getLogger(redfoot_current)
+
+# TODO: usage and error handling
+hostname = args[0] 
+
+import sys, traceback, struct, time, sha, md5
+
+_logger.info("xmpp_auth %s" % sys.stdin)
+
+SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+
+def authenticate_user(username, password):
+    user_uri = URIRef("mailto:%s@%s" % (username, hostname))
+    hexdigest = sha.new(password).hexdigest()
+    md5_digest = md5.new(password).hexdigest()
+    return (user_uri, SESSION.hexdigest, Literal(hexdigest)) in redfoot or (user_uri, SESSION.hexdigest, Literal(md5_digest)) in redfoot
+
+def is_user(username, host):
+    user_uri = URIRef("mailto:%s@%s" % (username, hostname))
+    return (user_uri, RDF.type, SESSION.User) in redfoot
+
+
+def main():
+    '''
+    The main loop
+    '''
+    while True:
+        time.sleep(2)
+        try:
+            nread = sys.stdin.read(2)
+            now = time.strftime('%d/%m/%Y %H:%M:%S',time.localtime())
+            if len(nread) < 2:
+                _logger.debug('time=%s bytes_read=%d\n' % (now, len(nread)))
+                if len(nread)==0:
+                    break
+                continue
+
+            size = struct.unpack('>h', nread)[0]
+            data = sys.stdin.read(size)
+            try:
+                (operation, rest) = data.split(':', 1)
+            except Exception, e:
+                _logger.debug("data: '%s'" % data)
+                _logger.exception(e)
+                break
+            _logger.info('time=%s operation=%s\n' % (now, operation))
+            if operation == 'auth':
+                try:
+                    user, host, password = rest.split(":", 2)
+                except Exception, e:
+                    _logger.exception(e)
+                result = authenticate_user(user, password)
+                _logger.info("authenticate_user: %s -> %s\n" % (user, result))
+                if result:
+                    sys.stdout.write(struct.pack('>hh', 2, 1))
+                else:
+                    sys.stdout.write(struct.pack('>hh', 2, 0))
+                sys.stdout.flush()
+            elif operation == 'isuser':
+                try:
+                    user, host = rest.split(":", 1)
+                except Exception, e:
+                    _logger.exception(e)
+                result = is_user(user, host)
+                if result:
+                    sys.stdout.write(struct.pack('>hh', 2, 1))
+                else:
+                    sys.stdout.write(struct.pack('>hh', 2, 0))
+                sys.stdout.flush()
+            else:
+                #setpass(usr, oldpwd, newpwd, domain, dc=None, verb=0):
+                sys.stdout.write(struct.pack('>hh', 2, 0))
+                sys.stdout.flush()
+        except Exception, e:
+            _logger.exception(e)	
+            
+
+main()
+]]>
+      </rdf:value>
+     </redfoot:Python>
+    </redfoot:code>
+  </commands:Command>
 
 </rdf:RDF>  
