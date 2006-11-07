@@ -344,7 +344,7 @@ def authenticate_user(username, hostname, password):
     md5_digest = md5.new(password).hexdigest()
     return (user_uri, SESSION.hexdigest, Literal(hexdigest)) in redfoot or (user_uri, SESSION.hexdigest, Literal(md5_digest)) in redfoot
 
-def is_user(username, host):
+def is_user(username, hostname):
     user_uri = URIRef("mailto:%s@%s" % (username, hostname))
     return (user_uri, RDF.type, SESSION.User) in redfoot
 
