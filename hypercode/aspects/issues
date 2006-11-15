@@ -31,7 +31,7 @@
      <server:PagePartHandler rdf:ID="issues_add_content">
       <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
 <![CDATA[
-  <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
+  <div xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
 <?python
 from rdflib.util import date_time
 from time import gmtime, time
@@ -105,7 +105,7 @@ if label and comment and uid:
 
 </div>
 
-  </span>
+  </div>
 
 ]]>
       </rdf:value>
@@ -151,7 +151,7 @@ from urllib import quote
       <server:PagePartHandler rdf:ID="all_issues">
         <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
 <![CDATA[
-  <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
+  <div xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
 <?python 
 import time
 
@@ -176,7 +176,7 @@ issues.sort()
 issues.reverse()
 
 ?>
-    <a href="#add_issue">add issue</a>
+    <p><a href="#add_issue">add issue</a> | <a href="resolved/">Resolved Issues</a></p>
     <ul class="issues">
       <li kid:for="c, created, issue, label, comment in issues">
         <h3><a href="${issue.concrete()}">${label}</a></h3>
@@ -214,7 +214,7 @@ from urllib import quote
   </div>
 </div>
 
-  </span>
+  </div>
 ]]>    
         </rdf:value>      
       </server:PagePartHandler>
@@ -231,7 +231,7 @@ from urllib import quote
       <server:PagePartHandler rdf:ID="resolved_issues">
         <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
 <![CDATA[
-  <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
+  <div xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
 <?python 
 import time
 
@@ -256,6 +256,8 @@ issues.sort()
 issues.reverse()
 
 ?>
+
+    <p><a href="/issues/">Issues</a></p>
     <ul class="issues">
       <li kid:for="c, created, issue, label, comment in issues">
         <h3><a href="${issue.concrete()}">${label}</a></h3>
@@ -267,9 +269,7 @@ issues.reverse()
       </li>
     </ul>
 
-</div>
-
-  </span>
+  </div>
 ]]>    
         </rdf:value>      
       </server:PagePartHandler>
