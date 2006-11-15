@@ -19,6 +19,7 @@
     <aspect:item rdf:resource="#site"/>
     <aspect:item rdf:resource="#issues_page"/>
     <aspect:item rdf:resource="#issues_add_page"/>
+    <aspect:item rdf:resource="#issues_resolved_page"/>
   </aspect:Aspect>
 
   <server:Page rdf:ID="issues_add_page">
