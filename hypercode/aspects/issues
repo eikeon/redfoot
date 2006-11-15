@@ -24,7 +24,6 @@
   <server:Page rdf:ID="issues_add_page">
     <aspect:location>/issues/add/</aspect:location>
     <rdfs:label>Add Issue</rdfs:label>
-    <rdfs:issue></rdfs:issue>
     <rdfs:member rdf:resource="http://redfoot.net/2005/issue#exclude"/>
     <server:allow rdf:resource="http://redfoot.net/2005/session#User"/>
     <template:content>
@@ -145,7 +144,6 @@ from urllib import quote
   <template:Section rdf:ID="issues_page">
     <aspect:location>/issues/</aspect:location>
     <rdfs:label>Issues</rdfs:label>
-    <rdfs:issue></rdfs:issue>
     <template:default_section_rank>23.0</template:default_section_rank>
     <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
     <template:content>
@@ -223,5 +221,60 @@ from urllib import quote
     
     <rdfs:member rdf:resource="http://redfoot.net/2005/issue#exclude"/>    
   </template:Section>
+
+  <server:Page rdf:ID="issues_resolved_page">
+    <aspect:location>/issues/resolved/</aspect:location>
+    <rdfs:label>Resolved Issues</rdfs:label>
+    <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
+    <template:content>
+      <server:PagePartHandler rdf:ID="resolved_issues">
+        <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+  <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
+<?python 
+import time
+
+ISSUE = redfoot.namespace("http://redfoot.net/2006/issue#")
+SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+DC_creator = URIRef("http://purl.org/dc/elements/1.1/creator")
+DC_created = URIRef("http://purl.org/dc/terms/created")
+
+issues = set()
+for issue in redfoot.subjects(RDF.type, ISSUE.Resolved): 
+    label = redfoot.label(issue) or issue
+    comment = redfoot.comment(issue)
+    c = redfoot.value(issue, DC_created)
+    try:
+        created = time.strftime("%A %d %B, %Y", time.gmtime(float(c)))
+    except Exception, e:
+        redfoot.log.warning("Couldn't format timestamp: %s" % e)
+        created = None
+    issues.add((c, created, issue, label, comment))
+issues = list(issues)
+issues.sort()
+issues.reverse()
+
+?>
+    <ul class="issues">
+      <li kid:for="c, created, issue, label, comment in issues">
+        <h3><a href="${issue.concrete()}">${label}</a></h3>
+        <div class="meta">
+          <a href="${issue.concrete()}">issue</a> 
+          <span kid:if="created">created on ${created}</span>.
+        </div>
+        <pre>${comment}</pre>
+      </li>
+    </ul>
+
+</div>
+
+  </span>
+]]>    
+        </rdf:value>      
+      </server:PagePartHandler>
+    </template:content>  
+    
+    <rdfs:member rdf:resource="http://redfoot.net/2005/issue#exclude"/>    
+  </server:Page>
 
 </rdf:RDF>  

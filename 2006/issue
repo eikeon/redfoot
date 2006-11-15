@@ -61,4 +61,10 @@ except:
     </template:content>
   </owl:Class>
 
+  <owl:Class rdf:ID="Resolved">
+    <rdfs:label>Resolved Issue</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="#Issue"/>
+  </owl:Class>
+
 </rdf:RDF>  
