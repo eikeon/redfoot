@@ -102,17 +102,22 @@ class Client(xmpp.Client):
             #self.send(from_id, "Thank you for your input. But I'm going to ignore it.")
     
     def presence(self, presence):
+        _logger.debug(presence.toXml().encode('utf-8'))
         if presence.hasAttribute("type") and presence["type"]=="subscribe":
             response = domish.Element(('jabber:client','presence'))
             response["to"] = presence["from"]
             response["from"] = self.client_jid.full()
             response["type"] = "subscribed"
+            _logger.debug("responding to presence with: %s" % response.toXml().encode('utf-8'))
             self.xmlstream.send(response)
 
     def iq(self, iq):
         pass
 
     def debug(self, element):
+        for child in element.children:
+            if child.name=="error":
+                return
         _logger.debug(element.toXml().encode('utf-8'))
             
     def send(self, to, msg, html=None):
