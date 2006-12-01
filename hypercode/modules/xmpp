@@ -429,7 +429,7 @@ main()
 
 jid = args[0]
 
-redfoot.xmpp.send("""<presence to='%s' type='subscribe'/>""" % jid)
+redfoot.xmpp.xmlsteam("""<presence to='%s' type='subscribe'/>""" % jid)
 
 ]]>
       </rdf:value>
