@@ -293,6 +293,7 @@ def install(who):
       <redfoot:Configuration rdf:ID="xmpp_config">    
         <commands:command rdf:resource="#xmpp_info"/>                
         <commands:command rdf:resource="#xmpp_auth"/>                
+        <commands:command rdf:resource="#xmpp_subscribe"/>                
       </redfoot:Configuration>
     </commands:config>
   </rdf:Description>
@@ -411,6 +412,25 @@ def main():
             
 
 main()
+]]>
+      </rdf:value>
+     </redfoot:Python>
+    </redfoot:code>
+  </commands:Command>
+
+  <commands:Command rdf:ID="xmpp_subscribe">
+    <rdfs:label>xmpp_subscribe</rdfs:label>
+    <rdfs:comment>A command to request the presence of another entity</rdfs:comment>
+    <redfoot:code>
+     <redfoot:Python rdf:ID="xmpp_subscribe_code">
+        <rdfs:label>xmpp subscribe code</rdfs:label>
+      <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+jid = args[0]
+
+redfoot.xmpp.send("""<presence to='%s' type='subscribe'/>""" % jid)
+
 ]]>
       </rdf:value>
      </redfoot:Python>
