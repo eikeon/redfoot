@@ -97,7 +97,9 @@ class Client(xmpp.Client):
             else:
                 self.send(from_id, "You need to be an admin to run commands.")
         else:
-            self.send(from_id, "Thank you for your input. But I'm going to ignore it.")
+            pass
+            # TODO: first check that it's not an error bouncing back such that we end up looping.
+            #self.send(from_id, "Thank you for your input. But I'm going to ignore it.")
     
     def presence(self, presence):
         if presence.hasAttribute("type") and presence["type"]=="subscribe":
