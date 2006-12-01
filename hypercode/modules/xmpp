@@ -115,9 +115,8 @@ class Client(xmpp.Client):
         pass
 
     def debug(self, element):
-        for child in element.children:
-            if child.name=="error":
-                return
+        if element.error:
+            return
         _logger.debug(element.toXml().encode('utf-8'))
             
     def send(self, to, msg, html=None):
