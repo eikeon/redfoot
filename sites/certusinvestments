@@ -214,6 +214,7 @@ items.sort()
   <div kid:for="label, uri, symbol in items">
     <h3><a href="${uri.concrete()}">${label}</a></h3>
     <p>
+      <img src="http://bigcharts.marketwatch.com/charts/big.chart?symb=${symbol}&amp;time=10yr&amp;freq=1dy&amp;lf=1&amp;type=256&amp;style=1538&amp;size=3"/>
       <img src="http://bigcharts.marketwatch.com/charts/big.chart?symb=${symbol}&amp;time=1yr&amp;freq=1dy&amp;lf=1&amp;type=256&amp;style=1538&amp;size=3"/>
       <img src="http://bigcharts.marketwatch.com/charts/big.chart?symb=${symbol}&amp;time=10dy&amp;freq=5mi&amp;lf=1&amp;type=256&amp;style=1538&amp;size=3"/>
       <img src="http://bigcharts.marketwatch.com/charts/big.chart?symb=${symbol}&amp;time=1dy&amp;freq=5mi&amp;lf=1&amp;type=256&amp;style=1538&amp;size=3"/>
