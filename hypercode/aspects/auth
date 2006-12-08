@@ -98,7 +98,7 @@ if request.method=='POST':
 
     uid = request.parameters.get("uid", None)
     # TODO: sync all username expansion code between here, register, and modules/auth
-    if "@" in uid:
+    if "@" in uid and not uid.endswith("@%s" % request.host):
         if not uid.startswith("mailto:"):
             uid = URIRef("mailto:%s" % uid)
     elif "." in uid:
