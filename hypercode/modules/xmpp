@@ -344,10 +344,13 @@ import sys, traceback, struct, time, sha, md5
 _logger.info("xmpp_auth %s" % sys.stdin)
 
 SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+FOAF = redfoot.namespace("http://xmlns.com/foaf/0.1/")
 
 def authenticate_user(username, hostname, password):
     _logger.debug("username '%s' hostname '%s' password '%s'" % (username, hostname, password))
-    user_uri = URIRef("mailto:%s@%s" % (username, hostname))
+    mbox = URIRef("mailto:%s@%s" % (username, hostname))
+    user_uri = redfoot.value(predicate=FOAF.mbox, object=mbox) or mbox
+
     hexdigest = sha.new(password).hexdigest()
     md5_digest = md5.new(password).hexdigest()
     return (user_uri, SESSION.hexdigest, Literal(hexdigest)) in redfoot or (user_uri, SESSION.hexdigest, Literal(md5_digest)) in redfoot
