@@ -26,6 +26,7 @@
     <rdfs:comment></rdfs:comment>
     <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
     <template:content rdf:resource="#login"/>
+    <server:allow>True</server:allow>
   </server:Page>
 
   <server:Page rdf:ID="login_process_page">
@@ -34,6 +35,7 @@
     <rdfs:comment></rdfs:comment>
     <server:long_running>true</server:long_running>
     <server:page_handler rdf:resource="#login_process"/>
+    <server:allow>True</server:allow>
   </server:Page>
 
   <server:Page rdf:ID="logout_page">

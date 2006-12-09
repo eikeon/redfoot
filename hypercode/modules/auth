@@ -92,7 +92,9 @@ def authenticate(request, username=None, password=None):
 def allow(request, uri=None):
     if uri is None:
         uri = request.uri
-    if (uri, SERVER.allow, None) in redfoot:
+    if (uri, SERVER.allow, None) in redfoot or (request.host, SERVER.allow, None) in redfoot:
+        if (uri, SERVER.allow, Literal("True")) in redfoot:
+            return True
         session_id = request.session_id
         if session_id:
 	    uid = redfoot.value(session_id, SESSION.uid)
