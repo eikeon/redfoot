@@ -97,7 +97,6 @@ _logger = logging.getLogger(redfoot_current)
 _logger.debug("login_process")
 
 if request.method=='POST':
-    _logger.debug("POST")
     from urllib import quote
     import md5
     uid = request.parameters.get("uid", None)
@@ -105,13 +104,8 @@ if request.method=='POST':
     if "@" in uid:
         if not uid.startswith("mailto:"):
             uid = URIRef("mailto:%s" % uid)
-        _logger.debug("a")
         FOAF = redfoot.namespace("http://xmlns.com/foaf/0.1/")
-        v = redfoot.value(predicate=FOAF.mbox, object=uid)
-        _logger.debug("v: %s" % v)
-        if v:
-            uid = v
-
+        uid = redfoot.value(predicate=FOAF.mbox, object=uid) of uid
     elif "." in uid:
         uid = URIRef(uid)
     else:
@@ -119,27 +113,17 @@ if request.method=='POST':
 
     _logger.debug("uid: %s" % uid)
 
-    _logger.debug("?a")
     password = request.parameters.get("password", None)
-    _logger.debug("?b")
-    try:
-        return_uri = URIRef(request.parameters.get("return_uri", "%s/" % request.hostname))
-    except Exception, e:
-        _logger.debug("???: %s" % e)
-        return_uri = request.uri
-    _logger.debug("?c")
+    return_uri = URIRef(request.parameters.get("return_uri", "%s/" % request.host))
     login_uri = URIRef(request.parameters.get("login_uri"))
 
-    _logger.debug("?d")
     auth = redfoot.module(URIRef("modules/auth#module", base=redfoot_program))    
     if auth.authenticate(request, username=uid, password=password):
-        _logger.debug("1")
 	response.setStatus(302, 'found')
 	if not return_uri.startswith(request.host):
 	    return_uri = URIRef(request.relative(return_uri))
 	response.setHeader('Location', return_uri)
     else:
-        _logger.debug("0")
 	login_uri += "?return_uri=%s" % quote(return_uri)
 	response.setStatus(302, 'found')   
 	response.setHeader('Location', login_uri)
