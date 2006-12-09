@@ -100,8 +100,13 @@ if request.method=='POST':
     if "@" in uid:
         if not uid.startswith("mailto:"):
             uid = URIRef("mailto:%s" % uid)
+        redfoot.log.info("a")
         FOAF = redfoot.namespace("http://xmlns.com/foaf/0.1/")
-        uid = redfoot.value(predicate=FOAF.mbox, object=uid)
+        v = redfoot.value(predicate=FOAF.mbox, object=uid)
+        redfoot.log.info("v: %s" % v)
+        if v:
+            uid = v
+
     elif "." in uid:
         uid = URIRef(uid)
     else:
