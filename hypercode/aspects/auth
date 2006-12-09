@@ -119,11 +119,14 @@ if request.method=='POST':
 
     _logger.debug("uid: %s" % uid)
 
+    _logger.debug("?a")
     password = request.parameters.get("password", None)
+    _logger.debug("?b")
     return_uri = URIRef(request.parameters.get("return_uri", "%s/" % request.hostname))
+    _logger.debug("?c")
     login_uri = URIRef(request.parameters.get("login_uri"))
 
-    _logger.debug("?")
+    _logger.debug("?d")
     auth = redfoot.module(URIRef("modules/auth#module", base=redfoot_program))    
     if auth.authenticate(request, username=uid, password=password):
         _logger.debug("1")
