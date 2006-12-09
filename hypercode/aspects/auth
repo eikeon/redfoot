@@ -125,11 +125,13 @@ if request.method=='POST':
 
     auth = redfoot.module(URIRef("modules/auth#module", base=redfoot_program))    
     if auth.authenticate(request, username=uid, password=password):
+        _logger.debug("1")
 	response.setStatus(302, 'found')
 	if not return_uri.startswith(request.host):
 	    return_uri = URIRef(request.relative(return_uri))
 	response.setHeader('Location', return_uri)
     else:
+        _logger.debug("0")
 	login_uri += "?return_uri=%s" % quote(return_uri)
 	response.setStatus(302, 'found')   
 	response.setHeader('Location', login_uri)
