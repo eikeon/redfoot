@@ -123,6 +123,7 @@ if request.method=='POST':
     return_uri = URIRef(request.parameters.get("return_uri", "%s/" % request.hostname))
     login_uri = URIRef(request.parameters.get("login_uri"))
 
+    _logger.debug("?")
     auth = redfoot.module(URIRef("modules/auth#module", base=redfoot_program))    
     if auth.authenticate(request, username=uid, password=password):
         _logger.debug("1")
