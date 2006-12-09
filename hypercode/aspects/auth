@@ -105,7 +105,7 @@ if request.method=='POST':
         if not uid.startswith("mailto:"):
             uid = URIRef("mailto:%s" % uid)
         FOAF = redfoot.namespace("http://xmlns.com/foaf/0.1/")
-        uid = redfoot.value(predicate=FOAF.mbox, object=uid) of uid
+        uid = redfoot.value(predicate=FOAF.mbox, object=uid) or uid
     elif "." in uid:
         uid = URIRef(uid)
     else:
