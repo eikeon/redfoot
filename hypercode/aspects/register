@@ -83,7 +83,7 @@ else:
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python"><![CDATA[
 
 if request.method=='POST':
-    import md5
+    import sha
 
     SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
 
@@ -111,7 +111,7 @@ if request.method=='POST':
 
         if password==verify:
             if not (uid, None, None) in redfoot:
-                hexdigest = Literal(md5.new(password).hexdigest())
+                hexdigest = Literal(sha.new(password).hexdigest())
                 redfoot.remove((sid, SESSION.authenticated, None))
                 redfoot.remove((sid, SESSION.uid, None))
                 context.add((sid, SESSION.authenticated, Literal("True")))
