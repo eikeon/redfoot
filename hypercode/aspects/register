@@ -50,7 +50,7 @@ else:
   <form action="process/" method="POST">
     <table>
       <tr>
-	<th>Email Address</th>
+	<th>Username</th>
 	<td><input type="text" name="uid" value=""/></td>
       </tr>
       <tr>
