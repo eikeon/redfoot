@@ -138,7 +138,10 @@ class Client(xmpp.Client):
             message["to"] = user
             message["from"] = self.client_jid.full()
             message["id"] = "%s" % __uri__ # uri of this module
-            message["type"] = "chat"
+            if "conference" in user:
+                message["type"] = "groupchat"
+            else:
+                message["type"] = "chat"
             message.addElement("body", "jabber:client", msg)
             if html:
                 e = message.addElement("html", "http://jabber.org/protocol/xhtml-im")
@@ -450,11 +453,11 @@ redfoot.xmpp.xmlsteam("""<presence to='%s' type='subscribe'/>""" % jid)
       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
-room_id = args[0]
+room_id = args[0] # include /nick ex. room@conference.domain.com/nick
 
-redfoot.xmpp.xmlsteam("""<presence to="%s/rdflib" >
+redfoot.xmpp.xmlstream.send("""<presence to="%s" >
 <priority>0</priority>
-</presence>""" % room_id)
+</presence>""" % (room_id)
 
 ]]>
       </rdf:value>
