@@ -30,6 +30,8 @@ except AttributeError, e:
     module_uri = URIRef("#client_2.4.0", base=__uri__)    
 
 XMPP = redfoot.namespace("%s#" % __uri__.defrag())
+FOAF = redfoot.namespace("http://xmlns.com/foaf/0.1/")
+
 xmpp = redfoot.module(module_uri)    
 
 from twisted.words.xish import domish
