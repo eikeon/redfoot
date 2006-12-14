@@ -40,7 +40,7 @@ from twisted.words.protocols.jabber import jid
 def user_uri(xmpp_id):
     uri = redfoot.value(predicate=XMPP.uid, object=xmpp_id)
     if not uri:
-        mbox = xmpp_id.replace("xmpp:", "mailto:")
+        mbox = URIRef(xmpp_id.replace("xmpp:", "mailto:"))
         uri = redfoot.value(predicate=FOAF.mbox, object=mbox) or mbox
     return uri
 
@@ -48,7 +48,7 @@ def xmpp_id(uri):
     xmpp_id = redfoot.value(uri, XMPP.uid)
     if not xmpp_id:
         mbox = redfoot.value(uri, FOAF.mbox, any=True) or uri
-        xmpp_id = mbox.replace("mailto:", "xmpp:")
+        xmpp_id = URIRef(mbox.replace("mailto:", "xmpp:"))
     #if "@" in xmpp_id:
     return xmpp_id
 
