@@ -29,6 +29,7 @@ except AttributeError, e:
     _logger.info("Falling back to 2.4.0 client implementation")
     module_uri = URIRef("#client_2.4.0", base=__uri__)    
 
+XMPP = redfoot.namespace("%s#" % __uri__.defrag())
 xmpp = redfoot.module(module_uri)    
 
 from twisted.words.xish import domish
@@ -126,7 +127,10 @@ class Client(xmpp.Client):
         if isinstance(to, URIRef):
             if (to, RDF.type, RDFS.Class) in redfoot:
                 for user in redfoot.subjects(RDF.type, to):
-                    xmpp_id = user.split("mailto:")[-1]
+                    xmpp_id = redfoot.value(user, XMPP.uid)
+                    if not xmpp_id:
+                        mbox = redfoot.value(user, FOAF.mbox) or user
+                        xmpp_id = mbox.split("mailto:")[-1]
                     if "@" in xmpp_id:
                         users.append(xmpp_id)
             else:
@@ -465,6 +469,11 @@ redfoot.xmpp.xmlstream.send("""<presence to="%s" >
     </redfoot:code>
   </commands:Command>
 
-
+  <rdf:Property rdf:ID="uid"> 
+    <rdfs:label>User ID</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:domain rdf:resource="http://redfoot.net/2005/session#User"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+  </rdf:Property>
 
 </rdf:RDF>  
