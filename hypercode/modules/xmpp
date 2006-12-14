@@ -47,7 +47,7 @@ def user_uri(xmpp_id):
 def xmpp_id(uri):
     xmpp_id = redfoot.value(uri, XMPP.uid)
     if not xmpp_id:
-        mbox = redfoot.value(uri, FOAF.mbox) or uri
+        mbox = redfoot.value(uri, FOAF.mbox, any=True) or uri
         xmpp_id = mbox.replace("mailto:", "xmpp:")
     #if "@" in xmpp_id:
     return xmpp_id
