@@ -29,28 +29,10 @@ except AttributeError, e:
     _logger.info("Falling back to 2.4.0 client implementation")
     module_uri = URIRef("#client_2.4.0", base=__uri__)    
 
-XMPP = redfoot.namespace("%s#" % __uri__.defrag())
-FOAF = redfoot.namespace("http://xmlns.com/foaf/0.1/")
-
 xmpp = redfoot.module(module_uri)    
 
 from twisted.words.xish import domish
 from twisted.words.protocols.jabber import jid
-
-def user_uri(xmpp_id):
-    uri = redfoot.value(predicate=XMPP.uid, object=xmpp_id)
-    if not uri:
-        mbox = URIRef(xmpp_id.replace("xmpp:", "mailto:"))
-        uri = redfoot.value(predicate=FOAF.mbox, object=mbox) or mbox
-    return uri
-
-def xmpp_id(uri):
-    xmpp_id = redfoot.value(uri, XMPP.uid)
-    if not xmpp_id:
-        mbox = redfoot.value(uri, FOAF.mbox, any=True) or uri
-        xmpp_id = URIRef(mbox.replace("mailto:", "xmpp:"))
-    #if "@" in xmpp_id:
-    return xmpp_id
 
 class Client(xmpp.Client):
 ###
@@ -89,9 +71,8 @@ class Client(xmpp.Client):
         if e.name=="body":
             command_line = "%s" % e
 
-        xmpp_id = URIRef("xmpp:%s" % jid.JID(from_id).userhost())
-        uri = user_uri(xmpp_id)
-        is_admin = (uri, RDF.type, REDFOOT.Admin) in redfoot
+        from_uri = URIRef("mailto:%s" % jid.JID(from_id).userhost())
+        is_admin = (from_uri, RDF.type, REDFOOT.Admin) in redfoot
 
         if command_line and command_line.startswith("redfoot"):
             def run_command(command_line, from_id, xmpp):
@@ -145,14 +126,16 @@ class Client(xmpp.Client):
         if isinstance(to, URIRef):
             if (to, RDF.type, RDFS.Class) in redfoot:
                 for user in redfoot.subjects(RDF.type, to):
-                    users.append(xmpp_id(user))
+                    xmpp_id = user.split("mailto:")[-1]
+                    if "@" in xmpp_id:
+                        users.append(xmpp_id)
             else:
                 users.append(to)
         else:
             users.append(to)
         for user in users:
             message = domish.Element(('jabber:client','message'))
-            message["to"] = user.split("xmpp:")[-1]
+            message["to"] = user
             message["from"] = self.client_jid.full()
             message["id"] = "%s" % __uri__ # uri of this module
             if "conference" in user:
@@ -482,11 +465,6 @@ redfoot.xmpp.xmlstream.send("""<presence to="%s" >
     </redfoot:code>
   </commands:Command>
 
-  <rdf:Property rdf:ID="uid"> 
-    <rdfs:label>User ID</rdfs:label>
-    <rdfs:comment></rdfs:comment>
-    <rdfs:domain rdf:resource="http://redfoot.net/2005/session#User"/>
-    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
-  </rdf:Property>
+
 
 </rdf:RDF>  
