@@ -35,6 +35,21 @@ xmpp = redfoot.module(module_uri)
 from twisted.words.xish import domish
 from twisted.words.protocols.jabber import jid
 
+def user_uri(xmpp_id):
+    uri = redfoot.value(predicate=XMPP.uid, object=xmpp_id)
+    if not uri:
+        mbox = xmpp_id.replace("xmpp:", "mailto:")
+        uri = redfoot.value(predicate=FOAF.mbox, object=mbox) or mbox
+    return uri
+
+def xmpp_id(uri):
+    xmpp_id = redfoot.value(uri, XMPP.uid)
+    if not xmpp_id:
+        mbox = redfoot.value(uri, FOAF.mbox) or uri
+        xmpp_id = mbox.replace("mailto:", "xmpp:")
+    #if "@" in xmpp_id:
+    return xmpp_id
+
 class Client(xmpp.Client):
 ###
 
@@ -72,8 +87,9 @@ class Client(xmpp.Client):
         if e.name=="body":
             command_line = "%s" % e
 
-        from_uri = URIRef("mailto:%s" % jid.JID(from_id).userhost())
-        is_admin = (from_uri, RDF.type, REDFOOT.Admin) in redfoot
+        xmpp_id = URIRef("xmpp:%s" % jid.JID(from_id).userhost())
+        uri = user_uri(xmpp_id)
+        is_admin = (uri, RDF.type, REDFOOT.Admin) in redfoot
 
         if command_line and command_line.startswith("redfoot"):
             def run_command(command_line, from_id, xmpp):
@@ -127,19 +143,14 @@ class Client(xmpp.Client):
         if isinstance(to, URIRef):
             if (to, RDF.type, RDFS.Class) in redfoot:
                 for user in redfoot.subjects(RDF.type, to):
-                    xmpp_id = redfoot.value(user, XMPP.uid)
-                    if not xmpp_id:
-                        mbox = redfoot.value(user, FOAF.mbox) or user
-                        xmpp_id = mbox.split("mailto:")[-1]
-                    if "@" in xmpp_id:
-                        users.append(xmpp_id)
+                    users.append(xmpp_id(user))
             else:
                 users.append(to)
         else:
             users.append(to)
         for user in users:
             message = domish.Element(('jabber:client','message'))
-            message["to"] = user
+            message["to"] = user.split("xmpp:")[-1]
             message["from"] = self.client_jid.full()
             message["id"] = "%s" % __uri__ # uri of this module
             if "conference" in user:
