@@ -590,6 +590,8 @@ class Redfoot(ConjunctiveGraph):
         frag = context_id or frag or "context"
         if frag.startswith("#"):
             frag = frag[1:]
+        if uri.endswith("/"):
+            uri = uri[:-1]
         return URIRef("%s#%s" % (uri, frag))
 
     def namespace(self, uri, creator=None, context=None):
@@ -725,7 +727,7 @@ class Redfoot(ConjunctiveGraph):
         return self.__xmpp_id
     def __set_xmpp_id(self, xmpp_id):
 	redfoot_loader.remove((REDFOOT.Globals, REDFOOT.xmpp_id, None))
-	redfoot_loader.add((REDFOOT.Globals, REDFOOT.xmpp_id, xmpp_id))
+	redfoot_loader.add((REDFOOT.Globals, REDFOOT.xmpp_id, Literal(xmpp_id)))
     xmpp_id = property(__get_xmpp_id, __set_xmpp_id)
 
     def __get_xmpp_password(self):
@@ -734,7 +736,7 @@ class Redfoot(ConjunctiveGraph):
         return self.__xmpp_password
     def __set_xmpp_password(self, xmpp_password):
 	redfoot_loader.remove((REDFOOT.Globals, REDFOOT.xmpp_password, None))
-	redfoot_loader.add((REDFOOT.Globals, REDFOOT.xmpp_password, xmpp_password))
+	redfoot_loader.add((REDFOOT.Globals, REDFOOT.xmpp_password, Literal(xmpp_password)))
     xmpp_password = property(__get_xmpp_password, __set_xmpp_password)
 
     def __get_xmpp_host(self):
@@ -743,7 +745,7 @@ class Redfoot(ConjunctiveGraph):
         return self.__xmpp_host
     def __set_xmpp_host(self, xmpp_host):
 	redfoot_loader.remove((REDFOOT.Globals, REDFOOT.xmpp_host, None))
-	redfoot_loader.add((REDFOOT.Globals, REDFOOT.xmpp_host, xmpp_host))
+	redfoot_loader.add((REDFOOT.Globals, REDFOOT.xmpp_host, Literal(xmpp_host)))
     xmpp_host = property(__get_xmpp_host, __set_xmpp_host)
 
     def __get_xmpp_port(self):
@@ -752,7 +754,7 @@ class Redfoot(ConjunctiveGraph):
         return self.__xmpp_port
     def __set_xmpp_port(self, xmpp_port):
 	redfoot_loader.remove((REDFOOT.Globals, REDFOOT.xmpp_port, None))
-	redfoot_loader.add((REDFOOT.Globals, REDFOOT.xmpp_port, xmpp_port))
+	redfoot_loader.add((REDFOOT.Globals, REDFOOT.xmpp_port, Literal(xmpp_port)))
     xmpp_port = property(__get_xmpp_port, __set_xmpp_port)
 
     def _get_xmpp(self):
