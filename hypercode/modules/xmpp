@@ -98,11 +98,13 @@ class Client(xmpp.Client):
                 for line in result.split("\n"):
                     xmpp.send(from_id, line)
             if is_admin:
+                _logger.info("running command")
                 t = Thread(target=run_command, args=(command_line, from_id, self))
                 t.start()
             else:
                 self.send(from_id, "You need to be an admin to run commands.")
         else:
+            _logger.info("ignoring input")
             pass
             # TODO: first check that it's not an error bouncing back such that we end up looping.
             #self.send(from_id, "Thank you for your input. But I'm going to ignore it.")
