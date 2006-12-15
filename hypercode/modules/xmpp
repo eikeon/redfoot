@@ -70,11 +70,12 @@ class Client(xmpp.Client):
         from threading import Thread
         from_id = message["from"]
         command_line = None
-        e = message.firstChildElement()
-        if e.name=="body":
-            command_line = "%s" % e
-        else:
-            _logger.info("TODO... message: %s" % message.toXml().encode('utf-8'))
+        for e in message.elements():
+            if e.name=="body":
+                command_line = "%s" % e
+                break
+        if command_line is None:
+            _logger.warning("Did not find body element in: %s" % message.toXml().encode('utf-8'))
 
         xmpp_id = URIRef("xmpp:%s" % jid.JID(from_id).userhost())
         uri = redfoot.value(predicate=XMPP.uid, object=xmpp_id)
