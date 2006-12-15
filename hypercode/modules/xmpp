@@ -74,7 +74,7 @@ class Client(xmpp.Client):
         if e.name=="body":
             command_line = "%s" % e
         else:
-            _logger.info("TODO... message: %s" % e.toXml().encode('utf-8'))
+            _logger.info("TODO... message: %s" % message.toXml().encode('utf-8'))
 
         xmpp_id = URIRef("xmpp:%s" % jid.JID(from_id).userhost())
         uri = redfoot.value(predicate=XMPP.uid, object=xmpp_id)
