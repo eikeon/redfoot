@@ -69,6 +69,7 @@ class Client(xmpp.Client):
         #import threading
         from threading import Thread
         from_id = message["from"]
+        from_id = jid.JID(from_id).userhost()
         command_line = None
         for e in message.elements():
             if e.name=="body":
