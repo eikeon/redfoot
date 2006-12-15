@@ -29,10 +29,13 @@ except AttributeError, e:
     _logger.info("Falling back to 2.4.0 client implementation")
     module_uri = URIRef("#client_2.4.0", base=__uri__)    
 
+XMPP = redfoot.namespace("%s#" % __uri__.defrag())
+
 xmpp = redfoot.module(module_uri)    
 
 from twisted.words.xish import domish
 from twisted.words.protocols.jabber import jid
+
 
 class Client(xmpp.Client):
 ###
@@ -71,8 +74,9 @@ class Client(xmpp.Client):
         if e.name=="body":
             command_line = "%s" % e
 
-        from_uri = URIRef("mailto:%s" % jid.JID(from_id).userhost())
-        is_admin = (from_uri, RDF.type, REDFOOT.Admin) in redfoot
+        xmpp_id = URIRef("xmpp:%s" % jid.JID(from_id).userhost())
+        uri = redfoot.value(predicate=XMPP.uid, object=xmpp_id)
+        is_admin = uri and (uri, RDF.type, REDFOOT.Admin) in redfoot
 
         if command_line and command_line.startswith("redfoot"):
             def run_command(command_line, from_id, xmpp):
@@ -126,8 +130,8 @@ class Client(xmpp.Client):
         if isinstance(to, URIRef):
             if (to, RDF.type, RDFS.Class) in redfoot:
                 for user in redfoot.subjects(RDF.type, to):
-                    xmpp_id = user.split("mailto:")[-1]
-                    if "@" in xmpp_id:
+                    xmpp_id = redfoot.value(user, XMPP.uid, any=True)
+                    if xmpp_id:
                         users.append(xmpp_id)
             else:
                 users.append(to)
@@ -135,7 +139,7 @@ class Client(xmpp.Client):
             users.append(to)
         for user in users:
             message = domish.Element(('jabber:client','message'))
-            message["to"] = user
+            message["to"] = user.split("xmpp:")[-1]
             message["from"] = self.client_jid.full()
             message["id"] = "%s" % __uri__ # uri of this module
             if "conference" in user:
@@ -465,6 +469,17 @@ redfoot.xmpp.xmlstream.send("""<presence to="%s" >
     </redfoot:code>
   </commands:Command>
 
+  <rdfs:Class rdf:ID="XMPPID">
+    <rdfs:label>XMPP ID</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/redfoot#Resource"/>
+  </rdfs:Class>
 
+  <rdf:Property rdf:ID="uid"> 
+    <rdfs:label>xmpp id</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:domain rdf:resource="http://redfoot.net/2005/session#User"/>
+    <rdfs:range rdf:resource="#XMPPID"/>
+  </rdf:Property>
 
 </rdf:RDF>  
