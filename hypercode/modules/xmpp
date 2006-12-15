@@ -107,6 +107,8 @@ class Client(xmpp.Client):
                 t.start()
             else:
                 self.send(from_id, "You need to be an admin to run commands.")
+        elif command_line and command_line.startswith("ping"):
+            self.send(from_id, "pong")
         else:
             _logger.debug("ignoring input: '%s'" % command_line)
             # TODO: first check that it's not an error bouncing back such that we end up looping.
