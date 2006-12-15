@@ -81,7 +81,7 @@ class Client(xmpp.Client):
         uri = redfoot.value(predicate=XMPP.uid, object=xmpp_id)
         is_admin = uri and (uri, RDF.type, REDFOOT.Admin) in redfoot
 
-        _logger.info("from_id: '%s' is_admin: '%s' xmpp_id: '%s'" % (from_id, is_admin, xmpp_id))
+        _logger.debug("from_id: '%s' is_admin: '%s' xmpp_id: '%s'" % (from_id, is_admin, xmpp_id))
 
         if command_line and command_line.startswith("redfoot"):
             def run_command(command_line, from_id, xmpp):
@@ -101,14 +101,13 @@ class Client(xmpp.Client):
                 for line in result.split("\n"):
                     xmpp.send(from_id, line)
             if is_admin:
-                _logger.info("running command")
+                _logger.debug("running command")
                 t = Thread(target=run_command, args=(command_line, from_id, self))
                 t.start()
             else:
                 self.send(from_id, "You need to be an admin to run commands.")
         else:
-            _logger.info("ignoring input: '%s'" % command_line)
-            pass
+            _logger.debug("ignoring input: '%s'" % command_line)
             # TODO: first check that it's not an error bouncing back such that we end up looping.
             #self.send(from_id, "Thank you for your input. But I'm going to ignore it.")
     
