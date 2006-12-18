@@ -148,7 +148,7 @@ class Client(xmpp.Client):
                         real_id = URIRef("xmpp:%s" % jid.JID(real_id).userhost())
                         room_id = URIRef("xmpp:%s" % jid.JID(room_id).full())
                         c = redfoot.get_context(redfoot.context_id(room_id, "context"), creator=__uri__)
-                        c.set((room_id, XMPP.uid, real_id))
+                        c.set((room_id, XMPP.real_id, real_id))
                         _logger.debug("room_id: %s -> read_id: %s" % (room_id, real_id))
 
     def iq(self, iq):
@@ -515,6 +515,13 @@ redfoot.xmpp.xmlstream.send("""<presence to="%s" >
     <rdfs:label>xmpp id</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:domain rdf:resource="http://redfoot.net/2005/session#User"/>
+    <rdfs:range rdf:resource="#XMPPID"/>
+  </rdf:Property>
+
+  <rdf:Property rdf:ID="real_id"> 
+    <rdfs:label>real xmpp id</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:domain rdf:resource="#XMPPID"/>
     <rdfs:range rdf:resource="#XMPPID"/>
   </rdf:Property>
 
