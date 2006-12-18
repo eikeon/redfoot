@@ -69,13 +69,14 @@ class Client(xmpp.Client):
         #import threading
         from threading import Thread
         from_id = message["from"]
-        from_id = jid.JID(from_id).userhost()
-        command_line = None
+        body = None
+        error = False
         for e in message.elements():
             if e.name=="body":
-                command_line = "%s" % e
-                break
-        if command_line is None:
+                body = "%s" % e
+            elif e.name=="error":
+                error = True
+        if body is None:
             _logger.warning("Did not find body element in: %s" % message.toXml().encode('utf-8'))
 
         xmpp_id = URIRef("xmpp:%s" % jid.JID(from_id).userhost())
@@ -84,7 +85,9 @@ class Client(xmpp.Client):
 
         _logger.debug("from_id: '%s' is_admin: '%s' xmpp_id: '%s'" % (from_id, is_admin, xmpp_id))
 
-        if command_line and command_line.startswith("redfoot"):
+        if error:
+            _logger.debug("error: %s" % message.toXml().encode('utf-8'))
+        elif body and body.startswith("redfoot"):
             def run_command(command_line, from_id, xmpp):
                 sio = StringIO()
                 orig = sys.stdout, sys.stderr
@@ -103,16 +106,16 @@ class Client(xmpp.Client):
                     xmpp.send(from_id, line)
             if is_admin:
                 _logger.debug("running command")
-                t = Thread(target=run_command, args=(command_line, from_id, self))
+                t = Thread(target=run_command, args=(body, from_id, self))
                 t.start()
             else:
                 self.send(from_id, "You need to be an admin to run commands.")
-        elif command_line and command_line.startswith("ping"):
-            self.send(from_id, "pong")
         else:
-            _logger.debug("ignoring input: '%s'" % command_line)
-            # TODO: first check that it's not an error bouncing back such that we end up looping.
-            #self.send(from_id, "Thank you for your input. But I'm going to ignore it.")
+            xmpp_handler = redfoot.value(REDFOOT.Globals, XMPP.handler)
+            if xmpp_handler:
+                redfoot.execute(xmpp_handler, xmpp=self, message=message)
+            else:
+                self.send(from_id, "Thank you for your input. But I'm going to ignore it.")
     
     def presence(self, presence):
         _logger.debug(presence.toXml().encode('utf-8'))
@@ -123,6 +126,30 @@ class Client(xmpp.Client):
             response["type"] = "subscribed"
             _logger.debug("responding to presence with: %s" % response.toXml().encode('utf-8'))
             self.xmlstream.send(response)
+        else:
+            # Example: 
+            # <presence xmlns='jabber:client'
+            # to='test@eikeon.com/26837695781166401341104343'
+            # from='test@conference.example.com/test'><priority>0</priority><x
+            # xmlns='http://jabber.org/protocol/muc#user'><item
+            # affiliation='owner'
+            # jid='test@eikeon.com/26837695781166401341104343'
+            # role='moderator'/></x></presence>
+
+            # TODO: should be keying off of full uri not just the name
+            # part... but no convient interface... so for now.
+            x = presence.x
+            if x:
+                item = x.item
+                if item:
+                    real_id  = item["jid"]
+                    room_id = presence["from"]
+                    if real_id and room_id:
+                        real_id = URIRef("xmpp:%s" % jid.JID(real_id).userhost())
+                        room_id = URIRef("xmpp:%s" % jid.JID(room_id).full())
+                        c = redfoot.get_context(redfoot.context_id(room_id, "context"), creator=__uri__)
+                        c.set((room_id, XMPP.uid, real_id))
+                        _logger.debug("room_id: %s -> read_id: %s" % (room_id, real_id))
 
     def iq(self, iq):
         pass
@@ -489,6 +516,19 @@ redfoot.xmpp.xmlstream.send("""<presence to="%s" >
     <rdfs:comment></rdfs:comment>
     <rdfs:domain rdf:resource="http://redfoot.net/2005/session#User"/>
     <rdfs:range rdf:resource="#XMPPID"/>
+  </rdf:Property>
+
+  <rdfs:Class rdf:ID="Handler">
+    <rdfs:label>XMPP Handler</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/redfoot#Resource"/>
+  </rdfs:Class>
+
+  <rdf:Property rdf:ID="handler"> 
+    <rdfs:label>xmpp handler</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:domain rdf:resource="http://redfoot.net/2005/redfoot#Globals"/>
+    <rdfs:range rdf:resource="#Handler"/>
   </rdf:Property>
 
 </rdf:RDF>  
