@@ -540,13 +540,14 @@ class Redfoot(ConjunctiveGraph):
         self.index.add((context.identifier, RDF.type, REDFOOT.DeletedContext))        
         super(Redfoot, self).remove_context(context)
 
-    def module(self, subject):
+    def module(self, subject, check_cache=True):
         if not isinstance(subject, URIRef):
             subject = URIRef(subject)
         module_name = subject       
-        module = sys.modules.get(module_name, None)
-        if module:
-            return module
+        if check_cache:
+            module = sys.modules.get(module_name, None)
+            if module:
+                return module
         self.check(subject)
         _logger.debug("importing: %s" % subject)
         value = self.value(subject)
