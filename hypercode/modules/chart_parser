@@ -1,0 +1,234 @@
+<?xml version="1.0"?>
+<rdf:RDF 
+        xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+        xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+        xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+>
+
+  <rdf:Description rdf:about="#">
+    <rdfs:label>Chart Parser Schema</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+  </rdf:Description>
+
+<!--
+  <rdfs:Class rdf:ID="Rule">
+    <rdfs:label>Noun</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+  </rdfs:Class>
+
+  <rdfs:Property rdf:ID="lhs">
+    <rdfs:label>Left hand side</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:domain rdf:resource="#Rule"/>
+    <rdfs:range rdf:resource="#Constituent"/>
+  </rdfs:Property>
+
+  <rdfs:Property rdf:ID="rhs">
+    <rdfs:label>right hand side</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:domain rdf:resource="#Rule"/>
+    <rdfs:range rdf:resource="#Constituent"/>
+  </rdfs:Property>
+
+  <rdfs:Class rdf:ID="Constituent">
+    <rdfs:label>Constituent</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+  </rdfs:Class>
+
+  <rdfs:Class rdf:ID="PreTerminal">
+    <rdfs:label>PreTerminal</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+  </rdfs:Class>
+
+  <rdfs:Class rdf:ID="Terminal">
+    <rdfs:label>Terminal</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+  </rdfs:Class>
+-->
+
+  <redfoot:Module rdf:ID="module">
+    <rdfs:label>Chart Parser</rdfs:label>      
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+import logging
+from rdflib.Namespace import Namespace
+
+_logger = logging.getLogger(__uri__)
+
+CHART_PARSER = Namespace("#", base=__uri__) # TODO: convert to redfoot.namespace(...)
+
+# ChartParser.py, version 1.0
+#
+# Released to the public domain 10 August 1999 by Oliver Steele.
+#"""Module ChartParser -- a simple chart parser
+#"""
+#__author__  = 'Oliver Steele', 'steele@cs.brandeis.edu'
+#__version__ = '1.0'
+
+
+class Rule:
+    """A rule represents a phrase-structure production rule of the form:
+            A => B C
+    where A expands to B followed by C (and therefore, B followed by
+    C can be composed into an A).  In this example, the left-hand-side
+    (lhs) is A, and the right-hand-side (rhs) is [B, C]."""
+        
+    def __init__(self, spec, action=None):
+        """spec is of the form [A, B, C], where A is the lhs and the remaining
+        items are the rhs.  In other words, [A, B, C] represents A => B C"""
+        self.lhs = spec[0]
+        self.rhs = spec[1:]
+        assert self.rhs[0], "Must have at least one element on rhs"
+        self.action = action
+
+    def __repr__(self):
+        return '%s => %s' % (self.lhs, self.rhs)    
+
+    def matches(self, category):
+        return self.rhs[0] == category
+
+
+class Constituent:
+    def __init__(self, type, children, left, right, rule=None):
+        self.type = type
+        self.children = children
+        self.left = left
+        self.right = right
+        self.rule = rule
+
+    def __repr__(self):
+        return '%s%s' % (self.type, `self.children`)
+
+    def tokens(self):
+        for c in self.children:
+            for t in c.tokens():
+                yield t
+
+    def terminals(self):
+        for c in self.children:
+            for terminal in c.terminals():
+                yield terminal
+
+    def action(self, *args, **keyword_args):
+        if self.rule:
+            if self.rule.action:
+                return self.rule.action(self.children, *args, **keyword_args) 
+         
+
+class PreTerminal(Constituent):
+    def __init__(self, tag, token, left):
+        Constituent.__init__(self, tag, None, left, left+1)
+        self.token = token
+        
+    def __repr__(self):
+        return '%s(%s)' % (self.type, self.token)
+        
+    def tokens(self):
+        yield self.token
+
+    def terminals(self):
+        yield self
+
+
+class Edge:
+    def __init__(self, rule, left, right=None, index=0, children=None):
+        self.rule = rule
+        self.left = left
+        self.right = right or left
+        self.index = index
+        self.children = children or []
+
+    def __repr__(self):
+        str = []
+        for i in range(len(self.rule.rhs)):
+            if i == self.index:
+                str.append('^')
+            str.append(self.rule.rhs[i] + ' ')
+        return '<%s => %s at %s:%s>' % (self.rule.lhs, "".join(str)[:-1], self.left, self.right)
+
+    def advanceOver(self, chart, constituent):
+        rule = self.rule
+        if self.right == constituent.left and rule.rhs[self.index] == constituent.type:
+            chart.addEdge(Edge(rule, self.left, constituent.right, self.index + 1, self.children + [constituent]))
+
+    def active(self):
+        return self.index < len(self.rule.rhs)
+
+
+class Chart:
+
+    def __init__(self, uri_or_rules=[], check_cache=True):
+        if isinstance(uri_or_rules, URIRef):
+            uri = uri_or_rules
+            rules = []
+            for rule in redfoot.items(redfoot.value(uri, CHART_PARSER.rules)):
+                lhs = redfoot.value(rule, CHART_PARSER.lhs)
+                spec = []
+                spec.append(lhs)
+                for item in redfoot.items(redfoot.value(rule, CHART_PARSER.rhs)):
+                    spec.append(item)
+                action_module = redfoot.value(rule, CHART_PARSER.action)
+                if action_module:
+                    action = redfoot.module(action_module, check_cache=check_cache).action
+                else:
+                    action = None
+                rules.append(Rule(spec, action))
+            _logger.debug("rules: %s" % rules)
+        else:
+            rules = uri_or_rules
+        self._rules = rules
+        self.unknown_tokens = set()
+
+    def tokenize(self, s):
+        for token in s.split(" "):
+            yield token
+
+    def parse(self, string_or_tokens):
+        if isinstance(string_or_tokens, basestring):
+            tokens = list(self.tokenize(string_or_tokens))
+        else:
+            tokens = list(string_or_tokens)
+
+        n = len(tokens)
+        if n>0:
+            self.n = n
+            self.edges = []
+            self.constituents = []
+            for i in range(n):
+                self.edges.append(list())
+                self.constituents.append(list())
+            for i in range(n):
+                token = tokens[i]
+                self.addToken(token, i)
+            for c in self.constituents[0]: 
+                assert c.left==0
+                if c.right==self.n:
+                    yield c
+
+    def addToken(self, token, position):
+        for tag in self.tags(token):
+            self.addConstituent(PreTerminal(tag, token, position))
+
+    def addConstituent(self, constituent):
+        self.constituents[constituent.left].append(constituent)
+        for edge in self.edges[constituent.left]:
+            edge.advanceOver(self, constituent)
+        for rule in self._rules:
+            if rule.matches(constituent.type):
+                Edge(rule, constituent.left).advanceOver(self, constituent)
+
+    def addEdge(self, edge):
+        if edge.active():
+            if edge.right < self.n:
+                self.edges[edge.right].append(edge)
+                for constituent in self.constituents[edge.right]:
+                    edge.advanceOver(self, constituent)
+        else:
+            self.addConstituent(Constituent(edge.rule.lhs, edge.children, edge.left, edge.right, edge.rule))
+
+]]>
+    </rdf:value>
+  </redfoot:Module>
+
+</rdf:RDF>
