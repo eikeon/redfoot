@@ -327,14 +327,18 @@ def display(uri, fragment=True, output=None, **args):
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
-response.setHeader('Content-Type', 'application/rdf+xml')            
-cid = request.uri.abstract()
-if (cid, RDF.type, REDFOOT.Context) in redfoot:
-    base = None
-else:
-    cid = redfoot.context_id(request.uri) # default context
-    #base = redfoot.context_id(cid, context_id="") # TODO: basically defrag... need better way
-    base = request.uri
+#response.setHeader('Content-Type', 'application/rdf+xml')            
+#cid = request.uri.abstract()
+#if (cid, RDF.type, REDFOOT.Context) in redfoot:
+#    base = None
+#else:
+#    cid = redfoot.context_id(request.uri) # default context
+#    #base = redfoot.context_id(cid, context_id="") # TODO: basically defrag... need better way
+#    base = request.uri
+
+cid = redfoot.context_id(request.uri) # default context
+base = request.uri
+
 context = redfoot.get_context(cid)
 context.serialize(destination=response, base=base)
 # NOTE: serialize calls close on response. So we should not call: response.finish() 
