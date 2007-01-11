@@ -321,7 +321,7 @@ def display(uri, fragment=True, output=None, **args):
     </rdf:value>
   </rdf:Description>
 
-  <server:Handler rdf:about="#rdfxml_handler">
+  <server:PageHandler rdf:about="#rdfxml_handler">
     <rdfs:label>Default RDF/XML handler</rdfs:label>      
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
@@ -339,7 +339,7 @@ context.serialize(destination=response, base=base)
 
 ]]>
     </rdf:value>
-  </server:Handler>
+  </server:PageHandler>
 
 
   <server:Handler rdf:about="#put_handler">
