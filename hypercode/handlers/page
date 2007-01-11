@@ -323,6 +323,7 @@ def display(uri, fragment=True, output=None, **args):
 
   <server:PageHandler rdf:about="#rdfxml_handler">
     <rdfs:label>Default RDF/XML handler</rdfs:label>      
+    <server:content_type>application/rdf+xml</server:content_type>
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
