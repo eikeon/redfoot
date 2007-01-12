@@ -23,7 +23,7 @@
     <rdfs:label>Browse</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
-    <template:default_section_rank>12.0</template:default_section_rank>
+    <template:default_section_rank>60.0</template:default_section_rank>
     <template:content rdf:resource="#browse"/>
   </template:Section>
 
