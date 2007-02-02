@@ -237,6 +237,7 @@ class XMPPClientConnector(SRVConnector):
 
 class Client(object):
     def __init__(self, client_id, secret, _host_no_longer_needed, _port_no_longer_needed):
+        _logger.debug("Creating client for '%s'" % client_id)
         self.xmlstream = None
         self.pending = []
         self.client_jid = client_jid = jid.JID(client_id)
