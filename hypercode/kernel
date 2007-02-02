@@ -751,7 +751,7 @@ class Redfoot(ConjunctiveGraph):
 
     def __get_xmpp_port(self):
         if self.__xmpp_port is None:
-            self.__xmpp_port = redfoot_loader.value(REDFOOT.Globals, REDFOOT.xmpp_port)
+            self.__xmpp_port = redfoot_loader.value(REDFOOT.Globals, REDFOOT.xmpp_port) or 5222
         return self.__xmpp_port
     def __set_xmpp_port(self, xmpp_port):
 	redfoot_loader.remove((REDFOOT.Globals, REDFOOT.xmpp_port, None))
