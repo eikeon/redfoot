@@ -398,7 +398,7 @@ import sys, traceback, struct, time, sha, md5
 _logger.info("xmpp_auth %s" % sys.stdin)
 
 SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
-XMPP = redfoot.namespace("%s#" % __uri__.defrag())
+XMPP = redfoot.namespace("http://redfoot.net/hypercode/modules/xmpp#")
 
 def authenticate_user(username, hostname, password):
     _logger.debug("username '%s' hostname '%s' password '%s'" % (username, hostname, password))
