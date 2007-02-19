@@ -398,12 +398,12 @@ import sys, traceback, struct, time, sha, md5
 _logger.info("xmpp_auth %s" % sys.stdin)
 
 SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
-FOAF = redfoot.namespace("http://xmlns.com/foaf/0.1/")
+XMPP = redfoot.namespace("%s#" % __uri__.defrag())
 
 def authenticate_user(username, hostname, password):
     _logger.debug("username '%s' hostname '%s' password '%s'" % (username, hostname, password))
-    mbox = URIRef("mailto:%s@%s" % (username, hostname))
-    user_uri = redfoot.value(predicate=FOAF.mbox, object=mbox) or mbox
+    uid = URIRef("xmpp:%s@%s" % (username, hostname))
+    user_uri = redfoot.value(predicate=XMPP.uid, object=uid) or uid
 
     hexdigest = sha.new(password).hexdigest()
     md5_digest = md5.new(password).hexdigest()
