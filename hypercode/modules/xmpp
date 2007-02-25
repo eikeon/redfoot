@@ -146,8 +146,13 @@ class Client(xmpp.Client):
                 if x:
                     item = x.item
                     if item:
-                        real_id  = item["jid"]
-                        room_id = presence["from"]
+                        try:
+                            real_id  = item["jid"]
+                            room_id = presence["from"]
+                        except Exception, e:
+                            _logger.debug("didn't have jid or from as expected")
+                            real_id = None
+                            room_id = None
                         if real_id and room_id:
                             real_id = URIRef("xmpp:%s" % jid.JID(real_id).userhost())
                             room_id = URIRef("xmpp:%s" % jid.JID(room_id).full())
@@ -201,6 +206,17 @@ class Client(xmpp.Client):
             else:
                 self.pending.append(message)
 
+    def join(self, room_id):
+        nick = self.client_jid.user
+        message = """<presence to="%s/%s" >
+<priority>0</priority>
+</presence>""" % (room_id, nick)
+        if self.xmlstream:
+            self.xmlstream.send(message)
+        else:
+            self.pending.append(message)
+
+
 ]]>
     </rdf:value>
   </redfoot:Module>
@@ -222,7 +238,7 @@ from twisted.words.protocols.jabber import xmlstream, client, jid
 class XMPPClientConnector(SRVConnector):
     def __init__(self, reactor, domain, factory):
         SRVConnector.__init__(self, reactor, 'xmpp-client', domain, factory)
-
+        self.tried_fallback = False
 
     def pickServer(self):
         host, port = SRVConnector.pickServer(self)
@@ -233,6 +249,14 @@ class XMPPClientConnector(SRVConnector):
 
         return host, port
 
+    def connectionFailed(self, reason):
+        if self.tried_fallback:
+            SRVConnector.connectionFailed(self, reason)
+        else:
+            self.tried_fallback = True
+            self.servers = [(1, 1, self.domain, 5222)]
+            self.orderedServers = []
+            self.connect()
 
 
 class Client(object):
