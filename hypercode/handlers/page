@@ -283,7 +283,7 @@ def display(uri, fragment=True, output=None, **args):
             redfoot._kid_cache = {}
         code = redfoot._kid_cache.get(value)
         if code is None:
-            code = kid_compiler.compile(StringIO(value.encode("utf-8")), filename=uri, encoding="utf-8")
+            code = kid_compiler.compile(StringIO(value.encode("utf-8")), filename=unicode(uri), encoding="utf-8")
             redfoot._kid_cache[value] = code
         exec code in context
 	if write_to_response:
