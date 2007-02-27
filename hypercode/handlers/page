@@ -222,21 +222,9 @@ else:
 SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
 TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")
 
-REQUIRED = "0.9.3"
-def version_tuple(s):
-    return tuple([int(x) for x in s[0:5].split(".")])    
-try:
-    import kid
-except ImportError, e:
-    raise ImportError("kid is not installed. Please install kid-%s ( http://kid-templating.org/ )" % REQUIRED)
-
-
-assert version_tuple(kid.__version__) >= version_tuple(REQUIRED), "Please install kid version %s or higher. Found kid version: %s" % (REQUIRED, kid.__version__)
-
-from kid import compiler as kid_compiler
+kid_module = redfoot.module(URIRef("modules/kid#module", base=redfoot_program))
 
 from StringIO import StringIO
-from itertools import chain
 
 # redefine lookup
 def lookup(property, default=None, uri=None):
@@ -247,15 +235,25 @@ def allow(uri):
     return auth.allow(request, uri)
 
 def display(uri, fragment=True, output=None, **args):
+    # Due to the way kid works we can not serialize a template within
+    # a template directly to the output stream. Instead we have to
+    # return it as an element stream to the template it appears
+    # within.
+    #
+    # See Also: http://www.kid-templating.org/trac/ticket/29
+    #
+    # Hence all the write_to_response fun...
+    global write_to_response
+
     if not uri:
         return
-    request.sources.append(uri)
+
     assert(isinstance(uri, URIRef), "uri not URIRef as expected")
     context = globals()
     for k, v in args.items():
         context[k] = v
     redfoot.check(uri)
-    global write_to_response
+
     if fragment==False:
         if not allow(request.uri):
             response.setStatus(403, "Forbidden")
@@ -281,36 +279,31 @@ def display(uri, fragment=True, output=None, **args):
     if value and value.datatype==SERVER.Kid:
         if not hasattr(redfoot, "_kid_cache"):
             redfoot._kid_cache = {}
-        code = redfoot._kid_cache.get(value)
-        if code is None:
-            code = kid_compiler.compile(StringIO(value.encode("utf-8")), filename=unicode(uri), encoding="utf-8")
-            redfoot._kid_cache[value] = code
-        exec code in context
+        mod = redfoot._kid_cache.get(value)
+        if mod is None:
+            mod = kid_module.load_template(StringIO(value.encode("utf-8")), name=unicode(uri), encoding="utf-8")
+            redfoot._kid_cache[value] = mod
+        t = mod.Template(**context)        
+        request.sources.append(uri)
 	if write_to_response:
 	    write_to_response = False
             try:
-                write(response, encoding="utf-8", fragment=fragment, output=output or "xml")
+                t.write(response, encoding="utf-8", fragment=fragment, output=output or "xml")
             except Exception, e:
                 redfoot.log.exception("While handling request for '%s' and trying to display %s (%s) the following exception occurred:\n" % (request.uri, redfoot.label(uri), uri))
             request.sources.pop()
 	else:
-            def pop():
+            def callback():
                 request.sources.pop()
-                if False:
-                    yield None
-
-            class CleanupElementStream(kid.ElementStream):
-                def __iter__(self):
-                    return chain(ElementStream.__iter__(self), pop())
-            return CleanupElementStream(pull())
-         
+            return kid_module.CleanupElementStream(t.pull(), callback)
     else:
-	#write_to_response = True
         if write_to_response:
+            request.sources.append(uri)
             redfoot.execute(uri, **context) # TODO: think we want context=context?
             request.sources.pop()
         else:
             def d():
+                request.sources.append(uri)
                 redfoot.execute(uri, **context)
                 request.sources.pop()
                 if False:

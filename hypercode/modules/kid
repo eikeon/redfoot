@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:rdfe="http://redfoot.net/rdf#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+>
+
+  <rdfe:RDFXMLDocument rdf:about="">
+  </rdfe:RDFXMLDocument>
+
+  <redfoot:Module rdf:ID="module">
+    <rdfs:label>kid glue</rdfs:label>      
+    <rdfs:comment></rdfs:comment>    
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+REQUIRED = "0.9.3" # TODO: bump to 0.9.5? ... as that's all I've tested so far.
+def version_tuple(s):
+    return tuple([int(x) for x in s[0:5].split(".")])    
+try:
+    import kid
+except ImportError, e:
+    raise ImportError("kid is not installed. Please install kid-%s ( http://kid-templating.org/ )" % REQUIRED)
+
+assert version_tuple(kid.__version__) >= version_tuple(REQUIRED), "Please install kid version %s or higher. Found kid version: %s" % (REQUIRED, kid.__version__)
+
+
+import sys, new, time
+from StringIO import StringIO
+from kid.compiler import compile
+
+ 
+def load_template(file, name='', cache=True, encoding=None, ns={},
+                  entity_map=None, exec_module=None):
+    
+    name = name.encode()
+    mod_name = "%s" % name.replace(".", "_") # TODO: 
+    mod = new.module(mod_name)
+    mod.__file__ = name
+    mod.__ctime__ = time.time()
+    mod.__dict__.update(ns)
+    sys.modules[mod_name] = mod
+    code = compile(file, filename=name, encoding=encoding)
+    exec code in mod.__dict__
+    return mod
+
+def Template(file=None, source=None, name=None, encoding=None, **kw):
+    mod = load_template(file, name=name, encoding=encoding)
+    return mod.Template(**kw)
+
+
+from itertools import chain
+
+class CleanupElementStream(kid.ElementStream):
+    def __init__(self, element_stream, callback):
+        kid.ElementStream.__init__(self, element_stream)
+        self.__callback = callback
+
+    def __pop(self):
+        self.__callback()
+        if False:
+            yield None
+
+    def __iter__(self):
+        return chain(kid.ElementStream.__iter__(self), self.__pop())
+
+
+if __name__=="__main__":
+    value = u"""
+<html xmlns:kid="http://purl.org/kid/ns#">
+<?python 
+print foo
+assert False
+?>
+</html>
+"""
+    encoding="utf-8"
+    fragment = False
+    output = "html"
+
+    context = {}
+    context["foo"] = "bar"
+
+    t = Template(StringIO(value.encode(encoding)), name=unicode("..."), encoding=encoding, **context)
+    t.write(sys.stdout, encoding=encoding, fragment=fragment, output=output)
+
+]]>
+    </rdf:value>
+  </redfoot:Module>
+
+</rdf:RDF>  
