@@ -361,6 +361,11 @@ class Redfoot(ConjunctiveGraph):
                         })
         self.__context = context
 
+    # holding off on introducing this... not sure we need/want it.
+    #def __get_globals(self):
+    #    return self.__context
+    #globals = property(__get_globals)
+
     def label(self, subject, default=''):
         # TODO: push this subproperty support back down into rdflib
         label = super(Redfoot, self).label(subject, None)
@@ -548,21 +553,15 @@ class Redfoot(ConjunctiveGraph):
             module = sys.modules.get(module_name, None)
             if module:
                 return module
-        self.check(subject)
         _logger.debug("importing: %s" % subject)
-        value = self.value(subject)
-        assert value!=None, "No objects found for %s, %s" % (subject, RDF.value)
         safe_module_name = "subject_%s" % hash(subject)
         module = ModuleType(safe_module_name)
         module.__name__ = module_name 
         module.__file__ = subject
         module.__ispkg__ = 0
         sys.modules[module_name] = module
-        code = compile(value+"\n", subject, "exec")
-        for key, value in self.__context.items():
-            module.__dict__[key] = value
-        module.__dict__["__uri__"] = subject
-        exec code in module.__dict__
+        module.__dict__.update(self.__context)
+        self.execute(subject, context=module.__dict__)
         return sys.modules[module_name]
 
     def execute(self, code, context=None, **args):
@@ -575,6 +574,7 @@ class Redfoot(ConjunctiveGraph):
         for k, v in args.items():
             context[k] = v
         context["redfoot_current"] = code
+        context["__uri__"] = code
         context["redfoot_program"] = redfoot_program
 
         value = value.replace("\r\n", "\n")        
