@@ -66,6 +66,19 @@ class CleanupElementStream(kid.ElementStream):
         return chain(kid.ElementStream.__iter__(self), self.__pop())
 
 
+_kid_cache = {}
+
+def get_kid_template(uri, value, context):
+    mod = _kid_cache.get(value)
+    if mod is None:
+        ns = dict(context)
+        ns["__uri__"] = uri
+        sio = StringIO(value.encode("utf-8"))
+        mod = load_template(sio, name=unicode(uri), encoding="utf-8", ns=ns)
+        _kid_cache[value] = mod
+    return mod
+
+
 if __name__=="__main__":
     value = u"""
 <html xmlns:kid="http://purl.org/kid/ns#">
