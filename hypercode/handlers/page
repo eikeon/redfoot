@@ -196,8 +196,9 @@ else:
     response.setHeader("Expires", datetimeToString(time()))
     #response.setHeader("Vary", "Accept-Encoding")
     
-    redfoot.execute(lookup(SERVER.display_support), context=globals())
-    
+    context = redfoot.execute(lookup(SERVER.display_support), 
+                              request=request, response=response, page_handler=page_handler)
+    display_page = context.get("display_page")
     long_running = redfoot.value(request.uri, SERVER.long_running) or redfoot.value(page_handler, SERVER.long_running)
     if str(long_running)=="true": # TODO:
         def finish(_):
@@ -220,11 +221,8 @@ else:
 # TODO: this is a bit out of hand :(
 
 SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
-TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")
 
 kid_module = redfoot.module(URIRef("modules/kid#module", base=redfoot_program))
-
-from StringIO import StringIO
 
 # redefine lookup
 def lookup(property, default=None, uri=None):
@@ -249,6 +247,8 @@ def display_page(uri, output=None, **args):
     display(uri, output=output, **args)
 
 
+mod_context = globals()
+
 def _create_display(normal):
     """ 
     Due to the way kid works we can not serialize a template within a
@@ -265,18 +265,14 @@ def _create_display(normal):
             if not allow(uri):
                 uri = lookup(SERVER.unauthorized_content_handler)
                 assert uri, "No 'unauthorized_content' found for: %s" % uri
-
-            context = dict(globals())
-            context["__uri__"] = uri
-            args = {}
-            args.update(context) # Ah... why is this needed??
-            args.update(args)
+            context = dict(mod_context)
+            context.update(args)
 
             value = redfoot.value(uri)
             if value and value.datatype==SERVER.Kid:
-                mod = kid_module.get_kid_template(uri, value, context)
-                args["display"] = _create_display(normal=False)
-                t = mod.Template(**args)        
+                mod = kid_module.get_kid_template(uri, value)
+                context["display"] = kid_display
+                t = mod.Template(**context)        
                 if normal:
                     request.sources.append(uri)
                     try:
@@ -292,7 +288,7 @@ def _create_display(normal):
                     return kid_module.CleanupElementStream(t.pull(), callback)
             else:
                 request.sources.append(uri)
-                redfoot.execute(uri, **context) # TODO: think we want context=context?
+                redfoot.execute(uri, **context) 
                 request.sources.pop()
 
                 # Leaving this here for now in case we need the normal==False case here too
@@ -307,6 +303,7 @@ def _create_display(normal):
     return _display
 
 display = _create_display(normal=True)
+kid_display = _create_display(normal=False)
 
 ]]>
     </rdf:value>
