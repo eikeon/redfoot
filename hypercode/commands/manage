@@ -849,6 +849,10 @@ out.serialize(destination=sys.stdout, base=base)
       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
+import logging
+
+_logger = logging.getLogger(redfoot_current)
+
 import sha, base64
 
 SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
@@ -872,7 +876,7 @@ for user in redfoot.subjects(RDF.type, SESSION.User):
             username = identifier2username(user)
             print "%s:{SHA}%s" % (username, b64(hexdigest))
         else:
-            print "warning: could not generate right kind of digest for %s using %s" % (user, hexdigest)
+            _logger.debug("warning: could not generate right kind of digest for %s using %s" % (user, hexdigest))
 
 ]]>
       </rdf:value>
