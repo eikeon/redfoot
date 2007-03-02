@@ -21,6 +21,7 @@
     <commands:command rdf:resource="#save"/>
     <commands:command rdf:resource="#print"/>
     <commands:command rdf:resource="#serialize"/>
+    <commands:command rdf:resource="#svn_auth"/>
     <commands:command rdf:resource="#contexts"/>
     <commands:command rdf:resource="#remove_context"/>
     <commands:command rdf:resource="#reload"/>
@@ -840,5 +841,45 @@ out.serialize(destination=sys.stdout, base=base)
      </redfoot:Python>
     </redfoot:code>      
   </commands:Command>
+
+  <commands:Command rdf:ID="svn_auth">
+    <rdfs:label>svn_auth</rdfs:label>
+    <redfoot:code>
+     <redfoot:Python rdf:ID="svn_auth_code">
+      <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+import sha, base64
+
+SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+
+def b64(hexdigest):
+    digest = base64.b16decode(hexdigest.upper())
+    return base64.encodestring(digest)[:-1] # [:-1] to remove a newline
+
+def identifier2username(uri):
+    if "@" in uri:
+        first = uri.split("@")[0]
+        return first.replace("mailto:", "")
+    if "/" in uri:
+        last = uri.split("/")[-1]
+        return last.replace("#", "")
+
+
+for user in redfoot.subjects(RDF.type, SESSION.User):
+    for hexdigest in redfoot.objects(user, SESSION.hexdigest):
+        if len(hexdigest)==40: # sha
+            username = identifier2username(user)
+            print "%s:%s" % (username, b64(hexdigest))
+        else:
+            print "warning: could not generate right kind of digest for %s" % user
+
+]]>
+      </rdf:value>
+     </redfoot:Python>
+    </redfoot:code>      
+  </commands:Command>
+
+
 
 </rdf:RDF>  
