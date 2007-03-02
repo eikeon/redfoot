@@ -870,7 +870,7 @@ for user in redfoot.subjects(RDF.type, SESSION.User):
     for hexdigest in redfoot.objects(user, SESSION.hexdigest):
         if len(hexdigest)==40: # sha
             username = identifier2username(user)
-            print "%s:%s" % (username, b64(hexdigest))
+            print "%s:{SHA}%s" % (username, b64(hexdigest))
         else:
             print "warning: could not generate right kind of digest for %s" % user
 
