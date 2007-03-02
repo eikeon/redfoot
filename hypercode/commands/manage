@@ -872,7 +872,7 @@ for user in redfoot.subjects(RDF.type, SESSION.User):
             username = identifier2username(user)
             print "%s:{SHA}%s" % (username, b64(hexdigest))
         else:
-            print "warning: could not generate right kind of digest for %s" % user
+            print "warning: could not generate right kind of digest for %s using %s" % (user, hexdigest)
 
 ]]>
       </rdf:value>
