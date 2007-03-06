@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:rdfe="http://redfoot.net/rdf#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:commands="http://redfoot.net/2005/commands#"
+   xmlns:server="http://redfoot.net/2005/server#"
+   xmlns:session="http://redfoot.net/2005/session#"
+   xmlns:template='http://redfoot.net/2005/template#'
+   xmlns:aspect="http://redfoot.net/hypercode/aspect#"
+>
+
+  <rdfe:RDFXMLDocument rdf:about="">
+  </rdfe:RDFXMLDocument>
+  
+  <aspect:Aspect rdf:ID="aspect">
+    <rdfs:label>Edit Head</rdfs:label>
+    <aspect:item rdf:resource="#edit_head_page"/>
+    <aspect:item rdf:resource="#edit_put_head_page"/>
+  </aspect:Aspect>
+
+  <server:Page rdf:ID="edit_head_page">
+    <aspect:location>/edit/head/</aspect:location>
+    <rdfs:label>Edit Head</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>        
+    <!-- TODO: define a class specifically for those who can edit head -->
+    <server:allow rdf:resource="#Admin"/>
+    <template:content>
+     <server:PagePartHandler rdf:ID="edit_head_head">
+      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+  <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
+
+<?python 
+
+TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")
+
+allowed = allow(URIRef("%s/edit/put_head/" % request.host))
+from urllib import quote
+
+uri = request.parameters.get("uri")
+if uri:
+    uri = URIRef(uri)
+    label = redfoot.label(uri)
+    head = redfoot.value(uri, TEMPLATE.head)
+    if head:
+        head_value = redfoot.value(head, RDF.value)
+    else: 
+        head_value = None
+
+    if head_value is None:
+        head_value = Literal("", datatype=URIRef("http://redfoot.net/2005/server#Kid"))
+
+    value_list = [("Kid", URIRef("http://redfoot.net/2005/server#Kid")), 
+                  ("Python", URIRef("http://redfoot.net/2005/redfoot#Python"))]
+    selected = head_value.datatype
+
+?>  
+  <div kid:if="uri and allowed" kid:strip="">
+    <form action="/edit/put_head/" method="post">
+      <input name="uri" type="hidden" value="${uri}"/>
+      <p>Title: <input type="text" name="title" value="${label}" style="width: 80%"/></p>
+      <textarea name="head" cols="" rows="40" style="width: 100%">${head_value}</textarea>
+      <p>Format: 
+       <select name="format">
+        <span kid:for="option_label, option_value in value_list" kid:strip="">
+          <option kid:if="option_value==selected" value="${option_value}" selected="true" >${option_label}</option>
+          <option kid:if="option_value!=selected" value="${option_value}">${option_label}</option>
+        </span>
+       </select>
+       <input name="submit" type="submit" value="Submit Head" />
+      </p>
+    </form>    
+  </div>
+
+  <div kid:if="not allowed" kid:strip="">
+    <p kid:if="allow(URIRef('%s/login/'% request.host))">
+      <a href="/login/?return_uri=${quote(request.uri)}">Login</a> to submit a edit_head head.
+    </p>
+  </div>
+
+  </span>
+]]>
+      </rdf:value>
+     </server:PagePartHandler> 
+    </template:content>
+  </server:Page>
+
+
+  <server:Page rdf:ID="edit_put_head_page">
+    <aspect:location>/edit/put_head/</aspect:location>
+    <rdfs:label>Put Head</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <server:allow rdf:resource="http://redfoot.net/2005/session#User"/>
+    <template:content>
+     <server:PagePartHandler rdf:ID="put_head_head">
+      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+  <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
+<?python
+from rdflib.util import date_time
+from urlparse import urljoin
+from urllib import quote
+from time import gmtime, time
+    
+from kid import XML
+
+TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")
+DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
+DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
+SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+
+uri = request.parameters.get("uri")
+title = request.parameters.get("title")
+head_value = request.parameters.get("head") or ""
+datatype = URIRef(request.parameters.get("format") or "")
+head_value = Literal(head_value, datatype=datatype)
+if uri:
+    uri = URIRef(uri)
+    # We do the following get context to create the default context if one's not already created.
+    redfoot.get_context(redfoot.context_id(uri.abstract(), context_id="#context")) 
+    context = redfoot.get_context(redfoot.context_id(uri.abstract(), context_id="#edit_head"))
+    if title:
+        label = Literal(title)
+        redfoot.remove((uri, RDFS.label, None))
+        context.add((uri, RDFS.label, label))
+    head = redfoot.value(uri, TEMPLATE.head)
+    if not head or isinstance(head, BNode):
+        head = redfoot.context_id(uri.abstract(), context_id="head_handler")
+        for c in redfoot.objects(uri, TEMPLATE.head):
+            context.remove((uri, TEMPLATE.head, c))
+            context.remove((c, None, None))
+        context.add((uri, TEMPLATE.head, head))
+    redfoot.remove((head, RDF.value, None))
+    context.add((head, RDF.value, head_value))
+
+    redfoot.remove((uri, SERVER.last_modified, None))
+    context.add((uri, SERVER.last_modified, Literal("%s" % time())))
+
+    message = ""
+    if head_value.datatype==URIRef("http://redfoot.net/2005/server#Kid"):
+        try:
+            for item in XML(head_value, fragment=False):
+                pass
+        except Exception, e:
+            message = str(e)
+            head = None
+
+from urllib import quote
+?>
+
+<h2 kid:if="message">${message} <a href="/edit/head/?uri=${quote(uri)}">Edit again</a></h2>
+
+<h2 kid:if="not message">Thank you for your head:
+  <a href="${quote(uri.concrete(), ':/')}">${redfoot.label(uri, uri)}</a>
+</h2>
+
+  </span>
+
+]]>
+      </rdf:value>
+     </server:PagePartHandler> 
+    </template:content>
+  </server:Page>
+
+</rdf:RDF>  
