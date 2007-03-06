@@ -214,6 +214,7 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
       href="${alternate}" title="${redfoot.label(alternate)}"
       type="${redfoot.value(alternate, SERVER.content_type)}" />
     </span> 
+    ${display(lookup(TEMPLATE.head_content))}
   </head>
 </div>
 ]]>
