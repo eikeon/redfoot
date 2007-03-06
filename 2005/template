@@ -66,6 +66,13 @@
     <rdfs:range rdf:resource="server#PagePartHandler"/>
   </rdf:Property>
 
+  <rdf:Property rdf:ID="head_content">
+    <rdfs:label>head content</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:domain rdf:resource="server#Site"/>
+    <rdfs:range rdf:resource="server#PagePartHandler"/>
+  </rdf:Property>
+
   <rdf:Property rdf:ID="css">
     <rdfs:label>css</rdfs:label>
     <rdfs:comment></rdfs:comment>
