@@ -220,6 +220,10 @@ else:
 <![CDATA[
 # TODO: this is a bit out of hand :(
 
+import logging
+
+_logger = logging.getLogger(__uri__)
+
 SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
 
 kid_module = redfoot.module(URIRef("modules/kid#module", base=redfoot_program))
@@ -233,6 +237,7 @@ def allow(uri):
     return auth.allow(request, uri)
 
 def display_page(uri, output=None, **args):
+    _logger.debug("display_page: %s" % uri)
     if not allow(request.uri):
         response.setStatus(403, "Forbidden")
     redfoot.check(uri)
