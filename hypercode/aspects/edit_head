@@ -15,17 +15,17 @@
   </rdfe:RDFXMLDocument>
   
   <aspect:Aspect rdf:ID="aspect">
-    <rdfs:label>Edit Head_Content</rdfs:label>
+    <rdfs:label>Edit Head Content</rdfs:label>
     <aspect:item rdf:resource="#edit_head_content_page"/>
     <aspect:item rdf:resource="#edit_put_head_content_page"/>
   </aspect:Aspect>
 
   <server:Page rdf:ID="edit_head_content_page">
     <aspect:location>/edit/head_content/</aspect:location>
-    <rdfs:label>Edit Head_Content</rdfs:label>
+    <rdfs:label>Edit Head Content</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>        
-    <!-- TODO: define a class specifically for those who can edit head_content -->
+    <!-- TODO: define a class specifically for those who can edit head content -->
     <server:allow rdf:resource="#Admin"/>
     <template:content>
      <server:PagePartHandler rdf:ID="edit_head_content">
@@ -70,7 +70,7 @@ if uri:
           <option kid:if="option_value!=selected" value="${option_value}">${option_label}</option>
         </span>
        </select>
-       <input name="submit" type="submit" value="Submit Head_Content" />
+       <input name="submit" type="submit" value="Submit Head Content" />
       </p>
     </form>    
   </div>
@@ -91,7 +91,7 @@ if uri:
 
   <server:Page rdf:ID="edit_put_head_content_page">
     <aspect:location>/edit/put_head_content/</aspect:location>
-    <rdfs:label>Put Head_Content</rdfs:label>
+    <rdfs:label>Put Head Content</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <server:allow rdf:resource="http://redfoot.net/2005/session#User"/>
     <template:content>
