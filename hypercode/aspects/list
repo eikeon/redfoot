@@ -15,6 +15,7 @@
   </rdfe:RDFXMLDocument>
 
   <aspect:Aspect rdf:about="bookmark#aspect"/>
+  <aspect:Aspect rdf:about="issues#aspect"/>
   <aspect:Aspect rdf:about="browse#aspect"/>
   <aspect:Aspect rdf:about="comments#aspect"/>
   <aspect:Aspect rdf:about="contexts#aspect"/>
