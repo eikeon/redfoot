@@ -36,6 +36,15 @@ xmpp = redfoot.module(module_uri)
 from twisted.words.xish import domish
 from twisted.words.protocols.jabber import jid
 
+from rdflib.events import Event
+
+class AuthenticatedEvent(Event):
+    """
+    This event is fired when the client has authenticated itself, it has the following attributes:
+
+      - 'client_id' identifier of client
+
+    """
 
 class Client(xmpp.Client):
 ###
@@ -61,6 +70,11 @@ class Client(xmpp.Client):
             self.pending = []
             for message in pending:
                 self.xmlstream.send(message)
+        try:
+            redfoot.dispatcher.dispatch(AuthenticatedEvent(client=self))
+        except Exception, e:
+            _logger.exception(e)
+
 
     def message(self, message):
         try:
@@ -275,7 +289,7 @@ class Client(object):
 
     def connected(self, xs):
         _logger.info('Connected.')
-        self.xmlstream = xs
+        self.xmlstream = xs        
 
     def disconnected(self, xs):
         _logger.info('Disconnected.')
