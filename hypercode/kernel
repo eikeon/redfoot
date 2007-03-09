@@ -52,6 +52,7 @@ from rdflib import URIRef, BNode, Literal
 from rdflib.Graph import Graph, ConjunctiveGraph
 from rdflib.util import first, date_time
 from rdflib.Journal import JournalReader, JournalWriter
+from rdflib.events import Dispatcher, Event
 
 redfoot_base = redfoot_loader.program.split("hypercode/kernel#")[0]
 
@@ -280,6 +281,7 @@ class Redfoot(ConjunctiveGraph):
         self.__xmpp_host = None
         self.__xmpp_port = None 
         self.__rule_engine = None
+        self.dispatcher = Dispatcher()
         
     def absolutize(self, uri, defrag=1):
         base = self.base
@@ -823,6 +825,12 @@ try:
         _root_logger.addHandler(_xmpp_handler)
 except Exception, e:
     _logger.warning("XMPP logger not installed: %s" % e)
+
+try:
+    for init in redfoot.objects(REDFOOT.Globals, REDFOOT.init): # TODO: also look for REDFOOT.init at __uri__ ?
+        redfoot.execute(init)
+except Exception, e:
+    _logger.warning("Failed to init: %s" % e)
 
 redfoot.main(options, args)
 

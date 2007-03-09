@@ -20,6 +20,27 @@
     <aspect:item rdf:resource="#add_bookmark"/>
   </aspect:Aspect>
 
+  <redfoot:Module rdf:ID="module">
+    <rdfs:label></rdfs:label>      
+    <rdfs:comment></rdfs:comment>    
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+from rdflib.events import Event
+
+class BookmarkCreatedEvent(Event):
+    """
+    This event is fired when a bookmark has been created, it has the following attributes:
+
+      - 'uri' identifier of bookmark
+
+    """
+
+]]>
+    </rdf:value>
+  </redfoot:Module>
+
+
   <template:Section rdf:ID="bookmarks">
     <aspect:location>/bookmarks/</aspect:location>
     <rdfs:label>Bookmarks</rdfs:label>
@@ -88,6 +109,7 @@ bookmarks.reverse()
 <![CDATA[
 
 auth = redfoot.module(URIRef("modules/auth#module", base=redfoot_program))
+bookmark_module = redfoot.module(URIRef("#module", base=__uri__))
 
 from sgmllib import SGMLParser
 
@@ -168,6 +190,7 @@ elif uri:
               import urllib
               parser = BookmarkParser(b, uri)
               parser.feed(page)
+        redfoot.dispatcher.dispatch(bookmark_module.BookmarkCreatedEvent(uri=b))
         response.setStatus(http.SEE_OTHER, "The Bookmark Page")
         response.setHeader("Location", b.concrete())               
         response.finish()
