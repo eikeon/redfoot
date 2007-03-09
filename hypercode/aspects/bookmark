@@ -108,6 +108,10 @@ bookmarks.reverse()
       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
+import logging
+
+_logger = logging.getLogger(__uri__)
+
 auth = redfoot.module(URIRef("modules/auth#module", base=redfoot_program))
 bookmark_module = redfoot.module(URIRef("#module", base=__uri__))
 
@@ -190,10 +194,14 @@ elif uri:
               import urllib
               parser = BookmarkParser(b, uri)
               parser.feed(page)
-        redfoot.dispatcher.dispatch(bookmark_module.BookmarkCreatedEvent(uri=b))
         response.setStatus(http.SEE_OTHER, "The Bookmark Page")
         response.setHeader("Location", b.concrete())               
         response.finish()
+        try:
+            redfoot.dispatcher.dispatch(bookmark_module.BookmarkCreatedEvent(uri=b))
+        except Exception, e:
+            _logger.exception(e)
+
 
     def error(result):
         finish(None)       
