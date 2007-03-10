@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:rdfe="http://redfoot.net/rdf#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:server="http://redfoot.net/2005/server#"
+   xmlns:session="http://redfoot.net/2005/session#"
+   xmlns:template="http://redfoot.net/2005/template#"
+   xmlns:aspect="http://redfoot.net/hypercode/aspect#"
+>
+
+  <rdfe:RDFXMLDocument rdf:about="">
+    <rdfs:label>Documents Aspect RDF/XML</rdfs:label>
+  </rdfe:RDFXMLDocument>
+
+  <rdfs:Class rdf:ID="Keyword">
+    <rdfs:label>Keyword</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+<!--    <rdfs:subClassOf rdf:resource="#Resource"/>-->
+  </rdfs:Class>
+
+  <rdfs:Class rdf:ID="Document">
+    <rdfs:label>document</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+<!--    <rdfs:subClassOf rdf:resource="#Document"/>-->
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/server#StaticPage"/>
+  </rdfs:Class>
+
+  <redfoot:Module rdf:ID="module">
+    <rdfs:label></rdfs:label>      
+    <rdfs:comment></rdfs:comment>    
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+from rdflib.events import Event
+
+class DocumentCreatedEvent(Event):
+    """
+    This event is fired when a document has been created, it has the following attributes:
+
+      - 'uri' identifier of document
+
+    """
+
+]]>
+    </rdf:value>
+  </redfoot:Module>
+
+  <aspect:Aspect rdf:ID="aspect">
+    <rdfs:label>Documents</rdfs:label>
+    <aspect:item rdf:resource="#documents"/>
+    <aspect:item rdf:resource="#upload"/>
+    <aspect:item rdf:resource="#upload_process"/>
+  </aspect:Aspect>
+
+  <template:Section rdf:ID="documents">
+    <aspect:location>/documents/</aspect:location>
+    <template:section_rank>19.0</template:section_rank>
+    <rdfs:label>Documents</rdfs:label>
+    <server:allow rdf:resource="terms#Team"/>
+    <template:content>
+      <template:Content rdf:ID="DocumentsPagePartHandler">
+        <rdfs:label>Documents Page Part Handler</rdfs:label>
+        <server:allow rdf:resource="terms#Team"/>
+       <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+<div xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:kid="http://purl.org/kid/ns#"
+     kid:strip=""
+>
+<?python
+
+import logging
+
+_logger = logging.getLogger(__uri__)
+
+from rdflib.util import parse_date_time
+import time
+
+DC_creator = URIRef("http://purl.org/dc/elements/1.1/creator")
+DC_created = URIRef("http://purl.org/dc/terms/created")
+
+DOCUMENT = redfoot.namespace(URIRef("#", base=__uri__))
+
+documents = []
+for document in redfoot.subjects(RDF.type, DOCUMENT.Document):
+    label = redfoot.label(document)
+    cid = redfoot.context_id(document, "context")
+    created = redfoot.value(cid, DC_created, any=True)
+    try:
+        created_label = time.strftime("%A %d %B, %Y", time.gmtime(parse_date_time(created)))
+    except Exception, e:
+        _logger.warning("Couldn't format timestamp: %s" % e)
+        created_label = None
+
+    creator = redfoot.value(cid, DC_creator, any=True)
+    documents.append((created, created_label, label, document, creator, cid))
+documents.sort()
+documents.reverse()
+?>
+
+<p><a href="/upload/">Upload Document</a> | <a href="${request.relative(DOCUMENT.Keyword.concrete())}">Browse by Keyword</a></p>
+
+<ul class="bookmarks"> <!-- TODO: replace with documents and -->
+  <li kid:for="created, created_label, label, document, creator, cid in documents">
+    <h3><a href="${document}" title="${redfoot.comment(document)}">${label}</a></h3>
+    <div class="meta">
+      <span><a href="${cid.concrete()}">document</a></span>
+      <span kid:if="created_label">uploaded on ${created_label}</span>
+      <span kid:if="creator">by <a href="${creator.concrete()}">${redfoot.label(creator) or creator}</a></span>
+    </div>
+  </li>
+</ul>
+
+
+</div>
+
+]]>
+        </rdf:value>
+      </template:Content>
+    </template:content>
+  </template:Section>
+
+  <template:Section rdf:ID="upload">
+    <aspect:location>/upload/</aspect:location>
+    <template:section_rank>21.0</template:section_rank>
+    <rdfs:label>Upload</rdfs:label>
+    <server:allow rdf:resource="terms#Team"/>
+    <template:content>
+      <template:Content rdf:ID="UploadPagePartHandler">
+        <rdfs:label>Upload Page Part Handler</rdfs:label>
+        <server:allow rdf:resource="terms#Team"/>
+       <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+<div xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:kid="http://purl.org/kid/ns#"
+     kid:strip=""
+>
+<?python
+mime_types = """
+# This is a comment. I love comments.
+
+# This file controls what Internet media types are sent to the client for
+# given file extension(s).  Sending the correct media type to the client
+# is important so they know how to handle the content of the file.
+# For more information about Internet media types,
+# please read RFC 2045, 2046, 2047, 2048, and 2077.  The Internet media type
+# registry is at <http://www.iana.org/assignments/media-types/>.
+
+# MIME type			Extension
+application/msword		Microsoft Word
+application/octet-stream	Binary
+application/pdf			PDF
+application/postscript		Postscript
+application/rtf			RTF
+application/vnd.ms-excel	Microsoft Excel
+application/vnd.ms-powerpoint	Microsoft Powerpoint
+application/x-bzip2		
+application/x-gtar		
+application/x-gzip		
+application/x-java-archive	Java Archive
+application/x-java-jnlp-file	Java JNLP File
+application/x-javascript	Javascript
+application/x-shockwave-flash	Shockwave Flash
+application/x-tar		
+application/x-tex		Tex
+application/x-texinfo		Texinfo
+application/xhtml+xml		XHTML
+application/xml			
+application/zip			Zip
+image/bmp			bmp
+image/gif			gif
+image/jpeg			jpeg
+image/png			png
+image/tiff			tiff
+image/x-portable-anymap		pnm
+image/x-portable-bitmap		pbm
+image/x-portable-graymap	pgm
+image/x-portable-pixmap		ppm
+image/x-rgb			rgb
+image/x-xbitmap			xbm
+image/x-xpixmap			xpm
+image/x-xwindowdump		xwd
+message/rfc822
+text/calendar
+text/css			css
+text/directory
+text/enriched
+text/html			html
+text/parityfec
+text/plain			txt
+text/prs.lines.tag
+text/rfc822-headers
+text/richtext			rtx
+text/rtf			rtf
+text/sgml			sgml
+text/tab-separated-values	tsv
+text/uri-list
+text/xml			xml
+text/xml-external-parsed-entity
+video/mp4v-es
+video/mpeg			mpeg
+video/parityfec
+video/pointer
+video/quicktime			qt
+video/x-flv			flv
+video/x-ms-asf			asf
+video/x-ms-wm			wm
+video/x-ms-wmv			wmv
+video/x-ms-wmx			wmx
+video/x-ms-wvx			wvx
+video/x-msvideo			avi
+video/x-sgi-movie		movie
+x-conference/x-cooltalk		ice
+"""
+
+types = []
+for line in mime_types.split("\n"):
+    line = line.strip()
+    if line.startswith("#"):
+        continue
+    line = line.replace("\t", " ")
+    parts = line.split(" ")
+    if len(parts)>0:
+        type = parts[0]
+        if type:
+            types.append((type, type))
+            label = " ".join(parts[1:])
+            label = label.strip()
+            if label:
+                types.append((label, type))      
+types.sort()
+
+?>
+  <form action="process/" enctype="multipart/form-data" method="POST">
+    <table>
+      <tr>
+        <th>File</th>
+        <td><input type="file" name="file" value="" size="60"/></td>
+      </tr> 
+      <tr>
+        <th>Content Type</th>
+        <td>
+          <select type="text" name="content_type">
+            <option kid:for="label, type in types" value="${type}">${label}</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <th>Document Name</th>
+        <td><input type="text" name="label" size="60" value=""/></td>
+      </tr>
+      <tr>
+        <th>Comment</th>
+        <td><textarea name="comment" rows="5" cols="60"></textarea></td>
+      </tr>
+      <tr>
+        <th>Keywords (comma separated)</th>
+        <td><input type="text" name="keywords" size="60" value=""/></td>
+      </tr>
+      <tr>    
+        <th>&#160;</th>
+        <td><input type="submit" value="upload"/></td>
+      </tr>
+    </table>
+  </form>
+</div>
+
+]]>
+        </rdf:value>
+      </template:Content>
+    </template:content>
+  </template:Section>
+
+  <server:Page rdf:ID="upload_process">
+    <aspect:location>/upload/process/</aspect:location>
+    <rdfs:label>Upload process</rdfs:label>
+    <template:content>
+      <template:Content rdf:ID="UploadProcessPagePartHandler">
+        <rdfs:label>Upload Process Page Part Handler</rdfs:label>
+       <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+<div xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:kid="http://purl.org/kid/ns#"
+     kid:strip=""
+>
+<?python
+
+import logging
+
+_logger = logging.getLogger(__uri__)
+
+documents_module = redfoot.module(URIRef("#module", base=__uri__))
+
+DOCUMENT = redfoot.namespace(URIRef("#", base=__uri__))
+
+label = request.parameters.get("label")
+comment = request.parameters.get("comment")
+content_type = request.parameters.get("content_type")
+file = request.parameters.get("file")
+if file:
+    from base64 import b64encode
+    SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+    import sha
+    uri = URIRef("%s/document/%s/" % (request.host, sha.new(file).hexdigest()))
+    cid = redfoot.context_id(uri, "context")
+    context = redfoot.get_context(cid, creator=request.user_id)
+    context.add((cid, RDFS.label, Literal(label)))
+    context.add((cid, RDF.type, DOCUMENT.DocumentContext))
+    base64Binary = URIRef("http://www.w3.org/2001/XMLSchema#base64Binary")
+    value = Literal(b64encode(file), datatype=base64Binary)
+    context.add((uri, RDFS.label, Literal(label)))
+    context.add((uri, RDFS.comment, Literal(comment)))
+    context.add((uri, RDF.type, DOCUMENT.Document))
+    context.set((uri, RDF.value, value))
+    context.set((uri, SERVER.content_type, Literal(content_type)))
+
+    keywords = request.parameters.get("keywords")
+    if keywords:
+        for s in keywords.split(","):
+            s = s.strip()
+
+            # TODO: push this functionality down somewhere
+            s = s.lower().replace(" ", "_")
+            s.replace("#", "_")
+            s.replace("/", "_") 
+
+            keyword = URIRef("%s/keyword/%s#" % (request.host, s))
+            context.add((keyword, RDF.type, DOCUMENT.Keyword))
+            context.add((keyword, RDFS.label, Literal(s)))
+            context.add((keyword, RDFS.member, uri))
+
+    try:
+        redfoot.dispatcher.dispatch(documents_module.DocumentCreatedEvent(uri=uri))
+    except Exception, e:
+        _logger.exception(e)
+
+?>
+
+<p kid:if="file">
+  Thank you for submiting <a href="${uri}">${label}</a>
+</p>
+
+<p kid:if="not file">
+  No file specified?
+</p>
+
+</div>
+
+]]>
+        </rdf:value>
+      </template:Content>
+    </template:content>
+  </server:Page>
+
+  <rdfs:Class rdf:ID="DocumentContext">
+    <rdfs:label>document Context</rdfs:label>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/redfoot#Context"/>    
+    <template:content>
+      <server:PagePartHandler rdf:ID="document_content_handler">
+        <server:allow rdf:resource="terms#Team"/>
+        <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
+
+<span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
+<?python
+from urllib import quote
+from rdflib.util import uniq
+
+cid = request.uri.abstract()
+#context = redfoot.get_context(cid)
+document = redfoot.context_id(cid, "#").concrete()
+
+REDFOOT = redfoot.namespace("http://redfoot.net/2005/redfoot#")
+DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
+DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
+action = request.parameters.get("action", None)
+
+if action=="delete":
+    print "Deleting:", cid
+    redfoot.remove_context(cid)   
+
+from urllib import quote
+comment = redfoot.comment(document)
+
+?>
+
+<div kid:if="action=='delete'" kid:strip="">
+  <h3>Deleted</h3>
+</div>
+
+<div kid:if="action!='delete'" kid:strip="">
+  <h3><a href="${document}">${redfoot.label(document)}</a></h3>
+  <p kid:if="comment">${comment}</p>
+
+  <p>Creator: ${redfoot.value(cid, DC.creator, any=True)}</p>
+  <p>Created: ${redfoot.value(cid, DCTERMS.created, any=True)}</p>
+
+  <p>
+    <form method="POST" action="">
+      <input type="submit" name="action" value="delete"/>
+    </form>
+  </p>
+</div>
+
+</span>
+
+
+      ]]></rdf:value>
+      </server:PagePartHandler>
+    </template:content>
+  </rdfs:Class>
+
+</rdf:RDF>
