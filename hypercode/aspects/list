@@ -26,5 +26,6 @@
   <aspect:Aspect rdf:about="auth#aspect"/>
   <aspect:Aspect rdf:about="auth_invite#aspect"/>
   <aspect:Aspect rdf:about="blog#aspect"/>
+  <aspect:Aspect rdf:about="documents#aspect"/>
 
 </rdf:RDF>
