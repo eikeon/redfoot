@@ -58,11 +58,9 @@ class DocumentCreatedEvent(Event):
     <aspect:location>/documents/</aspect:location>
     <template:section_rank>19.0</template:section_rank>
     <rdfs:label>Documents</rdfs:label>
-    <server:allow rdf:resource="terms#Team"/>
     <template:content>
       <template:Content rdf:ID="DocumentsPagePartHandler">
         <rdfs:label>Documents Page Part Handler</rdfs:label>
-        <server:allow rdf:resource="terms#Team"/>
        <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
 <![CDATA[
 <div xmlns="http://www.w3.org/1999/xhtml"
@@ -122,15 +120,14 @@ documents.reverse()
     </template:content>
   </template:Section>
 
-  <template:Section rdf:ID="upload">
+  <server:Page rdf:ID="upload">
     <aspect:location>/upload/</aspect:location>
     <template:section_rank>21.0</template:section_rank>
     <rdfs:label>Upload</rdfs:label>
-    <server:allow rdf:resource="terms#Team"/>
+    <server:allow rdf:resource="http://redfoot.net/2005/session#User"/>
     <template:content>
       <template:Content rdf:ID="UploadPagePartHandler">
         <rdfs:label>Upload Page Part Handler</rdfs:label>
-        <server:allow rdf:resource="terms#Team"/>
        <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
 <![CDATA[
 <div xmlns="http://www.w3.org/1999/xhtml"
@@ -271,11 +268,13 @@ types.sort()
         </rdf:value>
       </template:Content>
     </template:content>
-  </template:Section>
+  </server:Page>
 
   <server:Page rdf:ID="upload_process">
     <aspect:location>/upload/process/</aspect:location>
     <rdfs:label>Upload process</rdfs:label>
+    <server:allow rdf:resource="http://redfoot.net/2005/session#User"/>
+    <server:long_running>true</server:long_running>
     <template:content>
       <template:Content rdf:ID="UploadProcessPagePartHandler">
         <rdfs:label>Upload Process Page Part Handler</rdfs:label>
@@ -359,7 +358,6 @@ if file:
     <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/redfoot#Context"/>    
     <template:content>
       <server:PagePartHandler rdf:ID="document_content_handler">
-        <server:allow rdf:resource="terms#Team"/>
         <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
 
 <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
