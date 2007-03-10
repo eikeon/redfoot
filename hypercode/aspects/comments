@@ -43,6 +43,8 @@ import logging
 
 _logger = logging.getLogger(redfoot_current)
 
+comment_module = redfoot.module(URIRef("#module", base=__uri__))
+
 from rdflib.util import date_time
 from urlparse import urljoin
 from time import gmtime, time
@@ -77,6 +79,11 @@ if uri is not None and comment:
 
     redfoot.remove((uri, SERVER.last_modified, None))
     context.add((uri, SERVER.last_modified, Literal("%s" % time())))
+
+    try:
+        redfoot.dispatcher.dispatch(comment_module.CommentCreatedEvent(uri=c_uri))
+    except Exception, e:
+        _logger.exception(e)
 
     try:
         redfoot.xmpp.send(REDFOOT.Admin, "%s just added a comment regarding %s. See: %s" % (redfoot.label(uid) or uid, redfoot.label(uri) or uri, c_uri.concrete()))
@@ -296,5 +303,25 @@ now = datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
 ]]>
     </rdf:value>
   </server:PageHandler>
+
+  <redfoot:Module rdf:ID="module">
+    <rdfs:label></rdfs:label>      
+    <rdfs:comment></rdfs:comment>    
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+from rdflib.events import Event
+
+class CommentCreatedEvent(Event):
+    """
+    This event is fired when a comment has been created, it has the following attributes:
+
+      - 'uri' identifier of comment
+
+    """
+
+]]>
+    </rdf:value>
+  </redfoot:Module>
 
 </rdf:RDF>  
