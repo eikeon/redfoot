@@ -47,12 +47,32 @@ if version < MINIMUM:
     _logger.critical("This kernel requires rdflib %s or greater required. Found rdflib version %s. Run redfoot --install-rdflib or see http://rdflib.net/ for information on downloading and installing rdflib." % ("%s.%s.%s" % MINIMUM, rdflib.__version__))
     sys.exit(-1)
 
-from rdflib import RDF, RDFS, Namespace, StringInputSource
+from rdflib import RDF, RDFS, StringInputSource
 from rdflib import URIRef, BNode, Literal
 from rdflib.Graph import Graph, ConjunctiveGraph
 from rdflib.util import first, date_time
 from rdflib.Journal import JournalReader, JournalWriter
 from rdflib.events import Dispatcher, Event
+
+class Namespace(object):
+
+    def __init__(self, uri, context=None):
+        self.NS = uri
+        self.__context = context
+        self.__term_cache = dict()
+        #self.__term_cache["NS"] = uri
+
+    def term(self, name):
+        uri = self.__term_cache.get(name)
+        if uri is None:
+            uri = URIRef(self.NS + name)
+            if self.__context and (uri, None, None) not in self.__context:
+                _logger.warning("%s not defined" % uri)
+            self.__term_cache[name] = uri
+        return uri 
+
+    def __getattr__(self, name):
+        return self.term(name)
 
 redfoot_base = redfoot_loader.program.split("hypercode/kernel#")[0]
 
@@ -72,7 +92,7 @@ NAMESPACE = URIRef("http://redfoot.net/2005/redfoot#")
 DC_creator = URIRef("http://purl.org/dc/elements/1.1/creator")
 DC_created = URIRef("http://purl.org/dc/terms/created")
 
-HTTP = Namespace("http://www.w3.org/1999/xx/http#")
+HTTP = rdflib.Namespace("http://www.w3.org/1999/xx/http#")
 OWL = Namespace("http://www.w3.org/2002/07/owl#")
 SCUTTER = Namespace("http://redfoot.net/2006/scutter#")
 
@@ -281,6 +301,7 @@ class Redfoot(ConjunctiveGraph):
         self.__xmpp_host = None
         self.__xmpp_port = None 
         self.__rule_engine = None
+        self.__namespaces = {}
         self.dispatcher = Dispatcher()
         
     def absolutize(self, uri, defrag=1):
@@ -599,24 +620,15 @@ class Redfoot(ConjunctiveGraph):
 
     def namespace(self, uri, creator=None, context=None):
         uri = URIRef(uri)
-        module = sys.modules.get(uri, None)
-        if module is None:
-            module = sys.modules[uri] = ModuleType("namespace_%s" % hash(uri))
-            module.__name__ = uri 
-            module.__file__ = uri
-            module.__ispkg__ = 0
+        namespace = self.__namespaces.get(uri)
+        if namespace is None:
             if context is None:
                 self.check(uri, creator=creator)
                 context_uri = self.context_id(uri)            
                 context = self.get_context(context_uri, creator=creator)            
-            d = module.__dict__
-            d["NS"] = uri
-            # TODO: module.__getattribute__ = module.__dict__.__getitem__ 
-            for subject in set(context.subjects(None, None)):
-                if subject.startswith(uri):
-                    ns, qname = subject.split(uri)
-                    d[qname] = subject
-        return module
+            namespace = Namespace(uri, context)
+            self.__namespaces[uri] = namespace
+        return namespace
 
     def bind(self, prefix, namespace, override=True):
         """
