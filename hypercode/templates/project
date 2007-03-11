@@ -36,11 +36,11 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
   ${display(lookup(TEMPLATE.head))}
   <body>
     <div id="container">
+      <div id="usernav">
+        ${display(lookup(TEMPLATE.user_navigation))}
+      </div>
       <div id="top">
         ${display(lookup(TEMPLATE.header))}
-      </div>
-      <div id="sitenav">
-        ${display(lookup(TEMPLATE.navigation))}
       </div>
       <?python authorized = allow(request.uri)?>
       <div id="content" kid:if="authorized">
@@ -65,11 +65,11 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
       <div id="content" kid:if="authorized is False">
         <h2>Unauthorized Page</h2>
       </div>
+      <div id="sitenav">
+        ${display(lookup(TEMPLATE.navigation))}
+      </div>
       <div id="footer">
        ${display(lookup(TEMPLATE.footer))}
-      </div>
-      <div id="usernav">
-        ${display(lookup(TEMPLATE.user_navigation))}
       </div>
     </div>
   </body>
