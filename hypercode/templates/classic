@@ -111,7 +111,7 @@ types = "%s" % ", ".join(types)
   <server:PagePartHandler rdf:ID="footer">
     <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
       <div xmlns:kid="http://purl.org/kid/ns#" kid:strip="">
-        <a href="http://redfoot.net/">redfoot.net</a>
+        <A href="http://redfoot.net/">redfoot.net</a>
       </div>
       ]]></rdf:value>
   </server:PagePartHandler>
@@ -150,7 +150,7 @@ sections.sort()
   <server:PagePartHandler rdf:ID="user_navigation">
     <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
 
-<span xmlns:kid="http://purl.org/kid/ns#">
+<span xmlns:kid="http://purl.org/kid/ns#" kid:strip="">
 <?python 
 login_uri = URIRef('%s/login/' % request.host)
 login_support = (login_uri, None, None) in redfoot
@@ -203,8 +203,8 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
 ?>
   <head>
     <title>${redfoot.label(request.site)}: ${title}</title>
-    <meta http-equiv="Content-Type" content="text/xhtml; charset=UTF-8"/>
-    <meta name="keywords" content=""/>
+    <!--Kid puts this on <meta http-equiv="Content-Type" content="text/xhtml; charset=UTF-8"/>-->
+    <!--<meta name="keywords" content=""/>-->
     <link rel="shortcut icon" href="${lookup(TEMPLATE.shortcut_icon)}"/>
     <style type="text/css">
       ${display(lookup(TEMPLATE.css))}
