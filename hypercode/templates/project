@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:rdfe="http://redfoot.net/rdf#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:template="http://redfoot.net/2005/template#"
+   xmlns:server="http://redfoot.net/2005/server#"
+>
+
+  <rdfe:RDFXMLDocument rdf:about="">
+  </rdfe:RDFXMLDocument>
+
+  <template:Template rdf:ID="page">
+    <rdfs:label>Classic Template</rdfs:label>
+    <template:content rdf:resource="classic#content"/>
+    <template:background_color>#B0C9BE</template:background_color>
+    <template:head rdf:resource="classic#head"/>
+    <template:css rdf:resource="#css"/>
+    <template:title rdf:resource="classic#title"/>
+    <template:shortcut_icon rdf:resource="http://redfoot.net/2002/11/25/favicon.ico"/>
+    <template:header rdf:resource="classic#header"/>
+    <template:navigation rdf:resource="classic#navigation"/>
+    <template:user_navigation rdf:resource="classic#user_navigation"/>
+    <template:footer rdf:resource="classic#footer"/>
+    <server:unauthorized_page_handler rdf:resource="classic#unauthorized_page_handler"/>
+    <server:unauthorized_content_handler rdf:resource="classic#unauthorized_content_handler"/>
+    <server:content_type>application/xhtml+xml</server:content_type>
+    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[<html xmlns="http://www.w3.org/1999/xhtml" xmlns:kid="http://purl.org/kid/ns#">
+<?python SERVER = redfoot.namespace("http://redfoot.net/2005/server#")?>
+<?python TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")?>
+<?python
+title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract(), None) or "-"
+?>
+  ${display(lookup(TEMPLATE.head))}
+  <body>
+    <div id="container">
+      <div id="top">
+        ${display(lookup(TEMPLATE.header))}
+      </div>
+      <div id="sitenav">
+        ${display(lookup(TEMPLATE.navigation))}
+      </div>
+      <?python authorized = allow(request.uri)?>
+      <div id="content" kid:if="authorized">
+        <!-- TODO: -->
+        <?python edit_content_uri = URIRef('%s/edit/content/' % request.host)?>
+        <div kid:if="(edit_content_uri, None, None) in redfoot and allow(edit_content_uri)" id="edit_content">
+          <?python from urllib import quote?>
+          <p> 
+            <a kid:if="(request.uri, None, None) in redfoot" href="/edit/head_content/?uri=${quote(request.uri)}">Edit Head</a>
+            <a kid:if="(request.uri, None, None) in redfoot" href="/edit/content/?uri=${quote(request.uri)}">Edit Content</a>
+            <a kid:if="(request.uri, None, None) not in redfoot" href="/edit/content/?uri=${quote(request.uri)}">Create</a>
+          </p>
+        </div>
+        <h2><a href="${request.uri}">${title}</a></h2>
+        ${display(lookup(TEMPLATE.content))}
+        <?python COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")?>
+        <div class="comments" kid:if="lookup(TEMPLATE.comments) and (request.uri, RDFS.member, COMMENT.exclude) not in redfoot">
+           ${display(lookup(TEMPLATE.comments))}
+           ${display(lookup(TEMPLATE.add_comment))}
+        </div>
+      </div>
+      <div id="content" kid:if="authorized is False">
+        <h2>Unauthorized Page</h2>
+      </div>
+      <div id="footer">
+       ${display(lookup(TEMPLATE.footer))}
+      </div>
+      <div id="usernav">
+        ${display(lookup(TEMPLATE.user_navigation))}
+      </div>
+    </div>
+  </body>
+</html>
+]]>
+    </rdf:value>    
+  </template:Template>
+
+
+  <server:PagePartHandler rdf:ID="css">
+    <rdfs:label>Default css</rdfs:label>
+    <server:content_type>text/css</server:content_type>
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+
+TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")
+
+color = lookup(TEMPLATE.background_color) or "#cccccc"
+
+response.write("""
+
+html {
+    background-color: %(color)s;
+    background: %(color)s url("http://redfoot.net/2005/fade-in-light.png") top left repeat-x;
+}
+
+""" % {"color": color})
+    
+    </rdf:value>
+  </server:PagePartHandler>
+
+</rdf:RDF>  
