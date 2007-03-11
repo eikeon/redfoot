@@ -11,6 +11,11 @@
   <rdfe:RDFXMLDocument rdf:about="">
   </rdfe:RDFXMLDocument>
   
+  <redfoot:Namespace rdf:about="#">
+    <rdfs:label>XMPP</rdfs:label>
+    <rdfs:comment>The Redfoot xmpp namespace.</rdfs:comment>
+  </redfoot:Namespace>
+
   <redfoot:Module rdf:about="#client">
     <rdfs:label>XMPP Client</rdfs:label>      
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
@@ -429,7 +434,7 @@ else:
 
 import logging
 
-_logger = logging.getLogger(redfoot_current)
+_logger = logging.getLogger(__uri__)
 
 import sys, traceback, struct, time, sha, md5
 

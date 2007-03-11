@@ -11,6 +11,11 @@
   <rdfe:RDFXMLDocument rdf:about="">
   </rdfe:RDFXMLDocument>
   
+  <redfoot:Namespace rdf:about="#">
+    <rdfs:label>Mimeparse</rdfs:label>
+    <rdfs:comment>The Redfoot mimeparse namespace.</rdfs:comment>
+  </redfoot:Namespace>
+
   <redfoot:Module rdf:about="#module">
     <rdfs:label>MIME-Type Parser</rdfs:label>      
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">

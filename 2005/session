@@ -6,9 +6,8 @@
 >  
 
   <redfoot:Namespace rdf:about="#">
-    <rdfs:label>Redfoot session namespace</rdfs:label>
-    <rdfs:comment>
-    </rdfs:comment>
+    <rdfs:label>Session</rdfs:label>
+    <rdfs:comment>The Redfoot session namespace.</rdfs:comment>
   </redfoot:Namespace>
 
   <rdfs:Class rdf:ID="Session">

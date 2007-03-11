@@ -11,19 +11,19 @@
   <rdfe:RDFXMLDocument rdf:about="">
   </rdfe:RDFXMLDocument>
   
+  <redfoot:Namespace rdf:about="#">
+    <rdfs:label>Static</rdfs:label>
+    <rdfs:comment>The Redfoot static namespace.</rdfs:comment>
+  </redfoot:Namespace>
+
   <redfoot:Configuration rdf:ID="config">
     <rdfs:label>static</rdfs:label>
     <rdfs:comment>A configuration with all the commands for static file management</rdfs:comment>
-    <commands:command rdf:resource="#import"/>
-    <commands:command rdf:resource="#export"/>
-  </redfoot:Configuration>
-
-  <commands:Command rdf:ID="import">
-    <rdfs:label>static_import</rdfs:label> 
-    <rdfs:comment>imports static files into redfoot</rdfs:comment>
-    <redfoot:code>
-     <redfoot:Python rdf:ID="import_code">
-       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <commands:command>
+      <commands:Command rdf:ID="import">
+        <rdfs:label>static_import</rdfs:label> 
+        <rdfs:comment>imports static files into redfoot</rdfs:comment>
+        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 import string, sys
 
@@ -95,17 +95,14 @@ for root, dirs, files in os.walk('html'):
         dirs.remove('CVS')  # don't visit CVS directories
 
 ]]>
-       </rdf:value>
-     </redfoot:Python>
-    </redfoot:code>
-  </commands:Command>
-
-  <commands:Command rdf:ID="export">
-    <rdfs:label>static_export</rdfs:label>
-    <rdfs:comment>exports static files into redfoot</rdfs:comment>
-    <redfoot:code>
-     <redfoot:Python rdf:ID="export_code">
-       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+        </rdf:value>
+      </commands:Command>
+    </commands:command>
+    <commands:command>
+      <commands:Command rdf:ID="export">
+        <rdfs:label>static_export</rdfs:label>
+        <rdfs:comment>exports static files into redfoot</rdfs:comment>
+        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
 StaticPage = URIRef("http://redfoot.net/2005/server#StaticPage")
@@ -133,9 +130,9 @@ for page in redfoot.subjects(RDF.type, StaticPage):
         f.close()
 
 ]]>
-       </rdf:value>
-     </redfoot:Python>
-    </redfoot:code>
-  </commands:Command>
+        </rdf:value>
+      </commands:Command>
+    </commands:command>
+  </redfoot:Configuration>
 
 </rdf:RDF>  

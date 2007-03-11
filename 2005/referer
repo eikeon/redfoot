@@ -6,9 +6,8 @@
 >  
 
   <redfoot:Namespace rdf:about="#">
-    <rdfs:label>Redfoot referer namespace</rdfs:label>
-    <rdfs:comment>
-    </rdfs:comment>
+    <rdfs:label>Referer</rdfs:label>
+    <rdfs:comment>The Redfoot referer namespace.</rdfs:comment>
   </redfoot:Namespace>
 
   <rdfs:Class rdf:ID="Referer">

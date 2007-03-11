@@ -14,6 +14,11 @@
   <rdfe:RDFXMLDocument rdf:about="">
   </rdfe:RDFXMLDocument>
   
+  <redfoot:Namespace rdf:about="#">
+    <rdfs:label>Contexts</rdfs:label>
+    <rdfs:comment>The Redfoot contexts namespace.</rdfs:comment>
+  </redfoot:Namespace>
+
   <aspect:Aspect rdf:ID="aspect">
     <rdfs:label>Contexts</rdfs:label>
     <aspect:item rdf:resource="#contexts_page"/>

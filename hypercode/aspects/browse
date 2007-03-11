@@ -13,6 +13,11 @@
   <rdfe:RDFXMLDocument rdf:about="">
   </rdfe:RDFXMLDocument>
   
+  <redfoot:Namespace rdf:about="#">
+    <rdfs:label>Browse</rdfs:label>
+    <rdfs:comment>The Redfoot browse namespace.</rdfs:comment>
+  </redfoot:Namespace>
+
   <aspect:Aspect rdf:ID="aspect">
     <rdfs:label>Browse</rdfs:label>
     <aspect:item rdf:resource="#browse_page"/>

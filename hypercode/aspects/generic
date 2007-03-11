@@ -12,6 +12,11 @@
   <rdfe:RDFXMLDocument rdf:about="">
   </rdfe:RDFXMLDocument>
   
+  <redfoot:Namespace rdf:about="#">
+    <rdfs:label>Generic</rdfs:label>
+    <rdfs:comment>The Redfoot generic namespace.</rdfs:comment>
+  </redfoot:Namespace>
+
   <aspect:Aspect rdf:ID="aspect">
     <rdfs:label>Editor (Generic)</rdfs:label>
     <aspect:item rdf:resource="#edit_page"/>
@@ -149,7 +154,7 @@ if processor=="delete":
       </tr>
       <tr kid:for="s, p, o in redfoot.triples((subject, None, None))">
 	<td>
-<!--${display(URIRef("#view_node", base=redfoot_current), node=p)}-->
+<!--${display(URIRef("#view_node", base=__uri__), node=p)}-->
   <pre kid:if="isinstance(p, Literal)">
 <?python
 if len(p)>40:
@@ -168,7 +173,7 @@ if p.language:
   </a>
 	</td>
 	<td style="width: 30em">
-<!--${display(URIRef("#view_node", base=redfoot_current), node=o)}-->
+<!--${display(URIRef("#view_node", base=__uri__), node=o)}-->
   <pre kid:if="isinstance(o, Literal)">
 <?python
 if len(o)>40:

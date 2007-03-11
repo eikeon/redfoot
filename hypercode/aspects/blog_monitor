@@ -44,7 +44,7 @@ DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
 
 COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")
 
-markdown = redfoot.module(URIRef("modules/markdown#module", base=redfoot_program)).markdown
+markdown = redfoot.module(URIRef("modules/markdown#module", base=redfoot.uri)).markdown
 
 blog = []
 for entry in redfoot.subjects(RDF.type, BLOG.Entry):
@@ -102,8 +102,8 @@ feed = redfoot.value(entry, BLOG.via, any=True)
 <?python
 BLOG = redfoot.namespace("http://redfoot.net/2005/blog#")
 
-update = redfoot.module(URIRef("modules/blog#update", base=redfoot_program))
-blog_feed = redfoot.module(URIRef("modules/blog#feed", base=redfoot_program))
+update = redfoot.module(URIRef("modules/blog#update", base=redfoot.uri))
+blog_feed = redfoot.module(URIRef("modules/blog#feed", base=redfoot.uri))
 
 feed = request.parameters.get("feed")
 if feed:

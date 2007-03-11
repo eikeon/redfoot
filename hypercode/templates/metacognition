@@ -125,6 +125,7 @@ sections.sort()
 <div xmlns:kid="http://purl.org/kid/ns#"
      kid:strip="">
 <?python
+TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")
 title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract(), None) or "-"
 ?>
   <head>

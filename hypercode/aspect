@@ -4,7 +4,13 @@
   xmlns:rdfs='http://www.w3.org/2000/01/rdf-schema#'
   xmlns:redfoot='http://redfoot.net/2005/redfoot#'
   xmlns:template='http://redfoot.net/2005/template#'
+  xmlns:aspect="http://redfoot.net/hypercode/aspect#"
 >
+
+  <redfoot:Namespace rdf:about="#">
+    <rdfs:label>Aspect</rdfs:label>
+    <rdfs:comment>The Redfoot aspect namespace.</rdfs:comment>
+  </redfoot:Namespace>
 
   <rdfs:Class rdf:ID="Aspect">
     <rdfs:label>Aspect</rdfs:label>
@@ -70,7 +76,7 @@ label = redfoot.label(aspect) or aspect
 from urllib import quote
 frag = quote(label.lower().replace(" ", "_"))
 
-context = redfoot.get_context(URIRef("%s#%s_aspect" % (base, frag)), creator=redfoot_current)
+context = redfoot.get_context(URIRef("%s#%s_aspect" % (base, frag)), creator=__uri__)
 context.remove((None, None, None))
 
 for item in redfoot.objects(aspect, ASPECT.item):
@@ -88,5 +94,20 @@ for item in redfoot.objects(aspect, ASPECT.item):
 ]]>
       </rdf:value>
   </redfoot:Python>
+
+  <aspect:Aspect rdf:about="aspects/bookmark#aspect"/>
+  <aspect:Aspect rdf:about="aspects/issues#aspect"/>
+  <aspect:Aspect rdf:about="aspects/browse#aspect"/>
+  <aspect:Aspect rdf:about="aspects/comments#aspect"/>
+  <aspect:Aspect rdf:about="aspects/contexts#aspect"/>
+  <aspect:Aspect rdf:about="aspects/edit_content#aspect"/>
+  <aspect:Aspect rdf:about="aspects/generic#aspect"/>
+  <aspect:Aspect rdf:about="aspects/recipes#aspect"/>
+  <aspect:Aspect rdf:about="aspects/register#aspect"/>
+  <aspect:Aspect rdf:about="aspects/auth#aspect"/>
+  <aspect:Aspect rdf:about="aspects/auth_invite#aspect"/>
+  <aspect:Aspect rdf:about="aspects/blog#aspect"/>
+  <aspect:Aspect rdf:about="aspects/documents#aspect"/>
+  <aspect:Aspect rdf:about="aspects/items#aspect"/>
 
 </rdf:RDF>

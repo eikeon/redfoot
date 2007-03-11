@@ -39,7 +39,7 @@ response.write("""
 <?kid
 # import some stuff
 # TODO: push to redfoot using datatype plugin
-format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot_program)).format
+format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot.uri)).format
 
 RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
 
@@ -97,7 +97,7 @@ source = redfoot.value(None, RECIPE.recipe, recipe, any=True)
 >
 <?kid
 RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
-format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot_program)).format
+format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot.uri)).format
 
 ingredient = request.uri
 

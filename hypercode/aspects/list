@@ -14,6 +14,11 @@
     <rdfs:label>List of redfoot aspects RDF/XML</rdfs:label>
   </rdfe:RDFXMLDocument>
 
+  <redfoot:Namespace rdf:about="#">
+    <rdfs:label>List</rdfs:label>
+    <rdfs:comment>The Redfoot list namespace.</rdfs:comment>
+  </redfoot:Namespace>
+
   <aspect:Aspect rdf:about="bookmark#aspect"/>
   <aspect:Aspect rdf:about="issues#aspect"/>
   <aspect:Aspect rdf:about="browse#aspect"/>
@@ -27,5 +32,6 @@
   <aspect:Aspect rdf:about="auth_invite#aspect"/>
   <aspect:Aspect rdf:about="blog#aspect"/>
   <aspect:Aspect rdf:about="documents#aspect"/>
+  <aspect:Aspect rdf:about="items#aspect"/>
 
 </rdf:RDF>

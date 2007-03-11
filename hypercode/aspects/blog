@@ -14,6 +14,11 @@
   <rdfe:RDFXMLDocument rdf:about="">
   </rdfe:RDFXMLDocument>
   
+  <redfoot:Namespace rdf:about="#">
+    <rdfs:label>Blog</rdfs:label>
+    <rdfs:comment>The Redfoot blog namespace.</rdfs:comment>
+  </redfoot:Namespace>
+
   <aspect:Aspect rdf:ID="aspect">
     <rdfs:label>Blog</rdfs:label>
     <redfoot:todo>Look into http://kupu.oscom.org/</redfoot:todo>
@@ -50,8 +55,8 @@ DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
 
 COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")
 
-HTML = redfoot.module(URIRef("modules/blog#html", base=redfoot_program)).HTML
-markdown = redfoot.module(URIRef("modules/markdown#module", base=redfoot_program)).markdown
+HTML = redfoot.module(URIRef("modules/blog#html", base=redfoot.uri)).HTML
+markdown = redfoot.module(URIRef("modules/markdown#module", base=redfoot.uri)).markdown
 
 blog = []
 blog_page = URIRef("/blog/", base=request.host)
@@ -262,7 +267,7 @@ DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
 SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
 
-format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot_program)).format
+format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot.uri)).format
 
 resources = []
 blog_page = URIRef("/blog/", base=request.host)
@@ -289,7 +294,7 @@ html_page = redfoot.value(None, SERVER.alternate, request.uri, any=True)
 now = datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
 
 ?>
-  <generator uri="${redfoot_program}">${redfoot.label(redfoot_program)}</generator>
+  <generator uri="${redfoot.uri}">${redfoot.label(redfoot.uri)}</generator>
   <id>${request.uri}</id>
   <title>${"%s: %s" % (redfoot.label(request.host), redfoot.label(request.uri))}</title>
   <link href="${request.uri}" rel="self"/>
@@ -337,7 +342,7 @@ DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
 SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
 
-format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot_program)).format
+format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot.uri)).format
 
 resources = []
 blog_page = URIRef("/blog/", base=request.host)

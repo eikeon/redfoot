@@ -14,6 +14,11 @@
   <rdfe:RDFXMLDocument rdf:about="">
   </rdfe:RDFXMLDocument>
   
+  <redfoot:Namespace rdf:about="#">
+    <rdfs:label>Issues</rdfs:label>
+    <rdfs:comment>The Redfoot issues namespace.</rdfs:comment>
+  </redfoot:Namespace>
+
   <aspect:Aspect rdf:ID="aspect">
     <rdfs:label>Issues</rdfs:label>
     <aspect:item rdf:resource="#site"/>
@@ -62,7 +67,7 @@ if label and comment and uid:
     path.replace("/", "_") 
 
     uri = URIRef("issues/%04d/%02d/%02d/%s" % (year, month, date, path) + "#issue", base=request.host)
-    context = redfoot.get_context(redfoot.context_id(uri, "context"), creator=redfoot_current)
+    context = redfoot.get_context(redfoot.context_id(uri, "context"), creator=__uri__)
     # check if context already in use?
     redfoot.index.add((context.identifier, RDFS.label, label))
     context.add((uri, RDF.type, ISSUE.Issue))

@@ -12,6 +12,11 @@
   <rdfe:RDFXMLDocument rdf:about="">
   </rdfe:RDFXMLDocument>
   
+  <redfoot:Namespace rdf:about="#">
+    <rdfs:label>Register</rdfs:label>
+    <rdfs:comment>The Redfoot register namespace.</rdfs:comment>
+  </redfoot:Namespace>
+
   <aspect:Aspect rdf:ID="aspect">
     <rdfs:label>Register</rdfs:label>
     <rdfs:comment></rdfs:comment>

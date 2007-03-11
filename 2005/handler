@@ -6,8 +6,8 @@
 >
 
   <redfoot:Namespace rdf:about="#">
-    <rdfs:label>Redfoot Handler</rdfs:label>
-    <rdfs:comment>The Redfoot Handler namespace is...</rdfs:comment>
+    <rdfs:label>Handler</rdfs:label>
+    <rdfs:comment>The Redfoot handler namespace</rdfs:comment>
   </redfoot:Namespace>
 
   <rdfs:Class rdf:ID="Handler">

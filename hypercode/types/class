@@ -29,8 +29,8 @@ elif (request.uri, None, None) in redfoot:
 else:
     uri = request.uri.abstract()
     
-format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot_program)).format
-format_uri = redfoot.module(URIRef("modules/simple_format#module", base=redfoot_program)).format_uri
+format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot.uri)).format
+format_uri = redfoot.module(URIRef("modules/simple_format#module", base=redfoot.uri)).format_uri
 
 seeAlsoList = list(redfoot.objects(uri, RDFS.seeAlso))
 

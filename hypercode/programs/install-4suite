@@ -88,8 +88,8 @@ from urllib2 import urlopen, Request
 FT_PROP = Namespace("http://xmlns.4suite.org/4ss/properties#")
 
 intersectionProp = rdflib.URIRef("http://www.w3.org/2002/07/owl#intersectionOf")
-components       = [u'Core']+[str(redfoot_loader.value(component,RDFS.label)) for component in redfoot_loader.items(redfoot_loader.value(redfoot_program,intersectionProp))]            
-superuser        = redfoot_loader.value(redfoot_program,rdflib.URIRef('http://xmlns.com/foaf/0.1/nick'))
+components       = [u'Core']+[str(redfoot_loader.value(component,RDFS.label)) for component in redfoot_loader.items(redfoot_loader.value(redfoot.uri,intersectionProp))]            
+superuser        = redfoot_loader.value(redfoot.uri,rdflib.URIRef('http://xmlns.com/foaf/0.1/nick'))
 
 if not len(args):
     logging.critical("usage: <installer password> [.. repository components ..]")
@@ -169,9 +169,9 @@ logging.info("setting up repository")
 #Read the config file
 Rdflib.InitializeModule()
 model = Model(Rdflib.DbAdapter(ConjunctiveGraph(redfoot_loader.store)))
-properties = ConfigFile.ReadCore(redfoot_program, model)
-properties['CoreId'] = redfoot_program
-properties['ConfigFile'] = redfoot_program
+properties = ConfigFile.ReadCore(redfoot.uri, model)
+properties['CoreId'] = redfoot.uri
+properties['ConfigFile'] = redfoot.uri
 
 superuser_passwdHash=ClAuthenticate.HashPasswd(superuser_passwd)
 
@@ -219,7 +219,7 @@ else:
     userName = superuser
     passwd = superuser_passwdHash
             
-print "Repository credentials: %s/%s"%(userName,redfoot_loader.value(redfoot_program,rdflib.URIRef('http://redfoot.net/2005/session#hexdigest')))
+print "Repository credentials: %s/%s"%(userName,redfoot_loader.value(redfoot.uri,rdflib.URIRef('http://redfoot.net/2005/session#hexdigest')))
 #Hand processing off to the common init routines
 if not skipInstall:
     Init.DoInit(properties,
@@ -245,7 +245,7 @@ repo.txCommit()
 config = GlobalConfig.GlobalConfig(
             userName,
             passwd,
-            redfoot_program,
+            redfoot.uri,
             'install-4suite',
             debug=1)
             

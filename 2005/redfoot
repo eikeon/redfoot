@@ -3,13 +3,13 @@
   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+  xmlns:template='http://redfoot.net/2005/template#'
+  xmlns:server="http://redfoot.net/2005/server#"
 >
 
   <redfoot:Namespace rdf:about="#">
-    <rdfs:label>Redfoot Namespace</rdfs:label>
-    <rdfs:comment>
-     The core Redfoot namespace.
-    </rdfs:comment>
+    <rdfs:label>Redfoot</rdfs:label>
+    <rdfs:comment>The core Redfoot namespace.</rdfs:comment>
   </redfoot:Namespace>
 
   <rdfs:Class rdf:ID="Resource">
@@ -96,6 +96,60 @@
     <rdfs:label>Context</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:subClassOf rdf:resource="#Resource"/>
+    <template:content>
+      <server:PagePartHandler rdf:ID="content_handler">
+        <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
+<span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
+<?python
+from urllib import quote
+from rdflib.util import uniq
+
+cid = request.uri.abstract()
+context = redfoot.get_context(cid)
+REDFOOT = redfoot.namespace("http://redfoot.net/2005/redfoot#")
+DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
+DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
+action = request.parameters.get("action", None)
+if action=="reload":
+    source = redfoot.value(cid, REDFOOT.source)
+    if source:
+        print "reloading: %s" % source
+        redfoot.load(source, publicID=cid)
+if action=="delete":
+    print "Deleting:", cid
+    redfoot.remove_context(cid)   
+
+from urllib import quote
+?>
+  <p>Creator: ${redfoot.value(cid, DC.creator, any=True)}</p>
+  <p>Length: ${len(context)}</p>
+  <p>Source: ${",".join(redfoot.objects(cid, REDFOOT.source))}</p>
+  <p>View: <a href="${request.relative('%s?content-type=%s' % (cid.defrag(), quote('application/rdf+xml')))}">RDF/XML</a></p>
+
+<p>
+<form method="POST" action="">
+  <input type="submit" name="action" value="reload"/>
+</form>
+</p>
+
+<p>
+<form method="POST" action="">
+  <input type="submit" name="action" value="delete"/>
+</form>
+</p>
+
+<h3>Instances</h3>
+
+<ul>
+  <li kid:for="s in [s for s in uniq(context.subjects()) if isinstance(s, URIRef)]"><a href="${request.host}/;${s.concrete()}">${context.label(s, s)}</a></li>
+</ul>  
+
+</span>
+
+
+      ]]></rdf:value>
+      </server:PagePartHandler>
+    </template:content>
   </rdfs:Class>
 
   <rdf:Property rdf:ID="source">

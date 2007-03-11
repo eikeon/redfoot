@@ -12,6 +12,11 @@
   <rdfe:RDFXMLDocument rdf:about="">
   </rdfe:RDFXMLDocument>
   
+  <redfoot:Namespace rdf:about="#">
+    <rdfs:label>Auth</rdfs:label>
+    <rdfs:comment>The Redfoot auth namespace.</rdfs:comment>
+  </redfoot:Namespace>
+
   <aspect:Aspect rdf:ID="aspect">
     <rdfs:label>Authentication</rdfs:label>
     <rdfs:comment></rdfs:comment>
@@ -94,7 +99,7 @@ else:
     <server:content_type>application/xhtml+xml</server:content_type>
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python"><![CDATA[
 
-_logger = logging.getLogger(redfoot_current)
+_logger = logging.getLogger(__uri__)
 
 _logger.debug("login_process")
 
@@ -119,7 +124,7 @@ if request.method=='POST':
     return_uri = URIRef(request.parameters.get("return_uri", "%s/" % request.host))
     login_uri = URIRef(request.parameters.get("login_uri"))
 
-    auth = redfoot.module(URIRef("modules/auth#module", base=redfoot_program))    
+    auth = redfoot.module(URIRef("modules/auth#module", base=redfoot.uri))    
     if auth.authenticate(request, username=uid, password=password):
 	response.setStatus(302, 'found')
 	if not return_uri.startswith(request.host):

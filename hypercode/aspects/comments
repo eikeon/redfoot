@@ -14,6 +14,11 @@
   <rdfe:RDFXMLDocument rdf:about="">
   </rdfe:RDFXMLDocument>
   
+  <redfoot:Namespace rdf:about="#">
+    <rdfs:label>Comments</rdfs:label>
+    <rdfs:comment>The Redfoot comments namespace.</rdfs:comment>
+  </redfoot:Namespace>
+
   <aspect:Aspect rdf:ID="aspect">
     <rdfs:label>Comments</rdfs:label>
     <aspect:item rdf:resource="#site"/>
@@ -41,7 +46,7 @@
 <?python
 import logging
 
-_logger = logging.getLogger(redfoot_current)
+_logger = logging.getLogger(__uri__)
 
 comment_module = redfoot.module(URIRef("#module", base=__uri__))
 
@@ -261,7 +266,7 @@ DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
 COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")
 
-format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot_program)).format
+format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot.uri)).format
 
 resources = []
 for resource in redfoot.subjects(RDF.type, COMMENT.Comment):

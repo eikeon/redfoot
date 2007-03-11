@@ -18,8 +18,8 @@
 release = request.uri.abstract()
 
 DOAP = redfoot.namespace("http://usefulinc.com/ns/doap#")
-format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot_program)).format
-format_uri = redfoot.module(URIRef("modules/simple_format#module", base=redfoot_program)).format_uri
+format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot.uri)).format
+format_uri = redfoot.module(URIRef("modules/simple_format#module", base=redfoot.uri)).format_uri
 
 content_value = redfoot.comment(release)
 content_type = content_value.datatype

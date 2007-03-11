@@ -8,9 +8,8 @@
 >  
 
   <redfoot:Namespace rdf:about="#">
-    <rdfs:label>Redfoot comment namespace</rdfs:label>
-    <rdfs:comment>
-    </rdfs:comment>
+    <rdfs:label>Comment</rdfs:label>
+    <rdfs:comment>The Redfoot comment namespace.</rdfs:comment>
   </redfoot:Namespace>
 
   <rdfs:Class rdf:ID="Comment">

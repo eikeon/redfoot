@@ -9,9 +9,8 @@
 <!-- deprecated... use commands instead. -->
 
   <redfoot:Namespace rdf:about="#">
-    <rdfs:label>Redfoot program Namespace</rdfs:label>
-    <rdfs:comment>
-    </rdfs:comment>
+    <rdfs:label>Program</rdfs:label>
+    <rdfs:comment>The Redfoot program namespce (deprecated).</rdfs:comment>
   </redfoot:Namespace>
 
   <rdf:Property rdf:ID="config">

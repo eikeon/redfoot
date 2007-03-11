@@ -9,6 +9,11 @@
   <rdfe:RDFXMLDocument rdf:about="">
   </rdfe:RDFXMLDocument>
   
+  <redfoot:Namespace rdf:about="#">
+    <rdfs:label>Auth</rdfs:label>
+    <rdfs:comment>The Redfoot auth namespace.</rdfs:comment>
+  </redfoot:Namespace>
+
   <redfoot:Module rdf:ID="module">
     <rdfs:label></rdfs:label>      
     <rdfs:comment></rdfs:comment>    

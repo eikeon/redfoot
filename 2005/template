@@ -6,8 +6,8 @@
 >
 
   <redfoot:Namespace rdf:about="#">
-    <rdfs:label>Redfoot Template</rdfs:label>
-    <rdfs:comment>The Redfoot Handler namespace is...</rdfs:comment>
+    <rdfs:label>Template</rdfs:label>
+    <rdfs:comment>The Redfoot template namespace.</rdfs:comment>
   </redfoot:Namespace>
 
   <rdfs:Class rdf:ID="Section">

@@ -10,6 +10,11 @@
   <rdfe:RDFXMLDocument rdf:about="">
   </rdfe:RDFXMLDocument>
   
+  <redfoot:Namespace rdf:about="#">
+    <rdfs:label>Server</rdfs:label>
+    <rdfs:comment>The Redfoot server namespace.</rdfs:comment>
+  </redfoot:Namespace>
+
   <server:Server rdf:about="#twisted">
     <rdfs:label>twisted server for Redfoot</rdfs:label>      
     <server:handler rdf:resource="../handlers/page#"/>
@@ -18,7 +23,7 @@
 
 import logging
 
-_logger = logging.getLogger(redfoot_current)
+_logger = logging.getLogger(__uri__)
 
 try:
     import twisted
@@ -251,11 +256,11 @@ class _Resource(object):
         request = Request(twisted_request)
         response = Response(twisted_request)
 
-        handler = redfoot.value(request.uri, SERVER.handler) or redfoot.value(request.host, SERVER.handler) or redfoot.value(redfoot_current, SERVER.handler)
+        handler = redfoot.value(request.uri, SERVER.handler) or redfoot.value(request.host, SERVER.handler) or redfoot.value(__uri__, SERVER.handler)
 
         # For Server header format see: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.38
         response.setHeader("Server", "Redfoot/%s rdflib/%s %s Kernel/%s Server/%s Handler/%s)" % 
-                           (redfootlib.__version__, rdflib.__version__, version, redfoot.uri, redfoot_current, handler))
+                           (redfootlib.__version__, rdflib.__version__, version, redfoot.uri, __uri__, handler))
         try:
             redfoot.execute(handler, request=request, response=response)
         except Exception, e:

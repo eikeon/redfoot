@@ -8,9 +8,8 @@
 >  
 
   <redfoot:Namespace rdf:about="#">
-    <rdfs:label>Redfoot server namespace</rdfs:label>
-    <rdfs:comment>
-    </rdfs:comment>
+    <rdfs:label>Server</rdfs:label>
+    <rdfs:comment>The Redfoot server namespce.</rdfs:comment>
   </redfoot:Namespace>
 
   <rdfs:Class rdf:ID="Server">
@@ -96,7 +95,7 @@ import rdflib, redfootlib, twisted, kid
   <ul>
     <li>redfoot: ${redfootlib.__version__}</li>
     <li>rdflib: ${rdflib.__version__} (${rdflib.__date__})</li>
-    <li>kernel: ${redfoot_program}</li>
+    <li>kernel: ${redfoot.uri}</li>
     <li>twisted: ${twisted.__version__}</li>
     <li>kid: ${kid.__version__}</li>
   </ul>

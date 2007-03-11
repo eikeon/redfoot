@@ -3,35 +3,69 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
    xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:commands="http://redfoot.net/2005/commands#"
 >
 
   <redfoot:Namespace rdf:about="#">
-    <rdfs:label>Redfoot commands Namespace</rdfs:label>
-    <rdfs:comment>
-    </rdfs:comment>
+    <rdfs:label>Commands</rdfs:label>
+    <rdfs:comment>The Redfoot commands namespace.</rdfs:comment>
   </redfoot:Namespace>
-
-  <rdf:Property rdf:ID="config">
-    <rdfs:label>config</rdfs:label>
-    <rdfs:comment></rdfs:comment>
-    <rdfs:domain rdf:resource="http://redfoot.net/2005/redfoot#Main"/>
-    <rdfs:range rdf:resource="#Config"/>
-  </rdf:Property> 
-
-   <rdf:Property rdf:ID="command">
-    <rdfs:label>command</rdfs:label>
-    <rdfs:comment></rdfs:comment>
-    <rdfs:domain rdf:resource="#Config"/>
-    <rdfs:range rdf:resource="#Command"/>
-  </rdf:Property> 
 
   <rdfs:Class rdf:ID="Command">
     <rdfs:label>Command</rdfs:label>
-    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/redfoot#Resource"/>
+    <rdfs:comment>...</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/redfoot#Code"/>
   </rdfs:Class>
 
-  <rdf:Property rdf:about="redfoot#code">
-    <rdfs:domain rdf:resource="#Command"/>
-  </rdf:Property>
+  <redfoot:Python rdf:ID="runner">
+    <rdfs:label>Command Runner</rdfs:label>
+    <rdfs:seeAlso rdf:resource="../hypercode/commands/manage#"/>
+    <rdfs:seeAlso rdf:resource="../hypercode/commands/static#"/>
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+import logging
+
+_logger = logging.getLogger(__uri__)
+
+COMMANDS = redfoot.namespace("http://redfoot.net/2005/commands#")
+
+commands = {}
+
+# TODO: move to redfoot.execute
+for d in redfoot.objects(__uri__, RDFS.seeAlso):
+    redfoot.check(d)
+
+for command in redfoot.instances(COMMANDS.Command):
+    redfoot.check(command)
+    label = redfoot.label(command)
+
+    # TODO: do we need to check for this level of indirection or can
+    # this be deprecated.
+    code = redfoot.value(command, REDFOOT.code) or command
+    if code!=command:
+        redfoot.check(code)
+    commands[label] = code
+
+# TODO: command line parsing and usage
+if not args:
+    args = [""]
+
+command = args[0]
+
+# find code object by label or full URIRef
+code = commands.get(command, URIRef(command))
+if code:
+    redfoot.execute(code, args=args[1:])
+else:
+    if command:
+        redfoot.write("Command '%s' not found.\n" % command)
+    command_list = commands.keys()
+    command_list.sort()
+    redfoot.write("available commands: \n    %s\n" % ", ".join(command_list))
+
+]]>
+    </rdf:value>
+  </redfoot:Python>
 
 </rdf:RDF>

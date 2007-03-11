@@ -14,7 +14,7 @@
     <rdfs:label>Redfoot Kernel</rdfs:label>
     <rdfs:comment>
     </rdfs:comment> 
-    <redfoot:program rdf:resource="programs/command_runner#"/>
+    <redfoot:program rdf:resource="../2005/commands#runner"/>
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
@@ -37,7 +37,10 @@ from itertools import chain
 import os
 import logging
 
-_logger = logging.getLogger("%s" % redfoot_loader.label(redfoot_program, redfoot_program))
+# BootLoader defines redfoot_program instead of __uri__
+__uri__ = redfoot_program 
+
+_logger = logging.getLogger("%s" % redfoot_loader.label(__uri__, __uri__))
 
 import rdflib
 
@@ -82,7 +85,7 @@ def logical_to_physical(uri):
 def physical_to_logical(uri):
     return URIRef(uri.replace(redfoot_base, "http://redfoot.net/", 1))
 
-redfoot_program = physical_to_logical(redfoot_program)
+__uri__ = physical_to_logical(__uri__)
 
 import urllib2, re
 from datetime import datetime, timedelta
@@ -334,9 +337,9 @@ class Redfoot(ConjunctiveGraph):
     log = property(_get_log)
 
     def __get_program(self):
-        # redfoot_program is defined by the BootLoader and is the boot program
-        program = self.value(redfoot_program, REDFOOT.program)
-        program = program or redfoot_loader.value(redfoot_program, REDFOOT.program)
+        # __uri__ is defined by the BootLoader and is the boot program
+        program = self.value(__uri__, REDFOOT.program)
+        program = program or redfoot_loader.value(__uri__, REDFOOT.program)
         assert program, "No default program found"            
         return program
     # program resource redfoot will execute
@@ -377,7 +380,7 @@ class Redfoot(ConjunctiveGraph):
         self.check(NAMESPACE, creator=physical_to_logical(redfoot_loader.program))
         REDFOOT = self.namespace(NAMESPACE, creator=physical_to_logical(redfoot_loader.program))
         
-        self.uri = redfoot_program # uri to the version of redfoot that's running
+        self.uri = __uri__ # uri to the version of redfoot that's running
         context = dict({"redfoot": self, "REDFOOT": REDFOOT, 
                         "RDF": RDF, "RDFS": RDFS,
                         "URIRef": URIRef, "BNode": BNode, "Literal": Literal
@@ -544,6 +547,10 @@ class Redfoot(ConjunctiveGraph):
         self.index.add((context_id, REDFOOT.source, location))
         self.index.remove((context_id, REDFOOT.publicID, None))        
         self.index.add((context_id, REDFOOT.publicID, publicID))
+        if (context_id, RDFS.label, None) not in self:
+            label = self.label(URIRef("#", base=publicID))
+            if label:
+                self.index.add((context_id, RDFS.label, label))
         if format=="xml":
             self.index.add((publicID.defrag(), RDF.type, URIRef("http://redfoot.net/rdf#RDFXMLDocument")))
         return context
@@ -589,16 +596,16 @@ class Redfoot(ConjunctiveGraph):
 
     def execute(self, code, context=None, **args):
         self.check(code)
+        for other in self.objects(code, RDFS.seeAlso):
+            redfoot.check(other)
         value = self.value(code)
         assert value, "%s has no RDF.value" % code
-        assert value.datatype==REDFOOT.Python, "%s RDF.value is not of datatype REDFOOT.Python. %s currently only supports REDFOOT.Python code values" % (code, redfoot_program)
+        assert value.datatype==REDFOOT.Python, "%s RDF.value is not of datatype REDFOOT.Python. %s currently only supports REDFOOT.Python code values" % (code, __uri__)
         if context==None:
             context = dict(self.__context)
         for k, v in args.items():
             context[k] = v
-        context["redfoot_current"] = code
         context["__uri__"] = code
-        context["redfoot_program"] = redfoot_program
 
         value = value.replace("\r\n", "\n")        
         value = value.replace("\r", "\n")        
@@ -720,7 +727,7 @@ class Redfoot(ConjunctiveGraph):
 		    yield property
 
     def main(self, options, args):
-        self.check(redfoot_program) # to get default program
+        self.check(__uri__) # to get default program
         if options.program:
             program = URIRef(options.program)
         else:
@@ -774,7 +781,7 @@ class Redfoot(ConjunctiveGraph):
 
     def _get_xmpp(self):
         if self.__xmpp is None:
-            xmpp_uri = URIRef("modules/xmpp", base=redfoot_program)
+            xmpp_uri = URIRef("modules/xmpp", base=__uri__)
             redfoot.check(xmpp_uri) # to pull in xmpp_info command
             if self.xmpp_id and self.xmpp_password:
                 xmpp = self.module(URIRef("#client", base=xmpp_uri))
@@ -786,7 +793,7 @@ class Redfoot(ConjunctiveGraph):
 
     def _get_rule_engine(self):
         if self.__rule_engine is None:
-            rules_uri = URIRef("modules/rules", base=redfoot_program)
+            rules_uri = URIRef("modules/rules", base=__uri__)
             rule_module = self.module(URIRef("#module", base=rules_uri))            
             rules = set(get_rules(redfoot))
             self.__rule_engine = rule_module.RuleEngine(redfoot)
@@ -808,6 +815,7 @@ path = "__rfdb__"
 
 redfoot = Redfoot("Sleepycat")
 
+# TODO: Push Journal bit down?
 if options.rebuild_from_journal:
     _logger.info("rebuilding store from journal file...")
     os.rename(path, "%s-backup-%s" % (path, date_time()))
@@ -815,21 +823,19 @@ if options.rebuild_from_journal:
     JournalReader(redfoot.store, "%s-journal" % path)
     redfoot.close()
     _logger.info("done rebuilding.")
-
 journal = JournalWriter(redfoot.store, filename="%s-journal" % path) 
+
 redfoot.open(path)
-redfoot._bootstrap()
-redfoot.load(redfoot_loader.program)
-redfoot_loader.redfoot = redfoot 
-
-#pyinc = PychinkoInc(redfoot.store)
+redfoot._bootstrap() # TODO: explain why this is not done at the end of open
+redfoot.load(redfoot_loader.program) # TODO: explain why we load this here too
+redfoot_loader.redfoot = redfoot # TODO: explain why this is needed
 
 
-
+# TODO: turn into REDFOOT.init / REDFOOT.exit pair?
 try:
     _xmpp_handler = None
     if redfoot.xmpp:
-        xmpp = redfoot.module(URIRef("modules/xmpp#logging", base=redfoot_program))
+        xmpp = redfoot.module(URIRef("modules/xmpp#logging", base=__uri__))
         _root_logger = logging.getLogger()
         _xmpp_handler = xmpp.XMPPHandler(REDFOOT.Admin)
         _xmpp_formatter = logging.Formatter('[%(name)s] %(message)s')
@@ -838,11 +844,11 @@ try:
 except Exception, e:
     _logger.warning("XMPP logger not installed: %s" % e)
 
-try:
-    for init in redfoot.objects(REDFOOT.Globals, REDFOOT.init): # TODO: also look for REDFOOT.init at __uri__ ?
+for init in redfoot.objects(REDFOOT.Globals, REDFOOT.init): # TODO: also look for REDFOOT.init at __uri__ ?
+    try:
         redfoot.execute(init)
-except Exception, e:
-    _logger.warning("Failed to init: %s" % e)
+    except Exception, e:
+        _logger.exception(e)
 
 redfoot.main(options, args)
 

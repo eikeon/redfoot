@@ -79,8 +79,8 @@ people.sort()
      xmlns:kid="http://purl.org/kid/ns#">
 <?python 
 DOAP = redfoot.namespace("http://usefulinc.com/ns/doap#")
-format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot_program)).format
-format_uri = redfoot.module(URIRef("modules/simple_format#module", base=redfoot_program)).format_uri
+format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot.uri)).format
+format_uri = redfoot.module(URIRef("modules/simple_format#module", base=redfoot.uri)).format_uri
 project = request.host.abstract()
 releases = []
 for release in redfoot.objects(project, DOAP.release):
@@ -115,8 +115,8 @@ releases.reverse()
 >
 <?python
 DOAP = redfoot.namespace("http://usefulinc.com/ns/doap#")
-format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot_program)).format
-format_uri = redfoot.module(URIRef("modules/simple_format#module", base=redfoot_program)).format_uri
+format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot.uri)).format
+format_uri = redfoot.module(URIRef("modules/simple_format#module", base=redfoot.uri)).format_uri
 # releases = []
 # for release in redfoot.objects(request.uri.abstract(), DOAP.release):
 #     created = redfoot.value(request.uri.abstract(), DOAP.created)

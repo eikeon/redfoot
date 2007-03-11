@@ -14,6 +14,11 @@
   <rdfe:RDFXMLDocument rdf:about="">
   </rdfe:RDFXMLDocument>
   
+  <redfoot:Namespace rdf:about="#">
+    <rdfs:label>Edit Content</rdfs:label>
+    <rdfs:comment>The Redfoot edit content namespace.</rdfs:comment>
+  </redfoot:Namespace>
+
   <aspect:Aspect rdf:ID="aspect">
     <rdfs:label>Edit Content</rdfs:label>
     <aspect:item rdf:resource="#edit_content_page"/>

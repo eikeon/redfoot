@@ -14,6 +14,11 @@
     <rdfs:label>Documents Aspect RDF/XML</rdfs:label>
   </rdfe:RDFXMLDocument>
 
+  <redfoot:Namespace rdf:about="#">
+    <rdfs:label>Documents</rdfs:label>
+    <rdfs:comment>The Redfoot documents namespace.</rdfs:comment>
+  </redfoot:Namespace>
+
   <rdfs:Class rdf:ID="Keyword">
     <rdfs:label>Keyword</rdfs:label>
     <rdfs:comment></rdfs:comment>

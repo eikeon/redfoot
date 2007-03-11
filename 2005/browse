@@ -6,9 +6,8 @@
 >  
 
   <redfoot:Namespace rdf:about="#">
-    <rdfs:label>Redfoot browse namespace</rdfs:label>
-    <rdfs:comment>
-    </rdfs:comment>
+    <rdfs:label>browse</rdfs:label>
+    <rdfs:comment>The redfoot browse namespace.</rdfs:comment>
   </redfoot:Namespace>
 
   <rdf:Property rdf:ID="root">

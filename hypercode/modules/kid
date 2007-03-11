@@ -9,6 +9,11 @@
   <rdfe:RDFXMLDocument rdf:about="">
   </rdfe:RDFXMLDocument>
 
+  <redfoot:Namespace rdf:about="#">
+    <rdfs:label>Kid</rdfs:label>
+    <rdfs:comment>The Redfoot kid namespace.</rdfs:comment>
+  </redfoot:Namespace>
+
   <redfoot:Module rdf:ID="module">
     <rdfs:label>kid glue</rdfs:label>      
     <rdfs:comment></rdfs:comment>    
