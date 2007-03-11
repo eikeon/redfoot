@@ -362,6 +362,14 @@ class Redfoot(ConjunctiveGraph):
     # context where redfoot stores data about contexts
     index = property(__get_index)
             
+    def rebuild_from_journal(self, path):
+        _logger.info("rebuilding store from journal file...")
+        os.rename(path, "%s-backup-%s" % (path, date_time()))
+        redfoot.open(path)
+        JournalReader(self.store, "%s-journal" % path)
+        self.close()
+        _logger.info("done rebuilding.")
+
     def open(self, path):
         #super(Redfoot, self).open(path) # TODO: why does this not work?
         self.store.open(path)
@@ -815,14 +823,9 @@ path = "__rfdb__"
 
 redfoot = Redfoot("Sleepycat")
 
-# TODO: Push Journal bit down?
 if options.rebuild_from_journal:
-    _logger.info("rebuilding store from journal file...")
-    os.rename(path, "%s-backup-%s" % (path, date_time()))
-    redfoot.open(path)
-    JournalReader(redfoot.store, "%s-journal" % path)
-    redfoot.close()
-    _logger.info("done rebuilding.")
+    redfoot.rebuild_from_journal(path)
+
 journal = JournalWriter(redfoot.store, filename="%s-journal" % path) 
 
 redfoot.open(path)
