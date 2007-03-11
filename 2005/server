@@ -42,7 +42,7 @@
   <rdfs:Class rdf:ID="Site">
     <rdfs:label>Site</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/redfoot#Resource"/>
+    <rdfs:subClassOf rdf:resource="redfoot#Resource"/>
     <server:allow rdf:resource="#Admin"/>
     <template:content>
       <server:PagePartHandler rdf:ID="site_handler">
@@ -122,13 +122,13 @@ import rdflib, redfootlib, twisted, kid
   <rdfs:Class rdf:ID="Page">
     <rdfs:label>Page</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/redfoot#Resource"/>
+    <rdfs:subClassOf rdf:resource="redfoot#Resource"/>
   </rdfs:Class>
 
   <rdfs:Class rdf:ID="StaticPage">
     <rdfs:label>Static Page</rdfs:label>
     <rdfs:comment>A page that is served from the filesystem or somesuch.</rdfs:comment>
-    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/redfoot#Resource"/>
+    <rdfs:subClassOf rdf:resource="redfoot#Resource"/>
     <server:supported_content_types>*/*</server:supported_content_types>
     <server:page_handler>
       <server:PageHandler rdf:ID="file_handler">

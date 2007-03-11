@@ -146,7 +146,7 @@
   <rdfs:Class rdf:ID="Title">
     <rdfs:label>Title</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:subClassOf rdf:resource="#PagePartHandler"/>
+    <rdfs:subClassOf rdf:resource="server#PagePartHandler"/>
   </rdfs:Class>
 
   <rdf:Property rdf:ID="title">
@@ -161,7 +161,7 @@
   <rdfs:Class rdf:ID="Shortcut_Icon">
     <rdfs:label>Shortcut_Icon</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:subClassOf rdf:resource="#PagePartHandler"/>
+    <rdfs:subClassOf rdf:resource="redfoot#Resource"/>
   </rdfs:Class>
 
   <rdf:Property rdf:ID="shortcut_icon">

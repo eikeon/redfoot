@@ -13,7 +13,7 @@
   <rdfs:Class rdf:ID="Session">
     <rdfs:label>Session</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/server#Class"/>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/redfoot#Resource"/>
   </rdfs:Class>
 
   <rdf:Property rdf:ID="session">
