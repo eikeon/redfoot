@@ -28,13 +28,9 @@ import logging
 
 _logger = logging.getLogger(__uri__)
 
-COMMANDS = redfoot.namespace("http://redfoot.net/2005/commands#")
+COMMANDS = redfoot.namespace(URIRef("#", base=__uri__))
 
 commands = {}
-
-# TODO: move to redfoot.execute
-for d in redfoot.objects(__uri__, RDFS.seeAlso):
-    redfoot.check(d)
 
 for command in redfoot.instances(COMMANDS.Command):
     redfoot.check(command)
