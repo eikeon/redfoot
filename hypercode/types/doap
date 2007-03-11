@@ -6,33 +6,4 @@
    xmlns:template='http://redfoot.net/2005/template#'
 >
 
-  <rdf:Description rdf:about="http://usefulinc.com/ns/doap#Version">
-    <template:content rdf:parseType="Resource">
-      <rdfs:label>Default main for Redfoot</rdfs:label>      
-      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
-<![CDATA[
-<div xmlns="http://www.w3.org/1999/xhtml"
-     xmlns:kid="http://purl.org/kid/ns#"
->
-<?python
-release = request.uri.abstract()
-
-DOAP = redfoot.namespace("http://usefulinc.com/ns/doap#")
-format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot.uri)).format
-format_uri = redfoot.module(URIRef("modules/simple_format#module", base=redfoot.uri)).format_uri
-
-content_value = redfoot.comment(release)
-content_type = content_value.datatype
-?>
-
-  <p kid:if="content_type=='http://www.w3.org/1999/xhtml'">${XML(content_value)}</p>
-  <p kid:if="content_type!='http://www.w3.org/1999/xhtml'">${content_value}</p>
-  
-
-</div>
-]]>
-      </rdf:value>
-    </template:content>
-  </rdf:Description>
-
 </rdf:RDF>  

@@ -12,63 +12,6 @@
   </rdfe:RDFXMLDocument>
   
   <rdfs:Class rdf:about="http://redfoot.net/2005/redfoot#Release">
-    <handler:content>
-      <redfoot:Python rdf:ID="release_content">
-        <rdfs:label>Display of Release</rdfs:label>
-        <handler:kid>
-<![CDATA[
-<div xmlns="http://www.w3.org/1999/xhtml"
-     xmlns:kid="http://purl.org/kid/ns#"
-     kid:strip=""
->
-<?python
-if (request.uri.abstract(), None, None) in redfoot:
-    uri = request.uri.abstract()
-elif (request.uri, None, None) in redfoot:
-    uri = request.uri
-else:
-    uri = request.uri.abstract()
-    
-format_uri = redfoot.module("http://eikco.com/2005/03/simple_format#module").format_uri
-seeAlsoList = list(redfoot.objects(uri, RDFS.seeAlso))
-
-miscList = [t for t in redfoot.predicate_objects(uri) if not t[0] in [RDFS.label, RDFS.comment, RDFS.seeAlso] and not t==(RDF.type, REDFOOT.Release)]
-?>
-
-  <h2 kid:if="(uri, None, None) not in redfoot">Not Found</h2>
-
-  <h2>Release: ${redfoot.label(uri)}</h2>
-  <p>${XML(format_uri(redfoot.comment(uri)))}</p>
-  
-  <ul>
-    <li kid:for="p, o in miscList">${redfoot.label(p) or p},
-      <span kid:strip="" kid:if="isinstance(o, Literal)">
-        <pre>${o}</pre>
-      </span>
-      <span kid:strip="" kid:if="isinstance(o, URIRef)">      
-        <a href="${request.host}/;${o.concrete()}">
-          ${", ".join(redfoot.objects(o, RDFS.label)) or o}
-        </a>
-      </span>
-      <span kid:strip="" kid:if="isinstance(o, BNode)">
-        ${", ".join(redfoot.objects(o, RDFS.label))}      
-      </span>      
-    </li>
-  </ul>
-
-
-  <div kid:if="seeAlsoList">
-  <h2>See Also</h2>
-  <ul>
-    <li kid:for="seeAlso in seeAlsoList">${XML(format_uri(seeAlso))}</li>
-  </ul>
-  </div>    
-
-</div>
-]]>
-        </handler:kid>
-      </redfoot:Python>
-    </handler:content>
   </rdfs:Class>
 
 </rdf:RDF>  

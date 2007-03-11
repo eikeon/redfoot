@@ -7,7 +7,7 @@
         xmlns:commands="http://redfoot.net/2005/commands#"
         xmlns:template="http://redfoot.net/2005/template#"
         xmlns:server="http://redfoot.net/2005/server#"
-   xmlns:aspect="http://redfoot.net/hypercode/aspect#"
+        xmlns:aspect="http://redfoot.net/hypercode/aspect#"
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
@@ -395,5 +395,138 @@ for recipe in redfoot.subjects(RDF.type, RECIPE.Recipe):
     </commands:command>
 
   </redfoot:Configuration>>
+
+  <rdf:Description rdf:about="http://donnafales.com/2002/07/28/recipe-schema#Recipe">
+<!--
+    <handler:text rdf:parseType="Resource">
+      <rdfs:label>KID template for displaying a Recipe</rdfs:label>
+      <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+response.write("""
+%s
+
+%s
+""" % (redfoot.label(request.uri), redfoot.comment(request.uri)))
+]]>
+      </rdf:value>
+    </handler:text>
+-->
+    <template:content>
+     <server:PagePartHandler rdf:ID="RecipeContent">
+      <rdfs:label>Recipe</rdfs:label>
+      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+<div xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:kid="http://purl.org/kid/ns#"
+     class="recipe"
+>
+<?kid
+# import some stuff
+# TODO: push to redfoot using datatype plugin
+format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot.uri)).format
+
+RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
+
+recipe = request.uri
+?>
+
+  <p>${XML(format(redfoot.comment(recipe)))}</p>
+
+ <div class="ingredients"
+      kid:for="ingredients in redfoot.objects(recipe, RECIPE.ingredients)">
+  <h3>${' | '.join(redfoot.objects(ingredients, RDFS.label)) + ' Ingredients'}</h3>
+  <ul>
+    <li kid:for="ingredient in redfoot.items(ingredients)">    
+        ${XML(format(redfoot.label(ingredient)))}
+    </li>    
+  </ul>
+ </div>
+
+ <div class="directions"
+       kid:for="steps in redfoot.objects(recipe, RECIPE.directions)">
+  <h3>Directions</h3>
+  <ol>
+    <li kid:for="item in redfoot.items(steps)">
+        ${XML(format(redfoot.label(item)))}
+    </li>    
+  </ol>
+ </div>
+ <div class="spacer"/>&#160;
+</div>
+]]>
+      </rdf:value>
+     </server:PagePartHandler>
+    </template:content>
+  </rdf:Description>
+<!--
+<hr/>
+<?python
+from random import choice
+RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")    
+recipe = choice(list(redfoot.subjects(RDF.type, RECIPE.Recipe)))
+source = redfoot.value(None, RECIPE.recipe, recipe, any=True)
+?>
+    <p>Random Recipe: <a href="${recipe}">${redfoot.label(recipe)}</a></p>
+-->
+
+  <rdf:Description rdf:about="http://donnafales.com/2002/07/28/recipe-schema#Ingredient">
+    <template:content>
+     <server:PagePartHandler rdf:ID="IngredientContent">
+      <rdfs:label>Ingredient</rdfs:label>
+      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+<div xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:kid="http://purl.org/kid/ns#"
+     class="ingredient"
+>
+<?kid
+RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
+format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot.uriyy)).format
+
+ingredient = request.uri
+
+recipes = []
+for recipe in redfoot.subjects(RECIPE.ingredient, ingredient):
+    label = redfoot.label(recipe)
+    recipes.append((label, recipe))
+recipes.sort()
+
+?>
+
+  <p>${XML(format(redfoot.comment(ingredient)))}</p>
+
+  <h3>Recipes containing ${redfoot.label(ingredient)}</h3>
+  <ul>
+    <li kid:for="label, recipe in recipes">
+      <a href="${request.relative(recipe.concrete())}">${label}</a>        
+    </li>    
+  </ul>
+
+</div>
+]]>
+      </rdf:value>
+     </server:PagePartHandler>
+    </template:content>
+  </rdf:Description>    
+
+  <rdf:Description rdf:about="http://donnafales.com/2002/07/28/recipe-schema#RecipeOriginal">
+    <rdfs:label>Recipe Original</rdfs:label>
+    <rdfs:comment>Alternative view of recipe, namely, the original</rdfs:comment>
+    <server:supported_content_types>text/plain</server:supported_content_types>
+    <server:page_handler>
+     <server:PageHandler rdf:ID="RecipeOriginalContent">
+      <rdfs:label>Recipe Original</rdfs:label>
+      <server:content_type>text/plain</server:content_type>            
+      <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
+SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+recipe = redfoot.value(None, SERVER.alternate, request.uri)
+response.write(redfoot.value(recipe, RECIPE.original))
+]]>
+      </rdf:value>
+     </server:PageHandler>
+    </server:page_handler>
+  </rdf:Description>
 
 </rdf:RDF>  

@@ -12,60 +12,6 @@
   </rdfe:RDFXMLDocument>
   
   <rdf:Description rdf:about="http://redfoot.net/2005/blog#Entry">
-    <template:content>
-     <server:PagePartHandler rdf:ID="EntryContent">
-      <rdfs:label>Entry</rdfs:label>
-      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
-<![CDATA[
-<div xmlns="http://www.w3.org/1999/xhtml"
-     xmlns:kid="http://purl.org/kid/ns#"
-     class="entry"
->
-<?python
-import time
-from rdflib.util import parse_date_time
-
-BLOG = redfoot.namespace("http://redfoot.net/2005/blog#")
-DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
-DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
-
-COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")
-
-HTML = redfoot.module(URIRef("modules/blog#html", base=redfoot.uri)).HTML
-markdown = redfoot.module(URIRef("modules/markdown#module", base=redfoot.uri)).markdown
-
-entry = request.uri.abstract()
-if (entry, RDF.type, BLOG.Entry) not in redfoot:
-    entry = request.uri
-
-date = redfoot.value(entry, DCTERMS.created)
-
-content = redfoot.value(entry, BLOG.content)
-if content:
-    content_value = redfoot.value(content, RDF.value)
-    content_type = redfoot.value(content, BLOG.content_type)
-else:
-    content_value = redfoot.comment(entry)
-    if content_value:
-        content_type = content_value.datatype
-
-creator = redfoot.value(entry, DC.creator)
-?>
-
-<p class="meta"><span kid:if="creator" kid:strip="">by ${redfoot.label(creator)}</span> on 
-   ${time.strftime("%A %d %B, %Y", time.gmtime(parse_date_time(date)))}:</p>
-
-  <span kid:if="content_value" kid:strip="">
-    <p kid:strip="" kid:if="content_type=='http://www.w3.org/TR/REC-html40'">${HTML(content_value)}</p>
-    <p kid:strip="" kid:if="content_type=='http://www.w3.org/1999/xhtml'">${XML(content_value)}</p>
-    <pre kid:if="not content_type">${content_value}</pre>
-  </span>
-
-</div>
-]]>
-      </rdf:value>
-     </server:PagePartHandler>
-    </template:content>
   </rdf:Description>
 
 </rdf:RDF>  
