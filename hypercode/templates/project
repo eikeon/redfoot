@@ -20,7 +20,7 @@
     <template:title rdf:resource="classic#title"/>
     <template:shortcut_icon rdf:resource="http://redfoot.net/2002/11/25/favicon.ico"/>
     <template:header rdf:resource="classic#header"/>
-    <template:navigation rdf:resource="classic#navigation"/>
+    <template:navigation rdf:resource="#navigation"/>
     <template:user_navigation rdf:resource="classic#user_navigation"/>
     <template:footer rdf:resource="classic#footer"/>
     <server:unauthorized_page_handler rdf:resource="classic#unauthorized_page_handler"/>
@@ -78,6 +78,38 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
     </rdf:value>    
   </template:Template>
 
+
+  <server:PagePartHandler rdf:ID="navigation">
+    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
+
+<div class="nav" xmlns:kid="http://purl.org/kid/ns#">
+<?python
+TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")
+sections = []
+for section in redfoot.objects(request.host, TEMPLATE.section):
+    label = redfoot.value(section, TEMPLATE.section_name) or redfoot.label(section)
+    comment = redfoot.comment(section)
+    try:
+        val = redfoot.value(section, TEMPLATE.section_rank)
+        if val is None:
+            val = redfoot.value(section, TEMPLATE.default_section_rank, any=True)            
+        rank = float(val)
+    except:
+        rank = 0.0
+    if allow(section):
+        sections.append((rank, label, section, comment))
+sections.sort()
+?>
+  <dl kid:if="sections" id="navlist">
+   <span kid:for="rank, label, section, comment in sections" kid:strip="">
+    <dt><a href="${section}" id="${section==request.uri and 'current' or None}">${label}</a></dt>
+    <dd>${comment}</dd>
+   </span>
+  </dl>  
+</div>
+    
+      ]]></rdf:value>
+  </server:PagePartHandler>
 
   <server:PagePartHandler rdf:ID="css">
     <rdfs:label>Default css</rdfs:label>
