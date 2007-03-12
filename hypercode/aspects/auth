@@ -129,10 +129,12 @@ if request.method=='POST':
 	response.setStatus(302, 'found')
 	if not return_uri.startswith(request.host):
 	    return_uri = URIRef(request.relative(return_uri))
+        _logger.debug("redirecting to '%s'" % return_uri)
 	response.setHeader('Location', return_uri)
     else:
 	login_uri += "?return_uri=%s" % quote(return_uri)
 	response.setStatus(302, 'found')   
+        _logger.debug("redirecting to '%s'" % login_uri)
 	response.setHeader('Location', login_uri)
 else:
     response.setStatus(405, "Method not Allowed")
