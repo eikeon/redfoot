@@ -203,8 +203,10 @@ else:
     if str(long_running)=="true": # TODO:
         def finish(_):
             response.finish()
+        def _error(e):
+            raise e
         d = deferToThread(display_page, page_handler)
-        d.addCallbacks(callback=finish, errback=finish)
+        d.addCallbacks(callback=finish, errback=_error)
     else:
         display_page(page_handler)
         response.finish()
