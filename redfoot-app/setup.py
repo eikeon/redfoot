@@ -27,15 +27,15 @@ setup(
     """,
 
     packages = ["redfootlib"],
-    #scripts = ["bin/redfoot"],
 
+    #scripts = ["bin/redfoot"],
     entry_points = {
         'console_scripts': [
             'redfoot = redfootlib.main:main',
         ]
     },
 
-    install_requires = ["rdflib", "zope.interface>=3.3.0", "kid>=0.9.5"],
+    install_requires = ["rdflib>2.3.3", "zope.interface>=3.3.0", "kid>=0.9.5"],
 
     )
 
