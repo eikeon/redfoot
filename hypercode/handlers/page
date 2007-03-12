@@ -204,7 +204,8 @@ else:
         def finish(_):
             response.finish()
         def _error(e):
-            raise e
+            _logger.exception(e)
+            response.finish()
         d = deferToThread(display_page, page_handler)
         d.addCallbacks(callback=finish, errback=_error)
     else:
