@@ -203,11 +203,16 @@ else:
     if str(long_running)=="true": # TODO:
         def finish(_):
             response.finish()
-        def _error(e):
-            _logger.exception(e)
+        def safe_display_page():
+            "version of display_page that catches all exceptions"
+            try:
+                display_page(page_handler)
+            except Exception, e:
+                _logger.exception(e)
+                response.setStatus(500, "Internal Server Error -- this is hopefully a temporary issue.")
             response.finish()
-        d = deferToThread(display_page, page_handler)
-        d.addCallbacks(callback=finish, errback=_error)
+        d = deferToThread(safe_display_page)
+        d.addCallbacks(callback=finish)
     else:
         display_page(page_handler)
         response.finish()
