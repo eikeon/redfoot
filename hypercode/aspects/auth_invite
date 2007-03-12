@@ -24,6 +24,9 @@
     <aspect:item rdf:resource="#login_page"/>
     <aspect:item rdf:resource="#login_process_page"/>
     <aspect:item rdf:resource="#logout_page"/>
+    <aspect:item rdf:resource="#user_invite_page"/>
+    <aspect:item rdf:resource="#user_invite_process_page"/>
+    <aspect:item rdf:resource="#register_process_page"/>
   </aspect:Aspect>
 
   <rdf:Description rdf:ID="auth_context">
@@ -44,28 +47,32 @@ in which case "" should be a server:Site
     <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/session#User"/>
   </rdfs:Class>
 
-  <server:Page rdf:about="/login/">
+  <server:Page rdf:ID="login_page">
+    <aspect:location>/login/</aspect:location>
     <rdfs:label>Login</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
-    <template:content rdf:resource="#login"/>
+    <template:content rdf:resource="auth#login"/>
   </server:Page>
 
-  <server:Page rdf:about="/login/process/">
+  <server:Page rdf:ID="login_process_page">
+    <aspect:location>/login/process/</aspect:location>
     <rdfs:label>Login process</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <server:long_running>true</server:long_running>
-    <server:page_handler rdf:resource="#login_process"/>
+    <server:page_handler rdf:resource="auth#login_process"/>
   </server:Page>
 
-  <server:Page rdf:about="/logout/">
+  <server:Page rdf:ID="logout_page">
+    <aspect:location>/logout/</aspect:location>
     <rdfs:label>Logout</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
-    <server:page_handler rdf:resource="#logout_process"/>
+    <server:page_handler rdf:resource="auth#logout_process"/>
   </server:Page>
 
-  <server:Page rdf:about="/user/invite/">
+  <server:Page rdf:ID="user_invite_page">
+    <aspect:location>/user/invite</aspect:location>
     <rdfs:label>Invite User</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
@@ -73,111 +80,20 @@ in which case "" should be a server:Site
     <server:allow rdf:resource="#User"/>
   </server:Page>
 
-  <server:Page rdf:about="/user/invite/process/">
+  <server:Page rdf:ID="user_invite_process_page">
+    <aspect:location>/user/invite/process/</aspect:location>
     <rdfs:label>Invite User</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
     <template:content rdf:resource="#auth_invite_process"/>
   </server:Page>
 
-  <server:Page rdf:about="/register/process/">
+  <server:Page rdf:ID="register_process_page">
+    <aspect:location>/register/process/</aspect:location>
     <rdfs:label>Register Process</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <server:page_handler rdf:resource="#register_process"/>
   </server:Page>
-
-  <server:PagePartHandler rdf:ID="login">
-    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
-
- <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
-<?python 
-SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
-authenticated = request.session_id and (request.session_id, SESSION.authenticated, Literal('True')) in redfoot
-if request.session_id:
-    message = redfoot.value(request.session_id, SESSION.message)
-else:
-    message = ""
-?>
-  <span kid:if="request.method=='GET'" kid:omit="">
-    <span kid:if="authenticated" kid:omit="">
-      <p>You are already logged in.</p>
-    </span>
-    <span kid:if="not authenticated" kid:omit="">
-      <p>${message}</p>
-      <form action="process/" method="POST">
-        <table>
-          <tr>
-            <th>Email Address</th>
-            <td><input type="text" name="uid" value=""/></td>
-          </tr>
-          <tr>
-           <th>Password</th>
-            <td><input type="password" name="password"/></td>
-          </tr>
-         <tr>    
-           <th>&#160;</th>
-           <td><input type="submit" value="login"/></td>
-         </tr>
-        </table>
-        <input type="hidden" name="return_uri" value="${request.headers.get('referer', '%s/login/' % request.host)}"/>
-        <input type="hidden" name="login_uri" value="${request.uri}"/>
-      </form>
-    </span>
-  </span>
- </span>
-      
-      ]]></rdf:value>
-  </server:PagePartHandler>
-
-  <server:PageHandler rdf:ID="login_process">
-    <server:content_type>application/xhtml+xml</server:content_type>
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python"><![CDATA[
-
-if request.method=='POST':
-    from urllib import quote
-    import md5
-
-    uid = request.parameters.get("uid", None)
-    password = request.parameters.get("password", None)
-    return_uri = URIRef(request.parameters.get("return_uri", "%s/" % request.host))
-    login_uri = URIRef(request.parameters.get("login_uri"))
-
-    auth = redfoot.module(URIRef("modules/auth#module", base=redfoot.uri))
-    request.create_session()
-    if auth.authenticate(request, username=uid, password=password):
-	response.setStatus(302, 'found')
-	if not return_uri.startswith(request.host):
-	    return_uri = URIRef(request.relative(return_uri))
-	response.setHeader('Location', return_uri)
-    else:
-	login_uri += "?return_uri=%s" % quote(return_uri)
-	response.setStatus(302, 'found')   
-	response.setHeader('Location', login_uri)
-      
-]]></rdf:value>
-  </server:PageHandler>
-
-  <server:PageHandler rdf:ID="logout_process">
-    <server:content_type>application/xhtml+xml</server:content_type>
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python"><![CDATA[
-
-SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
-authenticated = request.session_id and (request.session_id, SESSION.authenticated, Literal('True')) in redfoot
-
-sid = request.session_id
-if sid:
-    context = redfoot.get_context(redfoot.context_id(sid))
-    redfoot.remove((sid, SESSION.authenticated, None))
-    redfoot.remove((sid, SESSION.uid, None))
-    context.add((sid, SESSION.authenticated, Literal("False")))
-
-return_uri = URIRef(request.headers.get("referer", "%s/" % request.host))
-
-response.setStatus(302, 'found')
-response.setHeader('Location', return_uri)
-      
-      ]]></rdf:value>
-  </server:PageHandler>
 
 
   <server:PageHandler rdf:ID="register_process">
