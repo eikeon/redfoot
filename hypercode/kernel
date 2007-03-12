@@ -814,6 +814,7 @@ parser = OptionParser("usage: %prog program <program_options>")
 parser.add_option("--path", dest="path", help="path to database") 
 parser.add_option("--program", dest="program", help="URIRef of program for kernel to load and run. Defaults to command_runner")
 parser.add_option("--rebuild-from-journal", action="store_true", dest="rebuild_from_journal", help="rebuild the store from the journal file")    
+parser.add_option("--update", action="store_true", dest="update", help="update cached version of program")    
 
 parser.allow_interspersed_args = False
 
@@ -827,9 +828,10 @@ if options.rebuild_from_journal:
     redfoot.rebuild_from_journal(path)
 
 journal = JournalWriter(redfoot.store, filename="%s-journal" % path) 
-
 redfoot.open(path)
 redfoot._bootstrap() # TODO: explain why this is not done at the end of open
+if options.update:
+    redfoot.load(redfoot.program)
 redfoot.load(redfoot_loader.program) # TODO: explain why we load this here too
 redfoot_loader.redfoot = redfoot # TODO: explain why this is needed
 
