@@ -614,6 +614,10 @@ if startswith:
                 redfoot.index.remove((cid, None, None))
         except Exception, e:
             print e
+    # clean up index
+    for cid in list(redfoot.index.subjects(RDF.type, REDFOOT.Context)):
+        if cid.startswith(startswith)
+            redfoot.index.remove((cid, None, None))
 
 ]]>
         </rdf:value>
