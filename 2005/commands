@@ -64,4 +64,29 @@ else:
     </rdf:value>
   </redfoot:Python>
 
+      <commands:Command rdf:ID="load">
+        <rdfs:label>load</rdfs:label>
+        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+if len(args)==0 or len(args)>3:
+    print "usage: ./redfoot.py load <uri> [<publicID>]"
+else:
+    import os
+    from urllib import pathname2url
+    from urlparse import urljoin
+    url = URIRef(args[0], base="%s/" % urljoin("file:", pathname2url(os.getcwd())))
+    try:
+        publicID = URIRef(redfoot.absolutize(args[1], defrag=False))
+    except:
+        publicID = None
+    print "loading: %s" % url
+    if publicID:
+        print " with publicID: %s" % publicID
+    redfoot.load(url, publicID=publicID, creator=__uri__)
+
+]]>
+        </rdf:value>
+      </commands:Command>
+
 </rdf:RDF>
