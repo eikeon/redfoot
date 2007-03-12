@@ -41,7 +41,7 @@ def authenticate(request, username=None, password=None):
     elif username.startswith("http") or ("." in username and not "@" in username):
 	if not username.startswith("http"):
 	    username = "http://%s" % username
-	from rdflib import Graph
+	from rdflib.Graph import Graph
 	FOAF = redfoot.namespace("http://xmlns.com/foaf/0.1/")
 	if not "#" in username:
 	    username = "%s#" % username
