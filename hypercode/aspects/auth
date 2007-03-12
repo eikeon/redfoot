@@ -134,6 +134,9 @@ if request.method=='POST':
 	login_uri += "?return_uri=%s" % quote(return_uri)
 	response.setStatus(302, 'found')   
 	response.setHeader('Location', login_uri)
+else:
+    response.setStatus(405, "Method not Allowed")
+    response.write("expecting method of POST, but got '%s'" % request.method)
       
 ]]></rdf:value>
   </server:PageHandler>
