@@ -616,7 +616,8 @@ if startswith:
             print e
     # clean up index
     for cid in list(redfoot.index.subjects(RDF.type, REDFOOT.Context)):
-        if cid.startswith(startswith)
+        if cid.startswith(startswith):
+            redfoot.write("Removing stale index info for: %s\n" % cid)
             redfoot.index.remove((cid, None, None))
 
 ]]>
