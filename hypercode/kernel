@@ -740,6 +740,8 @@ class Redfoot(ConjunctiveGraph):
             program = URIRef(options.program)
         else:
             program = self.program
+        if options.update:
+            self.load(program)
         try:
             self.check(program)
         except ImportError, e: # TODO: something more specific that Exception
@@ -831,8 +833,8 @@ journal = JournalWriter(redfoot.store, filename="%s-journal" % path)
 redfoot.open(path)
 redfoot._bootstrap() # TODO: explain why this is not done at the end of open
 if options.update:
-    redfoot.load(redfoot.program)
-redfoot.load(redfoot_loader.program) # TODO: explain why we load this here too
+    redfoot.load(redfoot_loader.program)
+redfoot.check(redfoot_loader.program) # TODO: explain why we load this here too
 redfoot_loader.redfoot = redfoot # TODO: explain why this is needed
 
 
