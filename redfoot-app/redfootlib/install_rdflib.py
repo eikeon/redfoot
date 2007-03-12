@@ -40,7 +40,7 @@ def install_rdflib(args=[]):
         if line.startswith("__version__"):
             d = {}
             exec line in d
-            expected_version = d{"__version__"}
+            expected_version = d["__version__"]
     assert expected_version
 
     log_file = file("redfoot-install-rdflib-log", "w")
