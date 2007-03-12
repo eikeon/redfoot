@@ -481,7 +481,7 @@ source = redfoot.value(None, RECIPE.recipe, recipe, any=True)
 >
 <?kid
 RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
-format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot.uriyy)).format
+format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot.uri)).format
 
 ingredient = request.uri
 
