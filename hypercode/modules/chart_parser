@@ -77,7 +77,8 @@ class Rule:
     def __init__(self, spec_or_uri, action=None, check_cache=True):
         """spec is of the form [A, B, C], where A is the lhs and the remaining
         items are the rhs.  In other words, [A, B, C] represents A => B C"""
-        if isinstance(spec_or_uri, URIRef):
+        if isinstance(spec_or_uri, (URIRef, BNode)):
+            uri = spec_or_uri
             lhs = redfoot.value(uri, CHART_PARSER.lhs)
             spec = []
             spec.append(lhs)
@@ -173,7 +174,7 @@ class Edge:
 class Chart:
 
     def __init__(self, uri_or_rules=[], check_cache=True):
-        if isinstance(uri_or_rules, URIRef):
+        if isinstance(uri_or_rules, (URIRef, BNode)):
             uri = uri_or_rules
             rules = []
             for rule_uri in redfoot.items(redfoot.value(uri, CHART_PARSER.rules)):
