@@ -74,9 +74,23 @@ class Rule:
     C can be composed into an A).  In this example, the left-hand-side
     (lhs) is A, and the right-hand-side (rhs) is [B, C]."""
         
-    def __init__(self, spec, action=None):
+    def __init__(self, spec_or_uri, action=None, check_cache=True):
         """spec is of the form [A, B, C], where A is the lhs and the remaining
         items are the rhs.  In other words, [A, B, C] represents A => B C"""
+        if isinstanc(spec_or_uri, URIRef):
+            lhs = redfoot.value(uri, CHART_PARSER.lhs)
+            spec = []
+            spec.append(lhs)
+            for item in redfoot.items(redfoot.value(uri, CHART_PARSER.rhs)):
+                spec.append(item)
+            action_module = redfoot.value(uri, CHART_PARSER.action)
+            if action_module:
+                action = redfoot.module(action_module, check_cache=check_cache).action
+            else:
+                action = None
+        else:
+            spec = spec_or_uri
+
         self.lhs = spec[0]
         self.rhs = spec[1:]
         assert self.rhs[0], "Must have at least one element on rhs"
@@ -162,17 +176,8 @@ class Chart:
         if isinstance(uri_or_rules, URIRef):
             uri = uri_or_rules
             rules = []
-            for rule in redfoot.items(redfoot.value(uri, CHART_PARSER.rules)):
-                lhs = redfoot.value(rule, CHART_PARSER.lhs)
-                spec = []
-                spec.append(lhs)
-                for item in redfoot.items(redfoot.value(rule, CHART_PARSER.rhs)):
-                    spec.append(item)
-                action_module = redfoot.value(rule, CHART_PARSER.action)
-                if action_module:
-                    action = redfoot.module(action_module, check_cache=check_cache).action
-                else:
-                    action = None
+            for rule_uri in redfoot.items(redfoot.value(uri, CHART_PARSER.rules)):
+                rule = Rule(rule_uri, check_cache=check_cache)
                 rules.append(Rule(spec, action))
             _logger.debug("rules: %s" % rules)
         else:
