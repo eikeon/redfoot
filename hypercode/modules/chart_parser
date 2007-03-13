@@ -77,7 +77,7 @@ class Rule:
     def __init__(self, spec_or_uri, action=None, check_cache=True):
         """spec is of the form [A, B, C], where A is the lhs and the remaining
         items are the rhs.  In other words, [A, B, C] represents A => B C"""
-        if isinstanc(spec_or_uri, URIRef):
+        if isinstance(spec_or_uri, URIRef):
             lhs = redfoot.value(uri, CHART_PARSER.lhs)
             spec = []
             spec.append(lhs)
