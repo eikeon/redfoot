@@ -82,7 +82,12 @@ class Rule:
             lhs = redfoot.value(uri, CHART_PARSER.lhs)
             spec = []
             spec.append(lhs)
-            for item in redfoot.items(redfoot.value(uri, CHART_PARSER.rhs)):
+            rhs = redfoot.value(uri, CHART_PARSER.rhs)
+            if (rhs, RDF.type, RDF.Seq) in redfoot:
+                s = redfoot.seq(rhs)
+            else:
+                s = redfoot.items(rhs)
+            for item in s:
                 spec.append(item)
             action_module = redfoot.value(uri, CHART_PARSER.action)
             if action_module:
