@@ -97,7 +97,7 @@ class Rule:
         self.action = action
 
     def __repr__(self):
-        return '%s => %s' % (self.lhs, self.rhs)    
+        return '%r => %r : %r' % (self.lhs, self.rhs, self.action)    
 
     def matches(self, category):
         return self.rhs[0] == category
@@ -112,7 +112,7 @@ class Constituent:
         self.rule = rule
 
     def __repr__(self):
-        return '%s%s' % (self.type, `self.children`)
+        return '%r%r' % (self.type, `self.children`)
 
     def tokens(self):
         for c in self.children:
@@ -136,7 +136,7 @@ class PreTerminal(Constituent):
         self.token = token
         
     def __repr__(self):
-        return '%s(%s)' % (self.type, self.token)
+        return '%r(%r)' % (self.type, self.token)
         
     def tokens(self):
         yield self.token
@@ -159,7 +159,7 @@ class Edge:
             if i == self.index:
                 str.append('^')
             str.append(self.rule.rhs[i] + ' ')
-        return '<%s => %s at %s:%s>' % (self.rule.lhs, "".join(str)[:-1], self.left, self.right)
+        return '<%r => %r at %r:%r>' % (self.rule.lhs, "".join(str)[:-1], self.left, self.right)
 
     def advanceOver(self, chart, constituent):
         rule = self.rule
@@ -179,7 +179,7 @@ class Chart:
             for rule_uri in redfoot.items(redfoot.value(uri, CHART_PARSER.rules)):
                 rule = Rule(rule_uri, check_cache=check_cache)
                 rules.append(Rule(spec, action))
-            _logger.debug("rules: %s" % rules)
+            _logger.debug("rules: %r" % rules)
         else:
             rules = uri_or_rules
         self._rules = rules
