@@ -811,7 +811,7 @@ import logging
 
 _logger = logging.getLogger(__uri__)
 
-_logger.info("running twisted's event loop")
+_logger.info("Running twisted's event loop")
 
 try:
     import twisted
@@ -826,7 +826,7 @@ try:
     except ValueError:
         reactor.run(installSignalHandlers=0)
 except KeyboardInterrupt: # TODO: 
-    _logger.info('shutting down twisted's event loop')
+    _logger.info("Shutting down twisted's event loop")
     reactor.shutdown()
 
 ]]>
