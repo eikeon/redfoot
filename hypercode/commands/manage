@@ -798,4 +798,40 @@ for user in redfoot.subjects(RDF.type, SESSION.User):
       </commands:Command>
     </commands:command>
   </redfoot:Configuration>
+
+
+      <commands:Command rdf:ID="run">
+        <rdfs:label>run</rdfs:label>
+        <rdfs:comment>Run the twisted event loop</rdfs:comment>
+        <server:server rdf:resource="../modules/server#twisted"/>
+        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+import logging
+
+_logger = logging.getLogger(__uri__)
+
+_logger.info("running twisted's event loop")
+
+try:
+    import twisted
+except ImportError, e:
+    raise ImportError("Twisted not installed. Please install Twisted-2.5.0 ( http://twistedmatrix.com/trac/#Downloading )")
+
+from twisted.internet import reactor
+
+try:
+    try:
+        reactor.run()
+    except ValueError:
+        reactor.run(installSignalHandlers=0)
+except KeyboardInterrupt: # TODO: 
+    _logger.info('shutting down twisted's event loop')
+    reactor.shutdown()
+
+]]>
+        </rdf:value>
+      </commands:Command>
+    </commands:command>
+
 </rdf:RDF>  

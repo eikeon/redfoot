@@ -28,7 +28,7 @@ _logger = logging.getLogger(__uri__)
 try:
     import twisted
 except ImportError, e:
-    raise ImportError("twisted not installed. Please install Twisted-2.4.0 ( http://twistedmatrix.com/trac/#Downloading )")
+    raise ImportError("Twisted not installed. Please install Twisted-2.5.0 ( http://twistedmatrix.com/trac/#Downloading )")
 
 from twisted.web.server import Site, NOT_DONE_YET, version
 from twisted.web.resource import IResource
