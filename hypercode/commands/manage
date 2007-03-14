@@ -832,6 +832,5 @@ except KeyboardInterrupt: # TODO:
 ]]>
         </rdf:value>
       </commands:Command>
-    </commands:command>
 
 </rdf:RDF>  
