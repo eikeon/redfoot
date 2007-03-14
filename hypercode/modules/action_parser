@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
+  xmlns:rdfs='http://www.w3.org/2000/01/rdf-schema#'
+  xmlns:redfoot='http://redfoot.net/2005/redfoot#'
+  xmlns:server='http://redfoot.net/2005/server#'
+  xmlns:session='http://redfoot.net/2005/session#'
+  xmlns:browse='http://redfoot.net/2005/browse#'
+  xmlns:template='http://redfoot.net/2005/template#'
+  xmlns:commands='http://redfoot.net/2005/commands#'
+  xmlns:cp="http://redfoot.net/hypercode/modules/chart_parser#"
+>
+
+  <redfoot:Module rdf:ID="module">
+    <rdfs:label>Action Parser</rdfs:label>      
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+import logging, re
+
+from rdflib.Namespace import Namespace
+from rdflib import URIRef
+
+chart_parser = redfoot.module(URIRef("http://redfoot.net/hypercode/modules/chart_parser#module"))
+
+_logger = logging.getLogger(__uri__)
+
+_sep = re.compile(ur"[\s]*([,]?)")
+
+def split(s):
+    for token in _sep.split(s):
+        if token:
+            yield token
+
+_number = re.compile(ur"([0-9]+%?$)", re.UNICODE)
+_date = re.compile(ur"([0-9]{4}/[0-9]{2}/[0-9]{2})", re.UNICODE)
+_time = re.compile(ur"([0-9]{1,2}:[0-9]{2}(:[0-9]{2})?)", re.UNICODE)
+
+class Term(object):
+    def __init__(self, datatype):
+        self.datatype = datatype
+    def _term(self, value):
+        return Literal(value, datatype=self.datatype)
+    def __getitem__(self, value, default=None):
+        return self._term(value)
+    def __getattr__(self, value):
+        return self._term(value)
+
+TYPE = Term(URIRef("#type", base=__uri__))
+TAG = Term(URIRef("#tag", base=__uri__))
+TOKEN = Term(URIRef("#token", base=__uri__))
+
+
+#_logger.debug("TAG: %s" % TAG)
+
+username = redfoot.xmpp_id.split("@")[0]
+
+class ActionChart(chart_parser.Chart):
+
+    def __init__(self, uri_or_rules, check_cache=True):
+        chart_parser.Chart.__init__(self, uri_or_rules, check_cache=check_cache)
+
+    def tokenize(self, str):
+        assert isinstance(str, unicode), "not unicode: %s: %s" % (type(str), str)
+        str = str.strip()
+        for token in split(str):
+            yield token
+
+    # Simple tagger.
+    def tags(self, token):
+        #write("TOKEN:", token.encode("unicode-escape"), type(token)
+        assert isinstance(token, unicode), "not unicode: %s: %s " % (type(token), token)
+        _logger.debug("token: '%s' %s %s" % (token, type(token), _number.match(token)))
+        if _number.match(token):
+            yield TAG.number
+        elif _date.match(token):
+            yield TAG.date
+        elif _time.match(token):
+            yield TAG.time
+        elif token in ["minute", "minutes", "hour", "hours", "second", "seconds"]:
+            yield TAG.timeUnit
+        elif token in ["about", "to", "that"]:
+            yield TAG.prep
+        if token==username:
+            yield TAG.botname
+        yield TOKEN[token.lower()]
+        yield TAG.any
+
+            
+    def action(self, s):
+        results = []
+        for result in list(self.parse(s)):
+            # TODO: better way to ignore intermediates?
+            #if result.type.startswith(TYPE) and result.type not in [TYPE.rest]: 
+            if result.type.datatype==TYPE.datatype and result.type not in [TYPE.rest]: 
+                results.append(result)
+        if len(results)==1:
+            action = results[0]
+        else:
+            action = None
+            _logger.debug("Didn't find exactly one action: %s" % results)
+        return action
+
+    def help(self):
+        def label(item):
+            if item.datatype==TYPE.datatype:
+                label = "<%s>" % item
+            elif item.datatype==TAG.datatype:
+                label = item.upper()
+            elif item.datatype==TOKEN.datatype:
+                label = "%s" % item
+            else:
+                label = repr(item)
+            return label
+
+        lines = []
+        for rule in self._rules:
+            line = "%s: " % label(rule.lhs)
+            for item in rule.rhs:
+                line += "%s " % label(item)
+            lines.append(line)
+        lines.sort()
+        return "\n".join(lines)
+
+]]>
+    </rdf:value>
+  </redfoot:Module>
+
+</rdf:RDF>
