@@ -35,7 +35,7 @@ setup(
         ]
     },
 
-    install_requires = ["rdflib>2.3.3", "zope.interface>=3.3.0", "kid>=0.9.5"],
+    install_requires = ["rdflib>2.3.3,==dev", "zope.interface>=3.3.0", "kid>=0.9.5"],
 
     )
 
