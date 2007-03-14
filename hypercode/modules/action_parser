@@ -50,9 +50,6 @@ TYPE = Term(URIRef("#type", base=__uri__))
 TAG = Term(URIRef("#tag", base=__uri__))
 TOKEN = Term(URIRef("#token", base=__uri__))
 
-
-#_logger.debug("TAG: %s" % TAG)
-
 username = redfoot.xmpp_id.split("@")[0]
 
 class ActionChart(chart_parser.Chart):
@@ -70,7 +67,7 @@ class ActionChart(chart_parser.Chart):
     def tags(self, token):
         #write("TOKEN:", token.encode("unicode-escape"), type(token)
         assert isinstance(token, unicode), "not unicode: %s: %s " % (type(token), token)
-        _logger.debug("token: '%s' %s %s" % (token, type(token), _number.match(token)))
+        #_logger.debug("token: '%s' %s %s" % (token, type(token), _number.match(token)))
         if _number.match(token):
             yield TAG.number
         elif _date.match(token):
