@@ -1,23 +1,34 @@
 from ez_setup import use_setuptools
 use_setuptools()
 
-#from distutils.core import setup
+import sys, warnings
 from setuptools import setup, find_packages
 
+VERSION = "2.1.1"
+
+if sys.version<"2.5":
+    warnings.warn("Redfoot is not being tested on Python < 2.5")
 
 setup(
     name = 'redfoot',
-    version = "2.1.1",
+    version = VERSION,
     description = "A hypercode program loader and runner",
     author = "Daniel Krech",
     author_email = "eikeon@eikeon.com",
     maintainer = "Daniel Krech",
     maintainer_email = "eikeon@eikeon.com",
     url = "http://redfoot.net/",
+    test_suite = 'nose.collector', # test_suite = 'setuptools.tests',
 
-    license = "http://redfoot.net/2006/10/15/redfoot-2.1.0/LICENSE",
+    license = "BSD",
     platforms = ["any"],
-    classifiers = ["Programming Language :: Python"],
+    classifiers = ["Programming Language :: Python",
+                   "License :: OSI Approved :: BSD License",
+                   "Operating System :: OS Independent",
+                   "Natural Language :: English",
+                   "Topic :: Software Development :: Libraries :: Application Frameworks",
+                   "Topic :: Software Development :: Libraries :: Python Modules",
+                   ],
     long_description = \
     """A hypercode program loader and runner.
 
@@ -25,6 +36,8 @@ setup(
     the very latest, you may want the development version instead:
     https://svn.redfoot.net/trunk/redfoot-app#egg=redfoot-dev
     """,
+    keywords = "hypercode RDF framework",
+    download_url = "http://redfoot.net/redfoot-%s.tar.gz" % VERSION,
 
     packages = ["redfootlib"],
 

@@ -9,11 +9,11 @@
 >
 
   <rdf:Description rdf:about="http://redfoot.net#">
-    <doap:release rdf:resource="http://redfoot.net/2.1.0#"/>
+    <doap:release rdf:resource="http://redfoot.net/2.1.1#"/>
   </rdf:Description>
 
-  <doap:Version rdf:about="http://redfoot.net/2.1.0#">
-    <rdfs:label>redfoot-2.1.0</rdfs:label>
+  <doap:Version rdf:about="http://redfoot.net/2.1.1#">
+    <rdfs:label>redfoot-2.1.1</rdfs:label>
     <rdfs:comment rdf:datatype="http://www.w3.org/1999/xhtml">
 <![CDATA[
 <div>
@@ -43,9 +43,9 @@
 <h3>Installation</h3>
 
 <ul>
-  <li>download the release from <a href="http://redfoot.net/redfoot-2.1.0.tar.gz">redfoot-2.1.0.tar.gz</a></li>
+  <li>download the release from <a href="http://redfoot.net/redfoot-2.1.1.tar.gz">redfoot-2.1.1.tar.gz</a></li>
   <li>unpack</li>
-  <li>then from the redfoot-2.1.0 directory run: <pre>python setup.py install</pre></li>
+  <li>then from the redfoot-2.1.1 directory run: <pre>python setup.py install</pre></li>
 
   <li>You should now have a script called redfoot installed where python
 installs scripts on your platform. On unix and OS X for me it gets put
@@ -72,22 +72,22 @@ On windows I think it goes in something like C:\Python25\Scripts\ and so you may
 </div>
 ]]>
     </rdfs:comment>
-    <doap:revision>2.1.0</doap:revision>
-    <doap:created>2006-10-15</doap:created>
+    <doap:revision>2.1.1</doap:revision>
+    <doap:created>2007-03-14</doap:created>
   </doap:Version>
 
   <blog:Entry rdf:ID="entry">
-    <rdfs:label>redfoot-2.1.0 released</rdfs:label>
+    <rdfs:label>redfoot-2.1.1 released</rdfs:label>
     <rdfs:comment rdf:datatype="http://www.w3.org/1999/xhtml">
 <![CDATA[
 
     <p>
-      <a href="http://redfoot.net/2.1.0/">redfoot-2.1.0 release</a>
+      <a href="http://redfoot.net/2.1.1/">redfoot-2.1.1 release</a>
     </p> 
 
 ]]>
     </rdfs:comment>
-    <dcterms:created>2006-10-15</dcterms:created>
+    <dcterms:created>2007-03-14</dcterms:created>
     <dc:creator rdf:resource="mailto:eikeon@eikeon.com"/>
   </blog:Entry>
 
