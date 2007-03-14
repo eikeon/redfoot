@@ -134,8 +134,8 @@ class Client(xmpp.Client):
                 xmpp_handler = redfoot.value(REDFOOT.Globals, XMPP.handler)
                 if xmpp_handler:
                     redfoot.execute(xmpp_handler, xmpp=self, message=message)
-                else:
-                    self.send(from_id, "Thank you for your input. But I'm going to ignore it.")
+                #else:
+                #    self.send(from_id, "Thank you for your input. But I'm going to ignore it.")
         except Exception, e:
             _logger.exception(e)
         
@@ -404,7 +404,10 @@ def install(who):
       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
-import twisted 
+try:
+    import twisted
+except ImportError, e:
+    raise ImportError("Twisted is not installed. Please install Twisted-2.5.0. 1) download http://twistedmatrix.com/trac/#Downloading 2) unpack 3) python setup.py install")
 
 if twisted.__version__.startswith("2.5.0"):
     assert len(args)==2, "expecting 2 arguments: xmpp_id, xmpp_password"
