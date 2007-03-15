@@ -25,7 +25,7 @@ chart_parser = redfoot.module(URIRef("http://redfoot.net/hypercode/modules/chart
 
 _logger = logging.getLogger(__uri__)
 
-_sep = re.compile(ur"[\s]*([,]?)")
+_sep = re.compile(ur"[\s]*")
 
 def split(s):
     for token in _sep.split(s):
