@@ -226,6 +226,8 @@ class Client(xmpp.Client):
                 self.pending.append(message)
 
     def join(self, room_id):
+        if room_id.startswith("xmpp:"):
+            room_id = room_id[5:]
         nick = self.client_jid.user
         message = """<presence to="%s/%s" >
 <priority>0</priority>
