@@ -14,7 +14,6 @@
     <rdfs:label>Redfoot Kernel</rdfs:label>
     <rdfs:comment>
     </rdfs:comment> 
-    <redfoot:program rdf:resource="../2005/commands#runner"/>
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
@@ -337,11 +336,7 @@ class Redfoot(ConjunctiveGraph):
     log = property(_get_log)
 
     def __get_program(self):
-        # __uri__ is defined by the BootLoader and is the boot program
-        program = self.value(__uri__, REDFOOT.program)
-        program = program or redfoot_loader.value(__uri__, REDFOOT.program)
-        assert program, "No default program found"            
-        return program
+        return URIRef("../2005/commands#runner", base=__uri__)
     # program resource redfoot will execute
     program = property(__get_program)
     
@@ -753,6 +748,30 @@ class Redfoot(ConjunctiveGraph):
     def write(self, s, encoding="utf-8"):
         sys.stdout.write(s.encode(encoding))
 
+    def _clear_cache(self):
+        """ Clear cache of any bits depending on kernel (that we know about)
+
+        Add bits to redfoot.execute and redfoot.module that mark
+        contexts as depending on kernel?
+        """
+        startswith = URIRef("../", base=__uri__)
+        # list is currently needed else not all will get removed due to
+        # concurrency issues (removing while iterating over)
+        for context in list(self.contexts()):
+            cid = context.identifier
+            try:
+                if cid.startswith(startswith):
+                    self.write("Removing: %s\n" % cid)
+                    self.remove_context(context)
+                    self.index.remove((cid, None, None))
+            except Exception, e:
+                print e
+        # clean up index
+        for cid in list(self.index.subjects(RDF.type, REDFOOT.Context)):
+            if cid.startswith(startswith):
+                self.write("Removing stale index info for: %s\n" % cid)
+                self.index.remove((cid, None, None))
+
     def __get_xmpp_id(self):
         if self.__xmpp_id is None:
             self.__xmpp_id = redfoot_loader.value(REDFOOT.Globals, REDFOOT.xmpp_id)
@@ -833,7 +852,7 @@ journal = JournalWriter(redfoot.store, filename="%s-journal" % path)
 redfoot.open(path)
 redfoot._bootstrap() # TODO: explain why this is not done at the end of open
 if options.update:
-    redfoot.load(redfoot_loader.program)
+    redfoot._clear_cache()
 redfoot.check(redfoot_loader.program) # TODO: explain why we load this here too
 redfoot_loader.redfoot = redfoot # TODO: explain why this is needed
 
