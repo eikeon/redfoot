@@ -101,6 +101,7 @@ for item in redfoot.objects(aspect, ASPECT.item):
   <aspect:Aspect rdf:about="aspects/comments#aspect"/>
   <aspect:Aspect rdf:about="aspects/contexts#aspect"/>
   <aspect:Aspect rdf:about="aspects/edit_content#aspect"/>
+  <aspect:Aspect rdf:about="aspects/edit_head#aspect"/>
   <aspect:Aspect rdf:about="aspects/generic#aspect"/>
   <aspect:Aspect rdf:about="aspects/recipes#aspect"/>
   <aspect:Aspect rdf:about="aspects/register#aspect"/>
