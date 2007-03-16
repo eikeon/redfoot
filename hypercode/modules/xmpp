@@ -449,13 +449,18 @@ SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
 XMPP = redfoot.namespace("http://redfoot.net/hypercode/modules/xmpp#")
 
 def authenticate_user(username, hostname, password):
-    _logger.debug("username '%s' hostname '%s' password '%s'" % (username, hostname, password))
+    #_logger.debug("username '%s' hostname '%s' password '%s'" % (username, hostname, password))
     uid = URIRef("xmpp:%s@%s" % (username, hostname))
     user_uri = redfoot.value(predicate=XMPP.uid, object=uid) or uid
-
-    hexdigest = sha.new(password).hexdigest()
-    md5_digest = md5.new(password).hexdigest()
-    return (user_uri, SESSION.hexdigest, Literal(hexdigest)) in redfoot or (user_uri, SESSION.hexdigest, Literal(md5_digest)) in redfoot
+    _logger.debug("found user_uri: %s" % user_uri)
+    if user_uri is not None:
+        hexdigest = sha.new(password).hexdigest()
+        if (user_uri, SESSION.hexdigest, Literal(hexdigest)) in redfoot:
+            return True
+        md5_digest = md5.new(password).hexdigest()
+        if (user_uri, SESSION.hexdigest, Literal(md5_digest)) in redfoot:
+            return True
+    return False
 
 def is_user(username, hostname):
     user_uri = URIRef("mailto:%s@%s" % (username, hostname))
@@ -492,7 +497,7 @@ def main():
                 except Exception, e:
                     _logger.exception(e)
                 result = authenticate_user(user, host, password)
-                _logger.info("authenticate_user: %s -> %s\n" % (user, result))
+                _logger.info("authenticate_user: %s %s -> %s\n" % (user, host, result))
                 if result:
                     sys.stdout.write(struct.pack('>hh', 2, 1))
                 else:
