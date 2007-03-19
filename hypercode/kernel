@@ -38,6 +38,19 @@
     <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
+import redfootlib
+
+redfootlib_version = tuple([int(x) for x in redfootlib.__version__.split(".", 2)])    
+
+REDFOOTLIB_MINIMUM = (2, 7, 0)
+
+if redfootlib_version < REDFOOTLIB_MINIMUM:
+    _logger.warning("This version of the redfoot kernel is still in development.")
+    _logger.critical("This kernel requires redfootlib %s or greater. Found redfootlib version %s. easy_install -U redfoot==dev" % ("%s.%s.%s" % REDFOOTLIB_MINIMUM, redfootlib.__version__))
+    _logger.warning("If you wish to keep running with redfoot 2.1.x please run: redfoot --program=https://svn.redfoot.net/branches/2.1/kernel# --set-default")
+    sys.exit(-1)
+
+
 import sys, logging
 from datetime import datetime
 from urlparse import urldefrag
