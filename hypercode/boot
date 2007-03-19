@@ -11,7 +11,7 @@
     <rdfs:comment></rdfs:comment>
   </rdfe:Namespace>
 
-  <code:Python rdf:ID="loader">
+  <code:Code rdf:ID="loader">
     <rdfs:label>Redfoot Loader</rdfs:label>
     <rdfs:comment>
 
@@ -22,7 +22,7 @@ For help on Redfoot see:
    redfoot.py help
 
     </rdfs:comment> 
-    <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
 from rdflib import URIRef
@@ -75,7 +75,7 @@ finally:
     redfoot.close()
 
 ]]>
-    </rdf:value>
-  </code:Python>
+    </code:python>
+  </code:Code>
 
 </rdf:RDF>  

@@ -72,13 +72,13 @@ class BootLoader(ConjunctiveGraph):
             self.check(uri)
             _logger.info("execute: %s" % self.label(uri))
             _logger.debug("  uri: %s" % uri)
-            value = self.value(uri, RDF.value)
+            value = self.value(uri, CODE.python)
             if value:
                 value = value.replace("\r\n", "\n")        
                 value = value.replace("\r", "\n")        
                 value += "\n"
             else:
-                raise ValueError("No RDF.value found for: %s" % uri)
+                raise ValueError("No CODE.python found for: %s" % uri)
             context = context or {"redfoot_loader": self, "__uri__": uri}
             for k, v in keyword_args.items():
                 context[k] = v
