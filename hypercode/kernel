@@ -36,6 +36,9 @@
 <![CDATA[
 
 import redfootlib
+import logging
+
+_logger = logging.getLogger()
 
 redfootlib_version = tuple([int(x) for x in redfootlib.__version__.split(".", 2)])    
 
