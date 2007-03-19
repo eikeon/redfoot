@@ -1,0 +1,712 @@
+import sys, getopt, os, logging, traceback, warnings
+
+from types import ModuleType
+from urlparse import urljoin, urldefrag, urlparse
+from urllib import pathname2url, url2pathname
+from itertools import chain
+
+# BootLoader defines redfoot_program instead of __uri__
+__uri__ = redfoot_program 
+
+_logger = logging.getLogger("%s" % redfoot_loader.label(__uri__, __uri__))
+
+from rdflib import RDF, RDFS, StringInputSource
+from rdflib import URIRef, BNode, Literal
+from rdflib.Graph import Graph, ConjunctiveGraph
+from rdflib.util import first, date_time
+from rdflib.Journal import JournalReader, JournalWriter
+from rdflib.events import Dispatcher, Event
+
+class Namespace(object):
+
+    def __init__(self, uri, context=None):
+        self.NS = uri
+        self.__context = context
+        self.__term_cache = dict()
+        #self.__term_cache["NS"] = uri
+
+    def term(self, name):
+        uri = self.__term_cache.get(name)
+        if uri is None:
+            uri = URIRef(self.NS + name)
+            if self.__context and (uri, None, None) not in self.__context:
+                _logger.warning("%s not defined" % uri)
+            self.__term_cache[name] = uri
+        return uri 
+
+    def __getattr__(self, name):
+        return self.term(name)
+
+redfoot_base = redfoot_loader.program.split("hypercode/kernel#")[0]
+
+def logical_to_physical(uri):
+    return URIRef(uri.replace("http://redfoot.net/", redfoot_base, 1))
+
+def physical_to_logical(uri):
+    return URIRef(uri.replace(redfoot_base, "http://redfoot.net/", 1))
+
+__uri__ = physical_to_logical(__uri__)
+
+import urllib2, re
+from datetime import datetime, timedelta
+
+REDFOOT = Namespace("http://redfoot.net/2005/redfoot#")
+
+def _compile(value):
+    value = value.replace("\r\n", "\n")        
+    value = value.replace("\r", "\n")        
+    try:
+        return compile(value+"\n", "TODO", "exec")
+    except Exception, e:
+        _logger.exception(e)
+        raise e
+
+from rdflib.Literal import bind
+#bind(REDFOOT.Python, _compile)
+
+DC_creator = URIRef("http://purl.org/dc/elements/1.1/creator")
+DC_created = URIRef("http://purl.org/dc/terms/created")
+
+from urllib2 import urlopen, Request
+
+from xml.sax.xmlreader import InputSource
+
+from rdflib import __version__
+
+
+class Redfoot(ConjunctiveGraph):
+
+    def __init__(self, store):
+        super(Redfoot, self).__init__(store)
+        self.scutterFailureCache = {}
+        self.uri = __uri__ # uri to the version of redfoot that's running
+	self.__base = None # default to CWD
+        self.__log = None        
+        self.__index = None
+        self.__config = None
+        self.__xmpp = None
+        self.__xmpp_id = None
+        self.__xmpp_password = None
+        self.__xmpp_host = None
+        self.__xmpp_port = None 
+        self.__rule_engine = None
+        self.__namespaces = {}
+        self.dispatcher = Dispatcher()
+        
+    def __get_base(self):
+        if self.__base is None:
+            self.__base = self.value(REDFOOT.Globals, REDFOOT.base)
+            if self.__base is None:
+                self.__base = URIRef("%s/" % urljoin("file:", pathname2url(os.getcwd())))
+        return self.__base
+
+    def __set_base(self, base):
+	self.config.remove((REDFOOT.Globals, REDFOOT.base, None))
+	self.config.add((REDFOOT.Globals, REDFOOT.base, base))
+
+    base = property(__get_base, __set_base)
+
+    def __get_config(self):
+        config = self.__config
+        if config is None:
+           config =  self.__config = self.get_context(BNode("_config"), creator=redfoot_loader.program)
+        return config
+    # context where redfoot stores configuration data
+    config = property(__get_config)
+
+    def __get_index(self):
+        if self.__index is None:
+            id = BNode("_index")
+            self.__index = Graph(store=self.store, identifier=id, namespace_manager=self)
+            self.get_context(id, creator=redfoot_loader.program) # to add creator and other bits that get_context adds
+        return self.__index
+    # context where redfoot stores data about contexts
+    index = property(__get_index)
+            
+    def rebuild_from_journal(self, path):
+        _logger.info("rebuilding store from journal file...")
+        os.rename(path, "%s-backup-%s" % (path, date_time()))
+        redfoot.open(path)
+        JournalReader(self.store, "%s-journal" % path)
+        self.close()
+        _logger.info("done rebuilding.")
+
+    def open(self, path):
+        #super(Redfoot, self).open(path) # TODO: why does this not work?
+        self.store.open(path)
+        global REDFOOT
+        self.check(REDFOOT.NS, creator=physical_to_logical(redfoot_loader.program))
+        REDFOOT = self.namespace(REDFOOT.NS, creator=physical_to_logical(redfoot_loader.program))        
+        context = dict({"redfoot": self, "REDFOOT": REDFOOT, 
+                        "RDF": RDF, "RDFS": RDFS,
+                        "URIRef": URIRef, "BNode": BNode, "Literal": Literal
+                        })
+        self.__context = context
+
+
+    #def _bootstrap(self):
+        # Note: we are currently being passed an open store        
+
+    # holding off on introducing this... not sure we need/want it.
+    def __get_globals(self):
+        return self.__context
+    globals = property(__get_globals)
+
+    def label(self, subject, default=''):
+        # TODO: push this subproperty support back down into rdflib
+        label = super(Redfoot, self).label(subject, None)
+        if label is None:
+            for subproperty in self.transitive_subjects(RDFS.subPropertyOf, RDFS.label):
+                label = self.value(subject, subproperty, default=None, any=True)        
+                if label is not None:
+                    return label
+        return label or default
+
+    def check(self, uri, creator=None):
+        """
+        Checks to see if redfoot knows anything about uri
+
+        Currently, if not, Redfoot will attempt to load from uri.
+        """
+        if isinstance(uri, URIRef):
+            location = uri.defrag()
+            context_uri = self.context_id(location)
+            if not (context_uri, RDF.type, REDFOOT.Context) in self.index: 
+                c = self.get_context(context_uri) #self.index.add((context_uri, RDF.type, REDFOOT.Context))
+                if uri==location:
+                    _logger.info("loading: %s" % uri)
+                else:
+                    _logger.info("loading: %s from %s" % (uri, logical_to_physical(location)))
+                try:
+                    context = self.load(location, creator=creator)
+                except Exception, e:
+                    _logger.warning("couldn't load %s while checking: %s\n" % (uri, e))
+
+    def scutter(self, location, creator, steps=SCUTTER_STEPS):
+        """
+        Performs a recursive scutter from the given location.  This assumes that the location has already
+        been loaded / cached prior to this function being called.  It attempts to load references (via link predicates)
+        as URLs, recursively (breadth-first) calling scutter on each URL that was successfully loaded as an RDF graph .  It does
+        this no more than SCUTTER_STEPS times.  Content negotiation is used to perform discovery of uknown URLs in order
+        to determine how to parse remote content.
+        """
+        _logger.info("Scuttering from %s"%location)
+        visitedNodes = []
+        sourceGraph = self.get_context(self.context_id(location),creator=creator)
+        for linkPredicate in LINK_PREDICATES:
+            linkedURLs = []
+            try:
+                linkedURLs = sourceGraph.objects(predicate=linkPredicate)
+            except Exception,e:
+                _logger.info(e)
+
+            for linkURL in linkedURLs:
+                #If the link is to itself or it has been attempted before, ignore
+                if "#" in linkURL:
+                    uri, frag = urldefrag(linkURL)
+                    linkURL = URIRef(uri)
+
+                if linkURL == location or linkURL in self.scutterFailureCache:
+                    continue
+                #Skip the rest if the maximum number of recursion steps have been surpassed
+                if steps < 1:
+                    break
+
+                #Check if linkURL has already been loaded
+                priorEvent = self.index.value(predicate=SCUTTER.fetch, object=linkURL, any=True)
+                if priorEvent:
+                    priorEvent = HTTPGetEvent(self.index, linkURL, priorEvent)
+                    if priorEvent.expirationDate < datetime.now().isoformat().split('.')[0]:
+                        _logger.info("%s has already been loaded previously but the cache has expired"%linkURL)
+                        #Aleady loaded, attempt a cacheable, content-negotiated load with HTTP provenance data on RDF graph URL
+                        cacheableSource = CacheableURLInputSource(priorEvent)
+                        if cacheableSource.modified:
+                            self.load(linkURL, publicID=priorEvent.publicID,format=cacheableSource.format,scutter=False)
+                        else:
+                            priorEvent.bumpExpiration()
+                            
+                    visitedNodes.append(linkURL)
+                    steps -= 1
+
+                else:
+                    #_logger.info("URL %s (linked by %s) has not been loaded before.. Attempting RESTful discovery"%(linkURL,linkPredicate))
+                    #Hasn't been loaded.  Need to perform 'RESTful' scutter discovery
+                    #Try to connect, first
+                    unknownURL = UnknownURLInputSource(linkURL)
+                    if not unknownURL.valid:
+                        continue
+
+                    #If the format is known (HTML is ignored), parse it using the format recorded at
+                    #the server, otherwise ignore the URL (Perhaps this is too strict?)
+                    if unknownURL.format:
+                        if unknownURL.format=="html":
+                            #_logger.warning("Ignoring html formatted url: %s" % (linkURL))
+                            self.scutterFailureCache[linkURL]=None
+                        else:
+                            try:
+                                self.load(linkURL, format=unknownURL.format,scutter=False)
+                                visitedNodes.append(linkURL)
+                                steps -= 1
+                            except:
+                                _logger.warning("Couldn't parse %s using the given format: %s" % (linkURL,unknownURL.format))
+                                self.scutterFailureCache[linkURL]=None
+                    else:
+                        #Need to attempt an Notation 3 parse first, then an RDF/XML parse
+                        try:
+                            self.load(linkURL, format='n3',scutter=False)
+                            visitedNodes.append(linkURL)
+                            steps -= 1
+                        except:
+                            try:
+                                self.load(linkURL,scutter=False)
+                                visitedNodes.append(linkURL)
+                                steps -= 1                                
+                            except Exception,e:
+                                _logger.warning("Unable to parse %s as either N3 or RDF/XML: %s" % (linkURL, e))
+                                self.scutterFailureCache[linkURL]=None
+                                
+        visitedNodes = dict([(location,None) for location in visitedNodes]).keys()                   
+        for visitedLocation in visitedNodes:
+            self.scutter(visitedLocation,creator,steps=steps)
+
+    def get_context(self, identifier, creator=None):
+        """ Returns a Context graph for the given identifier, which
+        must be a URIRef or BNode."""
+        result = Graph(store=self.store, identifier=identifier, namespace_manager=self)
+        self.index.remove((identifier, RDF.type, REDFOOT.DeletedContext))
+        self.index.add((identifier, RDF.type, REDFOOT.Context))
+        if creator and not (identifier, DC_creator, None) in self.index:
+            self.index.add((identifier, DC_creator, creator))
+        if (identifier, DC_created, None) not in self.index:
+            self.index.add((identifier, DC_created, Literal(date_time())))
+        return result
+
+    def remove_context(self, context):
+        """removes both the context and metadata about the context."""
+        if isinstance(context, URIRef) or isinstance(context, BNode):
+            context = self.get_context(context)
+        self.index.remove((context.identifier, None, None))
+        self.index.add((context.identifier, RDF.type, REDFOOT.DeletedContext))        
+        super(Redfoot, self).remove_context(context)
+
+    def module(self, uri, check_cache=True):
+        if not isinstance(uri, URIRef):
+            uri = URIRef(uri)
+        self.check(uri)
+        _logger.info("creating module for: %s" % uri)
+        if (uri, RDF.type, REDFOOT.Module) not in self:
+            _logger.warning("%r not of type redfoot#Module" % uri)
+        return self.instance(uri, type=REDFOOT.Module)
+
+    def instance(self, uri, type=None):
+        class Object(object):
+            pass
+        this = Object()
+        this.execute = self.execute
+        this.__uri__ = uri
+        
+        for code in self.objects(uri, RDF.type):
+            self.execute(code, this=this)
+        return this
+        
+    def execute(self, code, context=None, **args):
+        self.check(code)
+        for other in self.objects(code, RDFS.seeAlso):
+            redfoot.check(other)
+        value = self.value(code)
+        assert value, "%s has no RDF.value" % code
+        assert value.datatype==REDFOOT.Python, "%s RDF.value is not of datatype REDFOOT.Python. %s currently only supports REDFOOT.Python code values" % (code, __uri__)
+        if context==None:
+            context = dict(self.__context)
+        for k, v in args.items():
+            context[k] = v
+        context["__uri__"] = code
+
+        from types import CodeType
+        if isinstance(value, CodeType):
+            _logger.info("Wheeee: %s", code)
+            exec value in context
+        else:
+            value = value.replace("\r\n", "\n")        
+            value = value.replace("\r", "\n")        
+            c = compile(value+"\n", code, "exec")
+            exec c in context
+        return context
+
+    def context_id(self, uri, context_id=None):
+        """ URI#context """
+        uri, frag = urldefrag(uri)
+        frag = context_id or frag or "context"
+        if frag.startswith("#"):
+            frag = frag[1:]
+        if uri.endswith("/"):
+            uri = uri[:-1]
+        return URIRef("%s#%s" % (uri, frag))
+
+    def main(self, options, args):
+        self.check(__uri__) # to get default program
+        if options.program:
+            program = URIRef(options.program)
+        else:
+            program = self.program
+        if options.update:
+            self.load(program)
+        try:
+            self.check(program)
+        except ImportError, e: # TODO: something more specific that Exception
+            _logger.warning("could not find program for '%s': %s" % (program, e))
+        else:
+            _logger.info("running: %s ( %s )" % (self.label(program), program))
+            self.execute(program, args=args)
+
+    def _clear_cache(self):
+        """ Clear cache of any bits depending on kernel (that we know about)
+
+        Add bits to redfoot.execute and redfoot.module that mark
+        contexts as depending on kernel?
+        """
+        startswith = URIRef("../", base=__uri__)
+        # list is currently needed else not all will get removed due to
+        # concurrency issues (removing while iterating over)
+        for context in list(self.contexts()):
+            cid = context.identifier
+            try:
+                if cid.startswith(startswith):
+                    self.write("Removing: %s\n" % cid)
+                    self.remove_context(context)
+                    self.index.remove((cid, None, None))
+            except Exception, e:
+                print e
+        # clean up index
+        for cid in list(self.index.subjects(RDF.type, REDFOOT.Context)):
+            if cid.startswith(startswith):
+                self.write("Removing stale index info for: %s\n" % cid)
+                self.index.remove((cid, None, None))
+
+    def __get_xmpp_id(self):
+        if self.__xmpp_id is None:
+            self.__xmpp_id = redfoot_loader.value(REDFOOT.Globals, REDFOOT.xmpp_id)
+        return self.__xmpp_id
+    def __set_xmpp_id(self, xmpp_id):
+	redfoot_loader.remove((REDFOOT.Globals, REDFOOT.xmpp_id, None))
+	redfoot_loader.add((REDFOOT.Globals, REDFOOT.xmpp_id, Literal(xmpp_id)))
+    xmpp_id = property(__get_xmpp_id, __set_xmpp_id)
+
+    def __get_xmpp_password(self):
+        if self.__xmpp_password is None:
+            self.__xmpp_password = redfoot_loader.value(REDFOOT.Globals, REDFOOT.xmpp_password)
+        return self.__xmpp_password
+    def __set_xmpp_password(self, xmpp_password):
+	redfoot_loader.remove((REDFOOT.Globals, REDFOOT.xmpp_password, None))
+	redfoot_loader.add((REDFOOT.Globals, REDFOOT.xmpp_password, Literal(xmpp_password)))
+    xmpp_password = property(__get_xmpp_password, __set_xmpp_password)
+
+    def __get_xmpp_host(self):
+        if self.__xmpp_host is None:
+            self.__xmpp_host = redfoot_loader.value(REDFOOT.Globals, REDFOOT.xmpp_host)
+        return self.__xmpp_host
+    def __set_xmpp_host(self, xmpp_host):
+	redfoot_loader.remove((REDFOOT.Globals, REDFOOT.xmpp_host, None))
+	redfoot_loader.add((REDFOOT.Globals, REDFOOT.xmpp_host, Literal(xmpp_host)))
+    xmpp_host = property(__get_xmpp_host, __set_xmpp_host)
+
+    def __get_xmpp_port(self):
+        if self.__xmpp_port is None:
+            self.__xmpp_port = redfoot_loader.value(REDFOOT.Globals, REDFOOT.xmpp_port) or 5222
+        return self.__xmpp_port
+    def __set_xmpp_port(self, xmpp_port):
+	redfoot_loader.remove((REDFOOT.Globals, REDFOOT.xmpp_port, None))
+	redfoot_loader.add((REDFOOT.Globals, REDFOOT.xmpp_port, Literal(xmpp_port)))
+    xmpp_port = property(__get_xmpp_port, __set_xmpp_port)
+
+    def _get_xmpp(self):
+        if self.__xmpp is None:
+            xmpp_uri = URIRef("modules/xmpp", base=__uri__)
+            redfoot.check(xmpp_uri) # to pull in xmpp_info command
+            if self.xmpp_id and self.xmpp_password:
+                xmpp = self.module(URIRef("#client", base=xmpp_uri))
+                self.__xmpp = xmpp.Client(self.xmpp_id, self.xmpp_password, self.xmpp_host, int(self.xmpp_port))
+            else:
+                _logger.info("To enable xmpp support use the redfoot xmpp_info command to set the needed information.")
+        return self.__xmpp
+    xmpp = property(_get_xmpp)
+
+    def _get_rule_engine(self):
+        if self.__rule_engine is None:
+            rules_uri = URIRef("modules/rules", base=__uri__)
+            rule_module = self.module(URIRef("#module", base=rules_uri))            
+            rules = set(get_rules(redfoot))
+            self.__rule_engine = rule_module.RuleEngine(redfoot)
+        return self.__rule_engine
+    rule_engine = property(_get_rule_engine)
+
+
+from optparse import OptionParser
+parser = OptionParser("usage: %prog program <program_options>")
+parser.add_option("--path", dest="path", help="path to database") 
+parser.add_option("--program", dest="program", help="URIRef of program for kernel to load and run. Defaults to command_runner")
+parser.add_option("--rebuild-from-journal", action="store_true", dest="rebuild_from_journal", help="rebuild the store from the journal file")    
+parser.add_option("--update", action="store_true", dest="update", help="update cached version of program")    
+
+parser.allow_interspersed_args = False
+
+(options, args) = parser.parse_args(args)
+
+path = "__rfdb__"
+
+redfoot = Redfoot("Sleepycat")
+
+if options.rebuild_from_journal:
+    redfoot.rebuild_from_journal(path)
+
+journal = JournalWriter(redfoot.store, filename="%s-journal" % path) 
+redfoot.open(path)
+#redfoot._bootstrap() # TODO: explain why this is not done at the end of open
+if options.update:
+    redfoot._clear_cache()
+redfoot.check(redfoot_loader.program) # TODO: explain why we load this here too
+redfoot_loader.redfoot = redfoot # TODO: explain why this is needed
+
+
+# TODO: turn into REDFOOT.init / REDFOOT.exit pair?
+try:
+    _xmpp_handler = None
+    if redfoot.xmpp:
+        xmpp = redfoot.module(URIRef("modules/xmpp#logging", base=__uri__))
+        _root_logger = logging.getLogger()
+        _xmpp_handler = xmpp.XMPPHandler(REDFOOT.Admin)
+        _xmpp_formatter = logging.Formatter('[%(name)s] %(message)s')
+        _xmpp_handler.setFormatter(_xmpp_formatter)
+        _root_logger.addHandler(_xmpp_handler)
+except Exception, e:
+    _logger.exception(e)
+    _logger.warning("XMPP logger not installed: %s" % e)
+
+for init in redfoot.objects(REDFOOT.Globals, REDFOOT.init): # TODO: also look for REDFOOT.init at __uri__ ?
+    try:
+        redfoot.execute(init)
+    except Exception, e:
+        _logger.exception(e)
+
+redfoot.main(options, args)
+
+# The XMPPHandler relies on the store being open. So we must remove it before closing the store.
+if _xmpp_handler:
+    _root_logger.removeHandler(_xmpp_handler)
+
+redfoot.close()
+
+
+
+
+HTTP = rdflib.Namespace("http://www.w3.org/1999/xx/http#")
+OWL = Namespace("http://www.w3.org/2002/07/owl#")
+SCUTTER = Namespace("http://redfoot.net/2006/scutter#")
+
+LINK_PREDICATES = [OWL.imports,RDFS.isDefinedBy,RDFS.seeAlso]
+
+HTTP_CACHE_PREDICATES = [
+    HTTP['Date'],
+    HTTP['Last-Modified'],
+    HTTP['Content-Type'],
+    HTTP['ETag'],
+]
+
+HEADER_KEYS = [
+    'Date',
+    'Last-Modified',
+    'Content-Type',
+    'ETag',
+]
+
+SCUTTER_STEPS = 5
+
+HTTP_CACHE_TTL = 24 * 60 * 60 #One day
+
+class HTTPGetEvent:
+    """
+    Represents a prior HTTP GET by a scutter (a dated event).  Provides functionality for
+    managing HTTP headers for subsequent fetches (to the same location)
+    """
+    def __init__(self,provenanceGraph,location,publicID=None,eventId=None):
+        if eventId:
+            assert isinstance(eventId,BNode),"Scutter event identifiers should be BNodes, not %s"%(type(eventId))
+            self.identifier = eventId
+        else:
+            event = first(provenanceGraph.subjects(SCUTTER.fetch,URIRef(location)))
+            
+            if event:
+                self.identifier = event
+            else:
+                self.identifier = BNode()
+                provenanceGraph.add((self.identifier,SCUTTER.fetch,URIRef(location)))
+                provenanceGraph.add((self.identifier, DC_created, Literal(date_time())))
+                provenanceGraph.add((self.identifier, RDF.type, SCUTTER.Event))
+                if publicID:
+                    provenanceGraph.add((self.identifier, SCUTTER.target, URIRef(publicID)))
+                
+        self.provenanceGraph = provenanceGraph
+
+    def __get_expiration_date(self):
+        now=datetime.now().isoformat().split('.')[0]
+        expiration = first(self.provenanceGraph.objects(self.identifier,SCUTTER.httpCacheExpiration))
+        #_logger.info(" ".join([now,expiration,str(expiration > now)]))
+        return first(self.provenanceGraph.objects(self.identifier,SCUTTER.httpCacheExpiration))
+    expirationDate = property( __get_expiration_date)
+
+    def __get_public_id(self):
+        return self.provenanceGraph.value(subject=self.identifier,predicate=SCUTTER.target, any=True)
+    publicID = property( __get_public_id)
+
+    def __get_system_id(self):
+        return self.provenanceGraph.value(subject=self.identifier,predicate=SCUTTER.fetch, any=True)
+    systemID = property(__get_system_id)        
+
+    def cacheEvent(self,httpStream,parseFormat):
+        """
+        Cache HTTP header information from the given HTTP stream
+        parseFormat is the format (xml or n3) that was used to successfully parse.  Setup the cache expiration
+        the RDF graph and is used as a fallback if the content-type doesn't match (text/plain, for instance)
+        """
+        #_logger.info("Caching HTTP headers for URL: %s"%(first(self.provenanceGraph.objects(self.identifier,SCUTTER.fetch))))
+        now = datetime.now()
+        expirationDT = (now + timedelta(seconds = HTTP_CACHE_TTL)).isoformat().split('.')[0]
+        #_logger.info(" ".join([now.isoformat(),str(HTTP_CACHE_TTL),expirationDT]))
+        self.provenanceGraph.remove((self.identifier,SCUTTER.httpCacheExpiration,None))
+        self.provenanceGraph.add((self.identifier, SCUTTER.httpCacheExpiration, Literal(expirationDT)))
+        for header_key in HEADER_KEYS:
+            val = httpStream.info().get(header_key)
+            if header_key == 'Content-Type':
+                isXml = re.match(r'(?:text|application)/.*\+?xml',val) is not None
+                if not isXml and parseFormat=='n3':
+                    val = 'text/n3'
+                elif not isXml and parseFormat=='xml':
+                    val = 'application/rdf+xml'
+                
+            if val:
+                #_logger.info("Caching HTTP header (%s): %s"%(header_key,val))
+                self.provenanceGraph.add((self.identifier,HTTP[header_key],Literal(val)))
+
+    def invalidateCache(self):
+        """
+        Clear the HTTP header metadata associated with this event. This would be called if
+        the content at the location was updated
+        """
+        now = datetime.now()
+        expirationDT = (now + timedelta(seconds = HTTP_CACHE_TTL)).isoformat().split('.')[0]
+        self.provenanceGraph.remove((self.identifier,SCUTTER.httpCacheExpiration,None))
+        self.provenanceGraph.add((self.identifier, SCUTTER.httpCacheExpiration, Literal(expirationDT)))
+        for http_cache_pred in HTTP_CACHE_PREDICATES:
+            self.provenanceGraph.remove((self.identifier,http_cache_pred,None))
+
+    def bumpExpiration(self):
+        """
+        Extend the cache expiration.  This is called because the cache expired and
+        a (cacheable) subsequent request responded in a 304 (no change at the server).
+        This should probably bump the cache by an increasing amount so static RDF graphs
+        (like the owl.rdfs) aren't repeatably hit uneccessarily
+        """
+        now = datetime.now()
+        expirationDT = (now + timedelta(seconds = HTTP_CACHE_TTL)).isoformat().split('.')[0]
+        self.provenanceGraph.remove((self.identifier,SCUTTER.httpCacheExpiration,None))
+        self.provenanceGraph.add((self.identifier, SCUTTER.httpCacheExpiration, Literal(expirationDT)))
+
+    def createHTTPHeaders(self):
+        """
+        Return a dictionary of HTTP headers to be used for a subsequent fetch to
+        the location associated with this event.  This is mechanism by which
+        HTTP caching and content negotiation is faciliated
+        """
+        headers={}        
+        httpDate = first(self.provenanceGraph.objects(self.identifier,HTTP['Date']))
+        httpLastModified = first(self.provenanceGraph.objects(self.identifier,HTTP['Last-Modified']))
+        httpContentType = first(self.provenanceGraph.objects(self.identifier,HTTP['Content-Type']))
+        httpETag = first(self.provenanceGraph.objects(self.identifier,HTTP['ETag']))
+
+        if httpDate:
+            headers['If-Modified-Since']= httpDate
+            
+        if httpETag:
+            headers['If-None-Match']    = httpETag
+
+        headers['Accept']               = httpContentType
+        headers['User-agent']           = 'Redfoot 2.0.X'
+
+        isXml = re.match(r'(?:text|application)/.*\+?xml',httpContentType) is not None
+
+        return headers, isXml and 'xml' or 'n3'
+
+
+
+class UnknownURLInputSource(InputSource, object):
+    def __init__(self, location):
+        super(UnknownURLInputSource, self).__init__(location)
+        self.valid = False
+        try:
+            httpStream = urllib2.urlopen(urllib2.Request(location))
+            self.valid = True
+            self.contentType = httpStream.info().get('content-type')
+            self.format = None
+            if re.match(r'.*html', self.contentType) is not None:
+                self.format = "html"
+            elif re.match(r'(?:text|application)/.*\+?xml', self.contentType) is not None:
+                self.format = "xml"
+            elif re.match(r'.*n3', self.contentType) is not None:
+                self.format = 'n3'
+            self.setByteStream(httpStream)
+        except Exception, e:
+            _logger.warning("Unable to connect to %s: %s\n"%(linkURL,e))
+        
+class CacheableURLInputSource(InputSource, object):
+    def __init__(self, priorEvent):
+        super(CacheableURLInputSource, self).__init__(priorEvent.publicID)
+        self.modified = True
+        if priorEvent:
+            hdrs, format = priorEvent.createHTTPHeaders()
+            try:
+                httpStream = urllib2.urlopen(urllib2.Request(system_id, headers=hdrs))
+            except urllib2.HTTPError, e:
+                _logger.info("Recieved 304 status from server.  Cached content is sufficient")
+                self.modified = False
+                assert e.code == 304, "HTTP response code %s recieved after cacheable request to %s"%(e.code,self.url)
+                #HTTP Error 304: Not Modified, do nothing
+                httpStream = None
+                # TODO: we'll likely need to deal with other http errors
+
+        if httpStream:
+            contentType = httpStream.info().get('content-type')
+            format = None
+            if re.match(r'.*html', contentType) is not None:
+                format = "html"
+            elif re.match(r'(?:text|application)/.*\+?xml', contentType) is not None:
+                format = "xml"
+            elif re.match(r'.*n3', contentType) is not None:
+                format = 'n3'
+            self.format = format
+            self.setByteStream(httpStream)
+
+    def __repr__(self):
+        return self.url
+
+
+
+
+
+
+
+class Kernel(ConjunctiveGraph):
+    """
+    """
+    
+
+    def instance(self, uri, type=None):
+        class Object(object):
+            pass
+        this = Object()
+        this.execute = self.execute
+        this.__uri__ = uri
+        
+        for code in self.objects(uri, RDF.type):
+            self.execute(code, this=this)
+        return this
+        

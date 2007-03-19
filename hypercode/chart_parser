@@ -2,56 +2,22 @@
 <rdf:RDF 
         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-        xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+        xmlns:rdfe="http://redfoot.net/rdf#"
+        xmlns:code="http://redfoot.net/hypercode/code#"
 >
 
-  <rdf:Description rdf:about="#">
-    <rdfs:label>Chart Parser Schema</rdfs:label>
+  <rdfe:Namespace rdf:about="#">
+    <rdfs:label>Chart Parser</rdfs:label>
     <rdfs:comment></rdfs:comment>
-  </rdf:Description>
+  </rdfe:Namespace>
 
-<!--
-  <rdfs:Class rdf:ID="Rule">
-    <rdfs:label>Noun</rdfs:label>
-    <rdfs:comment></rdfs:comment>
-  </rdfs:Class>
-
-  <rdfs:Property rdf:ID="lhs">
-    <rdfs:label>Left hand side</rdfs:label>
-    <rdfs:comment></rdfs:comment>
-    <rdfs:domain rdf:resource="#Rule"/>
-    <rdfs:range rdf:resource="#Constituent"/>
-  </rdfs:Property>
-
-  <rdfs:Property rdf:ID="rhs">
-    <rdfs:label>right hand side</rdfs:label>
-    <rdfs:comment></rdfs:comment>
-    <rdfs:domain rdf:resource="#Rule"/>
-    <rdfs:range rdf:resource="#Constituent"/>
-  </rdfs:Property>
-
-  <rdfs:Class rdf:ID="Constituent">
-    <rdfs:label>Constituent</rdfs:label>
-    <rdfs:comment></rdfs:comment>
-  </rdfs:Class>
-
-  <rdfs:Class rdf:ID="PreTerminal">
-    <rdfs:label>PreTerminal</rdfs:label>
-    <rdfs:comment></rdfs:comment>
-  </rdfs:Class>
-
-  <rdfs:Class rdf:ID="Terminal">
-    <rdfs:label>Terminal</rdfs:label>
-    <rdfs:comment></rdfs:comment>
-  </rdfs:Class>
--->
-
-  <redfoot:Module rdf:ID="module">
+  <code:PythonModule rdf:ID="module">
     <rdfs:label>Chart Parser</rdfs:label>      
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
 import logging
+from rdflib import URIRef, BNode
 from rdflib.Namespace import Namespace
 
 _logger = logging.getLogger(__uri__)
@@ -240,6 +206,6 @@ class Chart:
 
 ]]>
     </rdf:value>
-  </redfoot:Module>
+  </code:PythonModule>
 
 </rdf:RDF>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:rdfe="http://redfoot.net/rdf#"
+   xmlns:code="http://redfoot.net/hypercode/code#"
+>
+  <rdfs:Class rdf:ID="Code">
+    <rdfs:label>Code</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+  </rdfs:Class>
+
+  <rdfs:Class rdf:ID="Python">
+    <rdfs:label>Python Code</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="#Code"/>
+  </rdfs:Class>
+
+  <rdfs:Class rdf:ID="PythonModule">
+    <rdfs:label>Python Module</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="#Python"/>
+    <code:constructor>
+      <code:Python rdf:ID="PythonModuleConstructor">
+        <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+<![CDATA[
+
+# TODO check_cache bit
+import sys, types
+
+_logger = redfoot.getLogger(__uri__)
+
+module_name = this.__uri__       
+
+_logger.debug("creating module: %s" % this.__uri__)
+safe_module_name = "__uri___%s" % hash(this.__uri__)
+module = types.ModuleType(safe_module_name)
+module.__name__ = module_name 
+module.__file__ = this.__uri__
+module.__ispkg__ = 0
+#sys.modules[module_name] = module
+module.__dict__.update(redfoot.globals)
+this.execute(this.__uri__, context=module.__dict__)
+
+for item in dir(module):
+    this.__setattr__(item, module.__dict__.get(item))
+
+# TODO: Do we need/want to do the following instead:
+#   this = module
+
+]]>
+        </rdf:value>
+      </code:Python>
+    </code:constructor>    
+  </rdfs:Class>
+
+</rdf:RDF>  

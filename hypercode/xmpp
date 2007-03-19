@@ -3,33 +3,60 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
    xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
-   xmlns:server="http://redfoot.net/2005/server#"
-   xmlns:commands="http://redfoot.net/2005/commands#"
+   xmlns:code="http://redfoot.net/hypercode/code#"
+   xmlns:command="http://redfoot.net/hypercode/command#"
 >
 
-  <rdfe:RDFXMLDocument rdf:about="">
-  </rdfe:RDFXMLDocument>
-  
-  <redfoot:Namespace rdf:about="#">
+  <rdfe:Namespace rdf:about="#">
     <rdfs:label>XMPP</rdfs:label>
     <rdfs:comment>The Redfoot xmpp namespace.</rdfs:comment>
-  </redfoot:Namespace>
+  </rdfe:Namespace>
 
-  <redfoot:Module rdf:about="#client">
+  <rdfs:Class rdf:ID="XMPPID">
+    <rdfs:label>XMPP ID</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/xmpp#Resource"/>
+  </rdfs:Class>
+
+  <rdf:Property rdf:ID="uid"> 
+    <rdfs:label>xmpp id</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:domain rdf:resource="http://redfoot.net/user#User"/>
+    <rdfs:range rdf:resource="#XMPPID"/>
+  </rdf:Property>
+
+  <rdf:Property rdf:ID="real_id"> 
+    <rdfs:label>real xmpp id</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:domain rdf:resource="#XMPPID"/>
+    <rdfs:range rdf:resource="#XMPPID"/>
+  </rdf:Property>
+
+  <rdfs:Class rdf:ID="Handler">
+    <rdfs:label>XMPP Handler</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/hypercode/code#Python"/>
+  </rdfs:Class>
+
+  <rdf:Property rdf:ID="handler"> 
+    <rdfs:label>xmpp handler</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:domain rdf:resource="http://redfoot.net/user#User"/>
+    <rdfs:range rdf:resource="#Handler"/>
+  </rdf:Property>
+
+  <code:PythonModule rdf:about="#client">
     <rdfs:label>XMPP Client</rdfs:label>      
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
-import logging
-
-_logger = logging.getLogger(__uri__)
+_logger = redfoot.getLogger(__uri__)
 
 from twisted.words.protocols.jabber import client
 
 try:
     client.XMPPClientFactory
-    module_uri = URIRef("#client_2.4.0+", base=__uri__)
+    module_uri = URIRef("#client_2.5.0", base=__uri__)
 except AttributeError, e:
     _logger.info("Falling back to 2.4.0 client implementation")
     module_uri = URIRef("#client_2.4.0", base=__uri__)    
@@ -99,9 +126,10 @@ class Client(xmpp.Client):
             if body is None:
                 _logger.warning("Did not find body element in: %s" % message.toXml().encode('utf-8'))
 
+            _logger.info("from_id: '%s'" % from_id)
             xmpp_id = URIRef("xmpp:%s" % jid.JID(from_id).userhost())
             uri = redfoot.value(predicate=XMPP.uid, object=xmpp_id)
-            is_admin = uri and (uri, RDF.type, REDFOOT.Admin) in redfoot
+            is_admin = uri and (uri, RDF.type, KERNEL.Admin) in redfoot
 
             _logger.debug("from_id: '%s' is_admin: '%s' xmpp_id: '%s'" % (from_id, is_admin, xmpp_id))
 
@@ -131,9 +159,11 @@ class Client(xmpp.Client):
                 else:
                     self.send(from_id, "You need to be an admin to run commands.")
             else:
-                xmpp_handler = redfoot.value(REDFOOT.Globals, XMPP.handler)
-                if xmpp_handler:
-                    redfoot.execute(xmpp_handler, xmpp=self, message=message)
+                xmpp_handlers = redfoot.instances(XMPP.Handler)
+                for xmpp_handler in xmpp_handlers:
+                    _logger.debug("xmpp_handler: %s" % xmpp_handler)
+                    if xmpp_handler:
+                        redfoot.execute(xmpp_handler, xmpp=self, message=message)
                 #else:
                 #    self.send(from_id, "Thank you for your input. But I'm going to ignore it.")
         except Exception, e:
@@ -204,7 +234,9 @@ class Client(xmpp.Client):
                     if xmpp_id:
                         users.append(xmpp_id)
             else:
-                users.append(to)
+                if not to.startswith("xmpp:"):
+                    _logger.warning("Not adding '%s'. Not a xmpp id" % to)
+                    users.append(to)
         else:
             users.append(to)
         for user in users:
@@ -226,12 +258,14 @@ class Client(xmpp.Client):
                 self.pending.append(message)
 
     def join(self, room_id):
+        _logger.info("%s join %s" % (self.client_jid.user, room_id))
         if room_id.startswith("xmpp:"):
             room_id = room_id[5:]
         nick = self.client_jid.user
         message = """<presence to="%s/%s" >
 <priority>0</priority>
 </presence>""" % (room_id, nick)
+        _logger.debug("%s" % message)
         if self.xmlstream:
             self.xmlstream.send(message)
         else:
@@ -240,16 +274,14 @@ class Client(xmpp.Client):
 
 ]]>
     </rdf:value>
-  </redfoot:Module>
+  </code:PythonModule>
 
-  <redfoot:Module rdf:about="#client_2.4.0+">
+  <code:PythonModule rdf:about="#client_2.5.0">
     <rdfs:label>XMPP Client</rdfs:label>      
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
-import logging
-
-_logger = logging.getLogger(__uri__)
+_logger = redfoot.getLogger(__uri__)
 
 from twisted.internet import reactor
 from twisted.names.srvconnect import SRVConnector
@@ -281,10 +313,12 @@ class XMPPClientConnector(SRVConnector):
 
 
 class Client(object):
-    def __init__(self, client_id, secret, _host_no_longer_needed, _port_no_longer_needed):
+    def __init__(self, client_id, secret):
         _logger.debug("Creating client for '%s'" % client_id)
         self.xmlstream = None
         self.pending = []
+        if client_id.startswith("xmpp:"):
+            client_id = client_id.replace("xmpp:", "", 1)
         self.client_jid = client_jid = jid.JID(client_id)
         f = client.XMPPClientFactory(client_jid, secret)
         f.addBootstrap(xmlstream.STREAM_CONNECTED_EVENT, self.connected)
@@ -309,16 +343,14 @@ class Client(object):
 
 ]]>
     </rdf:value>
-  </redfoot:Module>
+  </code:PythonModule>
 
-  <redfoot:Module rdf:about="#client_2.4.0">
+  <code:PythonModule rdf:about="#client_2.4.0">
     <rdfs:label>XMPP Client</rdfs:label>      
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
-import logging
-
-_logger = logging.getLogger(__uri__)
+_logger = redfoot.getLogger(__uri__)
 
 from twisted.words.protocols.jabber import client, jid
 from twisted.words.xish import domish
@@ -327,7 +359,7 @@ from twisted.internet import reactor
 from twisted.words.protocols.jabber.client import BasicAuthenticator
 
 class Client(object):
-    def __init__(self, client_id, password, host, port):
+    def __init__(self, client_id, password):
         self.xmlstream = None
         self.pending = []
         self.client_jid = client_jid = jid.JID(client_id)
@@ -349,9 +381,9 @@ class Client(object):
 
 ]]>
     </rdf:value>
-  </redfoot:Module>
+  </code:PythonModule>
 
-  <redfoot:Module rdf:about="#logging">
+  <code:PythonModule rdf:about="#logging">
     <rdfs:label>XMPP Loggin</rdfs:label>      
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
@@ -385,25 +417,12 @@ def install(who):
 
 ]]>
     </rdf:value>
-  </redfoot:Module>
+  </code:PythonModule>
 
-  <rdf:Description rdf:about="http://redfoot.net/2005/redfoot#Globals">
-    <commands:config>
-      <redfoot:Configuration rdf:ID="xmpp_config">    
-        <commands:command rdf:resource="#xmpp_info"/>                
-        <commands:command rdf:resource="#xmpp_auth"/>                
-        <commands:command rdf:resource="#xmpp_subscribe"/>
-        <commands:command rdf:resource="#xmpp_join"/>
-      </redfoot:Configuration>
-    </commands:config>
-  </rdf:Description>
-
-  <commands:Command rdf:ID="xmpp_info">
+  <command:Command rdf:ID="xmpp_info">
     <rdfs:label>xmpp_info</rdfs:label>
     <rdfs:comment>A command for setting the jabber id and password redfoot will try to connect using.</rdfs:comment>
-    <redfoot:code>
-     <redfoot:Python rdf:ID="xmpp_logger_code">
-      <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
 try:
@@ -423,30 +442,23 @@ else:
     redfoot.xmpp_port = args[3]
 
 ]]>
-      </rdf:value>
-     </redfoot:Python>
-    </redfoot:code>
-  </commands:Command>
+    </rdf:value>
+  </command:Command>
 
-  <commands:Command rdf:ID="xmpp_auth">
+  <command:Command rdf:ID="xmpp_auth">
     <rdfs:label>xmpp_auth</rdfs:label>
     <rdfs:comment>An ejabberd external authentication script</rdfs:comment>
-    <redfoot:code>
-     <redfoot:Python rdf:ID="xmpp_auth_code">
-        <rdfs:label>Update Symbols</rdfs:label>
-      <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
-import logging
-
-_logger = logging.getLogger(__uri__)
+_logger = redfoot.getLogger(__uri__)
 
 import sys, traceback, struct, time, sha, md5
 
 _logger.info("xmpp_auth %s" % sys.stdin)
 
-SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
-XMPP = redfoot.namespace("http://redfoot.net/hypercode/modules/xmpp#")
+USER = redfoot.namespace("http://redfoot.net/hypercode/user#")
+XMPP = redfoot.namespace("http://redfoot.net/hypercode/xmpp#")
 
 def authenticate_user(username, hostname, password):
     #_logger.debug("username '%s' hostname '%s' password '%s'" % (username, hostname, password))
@@ -455,16 +467,16 @@ def authenticate_user(username, hostname, password):
     _logger.debug("found user_uri: %s" % user_uri)
     if user_uri is not None:
         hexdigest = sha.new(password).hexdigest()
-        if (user_uri, SESSION.hexdigest, Literal(hexdigest)) in redfoot:
+        if (user_uri, USER.hexdigest, Literal(hexdigest)) in redfoot:
             return True
         md5_digest = md5.new(password).hexdigest()
-        if (user_uri, SESSION.hexdigest, Literal(md5_digest)) in redfoot:
+        if (user_uri, USER.hexdigest, Literal(md5_digest)) in redfoot:
             return True
     return False
 
 def is_user(username, hostname):
     user_uri = URIRef("mailto:%s@%s" % (username, hostname))
-    return (user_uri, RDF.type, SESSION.User) in redfoot
+    return (user_uri, RDF.type, USER.User) in redfoot
 
 
 def main():
@@ -525,17 +537,12 @@ def main():
 main()
 ]]>
       </rdf:value>
-     </redfoot:Python>
-    </redfoot:code>
-  </commands:Command>
+  </command:Command>
 
-  <commands:Command rdf:ID="xmpp_subscribe">
+  <command:Command rdf:ID="xmpp_subscribe">
     <rdfs:label>xmpp_subscribe</rdfs:label>
     <rdfs:comment>A command to request the presence of another entity</rdfs:comment>
-    <redfoot:code>
-     <redfoot:Python rdf:ID="xmpp_subscribe_code">
-        <rdfs:label>xmpp subscribe code</rdfs:label>
-      <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
 jid = args[0]
@@ -544,17 +551,12 @@ redfoot.xmpp.xmlsteam("""<presence to='%s' type='subscribe'/>""" % jid)
 
 ]]>
       </rdf:value>
-     </redfoot:Python>
-    </redfoot:code>
-  </commands:Command>
+  </command:Command>
 
-  <commands:Command rdf:ID="xmpp_join">
+  <command:Command rdf:ID="xmpp_join">
     <rdfs:label>xmpp_join</rdfs:label>
     <rdfs:comment>A command to request the presence of another entity</rdfs:comment>
-    <redfoot:code>
-     <redfoot:Python rdf:ID="xmpp_join_code">
-        <rdfs:label>xmpp join code</rdfs:label>
-      <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
 room_id = args[0] # include /nick ex. room@conference.domain.com/nick
@@ -564,42 +566,7 @@ redfoot.xmpp.xmlstream.send("""<presence to="%s" >
 </presence>""" % room_id)
 
 ]]>
-      </rdf:value>
-     </redfoot:Python>
-    </redfoot:code>
-  </commands:Command>
-
-  <rdfs:Class rdf:ID="XMPPID">
-    <rdfs:label>XMPP ID</rdfs:label>
-    <rdfs:comment></rdfs:comment>
-    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/redfoot#Resource"/>
-  </rdfs:Class>
-
-  <rdf:Property rdf:ID="uid"> 
-    <rdfs:label>xmpp id</rdfs:label>
-    <rdfs:comment></rdfs:comment>
-    <rdfs:domain rdf:resource="http://redfoot.net/2005/session#User"/>
-    <rdfs:range rdf:resource="#XMPPID"/>
-  </rdf:Property>
-
-  <rdf:Property rdf:ID="real_id"> 
-    <rdfs:label>real xmpp id</rdfs:label>
-    <rdfs:comment></rdfs:comment>
-    <rdfs:domain rdf:resource="#XMPPID"/>
-    <rdfs:range rdf:resource="#XMPPID"/>
-  </rdf:Property>
-
-  <rdfs:Class rdf:ID="Handler">
-    <rdfs:label>XMPP Handler</rdfs:label>
-    <rdfs:comment></rdfs:comment>
-    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/redfoot#Resource"/>
-  </rdfs:Class>
-
-  <rdf:Property rdf:ID="handler"> 
-    <rdfs:label>xmpp handler</rdfs:label>
-    <rdfs:comment></rdfs:comment>
-    <rdfs:domain rdf:resource="http://redfoot.net/2005/redfoot#Globals"/>
-    <rdfs:range rdf:resource="#Handler"/>
-  </rdf:Property>
+    </rdf:value>
+  </command:Command>
 
 </rdf:RDF>  

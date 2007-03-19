@@ -2,28 +2,23 @@
 <rdf:RDF
   xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
   xmlns:rdfs='http://www.w3.org/2000/01/rdf-schema#'
-  xmlns:redfoot='http://redfoot.net/2005/redfoot#'
-  xmlns:server='http://redfoot.net/2005/server#'
-  xmlns:session='http://redfoot.net/2005/session#'
-  xmlns:browse='http://redfoot.net/2005/browse#'
-  xmlns:template='http://redfoot.net/2005/template#'
-  xmlns:commands='http://redfoot.net/2005/commands#'
-  xmlns:cp="http://redfoot.net/hypercode/modules/chart_parser#"
+  xmlns:rdfe='http://redfoot.net/rdfe#'
+  xmlns:code='http://redfoot.net/hypercode/code#'
 >
 
-  <redfoot:Module rdf:ID="module">
+  <code:PythonModule rdf:ID="module">
     <rdfs:label>Action Parser</rdfs:label>      
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
-import logging, re
+import re
 
 from rdflib.Namespace import Namespace
 from rdflib import URIRef
 
-chart_parser = redfoot.module(URIRef("http://redfoot.net/hypercode/modules/chart_parser#module"))
+chart_parser = redfoot.module(URIRef("chart_parser#module", base=__uri__))
 
-_logger = logging.getLogger(__uri__)
+_logger = redfoot.getLogger(__uri__)
 
 _sep = re.compile(ur"[\s]*")
 
@@ -50,12 +45,12 @@ TYPE = Term(URIRef("#type", base=__uri__))
 TAG = Term(URIRef("#tag", base=__uri__))
 TOKEN = Term(URIRef("#token", base=__uri__))
 
-username = redfoot.xmpp_id.split("@")[0]
 
 class ActionChart(chart_parser.Chart):
 
-    def __init__(self, uri_or_rules, check_cache=True):
+    def __init__(self, uri_or_rules, username=None, check_cache=True):
         chart_parser.Chart.__init__(self, uri_or_rules, check_cache=check_cache)
+        self.username = username
 
     def tokenize(self, str):
         assert isinstance(str, unicode), "not unicode: %s: %s" % (type(str), str)
@@ -78,7 +73,7 @@ class ActionChart(chart_parser.Chart):
             yield TAG.timeUnit
         elif token in ["about", "to", "that"]:
             yield TAG.prep
-        if token==username:
+        if self.username and token==self.username:
             yield TAG.botname
         yield TOKEN[token.lower()]
         yield TAG.any
@@ -121,6 +116,6 @@ class ActionChart(chart_parser.Chart):
 
 ]]>
     </rdf:value>
-  </redfoot:Module>
+  </code:PythonModule>
 
 </rdf:RDF>
