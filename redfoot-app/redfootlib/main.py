@@ -25,7 +25,6 @@ parser.add_option("--store", dest="store", help="name of rdflib store to use (na
 parser.add_option("--path", dest="path", help="path to database (defaults to __rfboot__)") # TODO: add alias called configuration... as that's what it's called now
 parser.add_option("--daemon", dest="daemon", action="store_true", help="run as a daemon")
 parser.add_option("--name", action="store", type="string", dest="name", help="name to use as base for log and PID files (when running with --daemon)")
-parser.add_option("--install-rdflib", dest="install_rdflib", action="store_true", help="download and install latest stable rdflib or version specified by URL or dev (for latest development version)")
 
 parser.set_defaults(path="__rfboot__", program = None, update=False, verbose=False, version=False, store=None, install_rdflib=False, set_default=False, clear_default=False, daemon=False, log_level=logging.INFO, name="redfoot")
 
@@ -87,6 +86,8 @@ def main(command=None):
             if len(args)>0 and args[0]=="program":
                 args = args[1:]
             loader.main(options, args)
+        except ValueError, e:
+            _logger.exception(e)
         finally:
             _logger.info("closing store=%s with configuration=%s" % (options.store, options.path))
             loader.close()

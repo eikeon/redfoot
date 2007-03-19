@@ -68,6 +68,35 @@
     <rdfs:label>Module</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:subClassOf rdf:resource="#Code"/>
+    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+<![CDATA[
+
+# TODO check_cache bit
+import logging, sys, types
+
+_logger = logging.getLogger(__uri__)
+
+module_name = this.__uri__       
+
+_logger.debug("creating module: %s" % this.__uri__)
+safe_module_name = "__uri___%s" % hash(this.__uri__)
+module = types.ModuleType(safe_module_name)
+module.__name__ = module_name 
+module.__file__ = this.__uri__
+module.__ispkg__ = 0
+sys.modules[module_name] = module
+module.__dict__.update(redfoot.globals)
+this.execute(this.__uri__, context=module.__dict__)
+
+for item in dir(module):
+    _logger.info("setting: '%s'" % item)
+    this.__setattr__(item, module.__dict__.get(item))
+#def getattr(name, default=None):
+#    return module.__dict__.get(name, default)
+#this.__getattr__ = getattr
+
+]]>
+    </rdf:value>
   </rdfs:Class>
 
   <rdfs:Class rdf:ID="Kernel">
