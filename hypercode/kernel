@@ -36,7 +36,7 @@
 <![CDATA[
 
 import redfootlib
-import logging
+import logging, sys
 
 _logger = logging.getLogger()
 
@@ -61,7 +61,7 @@ if redfootlib_version < REDFOOTLIB_MINIMUM:
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
-import logging
+import logging, sys
 
 _logger = logging.getLogger()
 
