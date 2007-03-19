@@ -61,6 +61,10 @@ if redfootlib_version < REDFOOTLIB_MINIMUM:
     <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
+import logging
+
+_logger = logging.getLogger()
+
 import redfootlib
 
 redfootlib_version = tuple([int(x) for x in redfootlib.__version__.split(".", 2)])    
