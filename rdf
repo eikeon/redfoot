@@ -4,6 +4,7 @@
   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
   xmlns:rdfe="http://redfoot.net/rdf#"
   xmlns:server="http://redfoot.net/hypercode/server#"
+  xmlns:code="http://redfoot.net/hypercode/code#"
   xmlns:template="http://redfoot.net/hypercode/template#"
 >
 
@@ -22,7 +23,7 @@
      <server:PageHandler rdf:ID="RDFXMLDocumentPageHandler">
       <rdfs:label>RDFXMLDocument PageHandler</rdfs:label>
       <server:content_type>application/rdf+xml</server:content_type>            
-      <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+      <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 document = request.uri
 
@@ -44,7 +45,7 @@ for s, p, o in redfoot:
 response.setHeader('Content-Type', 'application/rdf+xml')            
 g.serialize(destination=response)#, base=document)
 ]]>
-      </rdf:value>
+      </code:python>
      </server:PageHandler>
     </server:page_handler>
   </rdfs:Class>
@@ -53,7 +54,7 @@ g.serialize(destination=response)#, base=document)
     <template:content>
       <server:PagePartHandler rdf:ID="class_content">
         <rdfs:label>Display of Class</rdfs:label>
-        <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+        <code:python rdf:datatype="http://redfoot.net/2005/server#Kid">
 <![CDATA[
 <div xmlns="http://www.w3.org/1999/xhtml"
      xmlns:kid="http://purl.org/kid/ns#"
@@ -147,7 +148,7 @@ superclasses = list(redfoot.objects(uri, RDFS.subClassOf)) # TODO:
 
 </div>
 ]]>
-        </rdf:value>
+        </code:python>
       </server:PagePartHandler>
     </template:content>
   </rdfs:Class>
