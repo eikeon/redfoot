@@ -4,12 +4,25 @@
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
    xmlns:rdfe="http://redfoot.net/rdf#"
    xmlns:code="http://redfoot.net/hypercode/code#"
+   xmlns:kernel="http://redfoot.net/hypercode/kernel#"
+   xmlns:command="http://redfoot.net/hypercode/command#"
 >
  
   <rdfe:Namespace rdf:about="#">
     <rdfs:label>Redfoot Boot</rdfs:label>
     <rdfs:comment></rdfs:comment>
   </rdfe:Namespace>
+
+  <boot:Resource rdf:ID="Globals">
+    <rdfs:label>Boot Globals</rdfs:label>
+    <rdfs:comment>Where the BootLoader looks for which boot program to run if one was not specified.</rdfs:comment>
+  </boot:Resource>
+
+  <boot:Resource rdf:ID="Defaults">
+    <rdfs:label>Boot Defaults</rdfs:label>
+    <rdfs:comment>Where the BootLoader looks for which boot program to run if not found in Globals.</rdfs:comment>
+    <boot:program rdf:resource="https://svn.boot.net/trunk/hypercode/boot#loader"/>
+  </boot:Resource>
 
   <code:Code rdf:ID="loader">
     <rdfs:label>Redfoot Loader</rdfs:label>
@@ -38,7 +51,7 @@ parser.add_option("--program", dest="program", help="URIRef of program for kerne
 parser.add_option("--rebuild-from-journal", action="store_true", dest="rebuild_from_journal", help="rebuild the store from the journal file")    
 parser.add_option("--update", action="store_true", dest="update", help="update cached version of program")    
 parser.set_defaults(path="__rfdb__", program = None, update=False, 
-                    program="http://redfoot.net/hypercode/command#runner")
+                    program="http://redfoot.net/hypercode/kernel#runner")
 
 parser.allow_interspersed_args = False
 
@@ -58,6 +71,7 @@ redfoot.open(options.path, rebuild=options.rebuild_from_journal)
 try:
    program = URIRef(options.program)
    # NOTE: Just for reference we load __uri__
+   #program = URIRef(program, base=__uri__)
    if options.update:
        redfoot.load(KERNEL)
        redfoot.load(program)
