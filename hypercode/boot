@@ -8,6 +8,9 @@
    xmlns:kernel="http://redfoot.net/hypercode/kernel#"
 >
  
+  <rdfe:RDFXMLDocument rdf:about="">
+  </rdfe:RDFXMLDocument>
+  
   <rdfe:Namespace rdf:about="#">
     <rdfs:label>Redfoot Boot</rdfs:label>
     <rdfs:comment></rdfs:comment>
