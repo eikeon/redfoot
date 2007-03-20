@@ -21,13 +21,13 @@
     <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
-KERNEL = redfoot.namespace("http://redfoot.net/hypercode/kernel#")
+RDFE = redfoot.namespace("http://redfoot.net/rdf#")
 
 for arg in args:
     print "saveing: %s" % arg
     source = URIRef(redfoot.absolutize(arg))
     print "source:", source
-    for cid, _, source in redfoot.index.triples((None, KERNEL.source, source)):
+    for cid, _, source in redfoot.index.triples((None, RDFE.source, source)):
         context = redfoot.get_context(cid)
         context.save(source, format="pretty-xml")
         print "saved:", source, len(context)
@@ -40,8 +40,6 @@ for arg in args:
     <rdfs:label>print</rdfs:label>
     <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
-
-KERNEL = redfoot.namespace("http://redfoot.net/hypercode/kernel#")
 
 import sys
 for arg in args:
@@ -59,12 +57,12 @@ for arg in args:
     <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
-KERNEL = redfoot.namespace("http://redfoot.net/hypercode/kernel#")
+RDFE = redfoot.namespace("http://redfoot.net/rdf#")
 
 for context in redfoot.contexts():
     try:
         cid = context.identifier
-        source = redfoot.index.value(cid, KERNEL.source)
+        source = redfoot.index.value(cid, RDFE.source)
         if source is None or cid.startswith(source):
             redfoot.write(cid+"\n")
         else:
@@ -81,7 +79,7 @@ for context in redfoot.contexts():
     <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
-KERNEL = redfoot.namespace("http://redfoot.net/hypercode/kernel#")
+RDFE = redfoot.namespace("http://redfoot.net/rdf#")
 
 for arg in args:
     if arg.startswith("_"):
@@ -92,7 +90,7 @@ for arg in args:
         if uri== context.identifier:
             print "removing:", uri
             redfoot.remove_context(context) 
-    for cid in redfoot.index.subjects(KERNEL.source, uri):
+    for cid in redfoot.index.subjects(RDFE.source, uri):
         print "removing: %s\n    source: %s" % (cid, uri)
         redfoot.remove_context(redfoot.get_context(cid))
 
@@ -105,7 +103,7 @@ for arg in args:
     <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
-KERNEL = redfoot.namespace("http://redfoot.net/hypercode/kernel#")
+RDFE = redfoot.namespace("http://redfoot.net/rdf#")
 
 import logging
 
@@ -132,7 +130,6 @@ if not done:
         prefix = ""
     prefix = redfoot.absolutize(prefix, defrag=False)
 
-    KERNEL = redfoot.namespace("http://redfoot.net/hypercode/kernel#")
     DC_creator = URIRef("http://purl.org/dc/elements/1.1/creator")
     
     for context in redfoot.contexts():
@@ -142,12 +139,12 @@ if not done:
                 if options.ignore_source:
                     source = cid
                 else:
-                    source = redfoot.index.value(cid, KERNEL.source)
+                    source = redfoot.index.value(cid, RDFE.source)
             except exceptions.UniquenessError, e:
-                _logger.warning("Multiple sources for %s: %s" % (cid, list(redfoot.objects(cid, KERNEL.source))))
+                _logger.warning("Multiple sources for %s: %s" % (cid, list(redfoot.objects(cid, RDFE.source))))
                 source = None
             if source is not None:
-                publicID = redfoot.index.value(cid, KERNEL.publicID, any=True)
+                publicID = redfoot.index.value(cid, RDFE.publicID, any=True)
                 if cid.startswith(source):
                     print "reloading: %s" % (cid,)
                 else:
@@ -163,9 +160,9 @@ if not done:
     <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
-KERNEL = redfoot.namespace("http://redfoot.net/hypercode/kernel#")
+RDFE = redfoot.namespace("http://redfoot.net/rdf#")
 
-for cid, _, source in redfoot.index.triples((None, KERNEL.source, None)):
+for cid, _, source in redfoot.index.triples((None, RDFE.source, None)):
     if source:
         print "saving %s" % source
         try:
@@ -209,7 +206,8 @@ Server(port=port).run()
     <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
     
-KERNEL = redfoot.namespace("http://redfoot.net/hypercode/kernel#")
+RDFE = redfoot.namespace("http://redfoot.net/rdf#")
+
 DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 
 from time import sleep
@@ -218,7 +216,7 @@ from os.path import getmtime, isfile
 
 while 1:
     sleep(1)
-    for cid, _, source in redfoot.index.triples((None, KERNEL.source, None)):
+    for cid, _, source in redfoot.index.triples((None, RDFE.source, None)):
         if source:
             scheme, netloc, path, params, query, fragment = urlparse(source)
             if isfile(path):
@@ -305,8 +303,6 @@ if uri:
     <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
     
-KERNEL = redfoot.namespace("http://redfoot.net/hypercode/kernel#")
-
 import time, logging
 from tarfile import open, TarInfo
 try:
@@ -363,8 +359,6 @@ tar.close()
     <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
     
-KERNEL = redfoot.namespace("http://redfoot.net/hypercode/kernel#")
-
 from rdflib.Graph import Graph
 import time, logging
 from tarfile import open, TarInfo
@@ -502,8 +496,6 @@ redfoot.index.remove((KERNEL.Checked, RDFS.member, None))
     <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
     
-KERNEL = redfoot.namespace("http://redfoot.net/hypercode/kernel#")
-
 import logging
 
 _logger = redfoot.getLogger(__uri__)
@@ -559,7 +551,6 @@ if nothing_renamed:
         <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
     
-KERNEL = redfoot.namespace("http://redfoot.net/hypercode/kernel#")
 SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
 
 from time import time
@@ -580,11 +571,13 @@ for (s, p, o), cg in redfoot.store.triples((None, SERVER.last_modified, None), N
 <![CDATA[
 
 KERNEL = redfoot.namespace("http://redfoot.net/hypercode/kernel#")
-for (s, p, o), cg in redfoot.store.triples((None, KERNEL.context_id, None), None):
+RDFE = redfoot.namespace("http://redfoot.net/rdf#")
+
+for (s, p, o), cg in redfoot.store.triples((None, RDFE.context_id, None), None):
     for c in cg:
         c.remove((s, p, o))
-        if (s, KERNEL.publicID, None) not in redfoot:
-            c.add((s, KERNEL.publicID, o))
+        if (s, RDFE.publicID, None) not in redfoot:
+            c.add((s, RDFE.publicID, o))
 ]]>
     </code:python>
   </command:Command>
@@ -593,8 +586,6 @@ for (s, p, o), cg in redfoot.store.triples((None, KERNEL.context_id, None), None
     <rdfs:label>serialize</rdfs:label>
     <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
-
-KERNEL = redfoot.namespace("http://redfoot.net/hypercode/kernel#")
 
 import sys
 from rdflib.Graph import Graph
@@ -621,8 +612,6 @@ out.serialize(destination=sys.stdout, base=base)
     <rdfs:label>svn_auth</rdfs:label>
     <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
-
-KERNEL = redfoot.namespace("http://redfoot.net/hypercode/kernel#")
 
 import logging
 
@@ -652,41 +641,6 @@ for user in redfoot.subjects(RDF.type, SESSION.User):
             print "%s:{SHA}%s" % (username, b64(hexdigest))
         else:
             _logger.debug("warning: could not generate right kind of digest for %s using %s" % (user, hexdigest))
-
-]]>
-    </code:python>
-  </command:Command>
-
-    <command:Command rdf:ID="run">
-    <rdfs:label>run</rdfs:label>
-    <rdfs:comment>Run the twisted event loop</rdfs:comment>
-        <server:server rdf:resource="../modules/server#twisted"/>
-        <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
-<![CDATA[
-
-KERNEL = redfoot.namespace("http://redfoot.net/hypercode/kernel#")
-
-import logging
-
-_logger = redfoot.getLogger(__uri__)
-
-_logger.info("Running twisted's event loop")
-
-try:
-    import twisted
-except ImportError, e:
-    raise ImportError("Twisted not installed. Please install Twisted-2.5.0 ( http://twistedmatrix.com/trac/#Downloading )")
-
-from twisted.internet import reactor
-
-try:
-    try:
-        reactor.run()
-    except ValueError:
-        reactor.run(installSignalHandlers=0)
-except KeyboardInterrupt: # TODO: 
-    _logger.info("Shutting down twisted's event loop")
-    reactor.shutdown()
 
 ]]>
     </code:python>
