@@ -52,6 +52,34 @@ for arg in args:
     </code:python>
   </command:Command>
 
+  <command:Command rdf:ID="serialize">
+    <rdfs:label>serialize</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+<![CDATA[
+
+_logger = redfoot.getLogger(__uri__)
+
+import sys
+from rdflib.Graph import Graph
+
+prefix = redfoot.absolutize(args[0], defrag=0)
+if len(args)>1:
+    base = redfoot.absolutize(args[1])
+else:
+    base = prefix
+
+out = Graph(namespace_manager=redfoot.namespace_manager)
+for cid in redfoot.contexts():
+    if cid.identifier.startswith(prefix):
+        c = redfoot.get_context(cid.identifier)
+        out += c  
+
+out.serialize(destination=sys.stdout, base=base)
+
+]]>
+    </code:python>
+  </command:Command>
+
   <command:Command rdf:ID="contexts">
     <rdfs:label>contexts</rdfs:label>
     <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
@@ -578,32 +606,6 @@ for (s, p, o), cg in redfoot.store.triples((None, RDFE.context_id, None), None):
         c.remove((s, p, o))
         if (s, RDFE.publicID, None) not in redfoot:
             c.add((s, RDFE.publicID, o))
-]]>
-    </code:python>
-  </command:Command>
-
-  <command:Command rdf:ID="serialize">
-    <rdfs:label>serialize</rdfs:label>
-    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
-<![CDATA[
-
-import sys
-from rdflib.Graph import Graph
-
-prefix = redfoot.absolutize(args[0], defrag=0)
-if len(args)>1:
-    base = redfoot.absolutize(args[1])
-else:
-    base = prefix
-
-out = Graph(namespace_manager=redfoot.namespace_manager)
-for cid in redfoot.contexts():
-    if cid.startswith(prefix):
-        c = redfoot.get_context(cid)
-        out += c  
-
-out.serialize(destination=sys.stdout, base=base)
-
 ]]>
     </code:python>
   </command:Command>
