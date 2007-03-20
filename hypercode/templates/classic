@@ -3,19 +3,19 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
    xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
-   xmlns:template="http://redfoot.net/2005/template#"
-   xmlns:server="http://redfoot.net/2005/server#"
+   xmlns:code="http://redfoot.net/hypercode/code#"
+   xmlns:template="http://redfoot.net/hypercode/template#"
+   xmlns:server="http://redfoot.net/hypercode/server#"
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
     <rdfs:label>Classic</rdfs:label>
   </rdfe:RDFXMLDocument>
 
-  <redfoot:Namespace rdf:about="#">
+  <rdfe:Namespace rdf:about="#">
     <rdfs:label>Classic</rdfs:label>
     <rdfs:comment>The Redfoot classic namespace.</rdfs:comment>
-  </redfoot:Namespace>
+  </rdfe:Namespace>
 
   <template:Template rdf:ID="page">
     <rdfs:label>Classic Template</rdfs:label>
@@ -32,10 +32,10 @@
     <server:unauthorized_page_handler rdf:resource="#unauthorized_page_handler"/>
     <server:unauthorized_content_handler rdf:resource="#unauthorized_content_handler"/>
     <server:content_type>application/xhtml+xml</server:content_type>
-    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+    <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#">
 <![CDATA[<html xmlns="http://www.w3.org/1999/xhtml" xmlns:kid="http://purl.org/kid/ns#">
-<?python SERVER = redfoot.namespace("http://redfoot.net/2005/server#")?>
-<?python TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")?>
+<?python SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")?>
+<?python TEMPLATE = redfoot.namespace("http://redfoot.net/hypercode/template#")?>
 <?python
 title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract(), None) or "-"
 ?>
@@ -65,7 +65,7 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
         </div>
         <h2><a href="${request.uri}">${title}</a> <span style="font-size: 0.5em; color: gray;">${display(URIRef("#types", base=__uri__))}</span></h2>
         ${display(lookup(TEMPLATE.content))}
-        <?python COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")?>
+        <?python COMMENT = redfoot.namespace("http://redfoot.net/hypercode/comment#")?>
         <div class="comments" kid:if="lookup(TEMPLATE.comments) and (request.uri, RDFS.member, COMMENT.exclude) not in redfoot">
            ${display(lookup(TEMPLATE.comments))}
            ${display(lookup(TEMPLATE.add_comment))}
@@ -81,12 +81,12 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
   </body>
 </html>
 ]]>
-    </rdf:value>    
+    </code:python>    
   </template:Template>
 
   <server:PagePartHandler rdf:ID="types">
     <rdfs:label>classic types</rdfs:label>
-    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#">
 <![CDATA[
 <div xmlns="http://www.w3.org/1999/xhtml" xmlns:kid="http://purl.org/kid/ns#" kid:strip=""><?python
 types = []
@@ -102,32 +102,32 @@ if not types:
 types.sort()
 
 ?><span kid:if="types" kid:strip="">( <span kid:for="label, type in types" kid:strip=""><a href="${request.relative(type.concrete())}">${label}</a><span kid:if="type!=types[-1][1]" kid:strip="">,</span> </span> )</span></div>]]>
-    </rdf:value>    
+    </code:python>    
   </server:PagePartHandler>
 
   <server:PagePartHandler rdf:ID="header">
-    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#">
 <![CDATA[
 <div xmlns:kid="http://purl.org/kid/ns#" kid:strip="">
 
 <h1><a href="${request.host}">${redfoot.label(request.site) or request.host}</a></h1></div>]]>
-    </rdf:value>    
+    </code:python>    
   </server:PagePartHandler>
 
   <server:PagePartHandler rdf:ID="footer">
-    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#"><![CDATA[
       <div xmlns:kid="http://purl.org/kid/ns#" kid:strip="">
         <a href="http://redfoot.net/">redfoot.net</a>
       </div>
-      ]]></rdf:value>
+      ]]></code:python>
   </server:PagePartHandler>
 
   <server:PagePartHandler rdf:ID="navigation">
-    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#"><![CDATA[
 
 <div class="nav" xmlns:kid="http://purl.org/kid/ns#">
 <?python
-TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")
+TEMPLATE = redfoot.namespace("http://redfoot.net/hypercode/template#")
 sections = []
 for section in redfoot.objects(request.host, TEMPLATE.section):
     label = redfoot.value(section, TEMPLATE.section_name) or redfoot.label(section)
@@ -150,11 +150,11 @@ sections.sort()
   </ul>  
 </div>
     
-      ]]></rdf:value>
+      ]]></code:python>
   </server:PagePartHandler>
 
   <server:PagePartHandler rdf:ID="user_navigation">
-    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#"><![CDATA[
 
 <span xmlns:kid="http://purl.org/kid/ns#" kid:strip="">
 <?python 
@@ -174,7 +174,7 @@ user_nav = login_support # TODO: check each of the user_nav bits
   </li>
 
 <?python
-SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+SESSION = redfoot.namespace("http://redfoot.net/hypercode/session#")
 FOAF = redfoot.namespace("http://xmlns.com/foaf/0.1/")
 authenticated = request.session_id and (request.session_id, SESSION.authenticated, Literal('True')) in redfoot
 if authenticated:
@@ -193,17 +193,17 @@ else:
  </span>
 </ul>
 </span>    
-      ]]></rdf:value>
+      ]]></code:python>
   </server:PagePartHandler>
 
 
   <server:PagePartHandler rdf:ID="head">
     <rdfs:label>Default head</rdfs:label>
-    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#">
 <![CDATA[
 <div xmlns:kid="http://purl.org/kid/ns#"
      kid:strip="">
-<?python TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")?>
+<?python TEMPLATE = redfoot.namespace("http://redfoot.net/hypercode/template#")?>
 <?python
 title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract(), None) or "-"
 ?>
@@ -225,16 +225,16 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
   </head>
 </div>
 ]]>
-    </rdf:value>
+    </code:python>
   </server:PagePartHandler>
 
 
   <server:PagePartHandler rdf:ID="css">
     <rdfs:label>Default css</rdfs:label>
     <server:content_type>text/css</server:content_type>
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
 
-TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")
+TEMPLATE = redfoot.namespace("http://redfoot.net/hypercode/template#")
 
 color = lookup(TEMPLATE.background_color) or "#cccccc"
 
@@ -412,24 +412,24 @@ a:hover {
 
 """ % {"color": color})
     
-    </rdf:value>
+    </code:python>
   </server:PagePartHandler>
 
   <server:PagePartHandler rdf:ID="unauthorized_content_handler">
     <rdfs:label>Unauthorized page handler</rdfs:label>
-    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#">
 <![CDATA[
 <div xmlns:kid="http://purl.org/kid/ns#"
      kid:strip="">
 <h2>Unauthorized Content</h2>
 </div>
 ]]>
-    </rdf:value>
+    </code:python>
   </server:PagePartHandler>
 
   <server:PagePartHandler rdf:ID="content">
     <rdfs:label>Generic Display of Resource</rdfs:label>
-    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#">
 <![CDATA[
 <div xmlns:kid="http://purl.org/kid/ns#"
      kid:strip=""
@@ -483,7 +483,7 @@ miscList = [t for t in redfoot.predicate_objects(uri) if t[0] not in [RDFS.label
   </div>    
 </div>
 ]]>
-    </rdf:value>
+    </code:python>
   </server:PagePartHandler>
 
 </rdf:RDF>  

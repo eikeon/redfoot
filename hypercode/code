@@ -14,7 +14,7 @@
   <rdfs:Class rdf:ID="Module">
     <rdfs:label>Python Module</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:subClassOf rdf:resource="#Python"/>
+    <rdfs:subClassOf rdf:resource="#Code"/>
     <code:constructor>
       <code:Python rdf:ID="PythonModuleConstructor">
         <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">

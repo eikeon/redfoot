@@ -203,32 +203,6 @@ for cid, _, source in redfoot.index.triples((None, RDFE.source, None)):
     </code:python>
   </command:Command>
 
-  <command:Command rdf:ID="server">
-    <rdfs:label>server</rdfs:label>
-    <server:server rdf:resource="../modules/server#twisted"/>
-    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
-<![CDATA[
-
-SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
-
-port = 80
-if len(args)>0:
-    try:
-        port = int(args[0])
-    except:
-	print "invalid port of '%s'" % port
-    
-server = redfoot.value(__uri__, SERVER.server) 
-assert server, "%s does not have a %s" % (__uri__, SERVER.server)
-
-print "running server on port %s" % port
-redfoot.execute(server, context=globals())
-Server(port=port).run()
-
-]]>
-    </code:python>
-  </command:Command>
-
   <command:Command rdf:ID="auto_reload">
     <rdfs:label>auto_reload</rdfs:label>
     <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
@@ -528,6 +502,7 @@ import logging
 
 _logger = redfoot.getLogger(__uri__)
 
+from rdflib import URIRef, BNode
 from rdflib.Graph import Graph
 
 OLD = args[0]

@@ -3,8 +3,8 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
    xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
-   xmlns:server="http://redfoot.net/2005/server#"
+   xmlns:code="http://redfoot.net/hypercode/code#"
+   xmlns:server="http://redfoot.net/hypercode/server#"
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
@@ -14,9 +14,9 @@
   <server:Handler rdf:about="#">
     <rdfs:label>Default handler</rdfs:label>      
     <server:display_support rdf:resource="#display_support"/>
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python"><![CDATA[
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string"><![CDATA[
 
-SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
 
 # Support tunneling requests for any resource through a server
 if request.path.startswith("/;"):
@@ -75,7 +75,7 @@ else:
     response.setHeader("ACCEPT", "HEAD")
     response.finish()
  ]]>
-    </rdf:value>
+    </code:python>
   </server:Handler>
 
   <server:Handler rdf:about="#get_handler">
@@ -84,10 +84,12 @@ else:
     <server:page_handler rdf:resource="#RDFXMLDocumentPageHandler"/>
     <server:supported_content_types>application/xhtml+xml, application/rdf+xml</server:supported_content_types>
     <server:display_support rdf:resource="#display_support"/>
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
 import logging
+
+from rdflib.Namespace import Namespace
 
 _logger = logging.getLogger(__uri__)
 
@@ -95,7 +97,8 @@ from twisted.internet.threads import deferToThread
 from twisted.web.http import datetimeToString
 from time import time
 
-SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+KERNEL = Namespace(URIRef("http://redfoot.net/hypercode/kernel#"))
+SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
 
 site = URIRef("/data#Site", base=request.host)
 request.site = site
@@ -125,7 +128,7 @@ if referer:
             c.add((request.uri, REFERER.referer, referer))
             xmpp = redfoot.xmpp
             if xmpp:
-                xmpp.send(REDFOOT.Admin, "Found new referer %s for page %s" % (referer, request.uri))
+                xmpp.send(KERNEL.Admin, "Found new referer %s for page %s" % (referer, request.uri))
 
 page_handler = None
 
@@ -217,13 +220,13 @@ else:
         response.finish()
 
 ]]>
-    </rdf:value>
+    </code:python>
   </server:Handler>
 
 
   <rdf:Description rdf:ID="display_support"> <!-- TODO: type-->
     <rdfs:label>display support</rdfs:label>      
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 # TODO: this is a bit out of hand :(
 
@@ -231,7 +234,8 @@ import logging
 
 _logger = logging.getLogger(__uri__)
 
-SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
+KID = redfoot.namespace("http://redfoot.net/hypercode/modules/kid#")
 
 kid_module = redfoot.module(URIRef("modules/kid#module", base=redfoot.uri))
 
@@ -280,8 +284,8 @@ def _create_display(normal):
             context = dict(mod_context)
             context.update(args)
 
-            value = redfoot.value(uri)
-            if value and value.datatype==SERVER.Kid:
+
+            if KID.Template in redfoot.types(uri):
                 mod = kid_module.get_kid_template(uri, value)
                 context["display"] = kid_display
                 t = mod.Template(**context)        
@@ -299,6 +303,7 @@ def _create_display(normal):
                         request.sources.pop()
                     return kid_module.CleanupElementStream(t.pull(), callback)
             else:
+                value = redfoot.value(uri)
                 request.sources.append(uri)
                 redfoot.execute(uri, **context) 
                 request.sources.pop()
@@ -318,13 +323,13 @@ display = _create_display(normal=True)
 kid_display = _create_display(normal=False)
 
 ]]>
-    </rdf:value>
+    </code:python>
   </rdf:Description>
 
   <server:PageHandler rdf:about="#rdfxml_handler">
     <rdfs:label>Default RDF/XML handler</rdfs:label>      
     <server:content_type>application/rdf+xml</server:content_type>
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
 #response.setHeader('Content-Type', 'application/rdf+xml')            
@@ -344,21 +349,24 @@ context.serialize(destination=response, base=base)
 # NOTE: serialize calls close on response. So we should not call: response.finish() 
 
 ]]>
-    </rdf:value>
+    </code:python>
   </server:PageHandler>
 
 
   <server:Handler rdf:about="#put_handler">
     <rdfs:label>Default GET handler</rdfs:label>      
     <server:display_support rdf:resource="#display_support"/>
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
+from rdflib.Namespace import Namespace
+
+KERNEL = Namespace(URIRef("http://redfoot.net/hypercode/kernel#"))
 auth = redfoot.module(URIRef("modules/auth#module", base=redfoot.uri))
 uid = auth.authenticate(request)
-if uid and (uid, RDF.type, REDFOOT.Admin) in redfoot:
+if uid and (uid, RDF.type, KERNEL.Admin) in redfoot:
     #acid = request.uri.abstract()
-    #if (acid, RDF.type, REDFOOT.Context) in redfoot:
+    #if (acid, RDF.type, KERNEL.Context) in redfoot:
     #    cid = redfoot.context_id(acid) # default context
     #else:
     #    cid = redfoot.context_id(request.uri) # default context
@@ -375,13 +383,13 @@ else:
 response.finish()
 
 ]]>
-    </rdf:value>
+    </code:python>
   </server:Handler>
 
      <server:PageHandler rdf:ID="RDFXMLDocumentPageHandler">
       <rdfs:label>RDFXMLDocument PageHandler</rdfs:label>
       <server:content_type>application/rdf+xml</server:content_type>            
-      <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+      <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 document = request.uri
 
@@ -403,7 +411,7 @@ for s, p, o in redfoot:
 response.setHeader('Content-Type', 'application/rdf+xml')            
 g.serialize(destination=response)#, base=document)
 ]]>
-      </rdf:value>
+      </code:python>
      </server:PageHandler>
 
 </rdf:RDF>  

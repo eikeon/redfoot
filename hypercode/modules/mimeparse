@@ -3,22 +3,20 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
    xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
-   xmlns:server="http://redfoot.net/2005/server#"
-   xmlns:commands="http://redfoot.net/2005/commands#"
+   xmlns:code="http://redfoot.net/hypercode/code#"
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
   </rdfe:RDFXMLDocument>
   
-  <redfoot:Namespace rdf:about="#">
+  <rdfe:Namespace rdf:about="#">
     <rdfs:label>Mimeparse</rdfs:label>
     <rdfs:comment>The Redfoot mimeparse namespace.</rdfs:comment>
-  </redfoot:Namespace>
+  </rdfe:Namespace>
 
-  <redfoot:Module rdf:about="#module">
+  <code:Module rdf:about="#module">
     <rdfs:label>MIME-Type Parser</rdfs:label>      
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
 """MIME-Type Parser
@@ -180,7 +178,7 @@ if __name__ == "__main__":
 
 
 ]]>
-    </rdf:value>
-  </redfoot:Module>
+    </code:python>
+  </code:Module>
 
 </rdf:RDF>  

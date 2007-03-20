@@ -22,13 +22,13 @@
   <rdfs:Class rdf:ID="Program">
     <rdfs:label>Kernel Program</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:subClassOf rdf:resource="http://redfoot.net/hypercode/code#Python"/>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/hypercode/code#Code"/>
   </rdfs:Class>
 
   <rdfs:Class rdf:ID="OnLoad">
     <rdfs:label>Kernel OnLoad Handler</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:subClassOf rdf:resource="http://redfoot.net/hypercode/code#Python"/>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/hypercode/code#Code"/>
   </rdfs:Class>
 
   <rdf:Description rdf:about="#">
@@ -67,7 +67,7 @@ import sys, logging
 from datetime import datetime
 from urlparse import urldefrag
 
-from rdflib import URIRef, Literal
+from rdflib import URIRef, Literal, BNode
 from rdflib import RDF, RDFS
 from rdflib.Graph import Graph, ConjunctiveGraph
 from rdflib.Namespace import NamespaceDict as Namespace 
@@ -225,6 +225,7 @@ class Kernel(ConjunctiveGraph):
                     _logger.warning("couldn't load %s while checking: %s\n" % (uri, e))
         else: 
             _logger.warning("%r is not an instance of rdflib.URIRef\n" % uri)
+            raise ValueError("wrong type")
         return (uri, None, None) in self
 
     def load(self, location, format="xml", publicID=None, creator=None, scutter=False):
@@ -315,9 +316,9 @@ class Kernel(ConjunctiveGraph):
         
     def execute(self, uri, context=None, **args):
         if self.check(uri):
-            if CODE.Python not in self.types(uri):
-                _logger.warning("%s not of type CODE.Python" % uri)
-                _logger.info("  types: %s" % list(self.types(uri)))
+            if CODE.Code not in self.types(uri):
+                _logger.warning("%s not of type CODE.Code" % uri)
+                _logger.warning("  types: %s" % list(self.types(uri)))
             for other in self.objects(uri, RDFS.seeAlso):
                 self.check(other)
             value = self.value(uri, CODE.python)

@@ -5,6 +5,7 @@
    xmlns:rdfe="http://redfoot.net/rdf#"
    xmlns:code="http://redfoot.net/hypercode/code#"
    xmlns:server="http://redfoot.net/hypercode/server#"
+   xmlns:command="http://redfoot.net/hypercode/command#"
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
@@ -15,9 +16,29 @@
     <rdfs:comment>The Redfoot server namespace.</rdfs:comment>
   </rdfe:Namespace>
 
+  <command:Command rdf:ID="server">
+    <rdfs:label>server</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+<![CDATA[
+
+port = 80
+if len(args)>0:
+    try:
+        port = int(args[0])
+    except:
+	print "invalid port of '%s'" % port
+    
+print "running server on port %s" % port
+redfoot.execute(URIRef("#twisted", base=__uri__), context=globals())
+Server(port=port).run()
+
+]]>
+    </code:python>
+  </command:Command>
+
   <code:Code rdf:about="#twisted">
     <rdfs:label>twisted server for Redfoot</rdfs:label>      
-    <server:handler rdf:resource="../handlers/page#"/>
+    <server:handler rdf:resource="handlers/page#"/>
     <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
@@ -52,7 +73,8 @@ from base64 import b64encode
 
 from cStringIO import StringIO
 
-SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+KERNEL = redfoot.namespace("http://redfoot.net/hypercode/kernel#")
+SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
 SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
 
 
@@ -126,7 +148,7 @@ class Request(object):
 
     def lookup(self, property, default=None, uri=None):
         uri = uri or self.uri
-        sources = chain([uri], redfoot.types(uri), [self.host, redfoot.uri, REDFOOT.Globals]) 
+        sources = chain([uri], redfoot.types(uri), [self.host, redfoot.uri, KERNEL.Globals]) 
         # add self.sources as additional sources; first, let's see if
         # we can find what's depending on them and make a test case
         if (uri, RDF.type, RDFS.Class) in redfoot:
@@ -139,7 +161,7 @@ class Request(object):
 
     def objects(self, predicate):
         # being used in hypercode/handlers/page#put_handler
-        sources = chain([self.uri], redfoot.types(self.uri), [self.host, redfoot.uri, REDFOOT.Globals]) 
+        sources = chain([self.uri], redfoot.types(self.uri), [self.host, redfoot.uri, KERNEL.Globals]) 
         if (self.uri, RDF.type, RDFS.Class) in redfoot:
             sources.next() # ignore self.uri
         for source in sources: 
@@ -257,16 +279,21 @@ class _Resource(object):
         response = Response(twisted_request)
 
         handler = redfoot.value(request.uri, SERVER.handler) or redfoot.value(request.host, SERVER.handler) or redfoot.value(__uri__, SERVER.handler)
-
-        # For Server header format see: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.38
-        response.setHeader("Server", "Redfoot/%s rdflib/%s %s Kernel/%s Server/%s Handler/%s)" % 
-                           (redfootlib.__version__, rdflib.__version__, version, redfoot.uri, __uri__, handler))
-        try:
-            redfoot.execute(handler, request=request, response=response)
-        except Exception, e:
-            _logger.exception(e)
-            response.setStatus(500, "Internal Server Error -- this is hopefully a temporary issue.")
-            return "%s" % e
+        if handler:
+           # For Server header format see: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.38
+            response.setHeader("Server", "Redfoot/%s rdflib/%s %s Kernel/%s Server/%s Handler/%s)" % 
+                               (redfootlib.__version__, rdflib.__version__, version, redfoot.uri, __uri__, handler))
+            try:
+                redfoot.execute(handler, request=request, response=response)
+            except Exception, e:
+                _logger.exception(e)
+                response.setStatus(500, "Internal Server Error -- this is hopefully a temporary issue.")
+                return "%s" % e
+        else:
+             msg = "No handler found"
+             _logger.error(msg)
+             response.setStatus(500, msg)
+             return msg
 
         # Note: it is the handler's job to call response.finish()
         # handlers can also do deferToThread (For example see handlers/page#)

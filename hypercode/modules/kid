@@ -3,21 +3,21 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
    xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:code="http://redfoot.net/hypercode/code#"
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
   </rdfe:RDFXMLDocument>
 
-  <redfoot:Namespace rdf:about="#">
+  <rdfe:Namespace rdf:about="#">
     <rdfs:label>Kid</rdfs:label>
     <rdfs:comment>The Redfoot kid namespace.</rdfs:comment>
-  </redfoot:Namespace>
+  </rdfe:Namespace>
 
-  <redfoot:Module rdf:ID="module">
+  <code:Module rdf:ID="module">
     <rdfs:label>kid glue</rdfs:label>      
     <rdfs:comment></rdfs:comment>    
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
 REQUIRED = "0.9.3" # TODO: bump to 0.9.5? ... as that's all I've tested so far.
@@ -102,7 +102,7 @@ assert False
     t.write(sys.stdout, encoding=encoding, fragment=fragment, output=output)
 
 ]]>
-    </rdf:value>
-  </redfoot:Module>
+    </code:python>
+  </code:Module>
 
 </rdf:RDF>  

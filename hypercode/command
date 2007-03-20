@@ -24,7 +24,7 @@
   <rdfs:Class rdf:ID="Command">
     <rdfs:label>Command</rdfs:label>
     <rdfs:comment>...</rdfs:comment>
-    <rdfs:subClassOf rdf:resource="&code;Python"/>
+    <rdfs:subClassOf rdf:resource="&code;Code"/>
   </rdfs:Class>
 
 </rdf:RDF>

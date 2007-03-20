@@ -2,25 +2,26 @@
 <rdf:RDF
   xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
   xmlns:rdfs='http://www.w3.org/2000/01/rdf-schema#'
-  xmlns:redfoot='http://redfoot.net/2005/redfoot#'
-  xmlns:template='http://redfoot.net/2005/template#'
+  xmlns:rdfe='http://redfoot.net/rdf#'
+  xmlns:template='http://redfoot.net/hypercode/template#'
   xmlns:aspect="http://redfoot.net/hypercode/aspect#"
+  xmlns:code="http://redfoot.net/hypercode/code#"
 >
 
-  <redfoot:Namespace rdf:about="#">
+  <rdfe:Namespace rdf:about="#">
     <rdfs:label>Aspect</rdfs:label>
     <rdfs:comment>The Redfoot aspect namespace.</rdfs:comment>
-  </redfoot:Namespace>
+  </rdfe:Namespace>
 
   <rdfs:Class rdf:ID="Aspect">
     <rdfs:label>Aspect</rdfs:label>
     <rdfs:comment>An aspect is a set of functionality that is intented to be added to a site.</rdfs:comment>
-    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/redfoot#Code"/>
+    <rdfs:subClassOf rdf:resource="#Resource"/>
     <template:content>
 
       <template:Content rdf:ID="UserPagePartHandler">
         <rdfs:label>Quant User Page Part Handler</rdfs:label>
-       <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+        <code:python rdf:datatype="http://redfoot.net/hypercode/server#Kid">
 <![CDATA[
 
 <div xmlns:kid="http://purl.org/kid/ns#" kid:strip="">
@@ -45,14 +46,14 @@ if action=="install" and aspect:
 </div>
 
 ]]>
-        </rdf:value>
+        </code:python>
       </template:Content>
     </template:content>
   </rdfs:Class>
 
-  <redfoot:Python rdf:ID="install">
+  <code:Code rdf:ID="install">
     <rdfs:label>Aspect</rdfs:label>
-      <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+      <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
 # input: 
@@ -65,8 +66,8 @@ site = base # TODO: calc site from base
 from rdflib.Namespace import Namespace
 ASPECT = Namespace("http://redfoot.net/hypercode/aspect#")
 
-TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")
-SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+TEMPLATE = redfoot.namespace("http://redfoot.net/hypercode/template#")
+SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
 
 cid = redfoot.context_id(aspect, context_id="context")
 redfoot.check(cid)
@@ -92,8 +93,8 @@ for item in redfoot.objects(aspect, ASPECT.item):
             context.add((uri, p, o))
 
 ]]>
-      </rdf:value>
-  </redfoot:Python>
+      </code:python>
+  </code:Code>
 
   <aspect:Aspect rdf:about="aspects/bookmark#aspect"/>
   <aspect:Aspect rdf:about="aspects/issues#aspect"/>
