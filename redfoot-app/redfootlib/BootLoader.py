@@ -35,9 +35,9 @@ class BootLoader(ConjunctiveGraph):
     def __get_program(self):
         program = self.value(BOOT.Globals, BOOT.program)
         if not program:
-            if not (BOOT.NS, None, None) in self:
-                _logger.info("loading: %s" % BOOT.NS)
-                self.load(BOOT.NS)
+            if not (BOOT, None, None) in self:
+                _logger.info("loading: %s" % BOOT)
+                self.load(BOOT)
                 self.commit()
             program = self.value(BOOT.Defaults, BOOT.program)
             raise NoProgramException()
@@ -46,7 +46,7 @@ class BootLoader(ConjunctiveGraph):
 
     def __get_config(self):
         if self.__config is None:
-            uri = URIRef("_config", base=BOOT.NS)
+            uri = URIRef("_config", base=BOOT)
             self.__config = Graph(store=self.store, identifier=uri)
         return self.__config
     config = property(__get_config, doc="context for storing configuration data")

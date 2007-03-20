@@ -181,7 +181,7 @@ try:
     _logger.debug("  uri: %s" % program)
     loader.execute(program or loader.program, args=args)
 except BootLoader.NoProgramException, e:
-    _logger.warning("No program specified. Set one with redfoot_admin --program")
+    _logger.warning("No program specified. Specify one with redfoot loader --program")
 except KeyboardInterrupt, ki:
     _logger.info("%s, Bye" % ki)
 except Exception, e:
