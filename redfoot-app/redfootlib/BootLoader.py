@@ -35,12 +35,17 @@ class BootLoader(ConjunctiveGraph):
     def __get_program(self):
         program = self.value(BOOT.Globals, BOOT.program)
         if not program:
+            _logger.info("No program found in BOOT.Globals")
             if not (BOOT, None, None) in self:
                 _logger.info("loading: %s" % BOOT)
                 self.load(BOOT)
                 self.commit()
             program = self.value(BOOT.Defaults, BOOT.program)
-            raise NoProgramException()
+            if program:
+                _logger.info("Found program: %s" % program)
+            else:
+                _logger.info("No program found in BOOT.Defaults")
+                raise NoProgramException()
         return program
     program = property(__get_program, __set_program, doc="python program redfoot.py will load and execute")
 

@@ -173,7 +173,7 @@ try:
     else:
         program = loader.program
     if options.update:
-        _logger.info("loading: %s" % program)
+        _logger.info("updating program: %s" % program)
         loader.load(program)
         loader.program 
         loader.commit()
