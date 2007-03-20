@@ -2,13 +2,13 @@
 <rdf:RDF
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:rdfe="http://redfoot.net/rdf#"
 >
 
-  <redfoot:Namespace rdf:about="#">
+  <rdfe:Namespace rdf:about="#">
     <rdfs:label>Template</rdfs:label>
     <rdfs:comment>The Redfoot template namespace.</rdfs:comment>
-  </redfoot:Namespace>
+  </rdfe:Namespace>
 
   <rdfs:Class rdf:ID="Section">
     <rdfs:label>Section</rdfs:label>
@@ -124,7 +124,6 @@
   <rdf:Property rdf:ID="background_color">
     <rdfs:label>background_color</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <redfoot:todo>Is there a better namespace for this property?</redfoot:todo>
     <rdfs:domain rdf:resource="server#Site"/>
     <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
   </rdf:Property>
@@ -152,7 +151,6 @@
   <rdf:Property rdf:ID="title">
     <rdfs:label>title</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:domain rdf:resource="redfoot#Release"/>
     <rdfs:domain rdf:resource="server#Site"/>
     <rdfs:domain rdf:resource="server#Page"/>
     <rdfs:range rdf:resource="#Title"/>
@@ -161,13 +159,12 @@
   <rdfs:Class rdf:ID="Shortcut_Icon">
     <rdfs:label>Shortcut_Icon</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:subClassOf rdf:resource="redfoot#Resource"/>
+    <rdfs:subClassOf rdf:resource="#Resource"/>
   </rdfs:Class>
 
   <rdf:Property rdf:ID="shortcut_icon">
     <rdfs:label>shortcut_icon</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:domain rdf:resource="redfoot#Release"/>
     <rdfs:domain rdf:resource="server#Site"/>
     <rdfs:domain rdf:resource="server#Page"/>
     <rdfs:range rdf:resource="#Shortcut_Icon"/>
