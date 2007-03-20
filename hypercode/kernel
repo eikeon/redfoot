@@ -58,29 +58,10 @@ if redfootlib_version < REDFOOTLIB_MINIMUM:
     <rdfs:label>Redfoot Kernel</rdfs:label>
     <rdfs:comment>
     </rdfs:comment> 
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
-<![CDATA[
-
-import logging, sys
-
-_logger = logging.getLogger()
-
-import redfootlib
-
-redfootlib_version = tuple([int(x) for x in redfootlib.__version__.split(".", 2)])    
-
-REDFOOTLIB_MINIMUM = (2, 7, 0)
-
-if redfootlib_version < REDFOOTLIB_MINIMUM:
-    _logger.warning("This version of the redfoot kernel is still in development.")
-    _logger.critical("This kernel requires redfootlib %s or greater. Found redfootlib version %s. easy_install -U redfoot==dev" % ("%s.%s.%s" % REDFOOTLIB_MINIMUM, redfootlib.__version__))
-    _logger.warning("If you wish to keep running with redfoot 2.1.x please run: redfoot --program=https://svn.redfoot.net/branches/2.1/kernel# --set-default")
-    sys.exit(-1)
-
-]]>
-    </rdf:value>
     <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
+
+# TODO: put in check that this is being run with boot#loader ?  
 
 import sys, logging
 from datetime import datetime
@@ -339,9 +320,9 @@ class Kernel(ConjunctiveGraph):
                 _logger.info("  types: %s" % list(self.types(uri)))
             for other in self.objects(uri, RDFS.seeAlso):
                 self.check(other)
-            value = self.value(uri)
+            value = self.value(uri, CODE.python)
             if value is None:
-                raise Exception("Couldn't execute %s (has no RDF.value)" % uri)
+                raise Exception("Couldn't execute %s (has no CODE.python)" % uri)
             if context==None:
                 context = dict(self.globals)
             for k, v in args.items():
@@ -471,6 +452,97 @@ class Kernel(ConjunctiveGraph):
 ]]>
     </code:python>
   </code:Module>
+
+  <kernel:Program rdf:ID="runner">
+    <rdfs:label>Command Runner</rdfs:label>
+    <rdfs:seeAlso rdf:resource="../hypercode/commands/manage#"/>
+    <rdfs:seeAlso rdf:resource="../hypercode/commands/static#"/>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+<![CDATA[
+
+import logging
+
+_logger = logging.getLogger(__uri__)
+
+CODE = redfoot.namespace(URIRef("http://redfoot.net/hypercode/code#"))
+COMMAND = redfoot.namespace(URIRef("http://redfoot.net/hypercode/command#"))
+
+
+commands = {}
+
+for command in redfoot.instances(COMMAND.Command):
+    redfoot.check(command)
+    label = redfoot.label(command)
+    commands[label] = command
+
+# TODO: command line parsing and usage
+if not args:
+    args = [""]
+
+command = args[0]
+
+# find code object by label or full URIRef
+code = commands.get(command, URIRef(command))
+if code:
+    redfoot.execute(code, stdout=redfoot, stderr=redfoot, args=args[1:])
+else:
+    if command:
+        redfoot.write("Command '%s' not found.\n" % command)
+    command_list = commands.keys()
+    command_list.sort()
+    redfoot.write("available commands: \n    %s\n" % ", ".join(command_list))
+
+]]>
+    </code:python>
+  </kernel:Program>
+
+  <command:Command rdf:ID="load">
+    <rdfs:label>load</rdfs:label>
+    <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+<![CDATA[
+
+if len(args)==0 or len(args)>3:
+    print "usage: ./redfoot.py load <uri> [<publicID>]"
+else:
+    import os
+    from urllib import pathname2url
+    from urlparse import urljoin
+    url = URIRef(args[0], base="%s/" % urljoin("file:", pathname2url(os.getcwd())))
+    try:
+        publicID = URIRef(redfoot.absolutize(args[1], defrag=False))
+    except:
+        publicID = None
+    print "loading: %s" % url
+    if publicID:
+        print " with publicID: %s" % publicID
+    redfoot.load(url, publicID=publicID, creator=__uri__)
+
+]]>
+    </rdf:value>
+  </command:Command>
+
+  <command:Command rdf:ID="run_tests">
+    <rdfs:label>run_tests</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+<![CDATA[
+
+_logger = redfoot.getLogger(__uri__)
+
+from optparse import OptionParser
+parser = OptionParser("""This command is for running tests on hypercode.""")
+
+try:
+    options, args = parser.parse_args(args)
+except SystemExit, e:
+    pass
+else:
+    for uri, _, value in redfoot.triples((None, RDF.value, None)):
+        if isinstance(value, Literal):
+            _logger.warning("%s has an old RDF.value of datatype REDFOOT.Python" % uri)
+
+]]>
+    </code:python>
+  </command:Command>
 
   <command:Command rdf:ID="set_base">
     <rdfs:label>set_base</rdfs:label>
