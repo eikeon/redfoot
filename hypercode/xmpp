@@ -45,9 +45,9 @@
     <rdfs:range rdf:resource="#Handler"/>
   </rdf:Property>
 
-  <code:PythonModule rdf:about="#client">
+  <code:Module rdf:about="#client">
     <rdfs:label>XMPP Client</rdfs:label>      
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <code:python rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
 _logger = redfoot.getLogger(__uri__)
@@ -273,12 +273,12 @@ class Client(xmpp.Client):
 
 
 ]]>
-    </rdf:value>
-  </code:PythonModule>
+    </code:python>
+  </code:Module>
 
-  <code:PythonModule rdf:about="#client_2.5.0">
+  <code:Module rdf:about="#client_2.5.0">
     <rdfs:label>XMPP Client</rdfs:label>      
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <code:python rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
 _logger = redfoot.getLogger(__uri__)
@@ -342,12 +342,12 @@ class Client(object):
 
 
 ]]>
-    </rdf:value>
-  </code:PythonModule>
+    </code:python>
+  </code:Module>
 
-  <code:PythonModule rdf:about="#client_2.4.0">
+  <code:Module rdf:about="#client_2.4.0">
     <rdfs:label>XMPP Client</rdfs:label>      
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <code:python rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
 _logger = redfoot.getLogger(__uri__)
@@ -380,12 +380,12 @@ class Client(object):
         _logger.error("Register User: %s" % failure)
 
 ]]>
-    </rdf:value>
-  </code:PythonModule>
+    </code:python>
+  </code:Module>
 
-  <code:PythonModule rdf:about="#logging">
+  <code:Module rdf:about="#logging">
     <rdfs:label>XMPP Loggin</rdfs:label>      
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <code:python rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
 import logging
@@ -416,13 +416,13 @@ def install(who):
     _root_logger.addHandler(_root_handler)
 
 ]]>
-    </rdf:value>
-  </code:PythonModule>
+    </code:python>
+  </code:Module>
 
   <command:Command rdf:ID="xmpp_info">
     <rdfs:label>xmpp_info</rdfs:label>
     <rdfs:comment>A command for setting the jabber id and password redfoot will try to connect using.</rdfs:comment>
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <code:python rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
 try:
@@ -442,13 +442,13 @@ else:
     redfoot.xmpp_port = args[3]
 
 ]]>
-    </rdf:value>
+    </code:python>
   </command:Command>
 
   <command:Command rdf:ID="xmpp_auth">
     <rdfs:label>xmpp_auth</rdfs:label>
     <rdfs:comment>An ejabberd external authentication script</rdfs:comment>
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <code:python rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
 _logger = redfoot.getLogger(__uri__)
@@ -536,13 +536,13 @@ def main():
 
 main()
 ]]>
-      </rdf:value>
+      </code:python>
   </command:Command>
 
   <command:Command rdf:ID="xmpp_subscribe">
     <rdfs:label>xmpp_subscribe</rdfs:label>
     <rdfs:comment>A command to request the presence of another entity</rdfs:comment>
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <code:python rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
 jid = args[0]
@@ -550,13 +550,13 @@ jid = args[0]
 redfoot.xmpp.xmlsteam("""<presence to='%s' type='subscribe'/>""" % jid)
 
 ]]>
-      </rdf:value>
+      </code:python>
   </command:Command>
 
   <command:Command rdf:ID="xmpp_join">
     <rdfs:label>xmpp_join</rdfs:label>
     <rdfs:comment>A command to request the presence of another entity</rdfs:comment>
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <code:python rdf:datatype="http://redfoot.net/2005/redfoot#Python">
 <![CDATA[
 
 room_id = args[0] # include /nick ex. room@conference.domain.com/nick
@@ -566,7 +566,7 @@ redfoot.xmpp.xmlstream.send("""<presence to="%s" >
 </presence>""" % room_id)
 
 ]]>
-    </rdf:value>
+    </code:python>
   </command:Command>
 
 </rdf:RDF>  

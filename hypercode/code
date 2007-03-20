@@ -11,13 +11,7 @@
     <rdfs:subClassOf rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
   </rdfs:Class>
 
-  <rdfs:Class rdf:ID="Python">
-    <rdfs:label>Python Code</rdfs:label>
-    <rdfs:comment></rdfs:comment>
-    <rdfs:subClassOf rdf:resource="#Code"/>
-  </rdfs:Class>
-
-  <rdfs:Class rdf:ID="PythonModule">
+  <rdfs:Class rdf:ID="Module">
     <rdfs:label>Python Module</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:subClassOf rdf:resource="#Python"/>

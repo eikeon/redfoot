@@ -3,138 +3,42 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
    xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
-   xmlns:commands="http://redfoot.net/2005/commands#"
-   xmlns:server="http://redfoot.net/2005/server#" 
+   xmlns:code="http://redfoot.net/hypercode/code#" 
+   xmlns:command="http://redfoot.net/hypercode/command#" 
+   xmlns:server="http://redfoot.net/hypercode/server#" 
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
   </rdfe:RDFXMLDocument>
   
-  <redfoot:Namespace rdf:about="#">
+  <rdfe:Namespace rdf:about="#">
     <rdfs:label>Manage</rdfs:label>
     <rdfs:comment>The Redfoot manage namespace.</rdfs:comment>
-  </redfoot:Namespace>
+  </rdfe:Namespace>
 
-  <redfoot:Configuration rdf:ID="config">
-    <rdfs:label>commands config</rdfs:label>
-    <rdfs:comment>A configuration with all the commands</rdfs:comment>
-    <commands:command>
-      <commands:Command rdf:ID="add_admin">
-        <rdfs:label>add_admin</rdfs:label>
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+  <command:Command rdf:ID="save">
+    <rdfs:label>save</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
-_logger = redfoot.getLogger(__uri__)
-
-REDFOOT = redfoot.namespace("http://redfoot.net/2005/redfoot#")
-
-from optparse import OptionParser
-parser = OptionParser("""
-This command is for adding a Redfoot admin and expects one argument, the user identifier.""")
-parser.add_option("--password", dest="password", help="password for the admin being added")
-parser.add_option("--xmpp_id", dest="xmpp_id", help="xmpp_id for the admin being added")
-
-try:
-    options, args = parser.parse_args(args)
-    done = False
-except SystemExit, e:
-    done = True
-
-if not done:
-    if len(args)==1:
-        user = args[0]
-        if not user.startswith("mailto:") and "@" in user:
-            user = "mailto:%s" % user
-        user = URIRef(user)
-
-        redfoot.config.add((user, RDF.type, REDFOOT.Admin))
-
-        if options.password:
-            SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
-            password = Literal(options.password.strip())
-            redfoot.config.add((user, RDF.type, SESSION.User))
-            import sha
-            hexdigest = Literal(sha.new(password).hexdigest())
-            redfoot.config.set((user, SESSION.hexdigest, hexdigest))
-        if options.xmpp_id:
-            XMPP = redfoot.namespace("http://redfoot.net/hypercode/modules/xmpp#")
-            value = options.xmpp_id.strip()
-            if not value.startswith("xmpp"):
-                value = "xmpp:%s" % value
-            redfoot.config.add((user, XMPP.uid, URIRef(value)))
-    else:
-        redfoot.write("No user identifier specified.\n")
-        parser.print_help()
-
-]]>
-        </rdf:value>
-      </commands:Command>
-    </commands:command>
-    <commands:command>
-      <commands:Command rdf:ID="set_base">
-        <rdfs:label>set_base</rdfs:label>
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
-<![CDATA[
-
-assert len(args)==1, "expecting one argument that is the base"
-redfoot.base = URIRef(args[0])
-
-]]>
-        </rdf:value>
-      </commands:Command>
-    </commands:command>
-    <commands:command>
-      <commands:Command rdf:ID="load">
-        <rdfs:label>load</rdfs:label>
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
-<![CDATA[
-
-if len(args)==0 or len(args)>3:
-    print "usage: ./redfoot.py load <uri> [<publicID>]"
-else:
-    import os
-    from urllib import pathname2url
-    from urlparse import urljoin
-    url = URIRef(args[0], base="%s/" % urljoin("file:", pathname2url(os.getcwd())))
-    try:
-        publicID = URIRef(redfoot.absolutize(args[1], defrag=False))
-    except:
-        publicID = None
-    print "loading: %s" % url
-    if publicID:
-        print " with publicID: %s" % publicID
-    redfoot.load(url, publicID=publicID, creator=__uri__)
-
-]]>
-        </rdf:value>
-      </commands:Command>
-    </commands:command>
-    <commands:command>
-      <commands:Command rdf:ID="save">
-        <rdfs:label>save</rdfs:label>
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
-<![CDATA[
-
-REDFOOT = redfoot.namespace("http://redfoot.net/2005/redfoot#")
+KERNEL = redfoot.namespace("http://redfoot.net/code/kernel#")
 
 for arg in args:
     print "saveing: %s" % arg
     source = URIRef(redfoot.absolutize(arg))
     print "source:", source
-    for cid, _, source in redfoot.index.triples((None, REDFOOT.source, source)):
+    for cid, _, source in redfoot.index.triples((None, KERNEL.source, source)):
         context = redfoot.get_context(cid)
         context.save(source, format="pretty-xml")
         print "saved:", source, len(context)
 
 ]]>
-        </rdf:value>
-      </commands:Command>
-    </commands:command>
-    <commands:command>
-      <commands:Command rdf:ID="print">
-        <rdfs:label>print</rdfs:label>
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    </code:python>
+  </command:Command>
+
+  <command:Command rdf:ID="print">
+    <rdfs:label>print</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
 import sys
@@ -145,21 +49,20 @@ for arg in args:
     context.serialize(format="pretty-xml", destination=sys.stdout)
 
 ]]>
-        </rdf:value>
-      </commands:Command>
-    </commands:command>
-    <commands:command>
-      <commands:Command rdf:ID="contexts">
-        <rdfs:label>contexts</rdfs:label>
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    </code:python>
+  </command:Command>
+
+  <command:Command rdf:ID="contexts">
+    <rdfs:label>contexts</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
-REDFOOT = redfoot.namespace("http://redfoot.net/2005/redfoot#")
+KERNEL = redfoot.namespace("http://redfoot.net/code/kernel#")
 
 for context in redfoot.contexts():
     try:
         cid = context.identifier
-        source = redfoot.index.value(cid, REDFOOT.source)
+        source = redfoot.index.value(cid, KERNEL.source)
         if source is None or cid.startswith(source):
             redfoot.write(cid+"\n")
         else:
@@ -168,16 +71,15 @@ for context in redfoot.contexts():
         print cid, e
 
 ]]>
-        </rdf:value>
-      </commands:Command>
-    </commands:command>
-    <commands:command>
-      <commands:Command rdf:ID="remove_context">
-        <rdfs:label>remove_context</rdfs:label>
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    </code:python>
+  </command:Command>
+
+  <command:Command rdf:ID="remove_context">
+    <rdfs:label>remove_context</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
-REDFOOT = redfoot.namespace("http://redfoot.net/2005/redfoot#")
+KERNEL = redfoot.namespace("http://redfoot.net/code/kernel#")
 
 for arg in args:
     if arg.startswith("_"):
@@ -188,18 +90,17 @@ for arg in args:
         if uri== context.identifier:
             print "removing:", uri
             redfoot.remove_context(context) 
-    for cid in redfoot.index.subjects(REDFOOT.source, uri):
+    for cid in redfoot.index.subjects(KERNEL.source, uri):
         print "removing: %s\n    source: %s" % (cid, uri)
         redfoot.remove_context(redfoot.get_context(cid))
 
 ]]>
-        </rdf:value>
-      </commands:Command>
-    </commands:command>
-    <commands:command>
-      <commands:Command rdf:ID="reload">
-        <rdfs:label>reload</rdfs:label>
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    </code:python>
+  </command:Command>
+
+  <command:Command rdf:ID="reload">
+    <rdfs:label>reload</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
 import logging
@@ -227,7 +128,7 @@ if not done:
         prefix = ""
     prefix = redfoot.absolutize(prefix, defrag=False)
 
-    REDFOOT = redfoot.namespace("http://redfoot.net/2005/redfoot#")
+    KERNEL = redfoot.namespace("http://redfoot.net/code/kernel#")
     DC_creator = URIRef("http://purl.org/dc/elements/1.1/creator")
     
     for context in redfoot.contexts():
@@ -237,12 +138,12 @@ if not done:
                 if options.ignore_source:
                     source = cid
                 else:
-                    source = redfoot.index.value(cid, REDFOOT.source)
+                    source = redfoot.index.value(cid, KERNEL.source)
             except exceptions.UniquenessError, e:
-                _logger.warning("Multiple sources for %s: %s" % (cid, list(redfoot.objects(cid, REDFOOT.source))))
+                _logger.warning("Multiple sources for %s: %s" % (cid, list(redfoot.objects(cid, KERNEL.source))))
                 source = None
             if source is not None:
-                publicID = redfoot.index.value(cid, REDFOOT.publicID, any=True)
+                publicID = redfoot.index.value(cid, KERNEL.publicID, any=True)
                 if cid.startswith(source):
                     print "reloading: %s" % (cid,)
                 else:
@@ -250,18 +151,17 @@ if not done:
                 redfoot.load(source, publicID=publicID)
 
 ]]>
-        </rdf:value>
-      </commands:Command>
-    </commands:command>
-    <commands:command>
-      <commands:Command rdf:ID="save_all">
-        <rdfs:label>save_all</rdfs:label>
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    </code:python>
+  </command:Command>
+
+  <command:Command rdf:ID="save_all">
+    <rdfs:label>save_all</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
-REDFOOT = redfoot.namespace("http://redfoot.net/2005/redfoot#")
+KERNEL = redfoot.namespace("http://redfoot.net/code/kernel#")
 
-for cid, _, source in redfoot.index.triples((None, REDFOOT.source, None)):
+for cid, _, source in redfoot.index.triples((None, KERNEL.source, None)):
     if source:
         print "saving %s" % source
         try:
@@ -271,14 +171,13 @@ for cid, _, source in redfoot.index.triples((None, REDFOOT.source, None)):
             print e
 
 ]]>
-        </rdf:value>
-      </commands:Command>
-    </commands:command>
-    <commands:command>
-      <commands:Command rdf:ID="server">
-        <rdfs:label>server</rdfs:label>
-        <server:server rdf:resource="../modules/server#twisted"/>
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    </code:python>
+  </command:Command>
+
+  <command:Command rdf:ID="server">
+    <rdfs:label>server</rdfs:label>
+    <server:server rdf:resource="../modules/server#twisted"/>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
 SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
@@ -298,16 +197,15 @@ redfoot.execute(server, context=globals())
 Server(port=port).run()
 
 ]]>
-        </rdf:value>
-      </commands:Command>
-    </commands:command>
-    <commands:command>
-      <commands:Command rdf:ID="auto_reload">
-        <rdfs:label>auto_reload</rdfs:label>
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    </code:python>
+  </command:Command>
+
+  <command:Command rdf:ID="auto_reload">
+    <rdfs:label>auto_reload</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
     
-REDFOOT = redfoot.namespace("http://redfoot.net/2005/redfoot#")
+KERNEL = redfoot.namespace("http://redfoot.net/code/kernel#")
 DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 
 from time import sleep
@@ -316,7 +214,7 @@ from os.path import getmtime, isfile
 
 while 1:
     sleep(1)
-    for cid, _, source in redfoot.index.triples((None, REDFOOT.source, None)):
+    for cid, _, source in redfoot.index.triples((None, KERNEL.source, None)):
         if source:
             scheme, netloc, path, params, query, fragment = urlparse(source)
             if isfile(path):
@@ -330,13 +228,12 @@ while 1:
                     redfoot.load(source, publicID=cid, creator=__uri__)
 
 ]]>
-        </rdf:value>
-      </commands:Command>
-    </commands:command>
-    <commands:command>
-      <commands:Command rdf:ID="import">
-        <rdfs:label>import</rdfs:label>
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    </code:python>
+  </command:Command>
+
+  <command:Command rdf:ID="import">
+    <rdfs:label>import</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
     
 from urllib import quote
@@ -347,7 +244,7 @@ uri = args[0]
 g = Graph()
 g.load(uri)
 
-for context in g.subjects(RDF.type, REDFOOT.Context):
+for context in g.subjects(RDF.type, KERNEL.Context):
     print context
     source = "%s?uri=%s" % (uri, quote(context))
     try:
@@ -356,13 +253,12 @@ for context in g.subjects(RDF.type, REDFOOT.Context):
         print e
 
 ]]>
-        </rdf:value>
-      </commands:Command>
-    </commands:command>
-    <commands:command>
-      <commands:Command rdf:ID="copy">
-        <rdfs:label>copy</rdfs:label>
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    </code:python>
+  </command:Command>
+
+  <command:Command rdf:ID="copy">
+    <rdfs:label>copy</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
     
 from urllib import quote
@@ -383,7 +279,7 @@ if uri:
       g = Graph()
       g.load(uri)
 
-      for context_id in g.subjects(RDF.type, REDFOOT.Context):
+      for context_id in g.subjects(RDF.type, KERNEL.Context):
           if context_id.startswith(startswith):
               print "Copying:", context_id    
               context = redfoot.get_context(context_id, creator=__uri__)
@@ -393,66 +289,12 @@ if uri:
                   print e
 
 ]]>
-        </rdf:value>
-      </commands:Command>
-    </commands:command>
-    <commands:command>
-      <commands:Command rdf:ID="editor">
-        <rdfs:label>editor</rdfs:label>
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
-<![CDATA[
-    
-def install_editor():
-    import logging
-    from tarfile import TarFile
-    from urllib2 import urlopen, Request
-    from StringIO import StringIO
-    import redfootlib
+    </code:python>
+  </command:Command>
 
-    logging.info("downloading editor")
-    url = "http://redfoot.net/dev/editor.tgz"
-    headers = {'User-agent': 'redfoot.py (%s)' % redfootlib.__version__}
-    f = urlopen(Request(url, None, headers))
-    sio = StringIO(f.read())
-    sio.seek(0)
-    tar = TarFile.gzopen("editor.tgz", fileobj=sio)
-
-    logging.info("extracting editor")
-    for member in tar:
-	tar.extract(member)
-
-# TODO: think we just need NSBundle and NSTabViewItem
-from Foundation import *
-from AppKit import *
-
-controller = redfoot.controller
-try:
-    bundle = NSBundle.bundleWithPath_("~/Library/redfoot/editor.bundle")
-    assert bundle is not None
-except:
-    install_editor()
-    bundle = NSBundle.bundleWithPath_("~/Library/redfoot/editor.bundle")
-
-EditorController = bundle.classNamed_("EditorController")
-controller.editor = editor = EditorController.allocWithZone_(controller.zone()).init(redfoot)
-
-NSBundle.loadNibNamed_owner_("editor", editor)
-
-print bundle.objectForInfoDictionaryKey_("CFBundleVersion")
-
-tabViewItem = NSTabViewItem.alloc().init()
-tabViewItem.setLabel_("editor")
-tabViewItem.setView_(editor.editView)
-controller.tabView.addTabViewItem_(tabViewItem)
-
-]]>
-        </rdf:value>
-      </commands:Command>
-    </commands:command>
-    <commands:command>
-      <commands:Command rdf:ID="backup">
-        <rdfs:label>backup</rdfs:label>
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+  <command:Command rdf:ID="backup">
+    <rdfs:label>backup</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
     
 import time, logging
@@ -503,13 +345,12 @@ tar.close()
 
 
 ]]>
-        </rdf:value>
-      </commands:Command>
-    </commands:command>
-    <commands:command>
-      <commands:Command rdf:ID="restore">
-        <rdfs:label>restore</rdfs:label>
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    </code:python>
+  </command:Command>
+
+  <command:Command rdf:ID="restore">
+    <rdfs:label>restore</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
     
 from rdflib.Graph import Graph
@@ -585,13 +426,12 @@ if filename is not None:
     tar.close()
 
 ]]>
-        </rdf:value>
-      </commands:Command>
-    </commands:command>
-    <commands:command>
-      <commands:Command rdf:ID="remove">
-        <rdfs:label>remove</rdfs:label>
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    </code:python>
+  </command:Command>
+
+  <command:Command rdf:ID="remove">
+    <rdfs:label>remove</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
     
 from urllib import quote
@@ -617,35 +457,33 @@ if startswith:
         except Exception, e:
             print e
     # clean up index
-    for cid in list(redfoot.index.subjects(RDF.type, REDFOOT.Context)):
+    for cid in list(redfoot.index.subjects(RDF.type, KERNEL.Context)):
         if cid.startswith(startswith):
             redfoot.write("Removing stale index info for: %s\n" % cid)
             redfoot.index.remove((cid, None, None))
 
 ]]>
-        </rdf:value>
-      </commands:Command>
-    </commands:command>
-    <commands:command>
-      <commands:Command rdf:ID="clear">
-        <rdfs:label>clear</rdfs:label>
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    </code:python>
+  </command:Command>
+
+  <command:Command rdf:ID="clear">
+    <rdfs:label>clear</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
     
 from urllib import quote
 from rdflib import Graph
 from itertools import chain
 
-redfoot.index.remove((REDFOOT.Checked, RDFS.member, None))
+redfoot.index.remove((KERNEL.Checked, RDFS.member, None))
     
 ]]>
-        </rdf:value>
-      </commands:Command>
-    </commands:command>
-    <commands:command>
-      <commands:Command rdf:ID="rename">
-        <rdfs:label>rename</rdfs:label>
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    </code:python>
+  </command:Command>
+
+  <command:Command rdf:ID="rename">
+    <rdfs:label>rename</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
     
 import logging
@@ -694,14 +532,13 @@ if nothing_renamed:
     _logger.warning("nothing renamed.")
 
 ]]>
-        </rdf:value>
-      </commands:Command>
-    </commands:command>
-    <commands:command>
-      <commands:Command rdf:ID="touch">
-        <rdfs:label>touch</rdfs:label>
-        <rdfs:comment>Modifies all SERVER.last_modified times to the current time.</rdfs:comment>
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    </code:python>
+  </command:Command>
+
+  <command:Command rdf:ID="touch">
+    <rdfs:label>touch</rdfs:label>
+    <rdfs:comment>Modifies all SERVER.last_modified times to the current time.</rdfs:comment>
+        <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
     
 SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
@@ -714,29 +551,27 @@ for (s, p, o), cg in redfoot.store.triples((None, SERVER.last_modified, None), N
         c.remove((s, p, o))
         c.add((s, p, now))
 ]]>
-        </rdf:value>
-      </commands:Command>
-    </commands:command>
-    <commands:command>
-      <commands:Command rdf:ID="update">
-        <rdfs:label>update</rdfs:label>
-        <rdfs:comment>...</rdfs:comment>
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    </code:python>
+  </command:Command>
+
+  <command:Command rdf:ID="update">
+    <rdfs:label>update</rdfs:label>
+    <rdfs:comment>...</rdfs:comment>
+        <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
-for (s, p, o), cg in redfoot.store.triples((None, REDFOOT.context_id, None), None):
+for (s, p, o), cg in redfoot.store.triples((None, KERNEL.context_id, None), None):
     for c in cg:
         c.remove((s, p, o))
-        if (s, REDFOOT.publicID, None) not in redfoot:
-            c.add((s, REDFOOT.publicID, o))
+        if (s, KERNEL.publicID, None) not in redfoot:
+            c.add((s, KERNEL.publicID, o))
 ]]>
-        </rdf:value>
-      </commands:Command>
-    </commands:command>
-    <commands:command>
-      <commands:Command rdf:ID="serialize">
-        <rdfs:label>serialize</rdfs:label>
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    </code:python>
+  </command:Command>
+
+  <command:Command rdf:ID="serialize">
+    <rdfs:label>serialize</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
 import sys
@@ -757,13 +592,12 @@ for cid in redfoot.contexts():
 out.serialize(destination=sys.stdout, base=base)
 
 ]]>
-        </rdf:value>
-      </commands:Command>
-    </commands:command>
-    <commands:command>
-      <commands:Command rdf:ID="svn_auth">
-        <rdfs:label>svn_auth</rdfs:label>
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    </code:python>
+  </command:Command>
+
+  <command:Command rdf:ID="svn_auth">
+    <rdfs:label>svn_auth</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
 import logging
@@ -796,17 +630,14 @@ for user in redfoot.subjects(RDF.type, SESSION.User):
             _logger.debug("warning: could not generate right kind of digest for %s using %s" % (user, hexdigest))
 
 ]]>
-        </rdf:value>
-      </commands:Command>
-    </commands:command>
-  </redfoot:Configuration>
+    </code:python>
+  </command:Command>
 
-
-      <commands:Command rdf:ID="run">
-        <rdfs:label>run</rdfs:label>
-        <rdfs:comment>Run the twisted event loop</rdfs:comment>
+    <command:Command rdf:ID="run">
+    <rdfs:label>run</rdfs:label>
+    <rdfs:comment>Run the twisted event loop</rdfs:comment>
         <server:server rdf:resource="../modules/server#twisted"/>
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+        <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
 import logging
@@ -832,7 +663,7 @@ except KeyboardInterrupt: # TODO:
     reactor.shutdown()
 
 ]]>
-        </rdf:value>
-      </commands:Command>
+    </code:python>
+  </command:Command>
 
 </rdf:RDF>  
