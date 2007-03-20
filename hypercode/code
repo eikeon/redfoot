@@ -17,7 +17,7 @@
     <rdfs:subClassOf rdf:resource="#Python"/>
     <code:constructor>
       <code:Python rdf:ID="PythonModuleConstructor">
-        <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+        <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
 # TODO check_cache bit
@@ -44,7 +44,7 @@ for item in dir(module):
 #   this = module
 
 ]]>
-        </rdf:value>
+        </code:python>
       </code:Python>
     </code:constructor>    
   </rdfs:Class>

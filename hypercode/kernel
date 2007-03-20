@@ -70,7 +70,7 @@ from urlparse import urldefrag
 from rdflib import URIRef, Literal
 from rdflib import RDF, RDFS
 from rdflib.Graph import Graph, ConjunctiveGraph
-from rdflib.Namespace import NamespaceDict as Namespace #2 as Namespace
+from rdflib.Namespace import NamespaceDict as Namespace 
 from rdflib.Journal import JournalReader, JournalWriter
 from rdflib.events import Dispatcher, Event
 
