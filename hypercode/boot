@@ -4,8 +4,8 @@
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
    xmlns:rdfe="http://redfoot.net/rdf#"
    xmlns:code="http://redfoot.net/hypercode/code#"
+   xmlns:boot="http://redfoot.net/hypercode/boot#"
    xmlns:kernel="http://redfoot.net/hypercode/kernel#"
-   xmlns:command="http://redfoot.net/hypercode/command#"
 >
  
   <rdfe:Namespace rdf:about="#">
