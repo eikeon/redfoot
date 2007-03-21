@@ -93,6 +93,7 @@ if request.method=='POST':
     import sha
 
     SESSION = redfoot.namespace("http://redfoot.net/hypercode/session#")
+    USER = redfoot.namespace("http://redfoot.net/hypercode/user#")
 
     return_uri = URIRef(request.parameters.get("return_uri", "%s/" % request.host))
     register_uri = URIRef(request.parameters.get("register_uri", "%s/register/" % request.host))
@@ -125,8 +126,8 @@ if request.method=='POST':
                 context.add((sid, SESSION.uid, uid))
                 if name:
                     users_context.add((uid, RDFS.label, Literal(name)))
-                users_context.add((uid, RDF.type, SESSION.User))
-                users_context.add((uid, SESSION.hexdigest, hexdigest))
+                users_context.add((uid, RDF.type, USER.User))
+                users_context.add((uid, USER.hexdigest, hexdigest))
                 #message = "Registered new user: %s" % uid
                 context.remove((sid, SESSION.message, None))        
                 response.setStatus(302, 'found')
