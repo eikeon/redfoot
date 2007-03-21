@@ -194,7 +194,9 @@ if title is not None:
     year, month, date, h, m, s, _, _, _ = gmtime()
     uri = URIRef(urljoin(request.host, "blog/%04d/%02d/%02d/%s" % (year, month, date, path)) + "#")
     
-    format = request.parameters.get("format") or ""
+    format = request.parameters.get("format")
+    if format:
+        format = URIRef(format)
     content = Literal(request.parameters.get("content"))
     message = ""
     try:
@@ -279,7 +281,7 @@ for resource in redfoot.objects(blog_page, BLOG.entry):
             content_value = redfoot.value(content, RDF.value)
             content_type = redfoot.value(content, BLOG.content_type)
             if content_type=="xhtml":
-                content_type = "http://www.w3.org/1999/xhtml"
+                content_type = URIRef("http://www.w3.org/1999/xhtml")
         else:
             content_value = redfoot.comment(resource)
             if content_value:

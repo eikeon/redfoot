@@ -71,6 +71,7 @@ if redfootlib_version < REDFOOTLIB_MINIMUM:
 import sys, logging
 from datetime import datetime
 from urlparse import urldefrag
+from itertools import chain
 
 from rdflib import URIRef, Literal, BNode
 from rdflib import RDF, RDFS
@@ -628,7 +629,7 @@ except SystemExit, e:
 else:
     if len(args)==1:
         username, hostname = args[0].split("@", 1)
-        uri = URIRef("/users/user/%s#" % username, base=redfoot.base)
+        uri = URIRef("/users/%s#" % username, base=redfoot.base)
         c = redfoot.get_context((URIRef("#context", base=uri)), creator=__uri__)
         full_name = options.full_name or username
         c.add((uri, RDFS.label, Literal(full_name)))

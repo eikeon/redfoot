@@ -29,6 +29,8 @@ USER = redfoot.namespace("http://redfoot.net/hypercode/user#")
 SESSION = redfoot.namespace("http://redfoot.net/hypercode/session#")
 SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
 
+user_mod = redfoot.module(URIRef("http://redfoot.net/hypercode/user#module"))
+
 def authenticate(request, username=None, password=None):
     "Returns uid if authentication succeeds or None otherwise"
 
@@ -40,53 +42,47 @@ def authenticate(request, username=None, password=None):
     if password is None:
         password = request.password
 
-    if not username:
-        username = BNode()
+    if "@" not in username and "/" not in username:
+        user = URIRef("/users/%s#" % username, base=request.host)    
     elif username.startswith("http") or ("." in username and not "@" in username):
 	if not username.startswith("http"):
-	    username = "http://%s" % username
+	    user = "http://%s" % username
+        else:
+            user = username
 	from rdflib.Graph import Graph
 	FOAF = redfoot.namespace("http://xmlns.com/foaf/0.1/")
-	if not "#" in username:
-	    username = "%s#" % username
-	username = URIRef(username)
+	if not "#" in user:
+	    user = "%s#" % user
+	user = URIRef(user)
 	g = Graph()
-	if not username.startswith(request.host): # more checks localhost, server IP, etc.
+	if not user.startswith(request.host): # more checks localhost, server IP, etc.
             try:
-                g.load(username)
+                g.load(user)
             except Exception, e:
-                message = "%s while trying to load from %s " % (str(e), username)
-	    cid = redfoot.context_id(username, context_id="#user")
+                message = "%s while trying to load from %s " % (str(e), user)
+	    cid = redfoot.context_id(user, context_id="#user")
 	    c = redfoot.get_context(cid, creator=__uri__)
-	    c.add((username, RDF.type, USER.User))
-	    c.remove((username, USER.hexdigest, None))
-	    for hexdigest in g.objects(username, USER.hexdigest):
-		c.add((username, USER.hexdigest, hexdigest))
-	    label = g.label(username) or g.value(username, FOAF.name)
+	    c.add((user, RDF.type, USER.User))
+	    c.remove((user, USER.hexdigest, None))
+	    for hexdigest in g.objects(user, USER.hexdigest):
+		c.add((user, USER.hexdigest, hexdigest))
+	    label = g.label(user) or g.value(user, FOAF.name)
 	    if label:
-		c.remove((username, RDFS.label, None))            
-		c.add((username, RDFS.label, label))
-    elif not username.startswith("mailto:"):
-        username = URIRef("mailto:%s" % username)
-    if password:
-        hexdigest = Literal(sha.new(password).hexdigest())
-        md5_hexdigest = Literal(md5.new(password).hexdigest())
-        if (username, USER.hexdigest, hexdigest) in redfoot:
-            match = True
-        elif (username, USER.hexdigest, md5_hexdigest) in redfoot:
-            match = True
-        else:
-            match = False
-        _logger.debug("%s %s %s %s %s" % (username, password, hexdigest, md5_hexdigest, match))
-    if password and match:
+		c.remove((user, RDFS.label, None))            
+		c.add((user, RDFS.label, label))
+    elif "@" in username and not username.startswith("mailto:"):
+        user = URIRef("mailto:%s" % username)
+    else:
+        raise Exception("Username '%s' has unexpected format" % username)
+    if user_mod.authenticate(user, password):
         if session_id:
 	    c = redfoot.get_context(redfoot.context_id(session_id), creator=__uri__)
 	    redfoot.remove((session_id, SESSION.authenticated, None))
 	    c.add((session_id, SESSION.authenticated, Literal("True")))
 	    redfoot.remove((session_id, SESSION.uid, None))
-	    c.add((session_id, SESSION.uid, username))
+	    c.add((session_id, SESSION.uid, user))
 	    redfoot.remove((session_id, SESSION.message, None))
-        return username
+        return user
     else:
         if session_id:
 	    c = redfoot.get_context(redfoot.context_id(session_id), creator=__uri__)

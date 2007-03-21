@@ -107,20 +107,7 @@ _logger.debug("login_process")
 
 if request.method=='POST':
     from urllib import quote
-    import md5
     uid = request.parameters.get("uid", None)
-    # TODO: sync all username expansion code between here, register, and auth
-    if "@" in uid:
-        if not uid.startswith("mailto:"):
-            uid = URIRef("mailto:%s" % uid)
-        FOAF = redfoot.namespace("http://xmlns.com/foaf/0.1/")
-        uid = redfoot.value(predicate=FOAF.mbox, object=uid) or uid
-    elif "." in uid:
-        uid = URIRef(uid)
-    else:
-        uid = URIRef("%s/users/%s#" % (request.host, uid))
-
-    _logger.debug("uid: %s" % uid)
 
     password = request.parameters.get("password", None)
     return_uri = URIRef(request.parameters.get("return_uri", "%s/" % request.host))

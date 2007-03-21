@@ -38,6 +38,8 @@
 <![CDATA[
   <div xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
 <?python
+_logger = redfoot.getLogger(__uri__)
+
 from rdflib.util import date_time
 from time import gmtime, time
 from urllib import quote

@@ -28,7 +28,7 @@
     <rdfs:subClassOf rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
     <template:content>
      <server:PagePartHandler rdf:ID="BookmarkHandler">
-      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+      <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
   <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
 <?python
@@ -78,7 +78,7 @@ categories = list(redfoot.objects(bookmark, BOOKMARK.category))
    </span>
   </span>
 ]]>
-      </rdf:value>
+      </kid:template>
      </server:PagePartHandler> 
     </template:content>
   </owl:Class>
@@ -96,7 +96,7 @@ categories = list(redfoot.objects(bookmark, BOOKMARK.category))
     <rdfs:subClassOf rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
     <template:content>
      <server:PagePartHandler rdf:ID="CategoryHandler">
-      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+      <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
   <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
 <?python
@@ -105,7 +105,7 @@ import time
 category = request.uri.abstract()
 
 BOOKMARK = redfoot.namespace("http://redfoot.net/hypercode/bookmark#")
-SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
 DC_creator = URIRef("http://purl.org/dc/elements/1.1/creator")
 DC_created = URIRef("http://purl.org/dc/terms/created")
 
@@ -139,7 +139,7 @@ bookmarks.reverse()
 
    </span>
 ]]>
-      </rdf:value>
+      </kid:template>
      </server:PagePartHandler> 
     </template:content>
   </owl:Class>

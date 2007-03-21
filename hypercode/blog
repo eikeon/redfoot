@@ -3,14 +3,16 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
    xmlns:rdfe="http://redfoot.net/rdf"
+   xmlns:code="http://redfoot.net/hypercode/code#"
    xmlns:template='http://redfoot.net/hypercode/template#'
+   xmlns:kid='http://redfoot.net/hypercode/kid#'
    xmlns:server="http://redfoot.net/hypercode/server#"
 >  
 
-  <redfoot:Namespace rdf:about="#">
+  <rdfe:Namespace rdf:about="#">
     <rdfs:label>Blog</rdfs:label>
     <rdfs:comment>The Redfoot blog namespace.</rdfs:comment>
-  </redfoot:Namespace>
+  </rdfe:Namespace>
 
   <rdfs:Class rdf:ID="Feed">
     <rdfs:label>Feed</rdfs:label>
@@ -66,14 +68,14 @@ creator = redfoot.value(entry, DC.creator)
    ${time.strftime("%A %d %B, %Y", time.gmtime(parse_date_time(date)))}:</p>
 
   <span kid:if="content_value" kid:strip="">
-    <p kid:strip="" kid:if="content_type=='http://www.w3.org/TR/REC-html40'">${HTML(content_value)}</p>
-    <p kid:strip="" kid:if="content_type=='http://www.w3.org/1999/xhtml'">${XML(content_value)}</p>
+    <p kid:strip="" kid:if="content_type==URIRef('http://www.w3.org/TR/REC-html40')">${HTML(content_value)}</p>
+    <p kid:strip="" kid:if="content_type==URIRef('http://www.w3.org/1999/xhtml')">${XML(content_value)}</p>
     <pre kid:if="not content_type">${content_value}</pre>
   </span>
 
 </div>
 ]]>
-      </rdf:value>
+      </kid:template>
      </server:PagePartHandler>
     </template:content>
   </rdfs:Class>
@@ -138,7 +140,7 @@ l.start(1*day, now=True) # call every
     </code:python>
   </code:Code>
 
-  <redfoot:Module rdf:ID="feed">
+  <code:Module rdf:ID="feed">
     <rdfs:label>update feeds</rdfs:label>      
     <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
 <![CDATA[
@@ -249,9 +251,9 @@ def update(feed=None):
         redfoot.log.exception(e)
 ]]>
     </code:python>
-  </redfoot:Module>
+  </code:Module>
 
-  <redfoot:Module rdf:ID="html">
+  <code:Module rdf:ID="html">
     <rdfs:label>update feeds</rdfs:label>      
     <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
 <![CDATA[
@@ -273,6 +275,6 @@ def HTML(text, fragment=1, encoding=None):
 
 ]]>
     </code:python>
-  </redfoot:Module>
+  </code:Module>
 
 </rdf:RDF>  

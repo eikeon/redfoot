@@ -3,6 +3,7 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
    xmlns:rdfe="http://redfoot.net/rdf#"
+   xmlns:code="http://redfoot.net/hypercode/code#"
 >  
 
   <rdfe:Namespace rdf:about="#">
@@ -64,5 +65,37 @@
     <rdfs:domain rdf:resource="#User"/>
     <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
   </rdf:Property>
+
+  <code:Module rdf:ID="module">
+    <rdfs:label>Auth</rdfs:label>      
+    <rdfs:comment></rdfs:comment>    
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+<![CDATA[
+
+_logger = redfoot.getLogger(__uri__)
+
+import md5, sha
+from rdflib import URIRef, BNode, Literal
+
+USER = redfoot.namespace("http://redfoot.net/hypercode/user#")
+
+def authenticate(user, password):
+    """..."""
+    assert isinstance(user, (URIRef, BNode)), "user expected to be identifier: %r" % user
+    hexdigest = Literal(sha.new(password).hexdigest())
+    md5_hexdigest = Literal(md5.new(password).hexdigest())
+    if (user, USER.hexdigest, hexdigest) in redfoot:
+        match = True
+    elif (user, USER.hexdigest, md5_hexdigest) in redfoot:
+        match = True
+    else:
+        match = False
+    _logger.debug("%s %s %s %s %s" % (user, password, hexdigest, md5_hexdigest, match))
+    return match
+
+
+]]>
+    </code:python>
+  </code:Module>
 
 </rdf:RDF>  

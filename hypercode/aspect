@@ -78,8 +78,10 @@ label = redfoot.label(aspect) or aspect
 from urllib import quote
 frag = quote(label.lower().replace(" ", "_"))
 
-context = redfoot.get_context(URIRef("%s#%s_aspect" % (base, frag)), creator=__uri__)
+context = redfoot.get_context(URIRef("%s/%s#aspect" % (base, frag)), creator=__uri__)
 context.remove((None, None, None))
+context_label = Literal("%s (%s)" % (label, redfoot.label(site) or site))
+context.set((context.identifier, RDFS.label, context_label))
 
 for item in redfoot.objects(aspect, ASPECT.item):
     if (item, RDF.type, SERVER.Site) in redfoot:
@@ -98,9 +100,10 @@ for item in redfoot.objects(aspect, ASPECT.item):
   </code:Code>
 
   <aspect:Aspect rdf:about="bookmark#aspect"/>
+  <aspect:Aspect rdf:about="browse#aspect"/>
+  <aspect:Aspect rdf:about="comment#aspect"/>
+
   <aspect:Aspect rdf:about="aspects/issues#aspect"/>
-  <aspect:Aspect rdf:about="aspects/browse#aspect"/>
-  <aspect:Aspect rdf:about="aspects/comments#aspect"/>
   <aspect:Aspect rdf:about="aspects/contexts#aspect"/>
   <aspect:Aspect rdf:about="aspects/edit_content#aspect"/>
   <aspect:Aspect rdf:about="aspects/edit_head#aspect"/>
