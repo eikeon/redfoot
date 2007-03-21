@@ -101,7 +101,9 @@ SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
 site = URIRef("/data#Site", base=request.host)
 request.site = site
 
+_logger.info("?????")
 if (site, None, None) not in redfoot:
+    _logger.info("install auth etc")
     data = redfoot.get_context(redfoot.context_id(site, context_id="context"))
     data.add((site, RDF.type, SERVER.Site))
     data.add((site, SERVER.allow, URIRef("%s/data#Admin" % request.host)))

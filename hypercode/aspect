@@ -62,10 +62,7 @@ if action=="install" and aspect:
 site = base # TODO: calc site from base
 
 
-#ASPECT = redfoot.namespace("http://redfoot.net/hypercode/aspect#")
-from rdflib.Namespace import Namespace
-ASPECT = Namespace("http://redfoot.net/hypercode/aspect#")
-
+ASPECT = redfoot.namespace("http://redfoot.net/hypercode/aspect#")
 TEMPLATE = redfoot.namespace("http://redfoot.net/hypercode/template#")
 SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
 
