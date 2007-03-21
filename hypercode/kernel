@@ -7,6 +7,11 @@
    xmlns:command="http://redfoot.net/hypercode/command#"
    xmlns:kernel="http://redfoot.net/hypercode/kernel#"
 >
+  <rdf:Resource rdf:ID="Globals">
+    <rdfs:label>Redfoot Globals</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+  </rdf:Resource>
+
   <rdf:Property rdf:ID="persona">
     <rdfs:label>persona</rdfs:label>
     <rdfs:comment>The identity the Kernel is to use to personify itself</rdfs:comment>
@@ -318,7 +323,7 @@ class Kernel(ConjunctiveGraph):
         if self.check(uri):
             if CODE.Code not in self.types(uri):
                 _logger.warning("%s not of type CODE.Code" % uri)
-                _logger.warning("  types: %s" % list(self.types(uri)))
+                _logger.debug("  types: %s" % list(self.types(uri)))
             for other in self.objects(uri, RDFS.seeAlso):
                 self.check(other)
             value = self.value(uri, CODE.python)

@@ -33,13 +33,13 @@
   <rdfs:Class rdf:ID="Handler">
     <rdfs:label>Server Handler</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:subClassOf rdf:resource="http://redfoot.net/hypercode/redfoot#Code"/>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/hypercode/code#Code"/>
   </rdfs:Class>
 
   <rdf:Property rdf:ID="handler">
     <rdfs:label>server handler</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:domain rdf:resource="http://redfoot.net/hypercode/redfoot#Kernel"/>
+    <rdfs:domain rdf:resource="http://redfoot.net/hypercode/kernel#Kernel"/>
     <rdfs:domain rdf:resource="#Server"/>
     <rdfs:range rdf:resource="#Handler"/>
   </rdf:Property>
@@ -52,7 +52,7 @@
     <template:content>
       <server:PagePartHandler rdf:ID="site_handler">
         <rdfs:label>Site Handler</rdfs:label>
-        <rdf:value rdf:datatype="http://redfoot.net/hypercode/server#Kid">
+        <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 <div xmlns:kid="http://purl.org/kid/ns#" kid:strip="">
 <?python

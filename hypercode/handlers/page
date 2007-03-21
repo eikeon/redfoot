@@ -87,11 +87,9 @@ else:
     <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
-import logging
-
 from rdflib.Namespace import Namespace
 
-_logger = logging.getLogger(__uri__)
+_logger = redfoot.getLogger(__uri__)
 
 from twisted.internet.threads import deferToThread
 from twisted.web.http import datetimeToString
@@ -224,15 +222,13 @@ else:
   </server:Handler>
 
 
-  <rdf:Description rdf:ID="display_support"> <!-- TODO: type-->
+  <code:Code rdf:ID="display_support"> <!-- TODO: type-->
     <rdfs:label>display support</rdfs:label>      
     <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 # TODO: this is a bit out of hand :(
 
-import logging
-
-_logger = logging.getLogger(__uri__)
+_logger = redfoot.getLogger(__uri__)
 
 SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
 KID = redfoot.namespace("http://redfoot.net/hypercode/kid#")
@@ -285,7 +281,8 @@ def _create_display(normal):
             context.update(args)
 
 
-            if KID.Template in redfoot.types(uri):
+            value = redfoot.value(uri, KID.template)
+            if value:
                 mod = kid_module.get_kid_template(uri, value)
                 context["display"] = kid_display
                 t = mod.Template(**context)        
@@ -294,7 +291,7 @@ def _create_display(normal):
                     try:
                         t.write(response, encoding="utf-8", fragment=True, output=output or "xml")
                     except Exception, e:
-                        redfoot.log.exception("While handling request for '%s' and trying to display %s (%s) the following exception occurred:\n" % (request.uri, redfoot.label(uri), uri))
+                        _logger.exception("While handling request for '%s' and trying to display %s (%s) the following exception occurred:\n" % (request.uri, redfoot.label(uri), uri))
                     request.sources.pop()
                 else:
                     # return ElementStream instead of writing directly to response
@@ -324,7 +321,7 @@ kid_display = _create_display(normal=False)
 
 ]]>
     </code:python>
-  </rdf:Description>
+  </code:Code>
 
   <server:PageHandler rdf:about="#rdfxml_handler">
     <rdfs:label>Default RDF/XML handler</rdfs:label>      
