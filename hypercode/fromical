@@ -9,10 +9,10 @@
   <rdfe:RDFXMLDocument rdf:about="">
   </rdfe:RDFXMLDocument>
   
-  <redfoot:PythonModule rdf:ID="v2.27">
+  <code:Module rdf:ID="v2.27">
     <rdfs:label>Simple Formatter</rdfs:label>      
     <rdfs:comment>A formatter that turns uris into links.</rdfs:comment>        
-    <rdf:value rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
+    <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
 <![CDATA[
 
 """fromIcal.py -- interpret iCalendar data as RDF
@@ -1138,14 +1138,14 @@ if __name__ == '__main__':
 
 
 ]]>
-    </rdf:value>
-  </redfoot:PythonModule>
+    </code:python>
+  </code:Module>
 
 
-  <redfoot:PythonModule rdf:ID="xmlwriter">
+  <code:Module rdf:ID="xmlwriter">
     <rdfs:label>Simple Formatter</rdfs:label>      
     <rdfs:comment>A formatter that turns uris into links.</rdfs:comment>        
-    <rdf:value rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
+    <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
 <![CDATA[
 
 """ $Id: XMLWriter.py,v 2.3 2004/09/30 14:25:31 connolly Exp $
@@ -1320,7 +1320,7 @@ if __name__ == '__main__': test()
 #
 
 ]]>
-    </rdf:value>
-  </redfoot:PythonModule>
+    </code:python>
+  </code:Module>
 
 </rdf:RDF>  

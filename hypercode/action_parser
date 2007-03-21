@@ -6,9 +6,9 @@
   xmlns:code='http://redfoot.net/hypercode/code#'
 >
 
-  <code:PythonModule rdf:ID="module">
+  <code:Module rdf:ID="module">
     <rdfs:label>Action Parser</rdfs:label>      
-    <rdf:value rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
+    <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
 <![CDATA[
 
 import re
@@ -115,7 +115,7 @@ class ActionChart(chart_parser.Chart):
         return "\n".join(lines)
 
 ]]>
-    </rdf:value>
-  </code:PythonModule>
+    </code:python>
+  </code:Module>
 
 </rdf:RDF>

@@ -6,7 +6,6 @@
     xmlns:rdfe="http://redfoot.net/rdf#
     xmlns:server="http://redfoot.net/hypercode/server#"        
     xmlns:handler="http://redfoot.net/hypercode/handler#"        
-    xmlns:commands="http://redfoot.net/hypercode/commands#"
     xmlns:doap="http://usefulinc.com/ns/doap#"
 >
 
@@ -19,7 +18,6 @@
     <doap:created>2005-12-03</doap:created>
     <redfoot:code rdf:resource="programs/kernel#"/>
     <redfoot:program rdf:resource="programs/command_runner#"/>
-    <commands:config rdf:resource="commands/manage#config"/>
     <server:server rdf:resource="server#twisted"/>
     <handler:handler rdf:resource="handlers/page#"/>
   </redfoot:Release>

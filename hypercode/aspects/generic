@@ -3,9 +3,9 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
    xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:redfoot='http://redfoot.net/2005/redfoot#'
-   xmlns:server="http://redfoot.net/2005/server#"
-   xmlns:template='http://redfoot.net/2005/template#'
+   xmlns:redfoot='http://redfoot.net/hypercode/redfoot#'
+   xmlns:server="http://redfoot.net/hypercode/server#"
+   xmlns:template='http://redfoot.net/hypercode/template#'
    xmlns:aspect="http://redfoot.net/hypercode/aspect#"
 >
 
@@ -31,7 +31,7 @@
     <rdfs:comment></rdfs:comment>
     <template:content rdf:resource="#add_resource"/>
     <template:default_section_rank>70.0</template:default_section_rank>    
-    <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>    
+    <rdfs:member rdf:resource="http://redfoot.net/hypercode/comment#exclude"/>    
     <server:allow rdf:resource="#Admin"/>
   </template:Section>
 
@@ -40,7 +40,7 @@
     <rdfs:label>Edit Resource</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <template:content rdf:resource="#edit_resource"/>
-    <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
+    <rdfs:member rdf:resource="http://redfoot.net/hypercode/comment#exclude"/>
     <server:allow rdf:resource="#Admin"/>
   </server:Page>
 
@@ -49,7 +49,7 @@
     <rdfs:label>View Triple</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <template:content rdf:resource="#edit_triple"/>
-    <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
+    <rdfs:member rdf:resource="http://redfoot.net/hypercode/comment#exclude"/>
     <server:allow rdf:resource="#Admin"/>
   </server:Page>
 
@@ -60,7 +60,7 @@
     <server:page_handler>
       <server:PageHandler rdf:ID="create">
         <server:content_type>application/xhtml+xml</server:content_type>
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python"><![CDATA[
+        <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string"><![CDATA[
 
 from time import gmtime
 from urllib import quote
@@ -86,15 +86,15 @@ if type:
 else:
     pass # TODO: bad request
 
-      ]]></rdf:value>
+      ]]></code:python>
       </server:PageHandler>
     </server:page_handler>
-    <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>    
+    <rdfs:member rdf:resource="http://redfoot.net/hypercode/comment#exclude"/>    
   </rdf:Description>
 
 
   <redfoot:Python rdf:ID="add_resource">
-    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+    <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 <div xmlns:kid="http://purl.org/kid/ns#" kid:strip="">
   <form name="edit_form" action="resource" method="get">
@@ -111,14 +111,14 @@ else:
   </form>
 </div>
 ]]>               
-    </rdf:value>
+    </kid:template>
   </redfoot:Python>
 
 
 
 
   <redfoot:Python rdf:ID="edit_resource">
-    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+    <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 <div xmlns:kid="http://purl.org/kid/ns#" kid:strip="">
 <?python
@@ -214,20 +214,20 @@ if o.language:
   </form>
 </div>
 ]]>               
-    </rdf:value>
+    </kid:template>
   </redfoot:Python>
 
 
 
 
   <redfoot:Python rdf:ID="edit_triple">
-    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+    <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 <div xmlns:kid="http://purl.org/kid/ns#" kid:strip="">
 <?python
 from rdflib.util import from_n3
 
-SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+SESSION = redfoot.namespace("http://redfoot.net/hypercode/session#")
 
 subject = from_n3(request.parameters.get("subject"))
 predicate = from_n3(request.parameters.get("predicate"))
@@ -420,7 +420,7 @@ else:
 
 </div>
 ]]>               
-    </rdf:value>
+    </kid:template>
   </redfoot:Python>
 
 </rdf:RDF>

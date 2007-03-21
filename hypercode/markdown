@@ -11,7 +11,7 @@
   
   <redfoot:Module rdf:ID="module">
     <rdfs:label>module for transforming markdown format</rdfs:label>      
-    <rdf:value rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
+    <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
 <![CDATA[
 
 #!/usr/bin/env python
@@ -606,7 +606,7 @@ if __name__ == '__main__':
     print Markdown(file(sys.argv[1]).read())
 
 ]]>
-    </rdf:value>
+    </code:python>
   </redfoot:Module>
 
 

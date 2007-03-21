@@ -80,7 +80,7 @@ else:
 
   <server:Handler rdf:about="#get_handler">
     <rdfs:label>Default GET handler</rdfs:label>      
-    <server:page_handler rdf:resource="../templates/classic#page"/>
+    <server:page_handler rdf:resource="templates/classic#page"/>
     <server:page_handler rdf:resource="#RDFXMLDocumentPageHandler"/>
     <server:supported_content_types>application/xhtml+xml, application/rdf+xml</server:supported_content_types>
     <server:display_support rdf:resource="#display_support"/>
@@ -115,7 +115,7 @@ def lookup(property, default=None):
 
 referer = request.headers.get("referer")
 if referer:
-    REFERER = redfoot.namespace("http://redfoot.net/2005/referer#")
+    REFERER = redfoot.namespace("http://redfoot.net/hypercode/referer#")
     referer = URIRef(referer)
     c = redfoot.get_context(URIRef("referers", base=request.host), creator=__uri__)
     if not (c.identifier, RDFS.label, None) in redfoot:

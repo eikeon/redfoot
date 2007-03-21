@@ -3,9 +3,9 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
    xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
-   xmlns:commands="http://redfoot.net/2005/commands#"
-   xmlns:handler="http://redfoot.net/2005/handler#"
+   xmlns:redfoot="http://redfoot.net/hypercode/redfoot#"
+   xmlns:commands="http://redfoot.net/hypercode/commands#"
+   xmlns:handler="http://redfoot.net/hypercode/handler#"
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
@@ -13,8 +13,8 @@
   
   <rdfs:Class rdf:ID="Format">
     <rdfs:label>Wiki Content</rdfs:label>
-    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/handler#Content"/>
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python"><![CDATA[
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/hypercode/handler#Content"/>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string"><![CDATA[
 wiki04 = redfoot.module("http://redfoot.net/dev/content/wiki#module")
     
 wf = wiki04.WikiFormatter("/")
@@ -23,14 +23,14 @@ content = redfoot.value(resource, RDF.value)
 response.write(wf.format(content))
 
 ]]>    
-    </rdf:value>    
+    </code:python>    
   </rdfs:Class>
 
 
-  <redfoot:PythonModule rdf:ID="module">
+  <code:Module rdf:ID="module">
     <rdfs:label>Wiki Formatter</rdfs:label>      
     <rdfs:comment></rdfs:comment>        
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
 #
@@ -176,7 +176,7 @@ class WikiFormatter:
         return s
 
 ]]>
-    </rdf:value>
-  </redfoot:PythonModule>
+    </code:python>
+  </code:Module>
   
 </rdf:RDF>  

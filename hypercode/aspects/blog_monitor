@@ -3,11 +3,11 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
    xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
-   xmlns:commands="http://redfoot.net/2005/commands#"
-   xmlns:server="http://redfoot.net/2005/server#"
-   xmlns:session="http://redfoot.net/2005/session#"
-   xmlns:template='http://redfoot.net/2005/template#'
+   xmlns:redfoot="http://redfoot.net/hypercode/redfoot#"
+   xmlns:commands="http://redfoot.net/hypercode/commands#"
+   xmlns:server="http://redfoot.net/hypercode/server#"
+   xmlns:session="http://redfoot.net/hypercode/session#"
+   xmlns:template='http://redfoot.net/hypercode/template#'
    xmlns:aspect="http://redfoot.net/hypercode/aspect#"
 >
 
@@ -28,7 +28,7 @@
     <template:default_section_rank>12.0</template:default_section_rank>
     <template:content>
      <server:PagePartHandler  rdf:ID="blog_monitor">
-      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+      <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 <div xmlns:kid="http://purl.org/kid/ns#" kid:strip="">
 
@@ -37,12 +37,12 @@ import time
 from urllib import quote
 from rdflib.util import parse_date_time
 
-SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
-BLOG = redfoot.namespace("http://redfoot.net/2005/blog#")
+SESSION = redfoot.namespace("http://redfoot.net/hypercode/session#")
+BLOG = redfoot.namespace("http://redfoot.net/hypercode/blog#")
 DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
 
-COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")
+COMMENT = redfoot.namespace("http://redfoot.net/hypercode/comment#")
 
 markdown = redfoot.module(URIRef("modules/markdown#module", base=redfoot.uri)).markdown
 
@@ -82,7 +82,7 @@ feed = redfoot.value(entry, BLOG.via, any=True)
 
 </div>
 ]]>    
-      </rdf:value>      
+      </kid:template>      
      </server:PagePartHandler>
     </template:content>
   </template:Section>
@@ -92,15 +92,15 @@ feed = redfoot.value(entry, BLOG.via, any=True)
     <aspect:location>/blog_monitor/feeds/</aspect:location>
     <rdfs:label>Blog Monitor Feeds</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <server:allow rdf:resource="http://redfoot.net/2005/session#User"/>
+    <server:allow rdf:resource="http://redfoot.net/hypercode/session#User"/>
     <template:content>
      <server:PagePartHandler  rdf:ID="blog_monitor_feeds">
-      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+      <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 <div xmlns:kid="http://purl.org/kid/ns#" kid:strip="">
 
 <?python
-BLOG = redfoot.namespace("http://redfoot.net/2005/blog#")
+BLOG = redfoot.namespace("http://redfoot.net/hypercode/blog#")
 
 update = redfoot.module(URIRef("modules/blog#update", base=redfoot.uri))
 blog_feed = redfoot.module(URIRef("modules/blog#feed", base=redfoot.uri))
@@ -139,7 +139,7 @@ feeds.sort()
 
 </div>
 ]]>    
-      </rdf:value>      
+      </kid:template>      
      </server:PagePartHandler>
     </template:content>
   </server:Page>

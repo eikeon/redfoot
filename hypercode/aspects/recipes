@@ -3,10 +3,10 @@
         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
         xmlns:rdfe="http://redfoot.net/rdf#"
-        xmlns:redfoot="http://redfoot.net/2005/redfoot#"
-        xmlns:commands="http://redfoot.net/2005/commands#"
-        xmlns:template="http://redfoot.net/2005/template#"
-        xmlns:server="http://redfoot.net/2005/server#"
+        xmlns:redfoot="http://redfoot.net/hypercode/redfoot#"
+        xmlns:commands="http://redfoot.net/hypercode/commands#"
+        xmlns:template="http://redfoot.net/hypercode/template#"
+        xmlns:server="http://redfoot.net/hypercode/server#"
         xmlns:aspect="http://redfoot.net/hypercode/aspect#"
 >
 
@@ -46,7 +46,7 @@
   <rdf:Description rdf:about="/recipes/rdfxml/">
     <server:content_type>application/rdf+xml</server:content_type>      
     <server:server rdf:parseType="Resource">
-      <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+      <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 from rdflib.URIRef import URIRef
 
@@ -54,7 +54,7 @@ response.setHeader("Content-Type", "application/rdf+xml")
 context = redfoot.get_context(URIRef("http://donnafales.com/recipes/submitted_recipes"))
 context.serialize(destination=response, format="pretty-xml")
 ]]>    
-      </rdf:value>
+      </code:python>
     </server:server>
   </rdf:Description>
 -->
@@ -66,7 +66,7 @@ context.serialize(destination=response, format="pretty-xml")
     <template:content>
      <server:PagePartHandler rdf:ID="ingredients_content_handler">
       <rdfs:label>Default main for Redfoot</rdfs:label>      
-      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+      <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
 <div xmlns:kid="http://purl.org/kid/ns#">
@@ -84,7 +84,7 @@ ingredients.sort()
 </div>
 
 ]]>
-      </rdf:value>
+      </kid:template>
      </server:PagePartHandler>
     </template:content>    
   </template:Section>
@@ -92,7 +92,7 @@ ingredients.sort()
 
   <server:PagePartHandler rdf:ID="recipe_xhtml_dl"> <!-- TODO: type-->
     <rdfs:label>Recipe list</rdfs:label>      
-    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+    <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
 <div xmlns="http://www.w3.org/1999/xhtml"
@@ -118,13 +118,13 @@ format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot.uri)
 
 ]]>
 
-    </rdf:value>
+    </kid:template>
   </server:PagePartHandler>
       
   <server:PageHandler rdf:ID="recipe_atom_0.3">
     <rdfs:label>Recipes (Atom feed)</rdfs:label>
     <server:content_type>application/x.atom+xml</server:content_type>    
-    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+    <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
 <feed version="0.3"
@@ -139,7 +139,7 @@ from rdflib.URIRef import URIRef
 from datetime import datetime
 
 RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
-SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
 
 format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot.uri)).format
 recipe_module = redfoot.module(URIRef("modules/recipe#module", base=redfoot.uri))
@@ -175,7 +175,7 @@ now = datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
 </feed>                      
 
 ]]>
-    </rdf:value>
+    </kid:template>
   </server:PageHandler>
 
 
@@ -183,7 +183,7 @@ now = datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
 <!-- recipes commands bit follows: -->
 
 
-  <rdf:Description rdf:about="http://redfoot.net/2005/redfoot#Globals">
+  <rdf:Description rdf:about="http://redfoot.net/hypercode/redfoot#Globals">
     <commands:config rdf:resource="#recipe_config"/>  
   </rdf:Description>
 
@@ -202,7 +202,7 @@ now = datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
       <redfoot:code>
         <redfoot:Program rdf:ID="submit_recipe_program">
           <rdfs:label>submit recipe</rdfs:label>      
-          <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+          <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
 RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
@@ -225,7 +225,7 @@ recipe_module = redfoot.module(URIRef("modules/recipe#module", base=redfoot.uri)
 recipe_module.parse(message.payload, context, recipe_uri)
 
 ]]>
-        </rdf:value>
+        </code:python>
        </redfoot:Program>
       </redfoot:code>
     </commands:command>
@@ -234,7 +234,7 @@ recipe_module.parse(message.payload, context, recipe_uri)
       <commands:Command rdf:ID="ingredients">
       <rdfs:label>ingredients</rdfs:label>
       <redfoot:code rdf:parseType="Resource">
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+        <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
 RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
@@ -243,7 +243,7 @@ for i in redfoot.subjects(RDF.type, RECIPE.Ingredient):
     print redfoot.label(i).encode("ascii", "replace")
 
 ]]>
-        </rdf:value>
+        </code:python>
       </redfoot:code>
       </commands:Command>
     </commands:command>
@@ -252,7 +252,7 @@ for i in redfoot.subjects(RDF.type, RECIPE.Ingredient):
       <rdfs:label>update_recipes</rdfs:label>
       <redfoot:code rdf:parseType="Resource">
         <rdfs:label>update recipes</rdfs:label>      
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+        <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
 RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
@@ -286,7 +286,7 @@ for recipes, _, r in redfoot.triples((None, RECIPE.recipe, None)):
     print "converting to type for %s" % r
 
 ]]>
-        </rdf:value>
+        </code:python>
       </redfoot:code>
     </commands:command>
 
@@ -294,7 +294,7 @@ for recipes, _, r in redfoot.triples((None, RECIPE.recipe, None)):
       <rdfs:label>print_recipe_rdf</rdfs:label>
       <redfoot:code rdf:parseType="Resource">
         <rdfs:label>print recipe rdf</rdfs:label>      
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+        <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
 RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
@@ -314,7 +314,7 @@ for arg in args:
         print "No %s found for %s" % (RECIPE.original, recipe)
 
 ]]>
-        </rdf:value>
+        </code:python>
       </redfoot:code>
     </commands:command>
 
@@ -322,7 +322,7 @@ for arg in args:
       <rdfs:label>parse_ingred</rdfs:label>
       <redfoot:code rdf:parseType="Resource">
         <rdfs:label>Default program for Redfoot</rdfs:label>      
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+        <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
 RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
@@ -349,7 +349,7 @@ if parser.unknown_tokens:
             print e                             
 
 ]]>
-        </rdf:value>
+        </code:python>
       </redfoot:code>
     </commands:command>
 
@@ -357,7 +357,7 @@ if parser.unknown_tokens:
       <rdfs:label>remove_recipe</rdfs:label>
       <redfoot:code rdf:parseType="Resource">
         <rdfs:label>Default program for Redfoot</rdfs:label>      
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+        <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
 def remove(r):
@@ -372,7 +372,7 @@ for arg in args:
     redfoot.remove((None, None, uri))
 
 ]]>
-        </rdf:value>
+        </code:python>
       </redfoot:code>
 
     </commands:command>
@@ -380,7 +380,7 @@ for arg in args:
     <commands:command>
       <commands:Command rdf:ID="recipes_missing">
         <rdfs:label>recipes_missing</rdfs:label>
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+        <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
 RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
@@ -390,7 +390,7 @@ for recipe in redfoot.subjects(RDF.type, RECIPE.Recipe):
         print recipe
 
 ]]>
-        </rdf:value>
+        </code:python>
       </commands:Command>
     </commands:command>
 
@@ -400,7 +400,7 @@ for recipe in redfoot.subjects(RDF.type, RECIPE.Recipe):
 <!--
     <handler:text rdf:parseType="Resource">
       <rdfs:label>KID template for displaying a Recipe</rdfs:label>
-      <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+      <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 response.write("""
 %s
@@ -408,13 +408,13 @@ response.write("""
 %s
 """ % (redfoot.label(request.uri), redfoot.comment(request.uri)))
 ]]>
-      </rdf:value>
+      </code:python>
     </handler:text>
 -->
     <template:content>
      <server:PagePartHandler rdf:ID="RecipeContent">
       <rdfs:label>Recipe</rdfs:label>
-      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+      <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 <div xmlns="http://www.w3.org/1999/xhtml"
      xmlns:kid="http://purl.org/kid/ns#"
@@ -454,7 +454,7 @@ recipe = request.uri
  <div class="spacer"/>&#160;
 </div>
 ]]>
-      </rdf:value>
+      </kid:template>
      </server:PagePartHandler>
     </template:content>
   </rdf:Description>
@@ -473,7 +473,7 @@ source = redfoot.value(None, RECIPE.recipe, recipe, any=True)
     <template:content>
      <server:PagePartHandler rdf:ID="IngredientContent">
       <rdfs:label>Ingredient</rdfs:label>
-      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+      <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 <div xmlns="http://www.w3.org/1999/xhtml"
      xmlns:kid="http://purl.org/kid/ns#"
@@ -504,7 +504,7 @@ recipes.sort()
 
 </div>
 ]]>
-      </rdf:value>
+      </kid:template>
      </server:PagePartHandler>
     </template:content>
   </rdf:Description>    
@@ -517,14 +517,14 @@ recipes.sort()
      <server:PageHandler rdf:ID="RecipeOriginalContent">
       <rdfs:label>Recipe Original</rdfs:label>
       <server:content_type>text/plain</server:content_type>            
-      <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+      <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
-SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
 recipe = redfoot.value(None, SERVER.alternate, request.uri)
 response.write(redfoot.value(recipe, RECIPE.original))
 ]]>
-      </rdf:value>
+      </code:python>
      </server:PageHandler>
     </server:page_handler>
   </rdf:Description>

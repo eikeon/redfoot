@@ -2,18 +2,18 @@
 <rdf:RDF
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-   xmlns:rdfe="http://redfoot.net/rdf#
+   xmlns:rdfe="http://redfoot.net/rdf#"
 >  
 
-  <redfoot:Namespace rdf:about="#">
+  <rdfe:Namespace rdf:about="#">
     <rdfs:label>Referer</rdfs:label>
     <rdfs:comment>The Redfoot referer namespace.</rdfs:comment>
-  </redfoot:Namespace>
+  </rdfe:Namespace>
 
   <rdfs:Class rdf:ID="Referer">
     <rdfs:label>Referer</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:subClassOf rdf:resource="http://redfoot.net/hypercode/redfoot#Resource"/>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
   </rdfs:Class>
 
   <rdf:Property rdf:ID="referer">

@@ -140,7 +140,7 @@ import rdflib, redfootlib, twisted, kid
         <server:content_type>*/*</server:content_type>
         <rdfs:label>file handler</rdfs:label>
         <server:long_running>true</server:long_running>
-        <rdf:value rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
+        <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
 <![CDATA[
 import os
 from os.path import join, exists
@@ -177,7 +177,7 @@ if ".." not in path:
                 response.write(value)
 
 ]]>
-        </rdf:value>
+        </code:python>
       </server:PageHandler>
     </server:page_handler>
   </rdfs:Class>
@@ -185,13 +185,13 @@ if ".." not in path:
   <rdfs:Class rdf:ID="PageHandler">
     <rdfs:label>Page Handler</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:subClassOf rdf:resource="http://redfoot.net/hypercode/redfoot#Code"/>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/hypercode/code#Code"/>
   </rdfs:Class>
 
   <rdfs:Class rdf:ID="PagePartHandler">
     <rdfs:label>Page Part Handler</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:subClassOf rdf:resource="http://redfoot.net/hypercode/redfoot#Code"/>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/hypercode/code#Code"/>
   </rdfs:Class>
 
   <rdf:Property rdf:ID="page_handler">
@@ -221,7 +221,7 @@ if ".." not in path:
   <rdf:Property rdf:ID="allow">
     <rdfs:label>allow</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:domain rdf:resource="http://redfoot.net/hypercode/redfoot#Kernel"/>
+    <rdfs:domain rdf:resource="http://redfoot.net/hypercode/kernel#Kernel"/>
     <rdfs:domain rdf:resource="http://redfoot.net/hypercode/server#Site"/>
     <rdfs:domain rdf:resource="http://redfoot.net/hypercode/server#Page"/>
     <rdfs:domain rdf:resource="http://redfoot.net/hypercode/server#PagePartHandler"/>
@@ -232,7 +232,7 @@ if ".." not in path:
     <rdfs:label>session support</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:domain rdf:resource="http://redfoot.net/hypercode/server#Handler"/>
-    <rdfs:domain rdf:resource="http://redfoot.net/hypercode/redfoot#Kernel"/>
+    <rdfs:domain rdf:resource="http://redfoot.net/hypercode/kernel#Kernel"/>
     <rdfs:domain rdf:resource="http://redfoot.net/hypercode/server#Site"/>
     <rdfs:domain rdf:resource="http://redfoot.net/hypercode/server#Page"/>
   </rdf:Property>
@@ -240,7 +240,7 @@ if ".." not in path:
   <rdf:Property rdf:ID="display_support">
     <rdfs:label>display support</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:domain rdf:resource="http://redfoot.net/hypercode/redfoot#Kernel"/>
+    <rdfs:domain rdf:resource="http://redfoot.net/hypercode/kernel#Kernel"/>
     <rdfs:domain rdf:resource="http://redfoot.net/hypercode/server#Site"/>
     <rdfs:domain rdf:resource="http://redfoot.net/hypercode/server#Page"/>
   </rdf:Property>
@@ -628,10 +628,10 @@ import os, sys
 from os.path import join, getsize, splitext
 from base64 import b64encode
 
-StaticPage = URIRef("http://redfoot.net/2005/server#StaticPage")
+StaticPage = URIRef("http://redfoot.net/hypercode/server#StaticPage")
 base64Binary = URIRef("http://www.w3.org/2001/XMLSchema#base64Binary")
 
-SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
 
 # TODO: usage
 base = redfoot.absolutize(args[0])
@@ -680,7 +680,7 @@ for root, dirs, files in os.walk('html'):
         <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
-StaticPage = URIRef("http://redfoot.net/2005/server#StaticPage")
+StaticPage = URIRef("http://redfoot.net/hypercode/server#StaticPage")
 base64Binary = URIRef("http://www.w3.org/2001/XMLSchema#base64Binary")
 
 from base64 import b64decode

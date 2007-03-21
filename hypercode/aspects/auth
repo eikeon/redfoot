@@ -3,9 +3,9 @@
   xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
   xmlns:rdfs='http://www.w3.org/2000/01/rdf-schema#'
   xmlns:rdfe="http://redfoot.net/rdf#"
-  xmlns:redfoot='http://redfoot.net/2005/redfoot#'
-  xmlns:server="http://redfoot.net/2005/server#"
-  xmlns:template='http://redfoot.net/2005/template#'
+  xmlns:redfoot='http://redfoot.net/hypercode/redfoot#'
+  xmlns:server="http://redfoot.net/hypercode/server#"
+  xmlns:template='http://redfoot.net/hypercode/template#'
   xmlns:aspect="http://redfoot.net/hypercode/aspect#"
 >
 
@@ -29,7 +29,7 @@
     <aspect:location>/login/</aspect:location>
     <rdfs:label>Login</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
+    <rdfs:member rdf:resource="http://redfoot.net/hypercode/comment#exclude"/>
     <template:content rdf:resource="#login"/>
     <server:allow>True</server:allow>
   </server:Page>
@@ -47,16 +47,16 @@
     <aspect:location>/logout/</aspect:location>
     <rdfs:label>Logout</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
+    <rdfs:member rdf:resource="http://redfoot.net/hypercode/comment#exclude"/>
     <server:page_handler rdf:resource="#logout_process"/>
   </server:Page>
 
   <server:PagePartHandler rdf:ID="login">
-    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
+    <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string"><![CDATA[
 
  <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
 <?python 
-SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+SESSION = redfoot.namespace("http://redfoot.net/hypercode/session#")
 authenticated = request.session_id and (request.session_id, SESSION.authenticated, Literal('True')) in redfoot
 if request.session_id:
     message = redfoot.value(request.session_id, SESSION.message)
@@ -92,12 +92,12 @@ else:
   </span>
  </span>
       
-      ]]></rdf:value>
+      ]]></kid:template>
   </server:PagePartHandler>
 
   <server:PageHandler rdf:ID="login_process">
     <server:content_type>application/xhtml+xml</server:content_type>
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python"><![CDATA[
+    <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python"><![CDATA[
 
 _logger = logging.getLogger(__uri__)
 
@@ -140,14 +140,14 @@ else:
     response.setStatus(405, "Method not Allowed")
     response.write("expecting method of POST, but got '%s'" % request.method)
       
-]]></rdf:value>
+]]></code:python>
   </server:PageHandler>
 
   <server:PageHandler rdf:ID="logout_process">
     <server:content_type>application/xhtml+xml</server:content_type>
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python"><![CDATA[
+    <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python"><![CDATA[
 
-SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+SESSION = redfoot.namespace("http://redfoot.net/hypercode/session#")
 authenticated = request.session_id and (request.session_id, SESSION.authenticated, Literal('True')) in redfoot
 
 sid = request.session_id
@@ -162,7 +162,7 @@ return_uri = URIRef(request.headers.get("referer", "%s/" % request.host))
 response.setStatus(302, 'found')
 response.setHeader('Location', return_uri)
       
-      ]]></rdf:value>
+      ]]></code:python>
   </server:PageHandler>
 
 </rdf:RDF>

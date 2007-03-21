@@ -3,11 +3,11 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
    xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
-   xmlns:commands="http://redfoot.net/2005/commands#"
-   xmlns:server="http://redfoot.net/2005/server#"
-   xmlns:session="http://redfoot.net/2005/session#"
-   xmlns:template='http://redfoot.net/2005/template#'
+   xmlns:redfoot="http://redfoot.net/hypercode/redfoot#"
+   xmlns:commands="http://redfoot.net/hypercode/commands#"
+   xmlns:server="http://redfoot.net/hypercode/server#"
+   xmlns:session="http://redfoot.net/hypercode/session#"
+   xmlns:template='http://redfoot.net/hypercode/template#'
    xmlns:aspect="http://redfoot.net/hypercode/aspect#"
 >
 
@@ -36,11 +36,11 @@
     <aspect:location>/add_comment/</aspect:location>
     <rdfs:label>Add Comment</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
-    <server:allow rdf:resource="http://redfoot.net/2005/session#User"/>
+    <rdfs:member rdf:resource="http://redfoot.net/hypercode/comment#exclude"/>
+    <server:allow rdf:resource="http://redfoot.net/hypercode/session#User"/>
     <template:content>
      <server:PagePartHandler rdf:ID="add_comment_content">
-      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+      <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
   <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
 <?python
@@ -54,11 +54,11 @@ from rdflib.util import date_time
 from urlparse import urljoin
 from time import gmtime, time
 
-SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
-COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")
+SESSION = redfoot.namespace("http://redfoot.net/hypercode/session#")
+COMMENT = redfoot.namespace("http://redfoot.net/hypercode/comment#")
 DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
-SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
 
 uri = request.parameters.get("uri")
 if not uri is None:
@@ -113,13 +113,13 @@ if uri is not None and comment:
   </span>
 
 ]]>
-      </rdf:value>
+      </kid:template>
      </server:PagePartHandler> 
     </template:content>
   </server:Page>
 
   <server:PagePartHandler rdf:ID="add_comment">
-    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+    <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 <div xmlns:kid="http://purl.org/kid/ns#" 
      class="add_comment">
@@ -144,12 +144,12 @@ from urllib import quote
   </div>
 </div>
 ]]>    
-    </rdf:value>      
+    </kid:template>      
   </server:PagePartHandler>
 
 
   <server:PagePartHandler rdf:ID="comments">
-    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+    <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 <div xmlns:kid="http://purl.org/kid/ns#" 
      class="comment_list">
@@ -160,7 +160,7 @@ from urllib import quote
 import time
 from rdflib.util import parse_date_time
 
-COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")
+COMMENT = redfoot.namespace("http://redfoot.net/hypercode/comment#")
 DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
 
@@ -184,7 +184,7 @@ creator_label = redfoot.label(creator) or creator.split('@')[0]
   </span>
 </div>
 ]]>    
-    </rdf:value>      
+    </kid:template>      
   </server:PagePartHandler>
 
   <template:Section rdf:ID="comments_page">
@@ -195,7 +195,7 @@ creator_label = redfoot.label(creator) or creator.split('@')[0]
     <template:default_section_rank>20.0</template:default_section_rank>
     <template:content>
       <server:PagePartHandler rdf:ID="all_comments">
-        <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+        <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 <div xmlns:kid="http://purl.org/kid/ns#" 
      class="comment_list">
@@ -204,7 +204,7 @@ creator_label = redfoot.label(creator) or creator.split('@')[0]
 import time
 from rdflib.util import parse_date_time
 
-COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")
+COMMENT = redfoot.namespace("http://redfoot.net/hypercode/comment#")
 DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
 
@@ -234,11 +234,11 @@ else:
   </span>
 </div>
 ]]>    
-        </rdf:value>      
+        </kid:template>      
       </server:PagePartHandler>
     </template:content>  
     
-    <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>    
+    <rdfs:member rdf:resource="http://redfoot.net/hypercode/comment#exclude"/>    
   </template:Section>
 
   <server:Page rdf:ID="comments_atom_page">
@@ -251,7 +251,7 @@ else:
   <server:PageHandler rdf:ID="comments_atom_0.3">
     <rdfs:label>comments feed (atom 0.3)</rdfs:label>
     <server:content_type>application/x.atom+xml</server:content_type>    
-    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+    <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
 <feed version="0.3"
@@ -261,10 +261,10 @@ else:
 <?python
 #
 from datetime import datetime
-BLOG = redfoot.namespace("http://redfoot.net/2005/blog#")
+BLOG = redfoot.namespace("http://redfoot.net/hypercode/blog#")
 DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
-COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")
+COMMENT = redfoot.namespace("http://redfoot.net/hypercode/comment#")
 
 format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot.uri)).format
 
@@ -306,13 +306,13 @@ now = datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
 </feed>                      
 
 ]]>
-    </rdf:value>
+    </kid:template>
   </server:PageHandler>
 
   <redfoot:Module rdf:ID="module">
     <rdfs:label></rdfs:label>      
     <rdfs:comment></rdfs:comment>    
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
 from rdflib.events import Event
@@ -326,7 +326,7 @@ class CommentCreatedEvent(Event):
     """
 
 ]]>
-    </rdf:value>
+    </code:python>
   </redfoot:Module>
 
 </rdf:RDF>  

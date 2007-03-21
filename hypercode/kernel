@@ -37,7 +37,7 @@
   </rdfs:Class>
 
   <rdf:Description rdf:about="#">
-    <rdf:value rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
+    <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
 <![CDATA[
 
 import redfootlib
@@ -56,7 +56,7 @@ if redfootlib_version < REDFOOTLIB_MINIMUM:
     sys.exit(-1)
 
 ]]>
-    </rdf:value>
+    </code:python>
   </rdf:Description>
 
   <code:Module rdf:ID="module">
@@ -461,8 +461,6 @@ class Kernel(ConjunctiveGraph):
 
   <kernel:Program rdf:ID="runner">
     <rdfs:label>Command Runner</rdfs:label>
-    <rdfs:seeAlso rdf:resource="../hypercode/commands/manage#"/>
-    <rdfs:seeAlso rdf:resource="../hypercode/commands/static#"/>
     <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
@@ -1281,7 +1279,7 @@ if nothing_renamed:
         <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
     
-SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
 
 from time import time
 now = Literal("%s" % time())
@@ -1323,7 +1321,7 @@ _logger = redfoot.getLogger(__uri__)
 
 import sha, base64
 
-SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+SESSION = redfoot.namespace("http://redfoot.net/hypercode/session#")
 
 def b64(hexdigest):
     digest = base64.b16decode(hexdigest.upper())

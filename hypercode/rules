@@ -5,7 +5,6 @@
    xmlns:rdfe="http://redfoot.net/rdf#"
    xmlns:redfoot="http://redfoot.net/hypercode/redfoot#"
    xmlns:server="http://redfoot.net/hypercode/server#"
-   xmlns:commands="http://redfoot.net/hypercode/commands#"
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
@@ -13,7 +12,7 @@
   
   <redfoot:Module rdf:about="#module">
     <rdfs:label>Rules Module</rdfs:label>      
-    <rdf:value rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
+    <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
 <![CDATA[
 
 from rdflib.Namespace import Namespace
@@ -106,7 +105,7 @@ class PychinkoInc(object):
         _logger.info("# inferred: %s" % len(redfoot.interp.inferredFacts))
 
 ]]>
-    </rdf:value>
+    </code:python>
   </redfoot:Module>
 
 </rdf:RDF>  

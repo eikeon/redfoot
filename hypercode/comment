@@ -5,6 +5,7 @@
    xmlns:rdfe="http://redfoot.net/rdf#"
    xmlns:server="http://redfoot.net/hypercode/server#"
    xmlns:template="http://redfoot.net/hypercode/template#"
+   xmlns:kid="http://redfoot.net/hypercode/kid#"
 >  
 
   <rdfe:Namespace rdf:about="#">

@@ -3,11 +3,11 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
    xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
-   xmlns:commands="http://redfoot.net/2005/commands#"
-   xmlns:server="http://redfoot.net/2005/server#"
-   xmlns:session="http://redfoot.net/2005/session#"
-   xmlns:template='http://redfoot.net/2005/template#'
+   xmlns:redfoot="http://redfoot.net/hypercode/redfoot#"
+   xmlns:commands="http://redfoot.net/hypercode/commands#"
+   xmlns:server="http://redfoot.net/hypercode/server#"
+   xmlns:session="http://redfoot.net/hypercode/session#"
+   xmlns:template='http://redfoot.net/hypercode/template#'
    xmlns:aspect="http://redfoot.net/hypercode/aspect#"
 >
 
@@ -32,13 +32,13 @@
     <aspect:location>/blog/</aspect:location>    
     <rdfs:label>Blog</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>    
+    <rdfs:member rdf:resource="http://redfoot.net/hypercode/comment#exclude"/>    
     <server:alternate rdf:resource="/blog/atom/"/>
     <template:section rdf:resource="/blog/add_entry/"/>
     <template:default_section_rank>10.0</template:default_section_rank>
     <template:content>
      <server:PagePartHandler  rdf:ID="blog">
-      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+      <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 <div xmlns:kid="http://purl.org/kid/ns#" 
      kid:strip="">
@@ -48,12 +48,12 @@ import time
 from urllib import quote
 from rdflib.util import parse_date_time
 
-SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
-BLOG = redfoot.namespace("http://redfoot.net/2005/blog#")
+SESSION = redfoot.namespace("http://redfoot.net/hypercode/session#")
+BLOG = redfoot.namespace("http://redfoot.net/hypercode/blog#")
 DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
 
-COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")
+COMMENT = redfoot.namespace("http://redfoot.net/hypercode/comment#")
 
 HTML = redfoot.module(URIRef("modules/blog#html", base=redfoot.uri)).HTML
 markdown = redfoot.module(URIRef("modules/markdown#module", base=redfoot.uri)).markdown
@@ -122,7 +122,7 @@ else:
 
 </div>
 ]]>    
-      </rdf:value>      
+      </kid:template>      
      </server:PagePartHandler>
     </template:content>
   </template:Section>
@@ -131,11 +131,11 @@ else:
     <aspect:location>/blog/add_entry/</aspect:location>
     <rdfs:label>Add Entry</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>    
-    <server:allow rdf:resource="http://redfoot.net/2005/session#User"/>
+    <rdfs:member rdf:resource="http://redfoot.net/hypercode/comment#exclude"/>    
+    <server:allow rdf:resource="http://redfoot.net/hypercode/session#User"/>
     <template:content>
      <server:PagePartHandler rdf:ID="add_entry_content">
-      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+      <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
   <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
 
@@ -160,7 +160,7 @@ from urllib import quote
 
   </span>
 ]]>
-      </rdf:value>
+      </kid:template>
      </server:PagePartHandler> 
     </template:content>
   </server:Page>
@@ -170,10 +170,10 @@ from urllib import quote
     <aspect:location>/put_entry/</aspect:location>
     <rdfs:label>Put Entry</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <server:allow rdf:resource="http://redfoot.net/2005/session#User"/>
+    <server:allow rdf:resource="http://redfoot.net/hypercode/session#User"/>
     <template:content>
      <server:PagePartHandler rdf:ID="put_entry_content">
-      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+      <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
   <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
 <?python
@@ -182,10 +182,10 @@ from urlparse import urljoin
 from urllib import quote
 from time import gmtime
     
-BLOG = redfoot.namespace("http://redfoot.net/2005/blog#")
+BLOG = redfoot.namespace("http://redfoot.net/hypercode/blog#")
 DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
-SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+SESSION = redfoot.namespace("http://redfoot.net/hypercode/session#")
 
 title = request.parameters.get("title")
 if title is not None:
@@ -238,7 +238,7 @@ from urllib import quote
   </span>
 
 ]]>
-      </rdf:value>
+      </kid:template>
      </server:PagePartHandler> 
     </template:content>
   </server:Page>
@@ -253,7 +253,7 @@ from urllib import quote
   <server:PageHandler rdf:ID="atom_1.0">
     <rdfs:label>Redfoot Atom 1.0 Page Handler</rdfs:label>
     <server:content_type>application/atom+xml</server:content_type>    
-    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+    <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en-US"
@@ -262,10 +262,10 @@ from urllib import quote
 <?python
 #
 from datetime import datetime
-BLOG = redfoot.namespace("http://redfoot.net/2005/blog#")
+BLOG = redfoot.namespace("http://redfoot.net/hypercode/blog#")
 DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
-SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
 
 format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot.uri)).format
 
@@ -321,13 +321,13 @@ now = datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
 </feed>                      
 
 ]]>
-    </rdf:value>
+    </kid:template>
   </server:PageHandler>
 
   <server:PageHandler rdf:ID="atom_0.3">
     <rdfs:label>blog feed (atom 0.3)</rdfs:label>
     <server:content_type>application/atom+xml</server:content_type>    
-    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+    <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
 <feed version="0.3"
@@ -337,10 +337,10 @@ now = datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
 <?python
 #
 from datetime import datetime
-BLOG = redfoot.namespace("http://redfoot.net/2005/blog#")
+BLOG = redfoot.namespace("http://redfoot.net/hypercode/blog#")
 DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
-SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
 
 format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot.uri)).format
 
@@ -393,7 +393,7 @@ now = datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
 </feed>                      
 
 ]]>
-    </rdf:value>
+    </kid:template>
   </server:PageHandler>
 
 </rdf:RDF>  

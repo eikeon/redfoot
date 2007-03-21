@@ -25,7 +25,7 @@
     <template:content>
      <server:PagePartHandler rdf:ID="EntryContent">
       <rdfs:label>Entry</rdfs:label>
-      <rdf:value rdf:datatype="http://redfoot.net/hypercode/server#Kid">
+      <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 <div xmlns="http://www.w3.org/1999/xhtml"
      xmlns:kid="http://purl.org/kid/ns#"
@@ -111,9 +111,9 @@ creator = redfoot.value(entry, DC.creator)
     <rdfs:range rdf:resource="#Feed"/>
   </rdf:Property>
 
-  <redfoot:Code rdf:ID="update">
+  <code:Code rdf:ID="update">
     <rdfs:label>update</rdfs:label>      
-    <rdf:value rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
+    <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
 <![CDATA[
 
 feed = redfoot.module(URIRef("#feed", base=__uri__)) # TODO: __uri__
@@ -135,12 +135,12 @@ l.start(1*day, now=True) # call every
 # l.stop() will stop the looping calls
 
 ]]>
-    </rdf:value>
-  </redfoot:Code>
+    </code:python>
+  </code:Code>
 
   <redfoot:Module rdf:ID="feed">
     <rdfs:label>update feeds</rdfs:label>      
-    <rdf:value rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
+    <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
 <![CDATA[
 
 try: from cStringIO import StringIO
@@ -248,12 +248,12 @@ def update(feed=None):
     except Exception, e:
         redfoot.log.exception(e)
 ]]>
-    </rdf:value>
+    </code:python>
   </redfoot:Module>
 
   <redfoot:Module rdf:ID="html">
     <rdfs:label>update feeds</rdfs:label>      
-    <rdf:value rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
+    <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
 <![CDATA[
 
 from kid import XML
@@ -272,7 +272,7 @@ def HTML(text, fragment=1, encoding=None):
         assert False, "Not implemented"
 
 ]]>
-    </rdf:value>
+    </code:python>
   </redfoot:Module>
 
 </rdf:RDF>  

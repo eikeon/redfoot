@@ -3,11 +3,11 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
    xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
-   xmlns:commands="http://redfoot.net/2005/commands#"
-   xmlns:server="http://redfoot.net/2005/server#"
-   xmlns:session="http://redfoot.net/2005/session#"
-   xmlns:template='http://redfoot.net/2005/template#'
+   xmlns:redfoot="http://redfoot.net/hypercode/redfoot#"
+   xmlns:commands="http://redfoot.net/hypercode/commands#"
+   xmlns:server="http://redfoot.net/hypercode/server#"
+   xmlns:session="http://redfoot.net/hypercode/session#"
+   xmlns:template='http://redfoot.net/hypercode/template#'
    xmlns:aspect="http://redfoot.net/hypercode/aspect#"
 >
 
@@ -29,18 +29,18 @@
     <aspect:location>/edit/content/</aspect:location>
     <rdfs:label>Edit Content</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>        
+    <rdfs:member rdf:resource="http://redfoot.net/hypercode/comment#exclude"/>        
     <!-- TODO: define a class specifically for those who can edit content -->
     <server:allow rdf:resource="#Admin"/>
     <template:content>
      <server:PagePartHandler rdf:ID="edit_content_content">
-      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+      <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
   <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
 
 <?python 
 
-TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")
+TEMPLATE = redfoot.namespace("http://redfoot.net/hypercode/template#")
 
 allowed = allow(URIRef("%s/edit/put_content/" % request.host))
 from urllib import quote
@@ -56,10 +56,10 @@ if uri:
         content_value = None
 
     if content_value is None:
-        content_value = Literal("", datatype=URIRef("http://redfoot.net/2005/server#Kid"))
+        content_value = Literal("", datatype=URIRef("http://redfoot.net/hypercode/server#Kid"))
 
-    value_list = [("Kid", URIRef("http://redfoot.net/2005/server#Kid")), 
-                  ("Python", URIRef("http://redfoot.net/2005/redfoot#Python"))]
+    value_list = [("Kid", URIRef("http://redfoot.net/hypercode/server#Kid")), 
+                  ("Python", URIRef("http://redfoot.net/hypercode/redfoot#Python"))]
     selected = content_value.datatype
 
 ?>  
@@ -88,7 +88,7 @@ if uri:
 
   </span>
 ]]>
-      </rdf:value>
+      </kid:template>
      </server:PagePartHandler> 
     </template:content>
   </server:Page>
@@ -98,10 +98,10 @@ if uri:
     <aspect:location>/edit/put_content/</aspect:location>
     <rdfs:label>Put Content</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <server:allow rdf:resource="http://redfoot.net/2005/session#User"/>
+    <server:allow rdf:resource="http://redfoot.net/hypercode/session#User"/>
     <template:content>
      <server:PagePartHandler rdf:ID="put_content_content">
-      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+      <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
   <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
 <?python
@@ -112,11 +112,11 @@ from time import gmtime, time
     
 from kid import XML
 
-TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")
+TEMPLATE = redfoot.namespace("http://redfoot.net/hypercode/template#")
 DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
-SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
-SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+SESSION = redfoot.namespace("http://redfoot.net/hypercode/session#")
+SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
 
 uri = request.parameters.get("uri")
 title = request.parameters.get("title")
@@ -146,7 +146,7 @@ if uri:
     context.add((uri, SERVER.last_modified, Literal("%s" % time())))
 
     message = ""
-    if content_value.datatype==URIRef("http://redfoot.net/2005/server#Kid"):
+    if content_value.datatype==URIRef("http://redfoot.net/hypercode/server#Kid"):
         try:
             for item in XML(content_value, fragment=False):
                 pass
@@ -166,7 +166,7 @@ from urllib import quote
   </span>
 
 ]]>
-      </rdf:value>
+      </kid:template>
      </server:PagePartHandler> 
     </template:content>
   </server:Page>

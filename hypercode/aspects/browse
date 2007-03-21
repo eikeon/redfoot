@@ -3,10 +3,10 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
    xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
-   xmlns:commands="http://redfoot.net/2005/commands#"
-   xmlns:server="http://redfoot.net/2005/server#"
-   xmlns:template='http://redfoot.net/2005/template#'
+   xmlns:redfoot="http://redfoot.net/hypercode/redfoot#"
+   xmlns:commands="http://redfoot.net/hypercode/commands#"
+   xmlns:server="http://redfoot.net/hypercode/server#"
+   xmlns:template='http://redfoot.net/hypercode/template#'
    xmlns:aspect="http://redfoot.net/hypercode/aspect#"
 >
 
@@ -27,7 +27,7 @@
     <aspect:location>/browse/</aspect:location>
     <rdfs:label>Browse</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:member rdf:resource="http://redfoot.net/2005/comment#exclude"/>
+    <rdfs:member rdf:resource="http://redfoot.net/hypercode/comment#exclude"/>
     <template:default_section_rank>60.0</template:default_section_rank>
     <template:content rdf:resource="#browse"/>
   </template:Section>
@@ -39,11 +39,11 @@
 Browse class Tree.
 
     </rdfs:comment>
-    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
+    <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string"><![CDATA[
 
   <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
 
-<?python BROWSE = redfoot.namespace("http://redfoot.net/2005/browse#") ?>
+<?python BROWSE = redfoot.namespace("http://redfoot.net/hypercode/browse#") ?>
 
 <span kid:strip=""
   kid:def="display_class(uri, seen=None)">
@@ -90,11 +90,11 @@ ${display_class(redfoot.value(request.uri, BROWSE.root) or RDFS.Resource)}
   </span>
       
 ]]>
-    </rdf:value>
+    </kid:template>
   </server:PagePartHandler>
 
   <server:PagePartHandler rdf:ID="typeless">
-    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
+    <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string"><![CDATA[
   <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
 <?python
 
@@ -122,7 +122,7 @@ for subject in uniq(redfoot.subjects()):
 
   </span>
       
-      ]]></rdf:value>
+      ]]></kid:template>
   </server:PagePartHandler>
 
 </rdf:RDF>  

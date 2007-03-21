@@ -3,9 +3,9 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
    xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
-   xmlns:template="http://redfoot.net/2005/template#"
-   xmlns:server="http://redfoot.net/2005/server#"
+   xmlns:redfoot="http://redfoot.net/hypercode/redfoot#"
+   xmlns:template="http://redfoot.net/hypercode/template#"
+   xmlns:server="http://redfoot.net/hypercode/server#"
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
@@ -25,11 +25,11 @@
     <server:unauthorized_page_handler rdf:resource="classic#unauthorized_page_handler"/>
     <server:unauthorized_content_handler rdf:resource="classic#unauthorized_content_handler"/>
     <server:content_type>application/xhtml+xml</server:content_type>
-    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+    <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[<html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:kid="http://purl.org/kid/ns#">
-<?python SERVER = redfoot.namespace("http://redfoot.net/2005/server#")?>
-<?python TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")?>
+<?python SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")?>
+<?python TEMPLATE = redfoot.namespace("http://redfoot.net/hypercode/template#")?>
 
 <?python
 title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract(), None) or "-"
@@ -63,7 +63,7 @@ comment = redfoot.comment(request.uri, None) or redfoot.comment(request.uri.abst
 
       ${display(lookup(TEMPLATE.content))}
 
-      <?python COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")?>
+      <?python COMMENT = redfoot.namespace("http://redfoot.net/hypercode/comment#")?>
       <div class="comments"
            kid:if="lookup(TEMPLATE.comments) and (request.uri, RDFS.member, COMMENT.exclude) not in redfoot">
         ${display(lookup(TEMPLATE.comments))}
@@ -90,11 +90,11 @@ comment = redfoot.comment(request.uri, None) or redfoot.comment(request.uri.abst
 
 <!-- TODO: update sytlesheet to work with classic#Navigation instead of duplication here. -->
   <server:PagePartHandler rdf:ID="navigation">
-    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
+    <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string"><![CDATA[
 
 <div id="menu" xmlns:kid="http://purl.org/kid/ns#">
 <?python
-TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")
+TEMPLATE = redfoot.namespace("http://redfoot.net/hypercode/template#")
 sections = []
 for section in redfoot.objects(request.host, TEMPLATE.section):
     label = redfoot.value(section, TEMPLATE.section_name) or redfoot.label(section)
@@ -120,12 +120,12 @@ sections.sort()
 
   <server:PagePartHandler rdf:ID="head">
     <rdfs:label>Default head</rdfs:label>
-    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+    <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 <div xmlns:kid="http://purl.org/kid/ns#"
      kid:strip="">
 <?python
-TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")
+TEMPLATE = redfoot.namespace("http://redfoot.net/hypercode/template#")
 title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract(), None) or "-"
 ?>
   <head>
@@ -182,9 +182,9 @@ a:hover {
   <server:PagePartHandler rdf:ID="css">
     <rdfs:label>Default css</rdfs:label>
     <server:content_type>text/css</server:content_type>
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 
-TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")
+TEMPLATE = redfoot.namespace("http://redfoot.net/hypercode/template#")
 
 color = lookup(TEMPLATE.background_color) or "#cccccc"
 

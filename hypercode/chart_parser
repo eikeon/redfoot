@@ -11,9 +11,9 @@
     <rdfs:comment></rdfs:comment>
   </rdfe:Namespace>
 
-  <code:PythonModule rdf:ID="module">
+  <code:Module rdf:ID="module">
     <rdfs:label>Chart Parser</rdfs:label>      
-    <rdf:value rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
+    <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
 <![CDATA[
 
 import logging
@@ -205,7 +205,7 @@ class Chart:
             self.addConstituent(Constituent(edge.rule.lhs, edge.children, edge.left, edge.right, edge.rule))
 
 ]]>
-    </rdf:value>
-  </code:PythonModule>
+    </code:python>
+  </code:Module>
 
 </rdf:RDF>

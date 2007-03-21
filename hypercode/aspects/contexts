@@ -3,11 +3,11 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
    xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
-   xmlns:commands="http://redfoot.net/2005/commands#"
-   xmlns:server="http://redfoot.net/2005/server#"
-   xmlns:session="http://redfoot.net/2005/session#"
-   xmlns:template='http://redfoot.net/2005/template#'
+   xmlns:redfoot="http://redfoot.net/hypercode/redfoot#"
+   xmlns:commands="http://redfoot.net/hypercode/commands#"
+   xmlns:server="http://redfoot.net/hypercode/server#"
+   xmlns:session="http://redfoot.net/hypercode/session#"
+   xmlns:template='http://redfoot.net/hypercode/template#'
    xmlns:aspect="http://redfoot.net/hypercode/aspect#"
 >
 
@@ -38,7 +38,7 @@
   </rdf:Description>
 
   <server:PagePartHandler rdf:ID="contexts">
-    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+    <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
   <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
@@ -59,7 +59,7 @@ contexts.sort()
   </ul>
   </span>
 ]]>
-    </rdf:value>
+    </kid:template>
   </server:PagePartHandler>
 
   <server:Page rdf:about="/rdfxml">
@@ -68,7 +68,7 @@ contexts.sort()
     <server:page_handler>
       <server:PageHandler rdf:about="rdfxml">
         <server:content_type>application/rdf+xml</server:content_type>      
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python"><![CDATA[
+        <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string"><![CDATA[
 
 # Make sure all contexts have RDF.type of REDFOOT.Context
 for context in redfoot.contexts():
@@ -91,7 +91,7 @@ else:
 g = redfoot.get_context(cid)
 g.serialize(destination=response, format="pretty-xml")
 
-      ]]></rdf:value>
+      ]]></code:python>
       </server:PageHandler>
     </server:page_handler>
   </server:Page>

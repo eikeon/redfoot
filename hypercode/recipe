@@ -12,7 +12,7 @@
   <redfoot:Module rdf:ID="module">
     <rdfs:label>Recipe Parser</rdfs:label>      
     <rdfs:comment>A module for parsing recipes into RDF</rdfs:comment>    
-    <rdf:value rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
+    <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
 <![CDATA[
   
 import re
@@ -192,7 +192,7 @@ def parse(string, redfoot, uri=None):
 
 
 ]]>
-    </rdf:value>
+    </code:python>
   </redfoot:Module>
 
 </rdf:RDF>  

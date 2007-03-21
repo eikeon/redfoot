@@ -68,7 +68,7 @@
     <rdfs:label>Module</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:subClassOf rdf:resource="#Code"/>
-    <rdf:value rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
+    <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
 <![CDATA[
 
 # TODO check_cache bit
@@ -96,7 +96,7 @@ for item in dir(module):
 #this.__getattr__ = getattr
 
 ]]>
-    </rdf:value>
+    </code:python>
   </rdfs:Class>
 
   <rdfs:Class rdf:ID="Kernel">
@@ -127,7 +127,7 @@ for item in dir(module):
     <rdfs:subClassOf rdf:resource="#Resource"/>
     <template:content>
       <server:PagePartHandler rdf:ID="content_handler">
-        <rdf:value rdf:datatype="http://redfoot.net/hypercode/server#Kid"><![CDATA[
+        <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string"><![CDATA[
 <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
 <?python
 from urllib import quote
