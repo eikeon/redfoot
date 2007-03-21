@@ -3,21 +3,21 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
    xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:redfoot="http://redfoot.net/hypercode/redfoot#"
+   xmlns:code="http://redfoot.net/hypercode/code#"
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
   </rdfe:RDFXMLDocument>
   
-  <redfoot:Namespace rdf:about="#">
+  <rdfe:Namespace rdf:about="#">
     <rdfs:label>Simple Format</rdfs:label>
     <rdfs:comment>The Redfoot simple format namespace.</rdfs:comment>
-  </redfoot:Namespace>
+  </rdfe:Namespace>
 
-  <redfoot:Module rdf:ID="module">
+  <code:Module rdf:ID="module">
     <rdfs:label>Simple Formatter</rdfs:label>      
     <rdfs:comment>A formatter that turns uris into links.</rdfs:comment>        
-    <rdf:value rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
 import re
@@ -54,7 +54,7 @@ def format_uri(uri, predicate=None):
 #print format(example)
 
 ]]>
-    </rdf:value>
-  </redfoot:Module>
+    </code:python>
+  </code:Module>
 
 </rdf:RDF>  

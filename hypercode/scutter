@@ -421,7 +421,7 @@ class Redfoot(ConjunctiveGraph):
 
     def _get_xmpp(self):
         if self.__xmpp is None:
-            xmpp_uri = URIRef("modules/xmpp", base=__uri__)
+            xmpp_uri = URIRef("xmpp", base=__uri__)
             redfoot.check(xmpp_uri) # to pull in xmpp_info command
             if self.xmpp_id and self.xmpp_password:
                 xmpp = self.module(URIRef("#client", base=xmpp_uri))
@@ -433,7 +433,7 @@ class Redfoot(ConjunctiveGraph):
 
     def _get_rule_engine(self):
         if self.__rule_engine is None:
-            rules_uri = URIRef("modules/rules", base=__uri__)
+            rules_uri = URIRef("rules", base=__uri__)
             rule_module = self.module(URIRef("#module", base=rules_uri))            
             rules = set(get_rules(redfoot))
             self.__rule_engine = rule_module.RuleEngine(redfoot)
@@ -472,7 +472,7 @@ redfoot_loader.redfoot = redfoot # TODO: explain why this is needed
 try:
     _xmpp_handler = None
     if redfoot.xmpp:
-        xmpp = redfoot.module(URIRef("modules/xmpp#logging", base=__uri__))
+        xmpp = redfoot.module(URIRef("xmpp#logging", base=__uri__))
         _root_logger = logging.getLogger()
         _xmpp_handler = xmpp.XMPPHandler(REDFOOT.Admin)
         _xmpp_formatter = logging.Formatter('[%(name)s] %(message)s')

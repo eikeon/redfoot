@@ -41,8 +41,8 @@ DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
 
 COMMENT = redfoot.namespace("http://redfoot.net/hypercode/comment#")
 
-HTML = redfoot.module(URIRef("modules/blog#html", base=redfoot.uri)).HTML
-markdown = redfoot.module(URIRef("modules/markdown#module", base=redfoot.uri)).markdown
+HTML = redfoot.module(URIRef("blog#html", base=redfoot.uri)).HTML
+markdown = redfoot.module(URIRef("markdown#module", base=redfoot.uri)).markdown
 
 entry = request.uri.abstract()
 if (entry, RDF.type, BLOG.Entry) not in redfoot:

@@ -20,7 +20,7 @@
     <redfoot:code rdf:resource="programs/kernel#"/>
     <redfoot:program rdf:resource="programs/command_runner#"/>
     <commands:config rdf:resource="commands/manage#config"/>
-    <server:server rdf:resource="modules/server#twisted"/>
+    <server:server rdf:resource="server#twisted"/>
     <handler:handler rdf:resource="handlers/page#"/>
   </redfoot:Release>
 
