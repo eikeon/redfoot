@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:template='http://redfoot.net/2005/template#'
+   xmlns:server="http://redfoot.net/2005/server#"
+>  
+
+  <redfoot:Namespace rdf:about="#">
+    <rdfs:label>Blog</rdfs:label>
+    <rdfs:comment>The Redfoot blog namespace.</rdfs:comment>
+  </redfoot:Namespace>
+
+  <rdfs:Class rdf:ID="Feed">
+    <rdfs:label>Feed</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/server#Class"/>
+  </rdfs:Class>
+
+  <rdfs:Class rdf:ID="Entry">
+    <rdfs:label>Entry</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/server#Class"/>
+    <template:content>
+     <server:PagePartHandler rdf:ID="EntryContent">
+      <rdfs:label>Entry</rdfs:label>
+      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+<div xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:kid="http://purl.org/kid/ns#"
+     class="entry"
+>
+<?python
+import time
+from rdflib.util import parse_date_time
+
+BLOG = redfoot.namespace("http://redfoot.net/2005/blog#")
+DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
+DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
+
+COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")
+
+HTML = redfoot.module(URIRef("modules/blog#html", base=redfoot.uri)).HTML
+markdown = redfoot.module(URIRef("modules/markdown#module", base=redfoot.uri)).markdown
+
+entry = request.uri.abstract()
+if (entry, RDF.type, BLOG.Entry) not in redfoot:
+    entry = request.uri
+
+date = redfoot.value(entry, DCTERMS.created)
+
+content = redfoot.value(entry, BLOG.content)
+if content:
+    content_value = redfoot.value(content, RDF.value)
+    content_type = redfoot.value(content, BLOG.content_type)
+else:
+    content_value = redfoot.comment(entry)
+    if content_value:
+        content_type = content_value.datatype
+
+creator = redfoot.value(entry, DC.creator)
+?>
+
+<p class="meta"><span kid:if="creator" kid:strip="">by ${redfoot.label(creator)}</span> on 
+   ${time.strftime("%A %d %B, %Y", time.gmtime(parse_date_time(date)))}:</p>
+
+  <span kid:if="content_value" kid:strip="">
+    <p kid:strip="" kid:if="content_type=='http://www.w3.org/TR/REC-html40'">${HTML(content_value)}</p>
+    <p kid:strip="" kid:if="content_type=='http://www.w3.org/1999/xhtml'">${XML(content_value)}</p>
+    <pre kid:if="not content_type">${content_value}</pre>
+  </span>
+
+</div>
+]]>
+      </rdf:value>
+     </server:PagePartHandler>
+    </template:content>
+  </rdfs:Class>
+
+  <rdfs:Class rdf:ID="Content">
+    <rdfs:label>Content</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+  </rdfs:Class>
+
+  <rdf:Property rdf:ID="content">
+    <rdfs:label>content</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:domain rdf:resource="#Entry"/>
+    <rdfs:range rdf:resource="#Content"/>
+  </rdf:Property>
+
+  <rdf:Property rdf:ID="content_type">
+    <rdfs:label>content</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:domain rdf:resource="#Content"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
+  </rdf:Property>
+
+  <rdf:Property rdf:ID="entry">
+    <rdfs:label>entry</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:domain rdf:resource="server#Page"/>
+    <rdfs:range rdf:resource="#Entry"/>
+  </rdf:Property>
+
+  <rdf:Property rdf:ID="via">
+    <rdfs:label>via</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:domain rdf:resource="#Entry"/>
+    <rdfs:range rdf:resource="#Feed"/>
+  </rdf:Property>
+
+</rdf:RDF>  

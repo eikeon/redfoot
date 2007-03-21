@@ -9,6 +9,12 @@
   <rdfe:RDFXMLDocument rdf:about="">
   </rdfe:RDFXMLDocument>
 
+  <rdfs:Class rdf:ID="Template">
+    <rdfs:label>Kid Template</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="template#Template"/>
+  </rdfs:Class>
+
   <rdfe:Namespace rdf:about="#">
     <rdfs:label>Kid</rdfs:label>
     <rdfs:comment>The Redfoot kid namespace.</rdfs:comment>

@@ -235,9 +235,9 @@ import logging
 _logger = logging.getLogger(__uri__)
 
 SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
-KID = redfoot.namespace("http://redfoot.net/hypercode/modules/kid#")
+KID = redfoot.namespace("http://redfoot.net/hypercode/kid#")
 
-kid_module = redfoot.module(URIRef("modules/kid#module", base=redfoot.uri))
+kid_module = redfoot.module(URIRef("kid#module", base=redfoot.uri))
 
 # redefine lookup
 def lookup(property, default=None, uri=None):
