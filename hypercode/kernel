@@ -743,4 +743,611 @@ except KeyboardInterrupt: # TODO:
     </code:python>
   </command:Command>
 
+  <command:Command rdf:ID="save">
+    <rdfs:label>save</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+<![CDATA[
+
+RDFE = redfoot.namespace("http://redfoot.net/rdf#")
+
+for arg in args:
+    print "saveing: %s" % arg
+    source = URIRef(redfoot.absolutize(arg))
+    print "source:", source
+    for cid, _, source in redfoot.index.triples((None, RDFE.source, source)):
+        context = redfoot.get_context(cid)
+        context.save(source, format="pretty-xml")
+        print "saved:", source, len(context)
+
+]]>
+    </code:python>
+  </command:Command>
+
+  <command:Command rdf:ID="print">
+    <rdfs:label>print</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+<![CDATA[
+
+import sys
+for arg in args:
+    cid = redfoot.absolutize(arg, defrag=0)
+    print cid
+    context = redfoot.get_context(cid)
+    context.serialize(format="pretty-xml", destination=sys.stdout)
+
+]]>
+    </code:python>
+  </command:Command>
+
+  <command:Command rdf:ID="serialize">
+    <rdfs:label>serialize</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+<![CDATA[
+
+_logger = redfoot.getLogger(__uri__)
+
+import sys
+from rdflib.Graph import Graph
+
+prefix = redfoot.absolutize(args[0], defrag=0)
+if len(args)>1:
+    base = redfoot.absolutize(args[1])
+else:
+    base = prefix
+
+out = Graph(namespace_manager=redfoot.namespace_manager)
+for cid in redfoot.contexts():
+    if cid.identifier.startswith(prefix):
+        c = redfoot.get_context(cid.identifier)
+        out += c  
+
+out.serialize(destination=sys.stdout, base=base)
+
+]]>
+    </code:python>
+  </command:Command>
+
+  <command:Command rdf:ID="contexts">
+    <rdfs:label>contexts</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+<![CDATA[
+
+RDFE = redfoot.namespace("http://redfoot.net/rdf#")
+
+for context in redfoot.contexts():
+    try:
+        cid = context.identifier
+        source = redfoot.index.value(cid, RDFE.source)
+        if source is None or cid.startswith(source):
+            redfoot.write(cid+"\n")
+        else:
+            print "%s\n   source: %s" % (cid, source) #, len(redfoot.get_context(cid))
+    except Exception, e:
+        print cid, e
+
+]]>
+    </code:python>
+  </command:Command>
+
+  <command:Command rdf:ID="remove_context">
+    <rdfs:label>remove_context</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+<![CDATA[
+
+RDFE = redfoot.namespace("http://redfoot.net/rdf#")
+
+for arg in args:
+    if arg.startswith("_"):
+        uri = BNode(arg[1:])
+    else:
+        uri = URIRef(redfoot.absolutize(arg, defrag=0))
+    for context in redfoot.contexts():
+        if uri== context.identifier:
+            print "removing:", uri
+            redfoot.remove_context(context) 
+    for cid in redfoot.index.subjects(RDFE.source, uri):
+        print "removing: %s\n    source: %s" % (cid, uri)
+        redfoot.remove_context(redfoot.get_context(cid))
+
+]]>
+    </code:python>
+  </command:Command>
+
+  <command:Command rdf:ID="reload">
+    <rdfs:label>reload</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+<![CDATA[
+
+RDFE = redfoot.namespace("http://redfoot.net/rdf#")
+
+import logging
+
+_logger = redfoot.getLogger(__uri__)
+
+from optparse import OptionParser
+parser = OptionParser("""
+This command is for reloading all redfoot contexts that start with a prefix.""")
+parser.add_option("--ignore-source", action="store_true", dest="ignore_source", help="ignore-source when reloading ")
+
+try:
+    options, args = parser.parse_args(args)
+    done = False
+except SystemExit, e:
+    done = True
+
+if not done:
+    from rdflib import exceptions
+ 
+    # usage reload all contexts starting with prefix (first arg)... defaults to all contexts
+    try:
+        prefix = args[0]
+    except:
+        prefix = ""
+    prefix = redfoot.absolutize(prefix, defrag=False)
+
+    DC_creator = URIRef("http://purl.org/dc/elements/1.1/creator")
+    
+    for context in redfoot.contexts():
+        cid = context.identifier
+        if cid.startswith(prefix):
+            try:
+                if options.ignore_source:
+                    source = cid
+                else:
+                    source = redfoot.index.value(cid, RDFE.source)
+            except exceptions.UniquenessError, e:
+                _logger.warning("Multiple sources for %s: %s" % (cid, list(redfoot.objects(cid, RDFE.source))))
+                source = None
+            if source is not None:
+                publicID = redfoot.index.value(cid, RDFE.publicID, any=True)
+                if cid.startswith(source):
+                    print "reloading: %s" % (cid,)
+                else:
+                    print "reloading: %s\n    source: %s" % (cid, source)
+                redfoot.load(source, publicID=publicID)
+
+]]>
+    </code:python>
+  </command:Command>
+
+  <command:Command rdf:ID="save_all">
+    <rdfs:label>save_all</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+<![CDATA[
+
+RDFE = redfoot.namespace("http://redfoot.net/rdf#")
+
+for cid, _, source in redfoot.index.triples((None, RDFE.source, None)):
+    if source:
+        print "saving %s" % source
+        try:
+            context = redfoot.get_context(cid)
+            context.save(source, format="pretty-xml")            
+        except Exception, e:
+            print e
+
+]]>
+    </code:python>
+  </command:Command>
+
+  <command:Command rdf:ID="auto_reload">
+    <rdfs:label>auto_reload</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+<![CDATA[
+    
+RDFE = redfoot.namespace("http://redfoot.net/rdf#")
+
+DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
+
+from time import sleep
+from urlparse import urlparse
+from os.path import getmtime, isfile
+
+while 1:
+    sleep(1)
+    for cid, _, source in redfoot.index.triples((None, RDFE.source, None)):
+        if source:
+            scheme, netloc, path, params, query, fragment = urlparse(source)
+            if isfile(path):
+                ts = getmtime(path)                
+		LONG_AGO = 0
+                current_ts = int(redfoot.value(cid, DC.date, any=True, default=LONG_AGO))
+                if not current_ts or current_ts<ts:
+                    redfoot.remove((cid, DC.date, None))
+                    redfoot.index.add((cid, DC.date, Literal(ts)))
+                    print "loading: %s" % path, ts
+                    redfoot.load(source, publicID=cid, creator=__uri__)
+
+]]>
+    </code:python>
+  </command:Command>
+
+  <command:Command rdf:ID="import">
+    <rdfs:label>import</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+<![CDATA[
+    
+KERNEL = redfoot.namespace("http://redfoot.net/hypercode/kernel#")
+
+from urllib import quote
+from rdflib import Graph
+
+uri = args[0]
+
+g = Graph()
+g.load(uri)
+
+for context in g.subjects(RDF.type, KERNEL.Context):
+    print context
+    source = "%s?uri=%s" % (uri, quote(context))
+    try:
+        redfoot.load(source, publicID=context, creator=__uri__)
+    except Exception, e:
+        print e
+
+]]>
+    </code:python>
+  </command:Command>
+
+  <command:Command rdf:ID="copy">
+    <rdfs:label>copy</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+<![CDATA[
+    
+KERNEL = redfoot.namespace("http://redfoot.net/hypercode/kernel#")
+
+from urllib import quote
+from rdflib import Graph
+
+try:
+    uri = args[0]
+except:
+    uri = None
+    print "usage: <uri> [<prefix>]" # [<new_prefix>]
+
+if uri:
+      if len(args)>1:
+          startswith = args[1]
+      else:
+          startswith = ''
+
+      g = Graph()
+      g.load(uri)
+
+      for context_id in g.subjects(RDF.type, KERNEL.Context):
+          if context_id.startswith(startswith):
+              print "Copying:", context_id    
+              context = redfoot.get_context(context_id, creator=__uri__)
+              try:
+                  context.load(context_id.concrete())
+              except Exception, e:
+                  print e
+
+]]>
+    </code:python>
+  </command:Command>
+
+  <command:Command rdf:ID="backup">
+    <rdfs:label>backup</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+<![CDATA[
+    
+import time, logging
+from tarfile import open, TarInfo
+try:
+    from cStringIO import StringIO
+except:
+    from StringIO import StringIO
+from urlparse import urlparse
+from urllib import url2pathname
+from rdflib.util import date_time
+root = "backup-%s" % url2pathname(date_time().replace(":", "-"))
+# one backup per day
+#year, month, date, h, m, s, _, _, _ = time.gmtime()
+#root = "backup-%04d-%02d-%02d" % (year, month, date)
+tar = open("%s.tgz" % root, "w:gz")
+
+DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
+
+# usage backup all contexts starting with prefix (first arg)... defaults to all contexts
+try:
+    prefix = args[0]
+except:
+    prefix = ""
+
+for context in redfoot.contexts():
+    cid = context.identifier
+    if cid.startswith(prefix):
+        try:
+            sio = StringIO(context.serialize())
+        except Exception, e:
+            sio = None
+            print "Could not serialize %s: %s" % (cid, e)
+        if sio:
+            scheme, netloc, url, params, query, fragment = urlparse(cid)
+            scheme = scheme or "_"
+            netloc = netloc or "_"    
+            if params or query:
+                print "WARNING: params and query are being ignored"
+            if fragment:
+                url = "%s#%s" % (url, fragment)
+            ti = TarInfo(str("%s/%s/%s/%s" % (root, scheme, netloc, url2pathname(url))))
+            ti.size = len(sio.getvalue())
+            # TODO: real last modified time
+            ti.mtime = int(time.time())#redfoot.value(cid, DCTERMS.created)
+            tar.addfile(ti, sio)
+tar.close()
+
+
+]]>
+    </code:python>
+  </command:Command>
+
+  <command:Command rdf:ID="restore">
+    <rdfs:label>restore</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+<![CDATA[
+    
+from rdflib.Graph import Graph
+import time, logging
+from tarfile import open, TarInfo
+try:
+    from cStringIO import StringIO
+except:
+    from StringIO import StringIO
+from urlparse import urlunparse
+from urllib import url2pathname
+
+try:
+    filename = args[0]
+except:
+    filename = None
+    print "Usage: redfoot restore <filename>"
+
+# TODO: don't clobber _index.
+# TODO: option for things like not clobbering a context if it's newer than backup
+
+if filename is not None:
+    tar = open(filename, "r:gz")
+
+    source_index = Graph()
+    for name in tar.getnames():
+        root, scheme, netloc, path = name.split("/", 3)
+        if path=="_index":
+            source_index.parse(tar.extractfile(tar.getmember(name)))
+            break
+    for tarinfo in tar:
+        if tarinfo.isreg():
+            root, scheme, netloc, path = tarinfo.name.split("/", 3)
+            if scheme=="_":
+                scheme = ""
+            if netloc=="_":
+                netloc = ""
+            params = ""
+            query = ""
+            if "#" in path:
+                path, fragment = path.split("#")
+            else:
+                fragment = ""
+            url = urlunparse((scheme, netloc, path, params, query, fragment))
+            if url=="_config" or url=="_index":
+                continue
+            if url.startswith("_"):
+                context_id = BNode(url)
+            else:
+                if "#" in url:
+                    publicID, frag = url.split("#")
+                    frag = "#%s" % frag
+                else:
+                    publicID = url
+                    frag = None
+                context_id = redfoot.context_id(url, frag)
+            print "loading:", context_id
+            context = redfoot.get_context(context_id)
+            if len(context)==0:
+                # clear context metadata about context we just created
+                # above when calling redfoot.get_context
+                redfoot.index.remove((context_id, None, None)) 
+                # copy context metadata from that in backup file
+                for t in source_index.triples((context_id, None, None)):
+                    redfoot.index.add(t)
+                context.parse(tar.extractfile(tarinfo), publicID=publicID, preserve_bnode_ids=True)
+            else:
+                print "skipping: %s (already exists)" % url
+        elif tarinfo.isdir():
+            print "a directory."
+        else:
+            print "something else."
+    tar.close()
+
+]]>
+    </code:python>
+  </command:Command>
+
+  <command:Command rdf:ID="remove">
+    <rdfs:label>remove</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+<![CDATA[
+    
+KERNEL = redfoot.namespace("http://redfoot.net/hypercode/kernel#")
+
+from urllib import quote
+from rdflib import Graph
+from itertools import chain
+
+try:
+    startswith = args[0]
+except:
+    startswith = None
+    print "usage: [startswith]"
+
+if startswith:
+    # list is currently needed else not all will get removed due to
+    # concurrency issues (removing while iterating over)
+    for context in list(redfoot.contexts()):
+        cid = context.identifier
+        try:
+            if cid.startswith(startswith):
+                redfoot.write("Removing: %s\n" % cid)
+                redfoot.remove_context(context)
+                redfoot.index.remove((cid, None, None))
+        except Exception, e:
+            print e
+    # clean up index
+    for cid in list(redfoot.index.subjects(RDF.type, KERNEL.Context)):
+        if cid.startswith(startswith):
+            redfoot.write("Removing stale index info for: %s\n" % cid)
+            redfoot.index.remove((cid, None, None))
+
+]]>
+    </code:python>
+  </command:Command>
+
+  <command:Command rdf:ID="clear">
+    <rdfs:label>clear</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+<![CDATA[
+    
+KERNEL = redfoot.namespace("http://redfoot.net/hypercode/kernel#")
+
+from urllib import quote
+from rdflib import Graph
+from itertools import chain
+
+redfoot.index.remove((KERNEL.Checked, RDFS.member, None))
+    
+]]>
+    </code:python>
+  </command:Command>
+
+  <command:Command rdf:ID="rename">
+    <rdfs:label>rename</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+<![CDATA[
+    
+import logging
+
+_logger = redfoot.getLogger(__uri__)
+
+from rdflib import URIRef, BNode
+from rdflib.Graph import Graph
+
+OLD = args[0]
+NEW = args[1]
+
+nothing_renamed = True
+
+# rename contexts
+for context in list(redfoot.contexts()):
+    if OLD in context.identifier:
+        if isinstance(context.identifier, URIRef):
+            identifier = URIRef(context.identifier.replace(OLD, NEW))
+        elif isinstance(context.identifier, BNode):
+            identifier = BNode(context.identifier.replace(OLD, NEW))
+        else:
+            _logger.warning("Unexpected identifier type. Skipping context '%s'" % context.identifier)
+            continue
+        new_context = Graph(store=redfoot.store, identifier=identifier, namespace_manager=redfoot)
+        nothing_renamed = False
+    else:
+        new_context = context
+
+    for s, p, o in context:
+        ss, pp, oo = s, p, o
+        if isinstance(s, URIRef) and OLD in s:
+            ss = URIRef(s.replace(OLD, NEW))
+        if isinstance(p, URIRef) and OLD in p:
+            pp = URIRef(p.replace(OLD, NEW))
+        if isinstance(o, URIRef) and OLD in o:
+            oo = URIRef(o.replace(OLD, NEW))
+        if (ss, pp, oo)!=(s, p, o) or context!=new_context:
+            nothing_renamed = False
+            context.remove((s, p, o))
+            new_context.add((ss, pp, oo))
+
+    if new_context!=context:
+        redfoot.remove_context(context.identifier)
+
+if nothing_renamed:
+    _logger.warning("nothing renamed.")
+
+]]>
+    </code:python>
+  </command:Command>
+
+  <command:Command rdf:ID="touch">
+    <rdfs:label>touch</rdfs:label>
+    <rdfs:comment>Modifies all SERVER.last_modified times to the current time.</rdfs:comment>
+        <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+<![CDATA[
+    
+SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+
+from time import time
+now = Literal("%s" % time())
+
+for (s, p, o), cg in redfoot.store.triples((None, SERVER.last_modified, None), None):
+    for c in cg:
+        c.remove((s, p, o))
+        c.add((s, p, now))
+]]>
+    </code:python>
+  </command:Command>
+
+  <command:Command rdf:ID="update">
+    <rdfs:label>update</rdfs:label>
+    <rdfs:comment>...</rdfs:comment>
+        <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+<![CDATA[
+
+KERNEL = redfoot.namespace("http://redfoot.net/hypercode/kernel#")
+RDFE = redfoot.namespace("http://redfoot.net/rdf#")
+
+for (s, p, o), cg in redfoot.store.triples((None, RDFE.context_id, None), None):
+    for c in cg:
+        c.remove((s, p, o))
+        if (s, RDFE.publicID, None) not in redfoot:
+            c.add((s, RDFE.publicID, o))
+]]>
+    </code:python>
+  </command:Command>
+
+  <command:Command rdf:ID="svn_auth">
+    <rdfs:label>svn_auth</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+<![CDATA[
+
+import logging
+
+_logger = redfoot.getLogger(__uri__)
+
+import sha, base64
+
+SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+
+def b64(hexdigest):
+    digest = base64.b16decode(hexdigest.upper())
+    return base64.encodestring(digest)[:-1] # [:-1] to remove a newline
+
+def identifier2username(uri):
+    if "@" in uri:
+        first = uri.split("@")[0]
+        return first.replace("mailto:", "")
+    if "/" in uri:
+        last = uri.split("/")[-1]
+        return last.replace("#", "")
+
+
+for user in redfoot.subjects(RDF.type, SESSION.User):
+    for hexdigest in redfoot.objects(user, SESSION.hexdigest):
+        if len(hexdigest)==40: # sha
+            username = identifier2username(user)
+            print "%s:{SHA}%s" % (username, b64(hexdigest))
+        else:
+            _logger.debug("warning: could not generate right kind of digest for %s using %s" % (user, hexdigest))
+
+]]>
+    </code:python>
+  </command:Command>
+
 </rdf:RDF>  
