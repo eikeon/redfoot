@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:rdfe="http://redfoot.net/rdf#"
+   xmlns:code="http://redfoot.net/hypercode/code#" 
+   xmlns:command="http://redfoot.net/hypercode/command#" 
+>
+
+  <rdfe:RDFXMLDocument rdf:about="">
+  </rdfe:RDFXMLDocument>
+  
+  <command:Command rdf:ID="editor">
+    <rdfs:label>editor</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+<![CDATA[
+    
+try:
+    # TODO: think we just need NSBundle and NSTabViewItem
+    from Foundation import *
+    from AppKit import *
+except ImportError, e:
+    raise ImportError("This command depends on being run from within the OS X program Redfoot.app.")
+
+
+def install_editor():
+    import logging
+    from tarfile import TarFile
+    from urllib2 import urlopen, Request
+    from StringIO import StringIO
+    import redfootlib
+
+    logging.info("downloading editor")
+    url = "http://redfoot.net/dev/editor.tgz"
+    headers = {'User-agent': 'redfoot.py (%s)' % redfootlib.__version__}
+    f = urlopen(Request(url, None, headers))
+    sio = StringIO(f.read())
+    sio.seek(0)
+    tar = TarFile.gzopen("editor.tgz", fileobj=sio)
+
+    logging.info("extracting editor")
+    for member in tar:
+	tar.extract(member)
+
+controller = redfoot.controller
+try:
+    bundle = NSBundle.bundleWithPath_("~/Library/redfoot/editor.bundle")
+    assert bundle is not None
+except:
+    install_editor()
+    bundle = NSBundle.bundleWithPath_("~/Library/redfoot/editor.bundle")
+
+EditorController = bundle.classNamed_("EditorController")
+controller.editor = editor = EditorController.allocWithZone_(controller.zone()).init(redfoot)
+
+NSBundle.loadNibNamed_owner_("editor", editor)
+
+print bundle.objectForInfoDictionaryKey_("CFBundleVersion")
+
+tabViewItem = NSTabViewItem.alloc().init()
+tabViewItem.setLabel_("editor")
+tabViewItem.setView_(editor.editView)
+controller.tabView.addTabViewItem_(tabViewItem)
+
+]]>
+    </code:python>
+  </command:Command>
+
+</rdf:RDF>  
