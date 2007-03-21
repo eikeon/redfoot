@@ -596,4 +596,116 @@ class Server(object):
     </code:python>
   </code:Code>
 
+  <command:Command rdf:ID="import">
+    <rdfs:label>static_import</rdfs:label> 
+    <rdfs:comment>imports static files into redfoot</rdfs:comment>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+<![CDATA[
+import string, sys
+
+text_characters = "".join(map(chr, range(32, 127)) + list("\n\r\t\b"))
+_null_trans = string.maketrans("", "")
+
+def istextfile(filename, blocksize = 512):
+    return istext(open(filename).read(blocksize))
+
+def istext(s, threshold=0.3):
+    if "\0" in s:
+        return False
+    
+    if not s:  # Empty files are considered text
+        return True
+
+    # Get the non-text characters (maps a character to itself then
+    # use the 'remove' option to get rid of the text characters.)
+    t = s.translate(_null_trans, text_characters)
+
+    # If more than threshold non-text characters, then
+    # this is considered a binary file
+    return len(t) <= len(t) * threshold
+
+import os, sys
+from os.path import join, getsize, splitext
+from base64 import b64encode
+
+StaticPage = URIRef("http://redfoot.net/2005/server#StaticPage")
+base64Binary = URIRef("http://www.w3.org/2001/XMLSchema#base64Binary")
+
+SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+
+# TODO: usage
+base = redfoot.absolutize(args[0])
+
+# TODO: add more common types
+content_types = {
+"css": "text/css",
+"png": "image/png",
+"js": "application/x-javascript",
+"html": "text/html",
+}
+
+# TODO: take root as optional second argument?
+for root, dirs, files in os.walk('html'):
+    for name in files:
+        if not name.endswith("~"):
+            filename = join(root, name)
+            pathname = "." + filename[len('html'):]
+            uri = URIRef(pathname, base=base)
+            c = redfoot.get_context(redfoot.context_id(uri))
+            c.add((uri, RDF.type, StaticPage))
+            if istextfile(filename):
+                value = Literal(file(filename).read())
+            else:
+                s = b64encode(file(filename).read())
+                value = Literal(s, datatype=base64Binary)
+            c.remove((uri, RDF.value, None))
+            c.add((uri, RDF.value, value))
+
+            _, ext = splitext(name)
+            if ext:
+                content_type = content_types.get(ext[1:])
+                if content_type:
+                    c.add((uri, SERVER.content_type, Literal(content_type)))
+
+    if 'CVS' in dirs:
+        dirs.remove('CVS')  # don't visit CVS directories
+
+]]>
+    </code:python>
+  </command:Command>
+
+  <command:Command rdf:ID="export">
+    <rdfs:label>static_export</rdfs:label>
+    <rdfs:comment>exports static files into redfoot</rdfs:comment>
+        <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+<![CDATA[
+
+StaticPage = URIRef("http://redfoot.net/2005/server#StaticPage")
+base64Binary = URIRef("http://www.w3.org/2001/XMLSchema#base64Binary")
+
+from base64 import b64decode
+from os import makedirs
+from os.path import join, dirname, exists
+
+prefix = args[0]
+
+for page in redfoot.subjects(RDF.type, StaticPage):
+    if page.startswith(prefix):
+        path = join("html", page.replace(prefix, ""))
+        dir = dirname(path)
+        if not exists(dir):
+            makedirs(dir)
+        f = file(path, mode="wb")
+        value = redfoot.value(page, RDF.value)
+        if value:
+            if value.datatype==base64Binary:
+                f.write(b64decode(value))
+            else:
+                f.write(value)
+        f.close()
+
+]]>
+    </code:python>
+  </command:Command>
+
 </rdf:RDF>  
