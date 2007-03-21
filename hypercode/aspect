@@ -4,6 +4,7 @@
   xmlns:rdfs='http://www.w3.org/2000/01/rdf-schema#'
   xmlns:rdfe='http://redfoot.net/rdf#'
   xmlns:template='http://redfoot.net/hypercode/template#'
+  xmlns:kid='http://redfoot.net/hypercode/kid#'
   xmlns:aspect="http://redfoot.net/hypercode/aspect#"
   xmlns:code="http://redfoot.net/hypercode/code#"
 >
@@ -21,7 +22,7 @@
 
       <template:Content rdf:ID="UserPagePartHandler">
         <rdfs:label>Quant User Page Part Handler</rdfs:label>
-        <code:python rdf:datatype="http://redfoot.net/hypercode/server#Kid">
+        <kid:template rdf:datatype="http://redfoot.net/hypercode/server#Kid">
 <![CDATA[
 
 <div xmlns:kid="http://purl.org/kid/ns#" kid:strip="">
@@ -46,7 +47,7 @@ if action=="install" and aspect:
 </div>
 
 ]]>
-        </code:python>
+        </kid:template>
       </template:Content>
     </template:content>
   </rdfs:Class>
@@ -66,7 +67,10 @@ ASPECT = redfoot.namespace("http://redfoot.net/hypercode/aspect#")
 TEMPLATE = redfoot.namespace("http://redfoot.net/hypercode/template#")
 SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
 
+_logger = redfoot.getLogger(__uri__)
+_logger.info("aspect: %s" % aspect)
 cid = redfoot.context_id(aspect, context_id="context")
+_logger.info("cid: %s" % cid)
 redfoot.check(cid)
 
 label = redfoot.label(aspect) or aspect
@@ -107,7 +111,7 @@ for item in redfoot.objects(aspect, ASPECT.item):
   <aspect:Aspect rdf:about="aspects/auth_invite#aspect"/>
   <aspect:Aspect rdf:about="aspects/blog#aspect"/>
   <aspect:Aspect rdf:about="aspects/documents#aspect"/>
-  <aspect:Aspect rdf:about="aspects/items#aspect"/>
+<!--  <aspect:Aspect rdf:about="aspects/items#aspect"/>-->
   <aspect:Aspect rdf:about="aspects/doap#aspect"/>
 
 </rdf:RDF>

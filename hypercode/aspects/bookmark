@@ -3,10 +3,13 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
    xmlns:rdfe="http://redfoot.net/rdf#"
+   xmlns:owl="http://www.w3.org/2002/07/owl#"
+   xmlns:code="http://redfoot.net/hypercode/code#"
    xmlns:redfoot="http://redfoot.net/hypercode/redfoot#"
    xmlns:server="http://redfoot.net/hypercode/server#"
    xmlns:session="http://redfoot.net/hypercode/session#"
    xmlns:template="http://redfoot.net/hypercode/template#"
+   xmlns:kid='http://redfoot.net/hypercode/kid#'
    xmlns:aspect="http://redfoot.net/hypercode/aspect#"
 >
 
@@ -14,10 +17,141 @@
     <rdfs:label>Bookmark Aspect RDF/XML</rdfs:label>
   </rdfe:RDFXMLDocument>
 
-  <redfoot:Namespace rdf:about="#">
+  <rdfe:Namespace rdf:about="#">
     <rdfs:label>Bookmark</rdfs:label>
     <rdfs:comment>The Redfoot bookmark namespace.</rdfs:comment>
-  </redfoot:Namespace>
+  </rdfe:Namespace>
+
+  <owl:Class rdf:ID="Bookmark">
+    <rdfs:label>Bookmark</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+    <template:content>
+     <server:PagePartHandler rdf:ID="BookmarkHandler">
+      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+  <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
+<?python
+import time
+
+bookmark = request.uri.abstract()
+
+BOOKMARK = redfoot.namespace("http://redfoot.net/hypercode/bookmark#")
+DC_created = URIRef("http://purl.org/dc/terms/created")
+DC_creator = URIRef("http://purl.org/dc/elements/1.1/creator")
+
+refersTo = redfoot.value(bookmark, BOOKMARK.refersTo)
+
+if refersTo:
+      creator = redfoot.value(bookmark, DC_creator)
+      c = redfoot.value(bookmark, DC_created)
+      try:
+          created = time.strftime("%A %d %B, %Y", time.gmtime(float(c)))
+      except:
+          created = None
+
+categories = list(redfoot.objects(bookmark, BOOKMARK.category))
+
+?>
+   <span kid:if="refersTo" >
+    <p>This bookmark refers to 
+      <a href="${refersTo}">${redfoot.label(refersTo) or "--"}</a>.
+      <span kid:if="created">The bookmark was created on ${created}.</span>
+      <span kid:if="creator">The bookmark was added by 
+            <a href="${request.relative(creator.concrete())}">${redfoot.label(creator) or creator}</a>.
+      </span> 
+    </p>
+
+    <span kid:if="categories"><p>The bookmark is in the following categories:
+      <ul>
+        <li kid:for="category in categories">
+          <a href="${request.relative(category.concrete())}">${redfoot.label(category) or category}</a>
+        </li>
+      </ul>
+     </p> 
+    </span> 
+
+
+   </span>
+   <span kid:if="not refersTo" >
+     <p>This bookmark does not refer to anything :(</p>
+   </span>
+  </span>
+]]>
+      </rdf:value>
+     </server:PagePartHandler> 
+    </template:content>
+  </owl:Class>
+
+  <owl:ObjectProperty rdf:ID="refersTo">
+    <rdfs:label>refers to</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:domain rdf:resource="#Bookmark"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+  </owl:ObjectProperty>
+
+  <owl:Class rdf:ID="Category">
+    <rdfs:label>Category</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+    <template:content>
+     <server:PagePartHandler rdf:ID="CategoryHandler">
+      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+<![CDATA[
+  <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
+<?python
+import time
+
+category = request.uri.abstract()
+
+BOOKMARK = redfoot.namespace("http://redfoot.net/hypercode/bookmark#")
+SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+DC_creator = URIRef("http://purl.org/dc/elements/1.1/creator")
+DC_created = URIRef("http://purl.org/dc/terms/created")
+
+bookmarks = set()
+for bookmark in redfoot.subjects(BOOKMARK.category, category):
+    if (bookmark, SERVER.site, request.host) in redfoot:
+        uri = redfoot.value(bookmark, BOOKMARK.refersTo)
+        label = redfoot.label(uri) or uri
+        c = redfoot.value(bookmark, DC_created)
+        try:
+            created = time.strftime("%A %d %B, %Y", time.gmtime(float(c)))
+        except Exception, e:
+            redfoot.log.warning("Couldn't format timestamp: %s" % e)
+            created = None
+        bookmarks.add((c, created, label, uri, bookmark))
+bookmarks = list(bookmarks)
+bookmarks.sort()
+bookmarks.reverse()
+
+
+?>
+    <ul class="bookmarks">
+      <li kid:for="c, created, label, uri, bookmark in bookmarks">
+        <h3><a href="${uri}">${label}</a></h3>
+        <div class="meta">
+          <a href="${bookmark.concrete()}">bookmark</a> 
+          <span kid:if="created">created on ${created}</span>.
+        </div>
+      </li>
+    </ul>
+
+   </span>
+]]>
+      </rdf:value>
+     </server:PagePartHandler> 
+    </template:content>
+  </owl:Class>
+
+  <owl:ObjectProperty rdf:ID="category">
+    <rdfs:label>category</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:domain rdf:resource="#Bookmark"/>
+    <rdfs:range rdf:resource="#Category"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
+    <!-- Allow literals in range to support using category for tags -->
+  </owl:ObjectProperty>
 
   <aspect:Aspect rdf:ID="aspect">
     <rdfs:label>Bookmark</rdfs:label>
@@ -25,7 +159,7 @@
     <aspect:item rdf:resource="#add_bookmark"/>
   </aspect:Aspect>
 
-  <redfoot:Module rdf:ID="module">
+  <code:Module rdf:ID="module">
     <rdfs:label></rdfs:label>      
     <rdfs:comment></rdfs:comment>    
     <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
@@ -43,8 +177,7 @@ class BookmarkCreatedEvent(Event):
 
 ]]>
     </code:python>
-  </redfoot:Module>
-
+  </code:Module>
 
   <template:Section rdf:ID="bookmarks">
     <aspect:location>/bookmarks/</aspect:location>
@@ -60,7 +193,7 @@ class BookmarkCreatedEvent(Event):
 <?python 
 import time
 
-BOOKMARK = redfoot.namespace("http://redfoot.net/2006/bookmark#")
+BOOKMARK = redfoot.namespace("http://redfoot.net/hypercode/bookmark#")
 SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
 DC_creator = URIRef("http://purl.org/dc/elements/1.1/creator")
 DC_created = URIRef("http://purl.org/dc/terms/created")
@@ -117,7 +250,7 @@ import logging
 
 _logger = logging.getLogger(__uri__)
 
-auth = redfoot.module(URIRef("modules/auth#module", base=redfoot.uri))
+auth = redfoot.module(URIRef("auth#module", base=redfoot.uri))
 bookmark_module = redfoot.module(URIRef("#module", base=__uri__))
 
 from sgmllib import SGMLParser
@@ -154,7 +287,7 @@ from time import time
 from twisted.web.client import getPage
 from twisted.web import http
 
-BOOKMARK = redfoot.namespace("http://redfoot.net/2006/bookmark#")
+BOOKMARK = redfoot.namespace("http://redfoot.net/hypercode/bookmark#")
 SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
 SESSION = redfoot.namespace("http://redfoot.net/hypercode/session#")
 DC_creator = URIRef("http://purl.org/dc/elements/1.1/creator")

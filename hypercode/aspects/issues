@@ -4,10 +4,10 @@
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
    xmlns:rdfe="http://redfoot.net/rdf#"
    xmlns:redfoot="http://redfoot.net/hypercode/redfoot#"
-   xmlns:commands="http://redfoot.net/hypercode/commands#"
    xmlns:server="http://redfoot.net/hypercode/server#"
    xmlns:session="http://redfoot.net/hypercode/session#"
    xmlns:template='http://redfoot.net/hypercode/template#'
+   xmlns:kid='http://redfoot.net/hypercode/kid#'
    xmlns:aspect="http://redfoot.net/hypercode/aspect#"
 >
 

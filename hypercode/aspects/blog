@@ -4,10 +4,10 @@
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
    xmlns:rdfe="http://redfoot.net/rdf#"
    xmlns:redfoot="http://redfoot.net/hypercode/redfoot#"
-   xmlns:commands="http://redfoot.net/hypercode/commands#"
    xmlns:server="http://redfoot.net/hypercode/server#"
    xmlns:session="http://redfoot.net/hypercode/session#"
    xmlns:template='http://redfoot.net/hypercode/template#'
+   xmlns:kid='http://redfoot.net/hypercode/kid#'
    xmlns:aspect="http://redfoot.net/hypercode/aspect#"
 >
 
@@ -55,8 +55,8 @@ DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
 
 COMMENT = redfoot.namespace("http://redfoot.net/hypercode/comment#")
 
-HTML = redfoot.module(URIRef("modules/blog#html", base=redfoot.uri)).HTML
-markdown = redfoot.module(URIRef("modules/markdown#module", base=redfoot.uri)).markdown
+HTML = redfoot.module(URIRef("blog#html", base=redfoot.uri)).HTML
+markdown = redfoot.module(URIRef("markdown#module", base=redfoot.uri)).markdown
 
 blog = []
 blog_page = URIRef("/blog/", base=request.host)
@@ -267,7 +267,7 @@ DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
 SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
 
-format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot.uri)).format
+format = redfoot.module(URIRef("simple_format#module", base=redfoot.uri)).format
 
 resources = []
 blog_page = URIRef("/blog/", base=request.host)
@@ -342,7 +342,7 @@ DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
 SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
 
-format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot.uri)).format
+format = redfoot.module(URIRef("simple_format#module", base=redfoot.uri)).format
 
 resources = []
 blog_page = URIRef("/blog/", base=request.host)

@@ -4,8 +4,9 @@
         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
         xmlns:rdfe="http://redfoot.net/rdf#"
         xmlns:redfoot="http://redfoot.net/hypercode/redfoot#"
-        xmlns:commands="http://redfoot.net/hypercode/commands#"
+        xmlns:command="http://redfoot.net/hypercode/command#"
         xmlns:template="http://redfoot.net/hypercode/template#"
+        xmlns:kid='http://redfoot.net/hypercode/kid#'
         xmlns:server="http://redfoot.net/hypercode/server#"
         xmlns:aspect="http://redfoot.net/hypercode/aspect#"
 >
@@ -100,8 +101,8 @@ ingredients.sort()
 >
 <?kid
 # TODO: better way to import redfoot modules
-recipes = redfoot.module(URIRef("modules/recipe#module", base=redfoot.uri)).recipes
-format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot.uri)).format
+recipes = redfoot.module(URIRef("recipe#module", base=redfoot.uri)).recipes
+format = redfoot.module(URIRef("simple_format#module", base=redfoot.uri)).format
 ?>
   <dl>
    <span kid:omit="" 
@@ -141,8 +142,8 @@ from datetime import datetime
 RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
 SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
 
-format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot.uri)).format
-recipe_module = redfoot.module(URIRef("modules/recipe#module", base=redfoot.uri))
+format = redfoot.module(URIRef("simple_format#module", base=redfoot.uri)).format
+recipe_module = redfoot.module(URIRef("recipe#module", base=redfoot.uri))
 
 recipe_list = redfoot.value(None, SERVER.alternate, request.uri)
 if recipe_list:
@@ -183,31 +184,14 @@ now = datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
 <!-- recipes commands bit follows: -->
 
 
-  <rdf:Description rdf:about="http://redfoot.net/hypercode/redfoot#Globals">
-    <commands:config rdf:resource="#recipe_config"/>  
-  </rdf:Description>
-
-<!--
-  <redfoot:Redfoot rdf:ID="submit_recipe">
-    <rdfs:label>submit recipe</rdfs:label>
-    <redfoot:code rdf:resource="kernel#"/>
-    <redfoot:program rdf:resource="#submit_recipe_program"/>
-  </redfoot:Redfoot>  
--->
-
-  <redfoot:Configuration rdf:ID="recipe_config">
-
-    <commands:command rdf:parseType="Resource">
-      <rdfs:label>submit_recipe</rdfs:label>
-      <redfoot:code>
-        <redfoot:Program rdf:ID="submit_recipe_program">
-          <rdfs:label>submit recipe</rdfs:label>      
-          <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+  <commands:Command rdf:ID=""submit_recipe">
+    <rdfs:label>submit_recipe</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
 RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
 
-email = redfoot.module(URIRef("modules/email#module", base=redfoot.uri))
+email = redfoot.module(URIRef("email#module", base=redfoot.uri))
 message = email.parse()
 
 if "@eikeon.com" in message.email_address:
@@ -221,20 +205,16 @@ context = redfoot.get_context(redfoot.context_id(recipe_uri.abstract()))
 
 context.add((recipe_uri, RDF.type, recipes.abstract()))
 
-recipe_module = redfoot.module(URIRef("modules/recipe#module", base=redfoot.uri))
+recipe_module = redfoot.module(URIRef("recipe#module", base=redfoot.uri))
 recipe_module.parse(message.payload, context, recipe_uri)
 
 ]]>
-        </code:python>
-       </redfoot:Program>
-      </redfoot:code>
-    </commands:command>
+    </code:python>
+  </commands:Command>
 
-    <commands:command>
-      <commands:Command rdf:ID="ingredients">
-      <rdfs:label>ingredients</rdfs:label>
-      <redfoot:code rdf:parseType="Resource">
-        <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+  <commands:Command rdf:ID="ingredients">
+    <rdfs:label>ingredients</rdfs:label>
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
 RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
@@ -243,21 +223,17 @@ for i in redfoot.subjects(RDF.type, RECIPE.Ingredient):
     print redfoot.label(i).encode("ascii", "replace")
 
 ]]>
-        </code:python>
-      </redfoot:code>
-      </commands:Command>
-    </commands:command>
+    </code:python>
+  </commands:Command>
 
-    <commands:command rdf:parseType="Resource">
-      <rdfs:label>update_recipes</rdfs:label>
-      <redfoot:code rdf:parseType="Resource">
-        <rdfs:label>update recipes</rdfs:label>      
-        <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+  <command:Command rdf:ID="update_recipes">
+    <rdfs:label>update recipes</rdfs:label>      
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
 RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
 
-recipe = redfoot.module(URIRef("modules/recipe#module", base=redfoot.uri))
+recipe = redfoot.module(URIRef("recipe#module", base=redfoot.uri))
 
 l = []
 for r in redfoot.subjects(RDF.type, RECIPE.Recipe):
@@ -286,15 +262,12 @@ for recipes, _, r in redfoot.triples((None, RECIPE.recipe, None)):
     print "converting to type for %s" % r
 
 ]]>
-        </code:python>
-      </redfoot:code>
-    </commands:command>
+    </code:python>
+  </command:Command>
 
-    <commands:command rdf:parseType="Resource">
-      <rdfs:label>print_recipe_rdf</rdfs:label>
-      <redfoot:code rdf:parseType="Resource">
-        <rdfs:label>print recipe rdf</rdfs:label>      
-        <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+  <command:Command rdf:ID="print_recipe_rdf">
+    <rdfs:label>print recipe rdf</rdfs:label>      
+    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
 RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
@@ -303,7 +276,7 @@ RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
 from rdflib.TripleStore import TripleStore
 context = TripleStore()
 
-recipe_module = redfoot.module(URIRef("modules/recipe#module", base=redfoot.uri))
+recipe_module = redfoot.module(URIRef("recipe#module", base=redfoot.uri))
 for arg in args:
     recipe = URIRef(arg)
     orig = redfoot.value(recipe, RECIPE.original)
@@ -314,9 +287,8 @@ for arg in args:
         print "No %s found for %s" % (RECIPE.original, recipe)
 
 ]]>
-        </code:python>
-      </redfoot:code>
-    </commands:command>
+      </code:python>
+    </command:Command>
 
     <commands:command rdf:parseType="Resource">
       <rdfs:label>parse_ingred</rdfs:label>
@@ -396,6 +368,7 @@ for recipe in redfoot.subjects(RDF.type, RECIPE.Recipe):
 
   </redfoot:Configuration>>
 
+
   <rdf:Description rdf:about="http://donnafales.com/2002/07/28/recipe-schema#Recipe">
 <!--
     <handler:text rdf:parseType="Resource">
@@ -423,7 +396,7 @@ response.write("""
 <?kid
 # import some stuff
 # TODO: push to redfoot using datatype plugin
-format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot.uri)).format
+format = redfoot.module(URIRef("simple_format#module", base=redfoot.uri)).format
 
 RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
 
@@ -481,7 +454,7 @@ source = redfoot.value(None, RECIPE.recipe, recipe, any=True)
 >
 <?kid
 RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
-format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot.uri)).format
+format = redfoot.module(URIRef("simple_format#module", base=redfoot.uri)).format
 
 ingredient = request.uri
 

@@ -6,6 +6,7 @@
    xmlns:redfoot="http://redfoot.net/hypercode/redfoot#"
    xmlns:commands="http://redfoot.net/hypercode/commands#"
    xmlns:handler="http://redfoot.net/hypercode/handler#"
+   xmlns:kid='http://redfoot.net/hypercode/kid#'
 >
 
   <rdfe:RDFXMLDocument rdf:about="">

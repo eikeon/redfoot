@@ -4,10 +4,10 @@
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
    xmlns:rdfe="http://redfoot.net/rdf#"
    xmlns:redfoot="http://redfoot.net/hypercode/redfoot#"
-   xmlns:commands="http://redfoot.net/hypercode/commands#"
    xmlns:server="http://redfoot.net/hypercode/server#"
    xmlns:session="http://redfoot.net/hypercode/session#"
    xmlns:template='http://redfoot.net/hypercode/template#'
+   xmlns:kid='http://redfoot.net/hypercode/kid#'
    xmlns:aspect="http://redfoot.net/hypercode/aspect#"
 >
 
@@ -44,7 +44,7 @@ DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
 
 COMMENT = redfoot.namespace("http://redfoot.net/hypercode/comment#")
 
-markdown = redfoot.module(URIRef("modules/markdown#module", base=redfoot.uri)).markdown
+markdown = redfoot.module(URIRef("markdown#module", base=redfoot.uri)).markdown
 
 blog = []
 for entry in redfoot.subjects(RDF.type, BLOG.Entry):
@@ -102,8 +102,8 @@ feed = redfoot.value(entry, BLOG.via, any=True)
 <?python
 BLOG = redfoot.namespace("http://redfoot.net/hypercode/blog#")
 
-update = redfoot.module(URIRef("modules/blog#update", base=redfoot.uri))
-blog_feed = redfoot.module(URIRef("modules/blog#feed", base=redfoot.uri))
+update = redfoot.module(URIRef("blog#update", base=redfoot.uri))
+blog_feed = redfoot.module(URIRef("blog#feed", base=redfoot.uri))
 
 feed = request.parameters.get("feed")
 if feed:

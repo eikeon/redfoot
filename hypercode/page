@@ -110,6 +110,7 @@ if (site, None, None) not in redfoot:
     install = URIRef("http://redfoot.net/hypercode/aspect#install")
     #redfoot.check(URIRef("aspects/list", base=redfoot.uri)) # since we're doing other init bits
     auth = URIRef("aspects/auth#aspect", base=redfoot.uri)
+    _logger.info("??: %s" % auth)
     redfoot.execute(install, aspect=auth , base=request.host)
 
 def lookup(property, default=None):
@@ -232,6 +233,8 @@ else:
 
 _logger = redfoot.getLogger(__uri__)
 
+from rdflib import BNode
+
 SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
 KID = redfoot.namespace("http://redfoot.net/hypercode/kid#")
 
@@ -262,6 +265,7 @@ def display_page(uri, output=None, **args):
 
 
 mod_context = globals()
+mod_context["BNode"] = BNode # no longer global
 
 def _create_display(normal):
     """ 

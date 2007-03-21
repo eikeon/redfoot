@@ -98,6 +98,7 @@ class Kernel(ConjunctiveGraph):
         self.__uri_map = set()
         self.__namespaces = {}
         self.dispatcher = Dispatcher()
+        self.xmpp = None
         self.__globals = None
         self.map(URIRef("http://xmlns.com/foaf/0.1/"), URIRef("http://xmlns.com/foaf/0.1/index.rdf"))
         
@@ -122,8 +123,7 @@ class Kernel(ConjunctiveGraph):
         return self.__base
 
     def __set_base(self, base):
-	self.config.remove((KERNEL.Globals, KERNEL.base, None))
-	self.config.add((KERNEL.Globals, KERNEL.base, base))
+	self.index.set((KERNEL.Globals, KERNEL.base, base))
 
     base = property(__get_base, __set_base)
 
@@ -347,6 +347,16 @@ class Kernel(ConjunctiveGraph):
             return context
         else:
             raise Exception("Couldn't execute %s (nothing known about resource)" % uri)
+
+    def context_id(self, uri, context_id=None):
+        """ URI#context """
+        uri, frag = urldefrag(uri)
+        frag = context_id or frag or "context"
+        if frag.startswith("#"):
+            frag = frag[1:]
+        if uri.endswith("/"):
+            uri = uri[:-1]
+        return URIRef("%s#%s" % (uri, frag))
 
     def namespace(self, uri, creator=None, context=None):
         uri = URIRef(uri)
@@ -649,7 +659,7 @@ else:
                 ee = b64decode(value)
                 assert ee==e, "%r!=%r" % (ee, e)
                 c.set((uri, USER.encrypted_password, value))
-            password = Literal(password.strip().upper())
+            password = Literal(password.strip())
             hexdigest = Literal(sha.new(password).hexdigest())
             c.set((uri, USER.hexdigest, hexdigest))
         _logger.debug("\nassertions added:\n%s" % c.serialize(format="n3"))

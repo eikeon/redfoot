@@ -3,9 +3,11 @@
   xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
   xmlns:rdfs='http://www.w3.org/2000/01/rdf-schema#'
   xmlns:rdfe="http://redfoot.net/rdf#"
+  xmlns:code='http://redfoot.net/hypercode/code#'
   xmlns:redfoot='http://redfoot.net/hypercode/redfoot#'
   xmlns:server="http://redfoot.net/hypercode/server#"
   xmlns:template='http://redfoot.net/hypercode/template#'
+  xmlns:kid='http://redfoot.net/hypercode/kid#'
   xmlns:aspect="http://redfoot.net/hypercode/aspect#"
 >
 
@@ -99,7 +101,7 @@ else:
     <server:content_type>application/xhtml+xml</server:content_type>
     <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python"><![CDATA[
 
-_logger = logging.getLogger(__uri__)
+_logger = redfoot.getLogger(__uri__)
 
 _logger.debug("login_process")
 
@@ -107,7 +109,7 @@ if request.method=='POST':
     from urllib import quote
     import md5
     uid = request.parameters.get("uid", None)
-    # TODO: sync all username expansion code between here, register, and modules/auth
+    # TODO: sync all username expansion code between here, register, and auth
     if "@" in uid:
         if not uid.startswith("mailto:"):
             uid = URIRef("mailto:%s" % uid)
@@ -124,7 +126,7 @@ if request.method=='POST':
     return_uri = URIRef(request.parameters.get("return_uri", "%s/" % request.host))
     login_uri = URIRef(request.parameters.get("login_uri"))
 
-    auth = redfoot.module(URIRef("modules/auth#module", base=redfoot.uri))    
+    auth = redfoot.module(URIRef("auth#module", base=redfoot.uri))    
     if auth.authenticate(request, username=uid, password=password):
 	response.setStatus(302, 'found')
 	if not return_uri.startswith(request.host):

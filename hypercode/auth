@@ -22,6 +22,8 @@
 
 import md5, sha
 
+KERNEL = redfoot.namespace("http://redfoot.net/hypercode/kernel#")
+USER = redfoot.namespace("http://redfoot.net/hypercode/user#")
 SESSION = redfoot.namespace("http://redfoot.net/hypercode/session#")
 SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
 
@@ -54,10 +56,10 @@ def authenticate(request, username=None, password=None):
                 message = "%s while trying to load from %s " % (str(e), username)
 	    cid = redfoot.context_id(username, context_id="#user")
 	    c = redfoot.get_context(cid, creator=__uri__)
-	    c.add((username, RDF.type, SESSION.User))
-	    c.remove((username, SESSION.hexdigest, None))
-	    for hexdigest in g.objects(username, SESSION.hexdigest):
-		c.add((username, SESSION.hexdigest, hexdigest))
+	    c.add((username, RDF.type, USER.User))
+	    c.remove((username, USER.hexdigest, None))
+	    for hexdigest in g.objects(username, USER.hexdigest):
+		c.add((username, USER.hexdigest, hexdigest))
 	    label = g.label(username) or g.value(username, FOAF.name)
 	    if label:
 		c.remove((username, RDFS.label, None))            
@@ -67,9 +69,9 @@ def authenticate(request, username=None, password=None):
     if password:
         hexdigest = Literal(sha.new(password).hexdigest())
         md5_hexdigest = Literal(md5.new(password).hexdigest())
-        if (username, SESSION.hexdigest, hexdigest) in redfoot:
+        if (username, USER.hexdigest, hexdigest) in redfoot:
             match = True
-        elif (username, SESSION.hexdigest, md5_hexdigest) in redfoot:
+        elif (username, USER.hexdigest, md5_hexdigest) in redfoot:
             match = True
         else:
             match = False
@@ -105,7 +107,7 @@ def allow(request, uri=None):
 	    uid = redfoot.value(session_id, SESSION.uid)
 	    if uid is None:
 		return False
-            if (uid, RDF.type, REDFOOT.Admin) in redfoot:
+            if (uid, RDF.type, KERNEL.Admin) in redfoot:
                 return True
 	    for allow in redfoot.objects(uri, SERVER.allow):
 		if allow==uid:

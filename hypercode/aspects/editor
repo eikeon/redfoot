@@ -6,7 +6,8 @@
   xmlns:redfoot='http://redfoot.net/hypercode/redfoot#'
   xmlns:server='http://redfoot.net/hypercode/server#'
   xmlns:template='http://redfoot.net/hypercode/template#'  
-   xmlns:aspect="http://redfoot.net/hypercode/aspect#"
+  xmlns:kid='http://redfoot.net/hypercode/kid#'
+  xmlns:aspect="http://redfoot.net/hypercode/aspect#"
 >
 
   <rdfe:RDFXMLDocument rdf:about="">

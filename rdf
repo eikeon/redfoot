@@ -6,6 +6,7 @@
   xmlns:server="http://redfoot.net/hypercode/server#"
   xmlns:code="http://redfoot.net/hypercode/code#"
   xmlns:template="http://redfoot.net/hypercode/template#"
+  xmlns:kid="http://redfoot.net/hypercode/kid#"
 >
 
   <rdfe:Namespace rdf:about="#">
@@ -80,7 +81,7 @@ g.serialize(destination=response)#, base=document)
     <template:content>
       <server:PagePartHandler rdf:ID="class_content">
         <rdfs:label>Display of Class</rdfs:label>
-        <code:python rdf:datatype="http://redfoot.net/2005/server#Kid">
+        <kid:template rdf:datatype="http://redfoot.net/2005/server#Kid">
 <![CDATA[
 <div xmlns="http://www.w3.org/1999/xhtml"
      xmlns:kid="http://purl.org/kid/ns#"
@@ -94,8 +95,8 @@ elif (request.uri, None, None) in redfoot:
 else:
     uri = request.uri.abstract()
     
-format = redfoot.module(URIRef("modules/simple_format#module", base=redfoot.uri)).format
-format_uri = redfoot.module(URIRef("modules/simple_format#module", base=redfoot.uri)).format_uri
+format = redfoot.module(URIRef("simple_format#module", base=redfoot.uri)).format
+format_uri = redfoot.module(URIRef("simple_format#module", base=redfoot.uri)).format_uri
 
 seeAlsoList = list(redfoot.objects(uri, RDFS.seeAlso))
 
@@ -174,7 +175,7 @@ superclasses = list(redfoot.objects(uri, RDFS.subClassOf)) # TODO:
 
 </div>
 ]]>
-        </code:python>
+        </kid:template>
       </server:PagePartHandler>
     </template:content>
   </rdfs:Class>

@@ -4,9 +4,9 @@
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
    xmlns:rdfe="http://redfoot.net/rdf#"
    xmlns:redfoot="http://redfoot.net/hypercode/redfoot#"
-   xmlns:commands="http://redfoot.net/hypercode/commands#"
    xmlns:handler="http://redfoot.net/hypercode/handler#"
    xmlns:aspect="http://redfoot.net/hypercode/aspect#"
+   xmlns:kid='http://redfoot.net/hypercode/kid#'
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
