@@ -3,10 +3,10 @@
     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
     xmlns:rdfe="http://redfoot.net/rdf#"
-    xmlns:redfoot="http://redfoot.net/2005/redfoot#"
-    xmlns:server="http://redfoot.net/2005/server#"        
-    xmlns:handler="http://redfoot.net/2005/handler#"        
-    xmlns:commands="http://redfoot.net/2005/commands#"
+    xmlns:rdfe="http://redfoot.net/rdf#
+    xmlns:server="http://redfoot.net/hypercode/server#"        
+    xmlns:handler="http://redfoot.net/hypercode/handler#"        
+    xmlns:commands="http://redfoot.net/hypercode/commands#"
     xmlns:doap="http://usefulinc.com/ns/doap#"
 >
 

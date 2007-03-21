@@ -50,7 +50,7 @@ __uri__ = physical_to_logical(__uri__)
 import urllib2, re
 from datetime import datetime, timedelta
 
-REDFOOT = Namespace("http://redfoot.net/2005/redfoot#")
+REDFOOT = Namespace("http://redfoot.net/hypercode/redfoot#")
 
 def _compile(value):
     value = value.replace("\r\n", "\n")        

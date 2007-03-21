@@ -2,8 +2,8 @@
 <rdf:RDF
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
-   xmlns:program="http://redfoot.net/2005/program#"
+   xmlns:rdfe="http://redfoot.net/rdf#
+   xmlns:program="http://redfoot.net/hypercode/program#"
 >
 
 <!-- deprecated... use commands instead. -->
@@ -16,7 +16,7 @@
   <rdf:Property rdf:ID="config">
     <rdfs:label>config</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:domain rdf:resource="http://redfoot.net/2005/redfoot#Main"/>
+    <rdfs:domain rdf:resource="http://redfoot.net/hypercode/redfoot#Main"/>
     <rdfs:range rdf:resource="#Config"/>
   </rdf:Property> 
 
@@ -29,7 +29,7 @@
 
   <rdfs:Class rdf:ID="Command">
     <rdfs:label>Command</rdfs:label>
-    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/redfoot#Resource"/>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/hypercode/redfoot#Resource"/>
   </rdfs:Class>
 
   <!--

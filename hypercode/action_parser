@@ -8,7 +8,7 @@
 
   <code:PythonModule rdf:ID="module">
     <rdfs:label>Action Parser</rdfs:label>      
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <rdf:value rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
 <![CDATA[
 
 import re

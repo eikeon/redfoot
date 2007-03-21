@@ -2,9 +2,9 @@
 <rdf:RDF
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
-   xmlns:server="http://redfoot.net/2005/server#"
-   xmlns:template="http://redfoot.net/2005/template#"
+   xmlns:rdfe="http://redfoot.net/rdf#
+   xmlns:server="http://redfoot.net/hypercode/server#"
+   xmlns:template="http://redfoot.net/hypercode/template#"
 >  
 
   <redfoot:Namespace rdf:about="#">
@@ -15,11 +15,11 @@
   <rdfs:Class rdf:ID="Comment">
     <rdfs:label>Comment</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/server#Class"/>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/hypercode/server#Class"/>
     <template:content>
      <server:PagePartHandler rdf:ID="comment_handler">
       <rdfs:label>comment handler</rdfs:label>
-      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+      <rdf:value rdf:datatype="http://redfoot.net/hypercode/server#Kid">
 <![CDATA[
 <div xmlns="http://www.w3.org/1999/xhtml"
      xmlns:kid="http://purl.org/kid/ns#"
@@ -29,7 +29,7 @@
 import time
 from rdflib.util import parse_date_time
 
-COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")
+COMMENT = redfoot.namespace("http://redfoot.net/hypercode/comment#")
 DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
 

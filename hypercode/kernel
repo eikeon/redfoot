@@ -32,7 +32,7 @@
   </rdfs:Class>
 
   <rdf:Description rdf:about="#">
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <rdf:value rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
 <![CDATA[
 
 import redfootlib
@@ -547,7 +547,7 @@ else:
 
   <command:Command rdf:ID="set_base">
     <rdfs:label>set_base</rdfs:label>
-    <code:python rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
 <![CDATA[
 
 from optparse import OptionParser
@@ -582,7 +582,7 @@ if not done:
 redfoot add_user eikeon@eikeon.com --password --digest-only --id=/users/user/eikeon# --full-name="Daniel Krech"
 
     </rdfs:comment>
-      <code:python rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+      <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
 <![CDATA[
 
 from getpass import getpass
@@ -663,7 +663,7 @@ else:
     <kernel:onLoadRank rdf:datatype="http://www.w3.org/2001/XMLSchema#float">9.0</kernel:onLoadRank>
     <rdfs:label>XMPP Authentication</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <code:python rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
 <![CDATA[
 
 _logger = redfoot.getLogger(__uri__)
@@ -700,7 +700,7 @@ if persona:
 
   <command:Command rdf:ID="test_module">
     <rdfs:label>test_module</rdfs:label>
-    <code:python rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
 <![CDATA[
 
 
@@ -711,7 +711,7 @@ if persona:
   <command:Command rdf:ID="run">
     <rdfs:label>run</rdfs:label>
     <rdfs:comment>Run the twisted event loop</rdfs:comment>
-    <code:python rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
 <![CDATA[
 
 _logger = redfoot.getLogger(__uri__)
