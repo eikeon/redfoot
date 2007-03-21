@@ -11,7 +11,7 @@
     <rdfs:label>Redfoot Kernel RDF/XML</rdfs:label>
   </rdfe:RDFXMLDocument>
 
-  <server:Handler rdf:about="#">
+  <server:Handler rdf:about="#handler">
     <rdfs:label>Default handler</rdfs:label>      
     <server:display_support rdf:resource="#display_support"/>
     <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string"><![CDATA[

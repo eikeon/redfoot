@@ -435,7 +435,7 @@ class Request(object):
 	return default
 
     def objects(self, predicate):
-        # being used in hypercode/handlers/page#put_handler
+        # being used in hypercode/page#put_handler
         sources = chain([self.uri], redfoot.types(self.uri), [self.host, redfoot.uri, KERNEL.Globals]) 
         if (self.uri, RDF.type, RDFS.Class) in redfoot:
             sources.next() # ignore self.uri
@@ -571,7 +571,7 @@ class _Resource(object):
              return msg
 
         # Note: it is the handler's job to call response.finish()
-        # handlers can also do deferToThread (For example see handlers/page#)
+        # handlers can also do deferToThread (For example see page#)
         return NOT_DONE_YET
 
 
