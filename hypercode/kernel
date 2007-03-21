@@ -7,10 +7,10 @@
    xmlns:command="http://redfoot.net/hypercode/command#"
    xmlns:kernel="http://redfoot.net/hypercode/kernel#"
 >
-  <rdf:Resource rdf:ID="Globals">
+  <rdfs:Resource rdf:ID="Globals">
     <rdfs:label>Redfoot Globals</rdfs:label>
     <rdfs:comment></rdfs:comment>
-  </rdf:Resource>
+  </rdfs:Resource>
 
   <rdf:Property rdf:ID="persona">
     <rdfs:label>persona</rdfs:label>

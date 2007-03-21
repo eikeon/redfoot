@@ -144,7 +144,7 @@ if not content_type:
         if not accept:
             accept = "*/*"
             _logger.debug("headers: %s" % request.headers)
-        mimeparse = redfoot.module(URIRef("modules/mimeparse#module", base=redfoot.uri))
+        mimeparse = redfoot.module(URIRef("mimeparse#module", base=redfoot.uri))
         try:
             content_type = mimeparse.best_match(supported, accept)
         except Exception, e:
@@ -239,7 +239,7 @@ kid_module = redfoot.module(URIRef("kid#module", base=redfoot.uri))
 def lookup(property, default=None, uri=None):
     return request.lookup(property, uri=uri) or redfoot.value(page_handler, property) or default
 
-auth = redfoot.module(URIRef("modules/auth#module", base=redfoot.uri))
+auth = redfoot.module(URIRef("auth#module", base=redfoot.uri))
 def allow(uri):
     return auth.allow(request, uri)
 
@@ -359,7 +359,7 @@ context.serialize(destination=response, base=base)
 from rdflib.Namespace import Namespace
 
 KERNEL = Namespace(URIRef("http://redfoot.net/hypercode/kernel#"))
-auth = redfoot.module(URIRef("modules/auth#module", base=redfoot.uri))
+auth = redfoot.module(URIRef("auth#module", base=redfoot.uri))
 uid = auth.authenticate(request)
 if uid and (uid, RDF.type, KERNEL.Admin) in redfoot:
     #acid = request.uri.abstract()

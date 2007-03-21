@@ -313,7 +313,7 @@ Server(port=port).run()
 
   <code:Code rdf:about="#twisted">
     <rdfs:label>twisted server for Redfoot</rdfs:label>      
-    <server:handler rdf:resource="handlers/page#"/>
+    <server:handler rdf:resource="page#handler"/>
     <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
