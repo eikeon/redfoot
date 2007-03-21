@@ -15,10 +15,12 @@
   </rdfe:Namespace>
 
   <code:Module rdf:ID="module">
-    <rdfs:label></rdfs:label>      
+    <rdfs:label>Auth</rdfs:label>      
     <rdfs:comment></rdfs:comment>    
     <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
+
+_logger = redfoot.getLogger(__uri__)
 
 import md5, sha
 
@@ -75,6 +77,7 @@ def authenticate(request, username=None, password=None):
             match = True
         else:
             match = False
+        _logger.debug("%s %s %s %s %s" % (username, password, hexdigest, md5_hexdigest, match))
     if password and match:
         if session_id:
 	    c = redfoot.get_context(redfoot.context_id(session_id), creator=__uri__)

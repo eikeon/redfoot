@@ -97,7 +97,7 @@ for item in redfoot.objects(aspect, ASPECT.item):
       </code:python>
   </code:Code>
 
-  <aspect:Aspect rdf:about="aspects/bookmark#aspect"/>
+  <aspect:Aspect rdf:about="bookmark#aspect"/>
   <aspect:Aspect rdf:about="aspects/issues#aspect"/>
   <aspect:Aspect rdf:about="aspects/browse#aspect"/>
   <aspect:Aspect rdf:about="aspects/comments#aspect"/>

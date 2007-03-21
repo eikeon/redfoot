@@ -1331,7 +1331,7 @@ _logger = redfoot.getLogger(__uri__)
 
 import sha, base64
 
-SESSION = redfoot.namespace("http://redfoot.net/hypercode/session#")
+USER = redfoot.namespace("http://redfoot.net/hypercode/user#")
 
 def b64(hexdigest):
     digest = base64.b16decode(hexdigest.upper())
@@ -1346,8 +1346,8 @@ def identifier2username(uri):
         return last.replace("#", "")
 
 
-for user in redfoot.subjects(RDF.type, SESSION.User):
-    for hexdigest in redfoot.objects(user, SESSION.hexdigest):
+for user in redfoot.subjects(RDF.type, USER.User):
+    for hexdigest in redfoot.objects(user, USER.hexdigest):
         if len(hexdigest)==40: # sha
             username = identifier2username(user)
             print "%s:{SHA}%s" % (username, b64(hexdigest))
