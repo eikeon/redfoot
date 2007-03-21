@@ -3,7 +3,6 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
    xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:redfoot="http://redfoot.net/hypercode/redfoot#"
    xmlns:server="http://redfoot.net/hypercode/server#"
    xmlns:session="http://redfoot.net/hypercode/session#"
    xmlns:template='http://redfoot.net/hypercode/template#'
@@ -16,7 +15,7 @@
   
   <aspect:Aspect rdf:ID="aspect">
     <rdfs:label>Doap</rdfs:label>
-    <redfoot:todo>Look into http://kupu.oscom.org/</redfoot:todo>
+    <rdfs:comment>Look into http://kupu.oscom.org/</rdfs:comment>
     <aspect:item rdf:resource="#contributors"/>
     <aspect:item rdf:resource="#releases"/>
   </aspect:Aspect>
