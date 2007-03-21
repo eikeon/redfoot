@@ -101,16 +101,13 @@ SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
 site = URIRef("/data#Site", base=request.host)
 request.site = site
 
-_logger.info("?????")
 if (site, None, None) not in redfoot:
-    _logger.info("install auth etc")
     data = redfoot.get_context(redfoot.context_id(site, context_id="context"))
     data.add((site, RDF.type, SERVER.Site))
     data.add((site, SERVER.allow, URIRef("%s/data#Admin" % request.host)))
     install = URIRef("http://redfoot.net/hypercode/aspect#install")
     #redfoot.check(URIRef("aspects/list", base=redfoot.uri)) # since we're doing other init bits
     auth = URIRef("aspects/auth#aspect", base=redfoot.uri)
-    _logger.info("??: %s" % auth)
     redfoot.execute(install, aspect=auth , base=request.host)
 
 def lookup(property, default=None):
