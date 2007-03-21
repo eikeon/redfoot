@@ -111,4 +111,168 @@ creator = redfoot.value(entry, DC.creator)
     <rdfs:range rdf:resource="#Feed"/>
   </rdf:Property>
 
+  <redfoot:Code rdf:ID="update">
+    <rdfs:label>update</rdfs:label>      
+    <rdf:value rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
+<![CDATA[
+
+feed = redfoot.module(URIRef("#feed", base=__uri__)) # TODO: __uri__
+
+from twisted.internet import reactor
+from twisted.internet import task
+
+second = 1.0
+minute = second * 60
+hour = minute * 60
+day = hour * 24
+
+def runEverySecond():
+    redfoot.log.info("updating feeds")
+    feed.update()
+
+l = task.LoopingCall(runEverySecond)
+l.start(1*day, now=True) # call every
+# l.stop() will stop the looping calls
+
+]]>
+    </rdf:value>
+  </redfoot:Code>
+
+  <redfoot:Module rdf:ID="feed">
+    <rdfs:label>update feeds</rdfs:label>      
+    <rdf:value rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
+<![CDATA[
+
+try: from cStringIO import StringIO
+except ImportError: from StringIO import StringIO
+    
+from kid import XML
+from elementtree.HTMLTreeBuilder import parse
+from StringIO import StringIO
+
+import feedparser, sys, sha, os, urllib
+from urlparse import urljoin
+
+from time import mktime
+from rdflib.util import date_time
+
+SESSION = redfoot.namespace("http://redfoot.net/hypercode/session#")
+BLOG = redfoot.namespace("http://redfoot.net/hypercode/blog#")
+DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
+DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
+
+def update(feed=None):
+    if feed is None:
+        for feed in redfoot.subjects(RDF.type, BLOG.Feed):
+            update(feed)
+        return
+    redfoot.log.info("reading: %s" % feed)
+    cid = URIRef("#blog_monitor", base=feed)
+    context = redfoot.get_context(cid)
+    #context.remove((None, None, None))
+    try:
+      data = feedparser.parse(feed)
+
+      redfoot.remove((feed, RDFS.label, None))
+      try:
+          context.add((feed, RDFS.label, Literal(data['channel']['title'])))
+      except:
+          redfoot.log.warning("couldn't get title for feed")
+
+      for item in data['items']:
+          entry = URIRef(item['link'])
+          # Track the feed we got the item from... the entry is also
+          # related to the feed through BLOG.entry, but this is to
+          # keep track of the single feed we got the entry
+          # from... since there can be more than on in the other
+          # direction.
+          context.add((entry, BLOG.via, feed))
+          if (entry, RDF.type, BLOG.Entry) not in redfoot:
+	      context.add((entry, RDF.type, BLOG.Entry))
+	      try:
+		  title = Literal(item['title'])
+	      except:
+		  redfoot.log.warning("could not find title")
+		  title = None
+              if title:
+                  context.add((entry, RDFS.label, title))
+	      try:
+		  modified = date_time(mktime(item['modified_parsed']))
+	      except:
+		  redfoot.log.warning("could not get modified_parsed -- using current time")
+		  modified = date_time()
+	      context.add((entry, DCTERMS.created, Literal(modified[0:19])))
+	      context.add((entry, DC.date, Literal(modified[0:10]))) 
+	      format = ""
+	      try:
+		  content = item['content']
+	      except:
+		  content = []
+	      if len(content)==1:
+		  c = content[0]
+	      else:
+		  try:
+		      c = item['summary_detail']
+		  except:
+		      c = None
+	      if c:
+		  type = c["type"]
+		  content_value = c["value"]
+		  if type=="text/html":
+		      datatype = URIRef("http://www.w3.org/TR/REC-html40")
+		      try:
+			  parse(StringIO("<div>%s</div>" % content_value))
+		      except Exception, e:
+			  datatype=''
+		  elif type=="application/xhtml+xml":
+		      datatype = URIRef("http://www.w3.org/1999/xhtml")
+		  else:
+		      print type
+		      datatype = URIRef("http://www.w3.org/TR/REC-html40")
+		      try:
+			  parse(StringIO("<div>%s</div>" % content_value))
+		      except Exception, e:
+			  datatype=''
+		  context.add((entry, RDFS.comment, Literal(content_value, datatype=datatype)))
+
+		  creator = BNode()
+		  try:
+		      author_name = Literal(item["author"])
+		  except:
+		      redfoot.log.warning("could not find author name")
+		      author_name = Literal(" - ")
+		  context.add((creator, RDFS.label, author_name))
+
+		  context.add((entry, DC.creator, creator))
+		  context.add((feed, BLOG.entry, entry))
+    except Exception, e:
+        redfoot.log.exception(e)
+]]>
+    </rdf:value>
+  </redfoot:Module>
+
+  <redfoot:Module rdf:ID="html">
+    <rdfs:label>update feeds</rdfs:label>      
+    <rdf:value rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
+<![CDATA[
+
+from kid import XML
+from elementtree.HTMLTreeBuilder import parse
+from StringIO import StringIO
+
+def HTML(text, fragment=1, encoding=None):
+    """Element generator that reads from a string"""
+    if fragment:
+          text = '<div>%s</div>' % text # allow XML fragments
+          e = parse(StringIO(text))
+          sio = StringIO()
+          e.write(sio)
+          return XML(sio.getvalue()) # TODO: strip off the div
+    else:
+        assert False, "Not implemented"
+
+]]>
+    </rdf:value>
+  </redfoot:Module>
+
 </rdf:RDF>  
