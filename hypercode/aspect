@@ -102,6 +102,7 @@ for item in redfoot.objects(aspect, ASPECT.item):
   <aspect:Aspect rdf:about="bookmark#aspect"/>
   <aspect:Aspect rdf:about="browse#aspect"/>
   <aspect:Aspect rdf:about="comment#aspect"/>
+  <aspect:Aspect rdf:about="doap#aspect"/>
 
   <aspect:Aspect rdf:about="aspects/issues#aspect"/>
   <aspect:Aspect rdf:about="aspects/contexts#aspect"/>
@@ -115,6 +116,6 @@ for item in redfoot.objects(aspect, ASPECT.item):
   <aspect:Aspect rdf:about="aspects/blog#aspect"/>
   <aspect:Aspect rdf:about="aspects/documents#aspect"/>
 <!--  <aspect:Aspect rdf:about="aspects/items#aspect"/>-->
-  <aspect:Aspect rdf:about="aspects/doap#aspect"/>
+
 
 </rdf:RDF>
