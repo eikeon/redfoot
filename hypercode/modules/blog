@@ -3,7 +3,7 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
    xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:redfoot="http://redfoot.net/hypercode/redfoot#"
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
@@ -11,7 +11,7 @@
   
   <redfoot:Code rdf:ID="update">
     <rdfs:label>update</rdfs:label>      
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <rdf:value rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
 <![CDATA[
 
 feed = redfoot.module(URIRef("#feed", base=__uri__)) # TODO: __uri__
@@ -38,7 +38,7 @@ l.start(1*day, now=True) # call every
 
   <redfoot:Module rdf:ID="feed">
     <rdfs:label>update feeds</rdfs:label>      
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <rdf:value rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
 <![CDATA[
 
 try: from cStringIO import StringIO
@@ -54,8 +54,8 @@ from urlparse import urljoin
 from time import mktime
 from rdflib.util import date_time
 
-SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
-BLOG = redfoot.namespace("http://redfoot.net/2005/blog#")
+SESSION = redfoot.namespace("http://redfoot.net/hypercode/session#")
+BLOG = redfoot.namespace("http://redfoot.net/hypercode/blog#")
 DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
 
@@ -151,7 +151,7 @@ def update(feed=None):
 
   <redfoot:Module rdf:ID="html">
     <rdfs:label>update feeds</rdfs:label>      
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <rdf:value rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
 <![CDATA[
 
 from kid import XML

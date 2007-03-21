@@ -3,7 +3,7 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
    xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:redfoot="http://redfoot.net/hypercode/redfoot#"
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
@@ -11,7 +11,7 @@
   
   <redfoot:Code rdf:ID="module">
     <rdfs:label>parse an email message</rdfs:label>      
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <rdf:value rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
 <![CDATA[
 
 import email
@@ -61,7 +61,7 @@ def parse(s=None):
 
 <!--
   <redfoot:Python rdf:ID="email_errors">
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <rdf:value rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
 <![CDATA[
 from logging.handlers import SMTPHandler
 

@@ -3,7 +3,7 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
    xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
+   xmlns:redfoot="http://redfoot.net/hypercode/redfoot#"
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
@@ -12,7 +12,7 @@
   <redfoot:PythonModule rdf:ID="v2.27">
     <rdfs:label>Simple Formatter</rdfs:label>      
     <rdfs:comment>A formatter that turns uris into links.</rdfs:comment>        
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <rdf:value rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
 <![CDATA[
 
 """fromIcal.py -- interpret iCalendar data as RDF
@@ -1145,7 +1145,7 @@ if __name__ == '__main__':
   <redfoot:PythonModule rdf:ID="xmlwriter">
     <rdfs:label>Simple Formatter</rdfs:label>      
     <rdfs:comment>A formatter that turns uris into links.</rdfs:comment>        
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <rdf:value rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
 <![CDATA[
 
 """ $Id: XMLWriter.py,v 2.3 2004/09/30 14:25:31 connolly Exp $

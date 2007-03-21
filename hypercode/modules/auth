@@ -22,8 +22,8 @@
 
 import md5, sha
 
-SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
-SERVER = redfoot.namespace("http://redfoot.net/2005/server#")
+SESSION = redfoot.namespace("http://redfoot.net/hypercode/session#")
+SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
 
 def authenticate(request, username=None, password=None):
     "Returns uid if authentication succeeds or None otherwise"

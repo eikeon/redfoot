@@ -3,9 +3,9 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
    xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:redfoot="http://redfoot.net/2005/redfoot#"
-   xmlns:server="http://redfoot.net/2005/server#"
-   xmlns:commands="http://redfoot.net/2005/commands#"
+   xmlns:redfoot="http://redfoot.net/hypercode/redfoot#"
+   xmlns:server="http://redfoot.net/hypercode/server#"
+   xmlns:commands="http://redfoot.net/hypercode/commands#"
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
@@ -13,7 +13,7 @@
   
   <redfoot:Module rdf:about="#module">
     <rdfs:label>Rules Module</rdfs:label>      
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <rdf:value rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
 <![CDATA[
 
 from rdflib.Namespace import Namespace
