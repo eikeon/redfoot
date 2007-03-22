@@ -24,7 +24,7 @@
   <boot:Resource rdf:ID="Defaults">
     <rdfs:label>Boot Defaults</rdfs:label>
     <rdfs:comment>Where the BootLoader looks for which boot program to run if not found in Globals.</rdfs:comment>
-    <boot:program rdf:resource="https://svn.redfoot.net/trunk/hypercode/boot#loader"/>
+    <boot:program rdf:resource="http://svn.redfoot.net/trunk/hypercode/boot#loader"/>
   </boot:Resource>
 
   <code:Code rdf:ID="loader">
