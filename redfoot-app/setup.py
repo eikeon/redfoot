@@ -34,7 +34,7 @@ setup(
 
     If you have recently reported a bug marked as fixed, or have a craving for
     the very latest, you may want the development version instead:
-    https://svn.redfoot.net/trunk/redfoot-app#egg=redfoot-dev
+    http://svn.redfoot.net/trunk/redfoot-app#egg=redfoot-dev
     """,
     keywords = "hypercode RDF framework",
     download_url = "http://redfoot.net/redfoot-%s.tar.gz" % VERSION,

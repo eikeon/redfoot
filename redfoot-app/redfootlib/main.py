@@ -7,6 +7,11 @@ For help on redfoot see:
    redfoot.py --help
 """
 
+import sys
+# try: except: finally: in this script below require 2.5
+# and I've only been testing on Python 2.5
+assert sys.version_info >= (2,5,0), "redfoot requires Python 2.5 or higher"
+
 import optparse, logging
 
 parser = optparse.OptionParser(usage="""usage: %prog [<%prog_options>] [program [<program_options>]][<program_args>]
