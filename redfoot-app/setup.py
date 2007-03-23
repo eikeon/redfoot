@@ -41,7 +41,6 @@ setup(
 
     packages = ["redfootlib"],
 
-    #scripts = ["bin/redfoot"],
     entry_points = {
         'console_scripts': [
             'redfoot = redfootlib.main:main',
