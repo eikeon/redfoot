@@ -4,7 +4,8 @@ use_setuptools()
 import sys, warnings
 from setuptools import setup, find_packages
 
-VERSION = "2.1.1"
+from redfootlib import __version__
+VERSION = __version__
 
 if sys.version<"2.5":
     warnings.warn("Redfoot is not being tested on Python < 2.5")
@@ -47,7 +48,7 @@ setup(
         ]
     },
 
-    install_requires = ["rdflib==dev", "zope.interface>=3.3.0", "kid>=0.9.5"],
+    install_requires = ["rdflib>=2.4.0.dev-r1005,==dev", "zope.interface>=3.3.0", "kid>=0.9.5"],
 
     )
 
