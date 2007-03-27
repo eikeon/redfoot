@@ -2,12 +2,12 @@
 <rdf:RDF
   xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
   xmlns:rdfs='http://www.w3.org/2000/01/rdf-schema#'
-  xmlns:redfoot='http://redfoot.net/2005/redfoot#'
-  xmlns:server='http://redfoot.net/2005/server#'
-  xmlns:session='http://redfoot.net/2005/session#'
-  xmlns:browse='http://redfoot.net/2005/browse#'
-  xmlns:template='http://redfoot.net/2005/template#'
-  xmlns:commands='http://redfoot.net/2005/commands#'
+  xmlns:redfoot='http://redfoot.net/3.0/redfoot#'
+  xmlns:server='http://redfoot.net/3.0/server#'
+  xmlns:session='http://redfoot.net/3.0/session#'
+  xmlns:browse='http://redfoot.net/3.0/browse#'
+  xmlns:template='http://redfoot.net/3.0/template#'
+  xmlns:commands='http://redfoot.net/3.0/commands#'
   xmlns:quant='http://www.certusinvestments.com/quant#'
 >
 
@@ -73,11 +73,11 @@
 
   <rdfs:Class rdf:ID="User">
     <rdfs:label>Quant User</rdfs:label>
-    <rdfs:subClassOf rdf:resource="http://redfoot.net/2005/session#User"/>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/3.0/session#User"/>
     <template:content>
       <template:Content rdf:ID="UserPagePartHandler">
         <rdfs:label>Quant User Page Part Handler</rdfs:label>
-       <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+       <rdf:value rdf:datatype="http://redfoot.net/3.0/server#Kid">
 <![CDATA[
 
 <h3>Hello</h3>
@@ -92,8 +92,8 @@
     <template:content>
       <template:Content rdf:ID="StockPagePartHandler">
         <rdfs:label>Stock</rdfs:label>
-        <server:allow rdf:resource="http://redfoot.net/2005/redfoot#Admin"/>
-       <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+        <server:allow rdf:resource="http://redfoot.net/3.0/redfoot#Admin"/>
+       <rdf:value rdf:datatype="http://redfoot.net/3.0/server#Kid">
 <![CDATA[
 <div xmlns="http://www.w3.org/1999/xhtml"
      xmlns:kid="http://purl.org/kid/ns#"
@@ -112,7 +112,7 @@ uri = request.uri.abstract()
 symbol = redfoot.value(uri, QUANT.symbol)
 
 try:
-    SESSION = redfoot.namespace("http://redfoot.net/2005/session#")
+    SESSION = redfoot.namespace("http://redfoot.net/3.0/session#")
     uid = None
     if request.session_id:
         uid = redfoot.value(request.session_id, SESSION.uid)
@@ -157,8 +157,8 @@ except Exception, e:
       <server:PageHandler rdf:ID="BasketCSVPageHandler">
         <rdfs:label>Basket CSV Page Handler</rdfs:label>
         <server:content_type>text/csv</server:content_type>
-        <server:allow rdf:resource="http://redfoot.net/2005/redfoot#Admin"/>
-       <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+        <server:allow rdf:resource="http://redfoot.net/3.0/redfoot#Admin"/>
+       <rdf:value rdf:datatype="http://redfoot.net/3.0/redfoot#Python">
 <![CDATA[
 
 import logging
@@ -188,7 +188,7 @@ response.write(",".join(symbols))
     <template:content>
       <template:Content rdf:ID="BasketPagePartHandler">
         <rdfs:label>Basket</rdfs:label>
-       <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+       <rdf:value rdf:datatype="http://redfoot.net/3.0/server#Kid">
 <![CDATA[
 <div xmlns="http://www.w3.org/1999/xhtml"
      xmlns:kid="http://purl.org/kid/ns#"
@@ -230,23 +230,23 @@ items.sort()
 
   <template:Template rdf:ID="page">
     <rdfs:label>Quant Template</rdfs:label>
-    <template:content rdf:resource="http://redfoot.net/hypercode/templates/classic#content"/>
+    <template:content rdf:resource="http://redfoot.net/3.0/templates/classic#content"/>
     <template:background_color>#B0C9BE</template:background_color>
-    <template:head rdf:resource="http://redfoot.net/hypercode/templates/classic#head"/>
+    <template:head rdf:resource="http://redfoot.net/3.0/templates/classic#head"/>
     <template:css rdf:resource="#css"/>
     <template:title rdf:resource="#title"/>
     <template:shortcut_icon rdf:resource="http://redfoot.net/2002/11/25/favicon.ico"/>
     <template:header rdf:resource="#header"/>
     <template:navigation rdf:resource="#navigation"/>
-    <template:user_navigation rdf:resource="http://redfoot.net/hypercode/templates/classic#user_navigation"/>
+    <template:user_navigation rdf:resource="http://redfoot.net/3.0/templates/classic#user_navigation"/>
     <template:footer rdf:resource="#footer"/>
-    <server:unauthorized_page_handler rdf:resource="http://redfoot.net/hypercode/templates/classic#unauthorized_page_handler"/>
-    <server:unauthorized_content_handler rdf:resource="http://redfoot.net/hypercode/templates/classic#unauthorized_content_handler"/>
+    <server:unauthorized_page_handler rdf:resource="http://redfoot.net/3.0/templates/classic#unauthorized_page_handler"/>
+    <server:unauthorized_content_handler rdf:resource="http://redfoot.net/3.0/templates/classic#unauthorized_content_handler"/>
     <server:content_type>application/xhtml+xml</server:content_type>
-    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+    <rdf:value rdf:datatype="http://redfoot.net/3.0/server#Kid">
 <![CDATA[<html xmlns="http://www.w3.org/1999/xhtml" xmlns:kid="http://purl.org/kid/ns#">
-<?python SERVER = redfoot.namespace("http://redfoot.net/2005/server#")?>
-<?python TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")?>
+<?python SERVER = redfoot.namespace("http://redfoot.net/3.0/server#")?>
+<?python TEMPLATE = redfoot.namespace("http://redfoot.net/3.0/template#")?>
 <?python
 title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract(), None) or "-"
 ?>
@@ -305,7 +305,7 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
 
                     <h2 kid:if="request.path!='/' and request.path!='/background/' and request.path!='/contact/'"><a href="${request.uri}">${title}</a></h2>
                     ${display(lookup(TEMPLATE.content))}
-                    <?python COMMENT = redfoot.namespace("http://redfoot.net/2005/comment#")?>
+                    <?python COMMENT = redfoot.namespace("http://redfoot.net/3.0/comment#")?>
                     <div class="comments" kid:if="lookup(TEMPLATE.comments) and (request.uri, RDFS.member, COMMENT.exclude) not in redfoot">
                        ${display(lookup(TEMPLATE.comments))}
                        ${display(lookup(TEMPLATE.add_comment))}
@@ -361,9 +361,9 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
   <server:PagePartHandler rdf:ID="css">
     <rdfs:label>Quant css</rdfs:label>
     <server:content_type>text/css</server:content_type>
-    <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+    <rdf:value rdf:datatype="http://redfoot.net/3.0/redfoot#Python">
 
-TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")
+TEMPLATE = redfoot.namespace("http://redfoot.net/3.0/template#")
 
 color = lookup(TEMPLATE.background_color) or "#cccccc"
 
@@ -621,11 +621,11 @@ A:hover {
   </server:PagePartHandler>
 
   <server:PagePartHandler rdf:ID="navigation">
-    <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid"><![CDATA[
+    <rdf:value rdf:datatype="http://redfoot.net/3.0/server#Kid"><![CDATA[
 
 <div kid:strip="" class="nav" xmlns:kid="http://purl.org/kid/ns#">
 <?python
-TEMPLATE = redfoot.namespace("http://redfoot.net/2005/template#")
+TEMPLATE = redfoot.namespace("http://redfoot.net/3.0/template#")
 sections = []
 for section in redfoot.objects(request.host, TEMPLATE.section):
     label = redfoot.value(section, TEMPLATE.section_name) or redfoot.label(section)
@@ -664,7 +664,7 @@ sections.sort()
       ]]></rdf:value>
   </server:PagePartHandler>
 
-  <rdf:Description rdf:about="http://redfoot.net/2005/redfoot#Globals">
+  <rdf:Description rdf:about="http://redfoot.net/3.0/redfoot#Globals">
     <commands:config>
       <redfoot:Configuration rdf:ID="quant_config">    
         <commands:command rdf:resource="#update_symbols"/>                
@@ -679,7 +679,7 @@ sections.sort()
     <redfoot:code>
      <redfoot:Python rdf:ID="update_symbols_code">
         <rdfs:label>Update Symbols</rdfs:label>
-      <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+      <rdf:value rdf:datatype="http://redfoot.net/3.0/redfoot#Python">
 <![CDATA[
 
 import logging
@@ -747,7 +747,7 @@ _logger.info("Symbols updated")
     <redfoot:code>
      <redfoot:Python rdf:ID="certus_code">
         <rdfs:label>certus code</rdfs:label>
-      <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+      <rdf:value rdf:datatype="http://redfoot.net/3.0/redfoot#Python">
 <![CDATA[
 
 import logging
@@ -816,7 +816,7 @@ reactor.spawnProcess(pp, executable, [executable] + args, env={})
     <redfoot:code> <!-- TODO: -->
       <redfoot:Python rdf:ID="cci_code">
         <rdfs:label>cci code</rdfs:label>
-      <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+      <rdf:value rdf:datatype="http://redfoot.net/3.0/redfoot#Python">
 <![CDATA[
 
 import logging
@@ -871,7 +871,7 @@ for basket in redfoot.subjects(RDF.type, QUANT.Basket):
     <redfoot:code>
      <redfoot:Python rdf:ID="strategies_code">
         <rdfs:label>stragegies code</rdfs:label>
-      <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+      <rdf:value rdf:datatype="http://redfoot.net/3.0/redfoot#Python">
 <![CDATA[
 import logging
 

@@ -2,10 +2,10 @@
 <rdf:RDF
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-   xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:code="http://redfoot.net/hypercode/code#"
-   xmlns:command="http://redfoot.net/hypercode/command#"
-   xmlns:kernel="http://redfoot.net/hypercode/kernel#"
+   xmlns:rdfe="http://redfoot.net/3.0/rdf#"
+   xmlns:code="http://redfoot.net/3.0/code#"
+   xmlns:command="http://redfoot.net/3.0/command#"
+   xmlns:kernel="http://redfoot.net/3.0/kernel#"
 >
   <rdfs:Resource rdf:ID="Globals">
     <rdfs:label>Redfoot Globals</rdfs:label>
@@ -21,23 +21,23 @@
   <rdfs:Class rdf:ID="Admin">
     <rdfs:label>Kernel Admin</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:subClassOf rdf:resource="http://redfoot.net/hypercode/kernel#Resource"/>
+    <rdfs:subClassOf rdf:resource="kernel#Resource"/>
   </rdfs:Class>
 
   <rdfs:Class rdf:ID="Program">
     <rdfs:label>Kernel Program</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:subClassOf rdf:resource="http://redfoot.net/hypercode/code#Code"/>
+    <rdfs:subClassOf rdf:resource="code#Code"/>
   </rdfs:Class>
 
   <rdfs:Class rdf:ID="OnLoad">
     <rdfs:label>Kernel OnLoad Handler</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:subClassOf rdf:resource="http://redfoot.net/hypercode/code#Code"/>
+    <rdfs:subClassOf rdf:resource="code#Code"/>
   </rdfs:Class>
 
   <rdf:Description rdf:about="#">
-    <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
+    <code:python rdf:datatype="redfoot#Python">
 <![CDATA[
 
 import redfootlib
@@ -82,9 +82,9 @@ from rdflib.events import Dispatcher, Event
 
 _logger = logging.getLogger("hypercode.%s" % redfoot_loader.label(__uri__))
 
-KERNEL = Namespace(URIRef("http://redfoot.net/hypercode/kernel#"))
-RDFE = Namespace(URIRef("http://redfoot.net/rdf#"))
-CODE = Namespace(URIRef("http://redfoot.net/hypercode/code#"))
+KERNEL = Namespace(URIRef("http://redfoot.net/3.0/kernel#"))
+RDFE = Namespace(URIRef("http://redfoot.net/3.0/rdf#"))
+CODE = Namespace(URIRef("http://redfoot.net/3.0/code#"))
 DCTERMS = Namespace(URIRef("http://purl.org/dc/elements/1.1/"))
 DC = Namespace(URIRef("http://purl.org/dc/terms/"))
 
@@ -268,7 +268,7 @@ class Kernel(ConjunctiveGraph):
             if label:
                 self.index.add((context_id, RDFS.label, label))
         if format=="xml":
-            self.index.add((publicID.defrag(), RDF.type, URIRef("http://redfoot.net/rdf#RDFXMLDocument")))
+            self.index.add((publicID.defrag(), RDF.type, URIRef("http://redfoot.net/3.0/rdf#RDFXMLDocument")))
         return context
 
     def module(self, uri, check_cache=True):
@@ -479,8 +479,8 @@ import logging
 
 _logger = logging.getLogger(__uri__)
 
-CODE = redfoot.namespace(URIRef("http://redfoot.net/hypercode/code#"))
-COMMAND = redfoot.namespace(URIRef("http://redfoot.net/hypercode/command#"))
+CODE = redfoot.namespace(URIRef("http://redfoot.net/3.0/code#"))
+COMMAND = redfoot.namespace(URIRef("http://redfoot.net/3.0/command#"))
 
 
 commands = {}
@@ -561,7 +561,7 @@ else:
 
   <command:Command rdf:ID="set_base">
     <rdfs:label>set_base</rdfs:label>
-    <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
+    <code:python rdf:datatype="redfoot#Python">
 <![CDATA[
 
 from optparse import OptionParser
@@ -596,7 +596,7 @@ if not done:
 redfoot add_user eikeon@eikeon.com --password --digest-only --id=/users/user/eikeon# --full-name="Daniel Krech"
 
     </rdfs:comment>
-      <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
+      <code:python rdf:datatype="redfoot#Python">
 <![CDATA[
 
 from getpass import getpass
@@ -605,10 +605,10 @@ import sha
 
 _logger = redfoot.getLogger(__uri__)
 
-KERNEL = redfoot.namespace("http://redfoot.net/hypercode/kernel#")
-USER = redfoot.namespace("http://redfoot.net/hypercode/user#")
+KERNEL = redfoot.namespace("http://redfoot.net/3.0/kernel#")
+USER = redfoot.namespace("http://redfoot.net/3.0/user#")
 FOAF = redfoot.namespace("http://xmlns.com/foaf/0.1/")
-XMPP = redfoot.namespace("http://redfoot.net/hypercode/xmpp#")
+XMPP = redfoot.namespace("http://redfoot.net/3.0/xmpp#")
 
 parser = OptionParser("""This command is for adding a Redfoot user and expects one argument, the user@host.""")
 parser.add_option("--full-name", dest="full_name", help="full name of user being added")
@@ -677,16 +677,16 @@ else:
     <kernel:onLoadRank rdf:datatype="http://www.w3.org/2001/XMLSchema#float">9.0</kernel:onLoadRank>
     <rdfs:label>XMPP Authentication</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
+    <code:python rdf:datatype="redfoot#Python">
 <![CDATA[
 
 _logger = redfoot.getLogger(__uri__)
 
-KERNEL = redfoot.namespace("http://redfoot.net/hypercode/kernel#")
-USER = redfoot.namespace("http://redfoot.net/hypercode/user#")
-XMPP = redfoot.namespace("http://redfoot.net/hypercode/xmpp#")
+KERNEL = redfoot.namespace("http://redfoot.net/3.0/kernel#")
+USER = redfoot.namespace("http://redfoot.net/3.0/user#")
+XMPP = redfoot.namespace("http://redfoot.net/3.0/xmpp#")
 
-xmpp = redfoot.module(URIRef("http://redfoot.net/hypercode/xmpp#client"))
+xmpp = redfoot.module(URIRef("http://redfoot.net/3.0/xmpp#client"))
 
 persona = redfoot.value(redfoot.uri, KERNEL.persona)
 if persona:
@@ -701,7 +701,7 @@ if persona:
         redfoot.xmpp = xmpp.Client(xmpp_id, xmpp_password)
 
         import logging
-        xmpp_logging = redfoot.module(URIRef("http://redfoot.net/hypercode/xmpp#logging"))
+        xmpp_logging = redfoot.module(URIRef("http://redfoot.net/3.0/xmpp#logging"))
         _root_logger = logging.getLogger()
         _xmpp_handler = xmpp_logging.XMPPHandler(KERNEL.Admin)
         _xmpp_formatter = logging.Formatter('[%(name)s] %(message)s')
@@ -714,7 +714,7 @@ if persona:
 
   <command:Command rdf:ID="test_module">
     <rdfs:label>test_module</rdfs:label>
-    <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
+    <code:python rdf:datatype="redfoot#Python">
 <![CDATA[
 
 
@@ -725,7 +725,7 @@ if persona:
   <command:Command rdf:ID="run">
     <rdfs:label>run</rdfs:label>
     <rdfs:comment>Run the twisted event loop</rdfs:comment>
-    <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
+    <code:python rdf:datatype="redfoot#Python">
 <![CDATA[
 
 _logger = redfoot.getLogger(__uri__)
@@ -757,7 +757,7 @@ except KeyboardInterrupt: # TODO:
     <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
-RDFE = redfoot.namespace("http://redfoot.net/rdf#")
+RDFE = redfoot.namespace("http://redfoot.net/3.0/rdf#")
 
 for arg in args:
     print "saveing: %s" % arg
@@ -821,7 +821,7 @@ out.serialize(destination=sys.stdout, base=base)
     <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
-RDFE = redfoot.namespace("http://redfoot.net/rdf#")
+RDFE = redfoot.namespace("http://redfoot.net/3.0/rdf#")
 
 for context in redfoot.contexts():
     try:
@@ -843,7 +843,7 @@ for context in redfoot.contexts():
     <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
-RDFE = redfoot.namespace("http://redfoot.net/rdf#")
+RDFE = redfoot.namespace("http://redfoot.net/3.0/rdf#")
 
 for arg in args:
     if arg.startswith("_"):
@@ -867,7 +867,7 @@ for arg in args:
     <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
-RDFE = redfoot.namespace("http://redfoot.net/rdf#")
+RDFE = redfoot.namespace("http://redfoot.net/3.0/rdf#")
 
 import logging
 
@@ -924,7 +924,7 @@ if not done:
     <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
-RDFE = redfoot.namespace("http://redfoot.net/rdf#")
+RDFE = redfoot.namespace("http://redfoot.net/3.0/rdf#")
 
 for cid, _, source in redfoot.index.triples((None, RDFE.source, None)):
     if source:
@@ -944,7 +944,7 @@ for cid, _, source in redfoot.index.triples((None, RDFE.source, None)):
     <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
     
-RDFE = redfoot.namespace("http://redfoot.net/rdf#")
+RDFE = redfoot.namespace("http://redfoot.net/3.0/rdf#")
 
 DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 
@@ -960,7 +960,7 @@ while 1:
             if isfile(path):
                 ts = getmtime(path)                
 		LONG_AGO = 0
-                current_ts = int(redfoot.value(cid, DC.date, any=True, default=LONG_AGO))
+                current_ts = float(redfoot.value(cid, DC.date, any=True, default=LONG_AGO))
                 if not current_ts or current_ts<ts:
                     redfoot.remove((cid, DC.date, None))
                     redfoot.index.add((cid, DC.date, Literal(ts)))
@@ -976,7 +976,7 @@ while 1:
     <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
     
-KERNEL = redfoot.namespace("http://redfoot.net/hypercode/kernel#")
+KERNEL = redfoot.namespace("http://redfoot.net/3.0/kernel#")
 
 from urllib import quote
 from rdflib import Graph
@@ -1003,7 +1003,7 @@ for context in g.subjects(RDF.type, KERNEL.Context):
     <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
     
-KERNEL = redfoot.namespace("http://redfoot.net/hypercode/kernel#")
+KERNEL = redfoot.namespace("http://redfoot.net/3.0/kernel#")
 
 from urllib import quote
 from rdflib import Graph
@@ -1178,7 +1178,7 @@ if filename is not None:
     <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
     
-KERNEL = redfoot.namespace("http://redfoot.net/hypercode/kernel#")
+KERNEL = redfoot.namespace("http://redfoot.net/3.0/kernel#")
 
 from urllib import quote
 from rdflib import Graph
@@ -1208,23 +1208,6 @@ if startswith:
             redfoot.write("Removing stale index info for: %s\n" % cid)
             redfoot.index.remove((cid, None, None))
 
-]]>
-    </code:python>
-  </command:Command>
-
-  <command:Command rdf:ID="clear">
-    <rdfs:label>clear</rdfs:label>
-    <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
-<![CDATA[
-    
-KERNEL = redfoot.namespace("http://redfoot.net/hypercode/kernel#")
-
-from urllib import quote
-from rdflib import Graph
-from itertools import chain
-
-redfoot.index.remove((KERNEL.Checked, RDFS.member, None))
-    
 ]]>
     </code:python>
   </command:Command>
@@ -1290,7 +1273,7 @@ if nothing_renamed:
         <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
     
-SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
+SERVER = redfoot.namespace("http://redfoot.net/3.0/server#")
 
 from time import time
 now = Literal("%s" % time())
@@ -1309,8 +1292,8 @@ for (s, p, o), cg in redfoot.store.triples((None, SERVER.last_modified, None), N
         <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
-KERNEL = redfoot.namespace("http://redfoot.net/hypercode/kernel#")
-RDFE = redfoot.namespace("http://redfoot.net/rdf#")
+KERNEL = redfoot.namespace("http://redfoot.net/3.0/kernel#")
+RDFE = redfoot.namespace("http://redfoot.net/3.0/rdf#")
 
 for (s, p, o), cg in redfoot.store.triples((None, RDFE.context_id, None), None):
     for c in cg:
@@ -1332,7 +1315,7 @@ _logger = redfoot.getLogger(__uri__)
 
 import sha, base64
 
-USER = redfoot.namespace("http://redfoot.net/hypercode/user#")
+USER = redfoot.namespace("http://redfoot.net/3.0/user#")
 
 def b64(hexdigest):
     digest = base64.b16decode(hexdigest.upper())

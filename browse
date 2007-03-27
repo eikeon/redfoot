@@ -2,11 +2,11 @@
 <rdf:RDF
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-   xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:server="http://redfoot.net/hypercode/server#"
-   xmlns:template='http://redfoot.net/hypercode/template#'
-   xmlns:kid="http://redfoot.net/hypercode/kid#"
-   xmlns:aspect="http://redfoot.net/hypercode/aspect#"
+   xmlns:rdfe="http://redfoot.net/3.0/rdf#"
+   xmlns:server="http://redfoot.net/3.0/server#"
+   xmlns:template='http://redfoot.net/3.0/template#'
+   xmlns:kid="http://redfoot.net/3.0/kid#"
+   xmlns:aspect="http://redfoot.net/3.0/aspect#"
 >  
 
   <rdfe:RDFXMLDocument rdf:about="">
@@ -33,7 +33,7 @@
     <aspect:location>/browse/</aspect:location>
     <rdfs:label>Browse</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:member rdf:resource="http://redfoot.net/hypercode/comment#exclude"/>
+    <rdfs:member rdf:resource="http://redfoot.net/3.0/comment#exclude"/>
     <template:default_section_rank>60.0</template:default_section_rank>
     <template:content rdf:resource="#browse"/>
   </template:Section>
@@ -49,7 +49,7 @@ Browse class Tree.
 
   <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
 
-<?python BROWSE = redfoot.namespace("http://redfoot.net/hypercode/browse#") ?>
+<?python BROWSE = redfoot.namespace("http://redfoot.net/3.0/browse#") ?>
 
 <span kid:strip=""
   kid:def="display_class(uri, seen=None)">

@@ -2,12 +2,12 @@
 <rdf:RDF
   xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
   xmlns:rdfs='http://www.w3.org/2000/01/rdf-schema#'
-  xmlns:rdfe="http://redfoot.net/rdf#"
-  xmlns:redfoot='http://redfoot.net/hypercode/redfoot#'
-  xmlns:server='http://redfoot.net/hypercode/server#'
-  xmlns:template='http://redfoot.net/hypercode/template#'  
-  xmlns:kid='http://redfoot.net/hypercode/kid#'
-  xmlns:aspect="http://redfoot.net/hypercode/aspect#"
+  xmlns:rdfe="http://redfoot.net/3.0/rdf#"
+  xmlns:redfoot='http://redfoot.net/3.0/redfoot#'
+  xmlns:server='http://redfoot.net/3.0/server#'
+  xmlns:template='http://redfoot.net/3.0/template#'  
+  xmlns:kid='http://redfoot.net/3.0/kid#'
+  xmlns:aspect="http://redfoot.net/3.0/aspect#"
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
@@ -222,15 +222,15 @@ redfoot static_export
   -->
 
   <rdf:Description rdf:about="/editor/icons/16dot-green.gif">
-    <rdf:type rdf:resource="http://redfoot.net/hypercode/server#StaticPage"/>
+    <rdf:type rdf:resource="http://redfoot.net/3.0/server#StaticPage"/>
     <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#base64Binary">R0lGODlhDAAMANUAAASUBJzCnBTOHGTebCzrNMTixEz6XFymXGz+fDTSPAy2DOTs5Fz+YJTmlCTgLDz4PiSSJNzy3BzYINTo1GT8eET+TgSiBKTGpFT+Wuz27GT+bIT+kUT6RITWjBzQHjzqREzGTLzavETmVHS2dByqHJzQnBTFFCyeLJT+rPz+/Hz+lDSWNDTyPMzqzAyqDDzaPCzmLIz+pCTaLAySDBS6FNzo3PT69Ez+ZFz9bCziLDz2TMzizHT+gGzebEz+VAAAACH5BAkAAD8ALAAAAAAMAAwAAAZtwJ/wl6othkjbiOSRJTrIBcTk0BlwmEFKeFBIWD4cRUVp/BYA6qOCQ2xQIlvAIiBUbhgKL4abzD12GD4MbjgtNWkOaxgaPBsfGT8rCoAPgxoMPUI7MzQeOWscLxFDOycuJh4eIKRIPyElJTtIQQA7</rdf:value>
   </rdf:Description>
   <rdf:Description rdf:about="/editor/icons/16dot-blue.gif">
-    <rdf:type rdf:resource="http://redfoot.net/hypercode/server#StaticPage"/>
+    <rdf:type rdf:resource="http://redfoot.net/3.0/server#StaticPage"/>
     <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#base64Binary">R0lGODlhDAAMANUAAARewIS65Dy0+hSK/Fzc/MTW5Ax26ETG/FyKvOTu9Cyg/IT+/Giy7Gzv/Nzk6CxyvCRqtDSW7BSB8aS6zETB/CSZ/EzQ/ARq1JTG7Dy6/ByS/GTk/Mze7PT6/Cym/ARm1HSezLzS5Eya5Jy2zHz+/PT2/Bx23Dye9DRurNzq9JT+/HT2/Jy+3AxitNTe5ByN+RR67Ozy/GTe/Mza5EzJ/BSC/FTQ/Axu1Pz+/DSq/Jy63NTi9ES69OTq7Iz+/AAAACH5BAkAAD8ALAAAAAAMAAwAAAZvwJ/wV+r1hkgcyPSqRALIHgRWydAINkZHiDBocgdCg7TB/ByAmkJw3Sx8PNzkM/BYbZuVT8YZfV4KFDQ2YgsEHC5pFQIUeCsLAjE/KAYvHgIWBBsEDEIuLTAaaxQUJ0eeDzcSGi8iKUhCITo6M0hBADs=</rdf:value>
   </rdf:Description>
   <rdf:Description rdf:about="/editor/rdf/query.js">
-    <rdf:type rdf:resource="http://redfoot.net/hypercode/server#StaticPage"/>
+    <rdf:type rdf:resource="http://redfoot.net/3.0/server#StaticPage"/>
     <server:content_type>application/x-javascript</server:content_type>
     <rdf:value>// Matching a formula against another formula
 //
@@ -473,7 +473,7 @@ function bindingDebug(b) {
 </rdf:value>
   </rdf:Description>
   <rdf:Description rdf:about="/editor/rdf/uri.js">
-    <rdf:type rdf:resource="http://redfoot.net/hypercode/server#StaticPage"/>
+    <rdf:type rdf:resource="http://redfoot.net/3.0/server#StaticPage"/>
     <server:content_type>application/x-javascript</server:content_type>
     <rdf:value>//  Implementing URI-specific functions
 //
@@ -526,12 +526,12 @@ function URIjoin(given, base) {
 </rdf:value>
   </rdf:Description>
   <rdf:Description rdf:about="/editor/icons/document.png">
-    <rdf:type rdf:resource="http://redfoot.net/hypercode/server#StaticPage"/>
+    <rdf:type rdf:resource="http://redfoot.net/3.0/server#StaticPage"/>
     <server:content_type>image/png</server:content_type>
     <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#base64Binary">iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAAGa2tLEAAAAElBMVEX///8AAADGxsYAAAAAAP8AAAA5vSNOAAAAFnRFWHRTb2Z0d2FyZQBnaWYycG5nIDIuMy4xPxgAMQAAAD9JREFUeNpjYIABVigdEMAQwABCrCAhVrgUa2hoAIpaVjAXg4CoCw2FKgcRQSAigMXFAawRyHBxwMFAdggQAABFRAwd5efVrAAAAABJRU5ErkJggg==</rdf:value>
   </rdf:Description>
   <rdf:Description rdf:about="/editor/dynamic.css">
-    <rdf:type rdf:resource="http://redfoot.net/hypercode/server#StaticPage"/>
+    <rdf:type rdf:resource="http://redfoot.net/3.0/server#StaticPage"/>
     <server:content_type>text/css</server:content_type>
     <rdf:value>/*  Some style for the tabulator
 */
@@ -612,7 +612,7 @@ table.results th { 	font-size: 12pt;
 </rdf:value>
   </rdf:Description>
   <rdf:Description rdf:about="/editor/rdf/match.js">
-    <rdf:type rdf:resource="http://redfoot.net/hypercode/server#StaticPage"/>
+    <rdf:type rdf:resource="http://redfoot.net/3.0/server#StaticPage"/>
     <server:content_type>application/x-javascript</server:content_type>
     <rdf:value>// Matching a statement against a formula
 //
@@ -771,11 +771,11 @@ function RDFComparePredicateSubject(self, other) {
 </rdf:value>
   </rdf:Description>
   <rdf:Description rdf:about="/editor/icons/16dot-yellow.gif">
-    <rdf:type rdf:resource="http://redfoot.net/hypercode/server#StaticPage"/>
+    <rdf:type rdf:resource="http://redfoot.net/3.0/server#StaticPage"/>
     <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#base64Binary">R0lGODlhDAAMANUAAKSuBMzWDNTanOTuHOTmzOzuVOz6HKy2XPT23LTCBOzulNziTOzuzPz+WPz+P9TiFOzyPPz+e5yqJOTivOT2HOzq3Pz+NPz+kuzyLOTm3PT6LMTKnPz69LzKDOzu5Pz+acTGdKy2LNzmPOTqbNzijPz+qKy2BNTeFNzqFKSqNPT2RNzenNzmFPTy5MzKpPT27Pz+TPz+hLzKHOTyHOTqzOTmxPz+/MzaDLTGBPT+LKSuDOTuJOTm1Oz6JOzu1AAAACH5BAkAAD8ALAAAAAAMAAwAAAZmwJ/wx6l4hkgOSLbDiEhIj+SRgzUijRFHeLj1HI1P5BJT/DI6lAUsvpQKHFditm6EL5eIb5MYWKxhYx8MGSYoOQ5WbSpbKQEUdWFZQgQ6NwYaiQ4QCEMVIR0sAwMLLUhCEwIrBEhBADs=</rdf:value>
   </rdf:Description>
   <rdf:Description rdf:about="/editor/rdf/parser.js">
-    <rdf:type rdf:resource="http://redfoot.net/hypercode/server#StaticPage"/>
+    <rdf:type rdf:resource="http://redfoot.net/3.0/server#StaticPage"/>
     <server:content_type>application/x-javascript</server:content_type>
     <rdf:value>/*
 rdfparser.js -
@@ -1736,12 +1736,12 @@ function triplesToFormula(triples, F, why) {
 </rdf:value>
   </rdf:Description>
   <rdf:Description rdf:about="/editor/icons/tbl-collapse.png">
-    <rdf:type rdf:resource="http://redfoot.net/hypercode/server#StaticPage"/>
+    <rdf:type rdf:resource="http://redfoot.net/3.0/server#StaticPage"/>
     <server:content_type>image/png</server:content_type>
     <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#base64Binary">iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAACHSURBVCiRtZGxDcJQDESfo2Qb5mFDZqCgQInSpaCgYwIaGgpAQtGjCEjh5wcpBa4s353ts0NlSRSL2ED5SSJi/YNXqZsvAXAFVjOCU26lHTBnaDsRqD3QJU0KoFOfuQmoDXAflW5qPebkrtQyeKuAOgUnAvUAXICzekzxMi28Yw88ckD8/dMvHeMuLJZwmjoAAAAASUVORK5CYII=</rdf:value>
   </rdf:Description>
   <rdf:Description rdf:about="/editor/tabulate.js">
-    <rdf:type rdf:resource="http://redfoot.net/hypercode/server#StaticPage"/>
+    <rdf:type rdf:resource="http://redfoot.net/3.0/server#StaticPage"/>
     <server:content_type>application/x-javascript</server:content_type>
     <rdf:value>//   Display RDF information in tabular form using HTML DOM
 // 
@@ -2559,21 +2559,21 @@ function GotoURI(uri) {
 </rdf:value>
   </rdf:Description>
   <rdf:Description rdf:about="/editor/icons/delete.png">
-    <rdf:type rdf:resource="http://redfoot.net/hypercode/server#StaticPage"/>
+    <rdf:type rdf:resource="http://redfoot.net/3.0/server#StaticPage"/>
     <server:content_type>image/png</server:content_type>
     <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#base64Binary">iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAAGa2tLEAAAAElBMVEX///8AAADGxsYAAAAAAP8AAAA5vSNOAAAAFnRFWHRTb2Z0d2FyZQBnaWYycG5nIDIuMy4xPxgAMQAAAD9JREFUeNpjYIABVigdEMAQwABCrCAhVrgUa2hoAIpaVjAXg4CoCw2FKgcRQSAigMXFAawRyHBxwMFAdggQAABFRAwd5efVrAAAAABJRU5ErkJggg==</rdf:value>
   </rdf:Description>
   <rdf:Description rdf:about="/editor/icons/16dot-red.gif">
-    <rdf:type rdf:resource="http://redfoot.net/hypercode/server#StaticPage"/>
+    <rdf:type rdf:resource="http://redfoot.net/3.0/server#StaticPage"/>
     <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#base64Binary">R0lGODlhDAAMANUAAKQGBNyKjKxaXNQSFMRydOTGxNwyPNxKTORibMympOzm5PyJkeRqbJwiJOwiJPQuLPx4fPxYWeTW1PxJSvRCRPxhYLwKDPyWpPxobvxQVvxubOQdHfz29OySlPQqLPw/PuS+vMSenKQyNLwaHNianOw+POTOzLQGBKwqLPTe3MwODPyOlOxKVPw2PKQODPTu7Oje3PQmLPx+hPyerPz+/OzKzPwyNOzS1NwWFPxWZPxibPxxfPxCTKwGBPTm5AAAACH5BAkAAD8ALAAAAAAMAAwAAAZvwJ/wx4H5hkgaYbRxGAJIRWMQ4+V0OQRNKFA5bBndbrHr/GAAXDVTGc9YnMQJZ+NlchjZBXMLWTY2ExERbQs6NRJpHi2CGBALFC8/IhZfH2waFQxCNwADDg8fExMlKUM3KBY4GxsHpkg/ICQkBUhBADs=</rdf:value>
   </rdf:Description>
   <rdf:Description rdf:about="/editor/icons/tbl-expand-trans.png">
-    <rdf:type rdf:resource="http://redfoot.net/hypercode/server#StaticPage"/>
+    <rdf:type rdf:resource="http://redfoot.net/3.0/server#StaticPage"/>
     <server:content_type>image/png</server:content_type>
     <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#base64Binary">iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAACHSURBVCiRtdE9CsJAEIbh91tyFEE9Qk7iCTykCJIilUXKIB7AxkDSpFAhn80KW8jGFE41xTzzw8g2SyIsqgaKTyJpB4xAbXuYBYCBDbCVdImwz4EUriO8Rtj9csMErIC9pDI3IY0XcLLdzIEAtMDR9iN3QwDuwMH27VunFDyByvY5t6P+/uk3mIYxrbLd5V0AAAAASUVORK5CYII=</rdf:value>
   </rdf:Description>
   <rdf:Description rdf:about="/editor/rdf/identity.js">
-    <rdf:type rdf:resource="http://redfoot.net/hypercode/server#StaticPage"/>
+    <rdf:type rdf:resource="http://redfoot.net/3.0/server#StaticPage"/>
     <server:content_type>application/x-javascript</server:content_type>
     <rdf:value>//  Identity management for RDF
 //
@@ -2832,7 +2832,7 @@ RDFIndexedFormula.prototype.statementsMatching = function(s1,p1,o1,w1,justOne) {
 </rdf:value>
   </rdf:Description>
   <rdf:Description rdf:about="/editor/rdf/term.js">
-    <rdf:type rdf:resource="http://redfoot.net/hypercode/server#StaticPage"/>
+    <rdf:type rdf:resource="http://redfoot.net/3.0/server#StaticPage"/>
     <server:content_type>application/x-javascript</server:content_type>
     <rdf:value>// These are the classes corresponding to the RDF and N3 data models
 //

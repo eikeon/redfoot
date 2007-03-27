@@ -2,14 +2,14 @@
 <rdf:RDF
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-   xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:code="http://redfoot.net/hypercode/code#"
-   xmlns:redfoot="http://redfoot.net/hypercode/redfoot#"
-   xmlns:server="http://redfoot.net/hypercode/server#"
-   xmlns:session="http://redfoot.net/hypercode/session#"
-   xmlns:template="http://redfoot.net/hypercode/template#"
-   xmlns:aspect="http://redfoot.net/hypercode/aspect#"
-   xmlns:kid='http://redfoot.net/hypercode/kid#'
+   xmlns:rdfe="http://redfoot.net/3.0/rdf#"
+   xmlns:code="http://redfoot.net/3.0/code#"
+   xmlns:redfoot="http://redfoot.net/3.0/redfoot#"
+   xmlns:server="http://redfoot.net/3.0/server#"
+   xmlns:session="http://redfoot.net/3.0/session#"
+   xmlns:template="http://redfoot.net/3.0/template#"
+   xmlns:aspect="http://redfoot.net/3.0/aspect#"
+   xmlns:kid='http://redfoot.net/3.0/kid#'
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
@@ -31,7 +31,7 @@
     <rdfs:label>Document</rdfs:label>
     <rdfs:comment></rdfs:comment>
 <!--    <rdfs:subClassOf rdf:resource="#Document"/>-->
-    <rdfs:subClassOf rdf:resource="http://redfoot.net/hypercode/server#StaticPage"/>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/3.0/server#StaticPage"/>
   </rdfs:Class>
 
   <redfoot:Module rdf:ID="module">
@@ -131,7 +131,7 @@ documents.reverse()
     <aspect:location>/upload/</aspect:location>
     <template:section_rank>21.0</template:section_rank>
     <rdfs:label>Upload</rdfs:label>
-    <server:allow rdf:resource="http://redfoot.net/hypercode/session#User"/>
+    <server:allow rdf:resource="http://redfoot.net/3.0/session#User"/>
     <template:content>
       <template:Content rdf:ID="UploadPagePartHandler">
         <rdfs:label>Upload Page Part Handler</rdfs:label>
@@ -280,7 +280,7 @@ types.sort()
   <server:Page rdf:ID="upload_process">
     <aspect:location>/upload/process/</aspect:location>
     <rdfs:label>Upload process</rdfs:label>
-    <server:allow rdf:resource="http://redfoot.net/hypercode/session#User"/>
+    <server:allow rdf:resource="http://redfoot.net/3.0/session#User"/>
     <server:long_running>true</server:long_running>
     <template:content>
       <template:Content rdf:ID="UploadProcessPagePartHandler">
@@ -307,7 +307,7 @@ content_type = request.parameters.get("content_type")
 file = request.parameters.get("file")
 if file:
     from base64 import b64encode
-    SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
+    SERVER = redfoot.namespace("http://redfoot.net/3.0/server#")
     import sha
     uri = URIRef("%s/document/%s/" % (request.host, sha.new(file).hexdigest()))
     cid = redfoot.context_id(uri, "context")
@@ -362,7 +362,7 @@ if file:
 
   <rdfs:Class rdf:ID="DocumentContext">
     <rdfs:label>Document Context</rdfs:label>
-    <rdfs:subClassOf rdf:resource="http://redfoot.net/hypercode/redfoot#Context"/>    
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/3.0/redfoot#Context"/>    
     <template:content>
       <server:PagePartHandler rdf:ID="document_content_handler">
         <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string"><![CDATA[
@@ -376,7 +376,7 @@ cid = request.uri.abstract()
 #context = redfoot.get_context(cid)
 document = redfoot.context_id(cid, "#").concrete()
 
-REDFOOT = redfoot.namespace("http://redfoot.net/hypercode/redfoot#")
+REDFOOT = redfoot.namespace("http://redfoot.net/3.0/redfoot#")
 DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
 action = request.parameters.get("action", None)

@@ -2,15 +2,15 @@
 <rdf:RDF
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-   xmlns:rdfe="http://redfoot.net/rdf#"
+   xmlns:rdfe="http://redfoot.net/3.0/rdf#"
    xmlns:owl="http://www.w3.org/2002/07/owl#"
-   xmlns:code="http://redfoot.net/hypercode/code#"
-   xmlns:redfoot="http://redfoot.net/hypercode/redfoot#"
-   xmlns:server="http://redfoot.net/hypercode/server#"
-   xmlns:session="http://redfoot.net/hypercode/session#"
-   xmlns:template="http://redfoot.net/hypercode/template#"
-   xmlns:kid='http://redfoot.net/hypercode/kid#'
-   xmlns:aspect="http://redfoot.net/hypercode/aspect#"
+   xmlns:code="http://redfoot.net/3.0/code#"
+   xmlns:redfoot="http://redfoot.net/3.0/redfoot#"
+   xmlns:server="http://redfoot.net/3.0/server#"
+   xmlns:session="http://redfoot.net/3.0/session#"
+   xmlns:template="http://redfoot.net/3.0/template#"
+   xmlns:kid='http://redfoot.net/3.0/kid#'
+   xmlns:aspect="http://redfoot.net/3.0/aspect#"
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
@@ -36,7 +36,7 @@ import time
 
 bookmark = request.uri.abstract()
 
-BOOKMARK = redfoot.namespace("http://redfoot.net/hypercode/bookmark#")
+BOOKMARK = redfoot.namespace("http://redfoot.net/3.0/bookmark#")
 DC_created = URIRef("http://purl.org/dc/terms/created")
 DC_creator = URIRef("http://purl.org/dc/elements/1.1/creator")
 
@@ -104,8 +104,8 @@ import time
 
 category = request.uri.abstract()
 
-BOOKMARK = redfoot.namespace("http://redfoot.net/hypercode/bookmark#")
-SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
+BOOKMARK = redfoot.namespace("http://redfoot.net/3.0/bookmark#")
+SERVER = redfoot.namespace("http://redfoot.net/3.0/server#")
 DC_creator = URIRef("http://purl.org/dc/elements/1.1/creator")
 DC_created = URIRef("http://purl.org/dc/terms/created")
 
@@ -183,7 +183,7 @@ class BookmarkCreatedEvent(Event):
     <aspect:location>/bookmarks/</aspect:location>
     <rdfs:label>Bookmarks</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:member rdf:resource="http://redfoot.net/hypercode/comment#exclude"/>        
+    <rdfs:member rdf:resource="http://redfoot.net/3.0/comment#exclude"/>        
     <template:default_section_rank>25.0</template:default_section_rank>
     <template:content>
      <server:PagePartHandler rdf:ID="Bookmarks">
@@ -193,8 +193,8 @@ class BookmarkCreatedEvent(Event):
 <?python 
 import time
 
-BOOKMARK = redfoot.namespace("http://redfoot.net/hypercode/bookmark#")
-SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
+BOOKMARK = redfoot.namespace("http://redfoot.net/3.0/bookmark#")
+SERVER = redfoot.namespace("http://redfoot.net/3.0/server#")
 DC_creator = URIRef("http://purl.org/dc/elements/1.1/creator")
 DC_created = URIRef("http://purl.org/dc/terms/created")
 
@@ -239,7 +239,7 @@ bookmarks.reverse()
     <aspect:location>/bookmarks/add_bookmark</aspect:location>
     <rdfs:label>Add Bookmark</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <server:allow rdf:resource="http://redfoot.net/hypercode/session#User"/>
+    <server:allow rdf:resource="http://redfoot.net/3.0/session#User"/>
     <server:long_running>true</server:long_running>
     <server:handler>
      <server:PagePartHandler rdf:ID="add_bookmark_handler">
@@ -287,9 +287,9 @@ from time import time
 from twisted.web.client import getPage
 from twisted.web import http
 
-BOOKMARK = redfoot.namespace("http://redfoot.net/hypercode/bookmark#")
-SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
-SESSION = redfoot.namespace("http://redfoot.net/hypercode/session#")
+BOOKMARK = redfoot.namespace("http://redfoot.net/3.0/bookmark#")
+SERVER = redfoot.namespace("http://redfoot.net/3.0/server#")
+SESSION = redfoot.namespace("http://redfoot.net/3.0/session#")
 DC_creator = URIRef("http://purl.org/dc/elements/1.1/creator")
 DC_created = URIRef("http://purl.org/dc/terms/created")
 

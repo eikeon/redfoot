@@ -2,10 +2,10 @@
 <!DOCTYPE rdf:RDF [
   <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#">
-  <!ENTITY rdfe "http://redfoot.net/rdf#">
+  <!ENTITY rdfe "http://redfoot.net/3.0/rdf#">
   <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#">
-  <!ENTITY code "http://redfoot.net/hypercode/code#">
-  <!ENTITY command "http://redfoot.net/hypercode/command#">
+  <!ENTITY code "http://redfoot.net/3.0/code#">
+  <!ENTITY command "http://redfoot.net/3.0/command#">
 ]>
 <rdf:RDF
    xmlns:rdf="&rdf;"
@@ -13,7 +13,7 @@
    xmlns:rdfe="&rdfe;"
    xmlns:code="&code;"
    xmlns:command="&command;"
-   xmlns:kernel="http://redfoot.net/hypercode/kernel#"
+   xmlns:kernel="http://redfoot.net/3.0/kernel#"
 >
 
   <rdfe:Namespace rdf:about="#">

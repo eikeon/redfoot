@@ -2,8 +2,8 @@
 <rdf:RDF
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-   xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:code="http://redfoot.net/hypercode/code#"
+   xmlns:rdfe="http://redfoot.net/3.0/rdf#"
+   xmlns:code="http://redfoot.net/3.0/code#"
 >
 
   <rdfe:RDFXMLDocument rdf:about="">

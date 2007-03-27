@@ -2,13 +2,13 @@
 <rdf:RDF
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-   xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:code="http://redfoot.net/hypercode/code#"
-   xmlns:redfoot='http://redfoot.net/hypercode/redfoot#'
-   xmlns:server="http://redfoot.net/hypercode/server#"
-   xmlns:template='http://redfoot.net/hypercode/template#'
-   xmlns:kid='http://redfoot.net/hypercode/kid#'
-   xmlns:aspect="http://redfoot.net/hypercode/aspect#"
+   xmlns:rdfe="http://redfoot.net/3.0/rdf#"
+   xmlns:code="http://redfoot.net/3.0/code#"
+   xmlns:redfoot='http://redfoot.net/3.0/redfoot#'
+   xmlns:server="http://redfoot.net/3.0/server#"
+   xmlns:template='http://redfoot.net/3.0/template#'
+   xmlns:kid='http://redfoot.net/3.0/kid#'
+   xmlns:aspect="http://redfoot.net/3.0/aspect#"
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
@@ -33,7 +33,7 @@
     <rdfs:comment></rdfs:comment>
     <template:content rdf:resource="#add_resource"/>
     <template:default_section_rank>70.0</template:default_section_rank>    
-    <rdfs:member rdf:resource="http://redfoot.net/hypercode/comment#exclude"/>    
+    <rdfs:member rdf:resource="http://redfoot.net/3.0/comment#exclude"/>    
     <server:allow rdf:resource="#Admin"/>
   </template:Section>
 
@@ -42,7 +42,7 @@
     <rdfs:label>Edit Resource</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <template:content rdf:resource="#edit_resource"/>
-    <rdfs:member rdf:resource="http://redfoot.net/hypercode/comment#exclude"/>
+    <rdfs:member rdf:resource="http://redfoot.net/3.0/comment#exclude"/>
     <server:allow rdf:resource="#Admin"/>
   </server:Page>
 
@@ -51,7 +51,7 @@
     <rdfs:label>View Triple</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <template:content rdf:resource="#edit_triple"/>
-    <rdfs:member rdf:resource="http://redfoot.net/hypercode/comment#exclude"/>
+    <rdfs:member rdf:resource="http://redfoot.net/3.0/comment#exclude"/>
     <server:allow rdf:resource="#Admin"/>
   </server:Page>
 
@@ -91,7 +91,7 @@ else:
       ]]></code:python>
       </server:PageHandler>
     </server:page_handler>
-    <rdfs:member rdf:resource="http://redfoot.net/hypercode/comment#exclude"/>    
+    <rdfs:member rdf:resource="http://redfoot.net/3.0/comment#exclude"/>    
   </rdf:Description>
 
 
@@ -229,7 +229,7 @@ if o.language:
 <?python
 from rdflib.util import from_n3
 
-SESSION = redfoot.namespace("http://redfoot.net/hypercode/session#")
+SESSION = redfoot.namespace("http://redfoot.net/3.0/session#")
 
 subject = from_n3(request.parameters.get("subject"))
 predicate = from_n3(request.parameters.get("predicate"))

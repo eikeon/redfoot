@@ -2,13 +2,13 @@
 <rdf:RDF
   xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
   xmlns:rdfs='http://www.w3.org/2000/01/rdf-schema#'
-  xmlns:rdfe="http://redfoot.net/rdf#"
-  xmlns:code="http://redfoot.net/hypercode/code#"
-  xmlns:redfoot='http://redfoot.net/hypercode/redfoot#'
-  xmlns:server="http://redfoot.net/hypercode/server#"
-  xmlns:template='http://redfoot.net/hypercode/template#'
-  xmlns:kid='http://redfoot.net/hypercode/kid#'
-  xmlns:aspect="http://redfoot.net/hypercode/aspect#"
+  xmlns:rdfe="http://redfoot.net/3.0/rdf#"
+  xmlns:code="http://redfoot.net/3.0/code#"
+  xmlns:redfoot='http://redfoot.net/3.0/redfoot#'
+  xmlns:server="http://redfoot.net/3.0/server#"
+  xmlns:template='http://redfoot.net/3.0/template#'
+  xmlns:kid='http://redfoot.net/3.0/kid#'
+  xmlns:aspect="http://redfoot.net/3.0/aspect#"
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
@@ -46,14 +46,14 @@ in which case "" should be a server:Site
   <rdfs:Class rdf:ID="User">
     <rdfs:label>Invitor User</rdfs:label>
     <rdfs:comment>A class of user that can invite other users to become members of the site.</rdfs:comment>
-    <rdfs:subClassOf rdf:resource="http://redfoot.net/hypercode/session#User"/>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/3.0/session#User"/>
   </rdfs:Class>
 
   <server:Page rdf:ID="login_page">
     <aspect:location>/login/</aspect:location>
     <rdfs:label>Login</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:member rdf:resource="http://redfoot.net/hypercode/comment#exclude"/>
+    <rdfs:member rdf:resource="http://redfoot.net/3.0/comment#exclude"/>
     <template:content rdf:resource="auth#login"/>
   </server:Page>
 
@@ -69,7 +69,7 @@ in which case "" should be a server:Site
     <aspect:location>/logout/</aspect:location>
     <rdfs:label>Logout</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:member rdf:resource="http://redfoot.net/hypercode/comment#exclude"/>
+    <rdfs:member rdf:resource="http://redfoot.net/3.0/comment#exclude"/>
     <server:page_handler rdf:resource="auth#logout_process"/>
   </server:Page>
 
@@ -77,7 +77,7 @@ in which case "" should be a server:Site
     <aspect:location>/user/invite</aspect:location>
     <rdfs:label>Invite User</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:member rdf:resource="http://redfoot.net/hypercode/comment#exclude"/>
+    <rdfs:member rdf:resource="http://redfoot.net/3.0/comment#exclude"/>
     <template:content rdf:resource="#auth_invite"/>
     <server:allow rdf:resource="#User"/>
   </server:Page>
@@ -86,7 +86,7 @@ in which case "" should be a server:Site
     <aspect:location>/user/invite/process/</aspect:location>
     <rdfs:label>Invite User</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:member rdf:resource="http://redfoot.net/hypercode/comment#exclude"/>
+    <rdfs:member rdf:resource="http://redfoot.net/3.0/comment#exclude"/>
     <template:content rdf:resource="#auth_invite_process"/>
   </server:Page>
 
@@ -100,11 +100,11 @@ in which case "" should be a server:Site
 
   <server:PageHandler rdf:ID="register_process">
     <server:content_type>application/xhtml+xml</server:content_type>
-    <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python"><![CDATA[
+    <code:python rdf:datatype="http://redfoot.net/3.0/redfoot#Python"><![CDATA[
 import md5
 
 FOAF = redfoot.namespace("http://xmlns.com/foaf/0.1/")
-SESSION = redfoot.namespace("http://redfoot.net/hypercode/session#")
+SESSION = redfoot.namespace("http://redfoot.net/3.0/session#")
 
 return_uri = URIRef(request.parameters.get("return_uri", "%s/" % request.host))
 register_uri = URIRef(request.parameters.get("register_uri", "%s/register/" % request.host))
@@ -284,7 +284,7 @@ s.close()
         <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string"><![CDATA[
  <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
 <?python
-SESSION = redfoot.namespace("http://redfoot.net/hypercode/session#")
+SESSION = redfoot.namespace("http://redfoot.net/3.0/session#")
 
 if request.session_id:
     message = redfoot.value(request.session_id, SESSION.message)

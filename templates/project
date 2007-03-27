@@ -2,10 +2,10 @@
 <rdf:RDF
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-   xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:redfoot="http://redfoot.net/hypercode/redfoot#"
-   xmlns:template="http://redfoot.net/hypercode/template#"
-   xmlns:server="http://redfoot.net/hypercode/server#"
+   xmlns:rdfe="http://redfoot.net/3.0/rdf#"
+   xmlns:redfoot="http://redfoot.net/3.0/redfoot#"
+   xmlns:template="http://redfoot.net/3.0/template#"
+   xmlns:server="http://redfoot.net/3.0/server#"
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
@@ -28,8 +28,8 @@
     <server:content_type>application/xhtml+xml</server:content_type>
     <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[<html xmlns="http://www.w3.org/1999/xhtml" xmlns:kid="http://purl.org/kid/ns#">
-<?python SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")?>
-<?python TEMPLATE = redfoot.namespace("http://redfoot.net/hypercode/template#")?>
+<?python SERVER = redfoot.namespace("http://redfoot.net/3.0/server#")?>
+<?python TEMPLATE = redfoot.namespace("http://redfoot.net/3.0/template#")?>
 <?python
 title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract(), None) or "-"
 ?>
@@ -56,7 +56,7 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
         </div>
         <h2><a href="${request.uri}">${title}</a></h2>
         ${display(lookup(TEMPLATE.content))}
-        <?python COMMENT = redfoot.namespace("http://redfoot.net/hypercode/comment#")?>
+        <?python COMMENT = redfoot.namespace("http://redfoot.net/3.0/comment#")?>
         <div class="comments" kid:if="lookup(TEMPLATE.comments) and (request.uri, RDFS.member, COMMENT.exclude) not in redfoot">
            ${display(lookup(TEMPLATE.comments))}
            ${display(lookup(TEMPLATE.add_comment))}
@@ -84,7 +84,7 @@ title = redfoot.label(request.uri, None) or redfoot.label(request.uri.abstract()
 
 <div class="nav" xmlns:kid="http://purl.org/kid/ns#">
 <?python
-TEMPLATE = redfoot.namespace("http://redfoot.net/hypercode/template#")
+TEMPLATE = redfoot.namespace("http://redfoot.net/3.0/template#")
 sections = []
 for section in redfoot.objects(request.host, TEMPLATE.section):
     label = redfoot.value(section, TEMPLATE.section_name) or redfoot.label(section)
@@ -116,7 +116,7 @@ sections.sort()
     <server:content_type>text/css</server:content_type>
     <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 
-TEMPLATE = redfoot.namespace("http://redfoot.net/hypercode/template#")
+TEMPLATE = redfoot.namespace("http://redfoot.net/3.0/template#")
 
 color = lookup(TEMPLATE.background_color) or "#cccccc"
 

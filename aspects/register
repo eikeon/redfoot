@@ -2,13 +2,13 @@
 <rdf:RDF
   xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
   xmlns:rdfs='http://www.w3.org/2000/01/rdf-schema#'
-  xmlns:rdfe="http://redfoot.net/rdf#"
-  xmlns:code="http://redfoot.net/hypercode/code#"
-  xmlns:redfoot='http://redfoot.net/hypercode/redfoot#'
-  xmlns:server="http://redfoot.net/hypercode/server#"
-  xmlns:template='http://redfoot.net/hypercode/template#'
-  xmlns:kid='http://redfoot.net/hypercode/kid#'
-  xmlns:aspect="http://redfoot.net/hypercode/aspect#"
+  xmlns:rdfe="http://redfoot.net/3.0/rdf#"
+  xmlns:code="http://redfoot.net/3.0/code#"
+  xmlns:redfoot='http://redfoot.net/3.0/redfoot#'
+  xmlns:server="http://redfoot.net/3.0/server#"
+  xmlns:template='http://redfoot.net/3.0/template#'
+  xmlns:kid='http://redfoot.net/3.0/kid#'
+  xmlns:aspect="http://redfoot.net/3.0/aspect#"
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
@@ -30,7 +30,7 @@
     <aspect:location>/register/</aspect:location>
     <rdfs:label>Register</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:member rdf:resource="http://redfoot.net/hypercode/comment#exclude"/>
+    <rdfs:member rdf:resource="http://redfoot.net/3.0/comment#exclude"/>
     <template:content rdf:resource="#auth_register"/>
   </server:Page>
 
@@ -46,7 +46,7 @@
 
  <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
 <?python 
-SESSION = redfoot.namespace("http://redfoot.net/hypercode/session#")
+SESSION = redfoot.namespace("http://redfoot.net/3.0/session#")
 if request.session_id:
     message = redfoot.value(request.session_id, SESSION.message)
 else:
@@ -92,8 +92,8 @@ else:
 if request.method=='POST':
     import sha
 
-    SESSION = redfoot.namespace("http://redfoot.net/hypercode/session#")
-    USER = redfoot.namespace("http://redfoot.net/hypercode/user#")
+    SESSION = redfoot.namespace("http://redfoot.net/3.0/session#")
+    USER = redfoot.namespace("http://redfoot.net/3.0/user#")
 
     return_uri = URIRef(request.parameters.get("return_uri", "%s/" % request.host))
     register_uri = URIRef(request.parameters.get("register_uri", "%s/register/" % request.host))

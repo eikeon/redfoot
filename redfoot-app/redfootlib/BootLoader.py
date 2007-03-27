@@ -5,8 +5,8 @@ _logger = logging.getLogger(__name__)
 from rdflib import RDF, URIRef, Namespace
 from rdflib.Graph import Graph, ConjunctiveGraph
 
-BOOT = Namespace("http://redfoot.net/hypercode/boot#")
-CODE = Namespace("http://redfoot.net/hypercode/code#")
+BOOT = Namespace("http://redfoot.net/3.0/boot#")
+CODE = Namespace("http://redfoot.net/3.0/code#")
 
 
 class NoProgramException(Exception):

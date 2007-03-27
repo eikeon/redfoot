@@ -2,9 +2,9 @@
 <rdf:RDF
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-   xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:code="http://redfoot.net/hypercode/code#"
-   xmlns:server="http://redfoot.net/hypercode/server#"
+   xmlns:rdfe="http://redfoot.net/3.0/rdf#"
+   xmlns:code="http://redfoot.net/3.0/code#"
+   xmlns:server="http://redfoot.net/3.0/server#"
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
@@ -25,11 +25,11 @@
   <rdfs:Class rdf:ID="Template">
     <rdfs:label>Kid Template</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:subClassOf rdf:resource="http://redfoot.net/rdf#Resource"/>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/3.0/rdf#Resource"/>
     <server:display rdf:resource="">
       <code:Code rdf:ID="kid_display">
         <rdfs:label>kid display</rdfs:label>
-        <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
+        <code:python rdf:datatype="http://redfoot.net/3.0/redfoot#Python">
 <![CDATA[
 
 _logger = redfoot.getLogger(__uri__)

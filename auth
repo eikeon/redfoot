@@ -2,8 +2,8 @@
 <rdf:RDF
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-   xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:code="http://redfoot.net/hypercode/code#"
+   xmlns:rdfe="http://redfoot.net/3.0/rdf#"
+   xmlns:code="http://redfoot.net/3.0/code#"
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
@@ -24,12 +24,12 @@ _logger = redfoot.getLogger(__uri__)
 
 import md5, sha
 
-KERNEL = redfoot.namespace("http://redfoot.net/hypercode/kernel#")
-USER = redfoot.namespace("http://redfoot.net/hypercode/user#")
-SESSION = redfoot.namespace("http://redfoot.net/hypercode/session#")
-SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
+KERNEL = redfoot.namespace("http://redfoot.net/3.0/kernel#")
+USER = redfoot.namespace("http://redfoot.net/3.0/user#")
+SESSION = redfoot.namespace("http://redfoot.net/3.0/session#")
+SERVER = redfoot.namespace("http://redfoot.net/3.0/server#")
 
-user_mod = redfoot.module(URIRef("http://redfoot.net/hypercode/user#module"))
+user_mod = redfoot.module(URIRef("http://redfoot.net/3.0/user#module"))
 
 def authenticate(request, username=None, password=None):
     "Returns uid if authentication succeeds or None otherwise"

@@ -2,10 +2,10 @@
 <rdf:RDF
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-   xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:code="http://redfoot.net/hypercode/code#"
-   xmlns:boot="http://redfoot.net/hypercode/boot#"
-   xmlns:kernel="http://redfoot.net/hypercode/kernel#"
+   xmlns:rdfe="http://redfoot.net/3.0/rdf#"
+   xmlns:code="http://redfoot.net/3.0/code#"
+   xmlns:boot="http://redfoot.net/3.0/boot#"
+   xmlns:kernel="http://redfoot.net/3.0/kernel#"
 >
  
   <rdfe:RDFXMLDocument rdf:about="">
@@ -24,7 +24,7 @@
   <boot:Resource rdf:ID="Defaults">
     <rdfs:label>Boot Defaults</rdfs:label>
     <rdfs:comment>Where the BootLoader looks for which boot program to run if not found in Globals.</rdfs:comment>
-    <boot:program rdf:resource="http://svn.redfoot.net/trunk/hypercode/boot#loader"/>
+    <boot:program rdf:resource="http://svn.redfoot.net/trunk/boot#loader"/>
   </boot:Resource>
 
   <code:Code rdf:ID="loader">
@@ -54,21 +54,21 @@ parser.add_option("--program", dest="program", help="URIRef of program for kerne
 parser.add_option("--rebuild-from-journal", action="store_true", dest="rebuild_from_journal", help="rebuild the store from the journal file")    
 parser.add_option("--update", action="store_true", dest="update", help="update cached version of program")    
 parser.set_defaults(path="__rfdb__", program = None, update=False, 
-                    program="http://redfoot.net/hypercode/kernel#runner")
+                    program="http://redfoot.net/3.0/kernel#runner")
 
 parser.allow_interspersed_args = False
 
 (options, args) = parser.parse_args(args)
 
-KERNEL = URIRef("http://redfoot.net/hypercode/kernel#module")
+KERNEL = URIRef("http://redfoot.net/3.0/kernel#module")
 redfoot_loader.load(URIRef("kernel#module", base=__uri__), publicID=KERNEL)
 
 Kernel = redfoot_loader.module(KERNEL).Kernel
 
 redfoot = Kernel("Sleepycat")
 
-physical = URIRef(__uri__.split("/hypercode/boot#loader")[0])
-redfoot.map(URIRef("http://redfoot.net"), physical)
+physical = URIRef(__uri__.split("/boot#loader")[0])
+redfoot.map(URIRef("http://redfoot.net/3.0"), physical)
 
 redfoot.open(options.path, rebuild=options.rebuild_from_journal)
 try:

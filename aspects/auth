@@ -2,13 +2,13 @@
 <rdf:RDF
   xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
   xmlns:rdfs='http://www.w3.org/2000/01/rdf-schema#'
-  xmlns:rdfe="http://redfoot.net/rdf#"
-  xmlns:code='http://redfoot.net/hypercode/code#'
-  xmlns:redfoot='http://redfoot.net/hypercode/redfoot#'
-  xmlns:server="http://redfoot.net/hypercode/server#"
-  xmlns:template='http://redfoot.net/hypercode/template#'
-  xmlns:kid='http://redfoot.net/hypercode/kid#'
-  xmlns:aspect="http://redfoot.net/hypercode/aspect#"
+  xmlns:rdfe="http://redfoot.net/3.0/rdf#"
+  xmlns:code='http://redfoot.net/3.0/code#'
+  xmlns:redfoot='http://redfoot.net/3.0/redfoot#'
+  xmlns:server="http://redfoot.net/3.0/server#"
+  xmlns:template='http://redfoot.net/3.0/template#'
+  xmlns:kid='http://redfoot.net/3.0/kid#'
+  xmlns:aspect="http://redfoot.net/3.0/aspect#"
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
@@ -31,7 +31,7 @@
     <aspect:location>/login/</aspect:location>
     <rdfs:label>Login</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:member rdf:resource="http://redfoot.net/hypercode/comment#exclude"/>
+    <rdfs:member rdf:resource="http://redfoot.net/3.0/comment#exclude"/>
     <template:content rdf:resource="#login"/>
     <server:allow>True</server:allow>
   </server:Page>
@@ -49,7 +49,7 @@
     <aspect:location>/logout/</aspect:location>
     <rdfs:label>Logout</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:member rdf:resource="http://redfoot.net/hypercode/comment#exclude"/>
+    <rdfs:member rdf:resource="http://redfoot.net/3.0/comment#exclude"/>
     <server:page_handler rdf:resource="#logout_process"/>
   </server:Page>
 
@@ -58,7 +58,7 @@
 
  <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
 <?python 
-SESSION = redfoot.namespace("http://redfoot.net/hypercode/session#")
+SESSION = redfoot.namespace("http://redfoot.net/3.0/session#")
 authenticated = request.session_id and (request.session_id, SESSION.authenticated, Literal('True')) in redfoot
 if request.session_id:
     message = redfoot.value(request.session_id, SESSION.message)
@@ -99,7 +99,7 @@ else:
 
   <server:PageHandler rdf:ID="login_process">
     <server:content_type>application/xhtml+xml</server:content_type>
-    <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python"><![CDATA[
+    <code:python rdf:datatype="http://redfoot.net/3.0/redfoot#Python"><![CDATA[
 
 _logger = redfoot.getLogger(__uri__)
 
@@ -134,9 +134,9 @@ else:
 
   <server:PageHandler rdf:ID="logout_process">
     <server:content_type>application/xhtml+xml</server:content_type>
-    <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python"><![CDATA[
+    <code:python rdf:datatype="http://redfoot.net/3.0/redfoot#Python"><![CDATA[
 
-SESSION = redfoot.namespace("http://redfoot.net/hypercode/session#")
+SESSION = redfoot.namespace("http://redfoot.net/3.0/session#")
 authenticated = request.session_id and (request.session_id, SESSION.authenticated, Literal('True')) in redfoot
 
 sid = request.session_id

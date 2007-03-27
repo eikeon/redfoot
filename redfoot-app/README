@@ -3,7 +3,7 @@
   xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
   xmlns:rdfs='http://www.w3.org/2000/01/rdf-schema#'
   xmlns:doap='http://usefulinc.com/ns/doap#'
-  xmlns:blog='http://redfoot.net/2005/blog#'
+  xmlns:blog='http://redfoot.net/3.0/blog#'
   xmlns:dc='http://purl.org/dc/elements/1.1/'
   xmlns:dcterms='http://purl.org/dc/terms/'
 >
@@ -59,8 +59,8 @@ On windows I think it goes in something like C:\Python25\Scripts\ and so you may
 
 <ul>
   <li>for rdflib run: <pre>redfoot --install-rdflib</pre></li>
-  <li>for twisted and kid run: <pre>redfoot --program=http://redfoot.net/hypercode/programs/install#prereqs</pre>
-      NOTE: see <a href="http://redfoot.net/hypercode/programs/install#prereqs">install#prereqs</a> for details if you want to install the twisted and kid prereqs by hand.
+  <li>for twisted and kid run: <pre>redfoot --program=http://redfoot.net/3.0/programs/install#prereqs</pre>
+      NOTE: see <a href="http://redfoot.net/3.0/programs/install#prereqs">install#prereqs</a> for details if you want to install the twisted and kid prereqs by hand.
   </li>
 </ul>
 

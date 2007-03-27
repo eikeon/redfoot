@@ -2,11 +2,11 @@
 <rdf:RDF
   xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
   xmlns:rdfs='http://www.w3.org/2000/01/rdf-schema#'
-  xmlns:rdfe='http://redfoot.net/rdf#'
-  xmlns:template='http://redfoot.net/hypercode/template#'
-  xmlns:kid='http://redfoot.net/hypercode/kid#'
-  xmlns:aspect="http://redfoot.net/hypercode/aspect#"
-  xmlns:code="http://redfoot.net/hypercode/code#"
+  xmlns:rdfe='http://redfoot.net/3.0/rdf#'
+  xmlns:template='http://redfoot.net/3.0/template#'
+  xmlns:kid='http://redfoot.net/3.0/kid#'
+  xmlns:aspect="http://redfoot.net/3.0/aspect#"
+  xmlns:code="http://redfoot.net/3.0/code#"
 >
 
   <rdfe:Namespace rdf:about="#">
@@ -40,12 +40,12 @@
 
       <template:Content rdf:ID="UserPagePartHandler">
         <rdfs:label>Quant User Page Part Handler</rdfs:label>
-        <kid:template rdf:datatype="http://redfoot.net/hypercode/server#Kid">
+        <kid:template rdf:datatype="http://redfoot.net/3.0/server#Kid">
 <![CDATA[
 
 <div xmlns:kid="http://purl.org/kid/ns#" kid:strip="">
 <?python
-install = URIRef("http://redfoot.net/hypercode/aspect#install")
+install = URIRef("http://redfoot.net/3.0/aspect#install")
 
 action = request.parameters.get("action")
 aspect = request.parameters.get("aspect")
@@ -81,9 +81,9 @@ if action=="install" and aspect:
 site = base # TODO: calc site from base
 
 
-ASPECT = redfoot.namespace("http://redfoot.net/hypercode/aspect#")
-TEMPLATE = redfoot.namespace("http://redfoot.net/hypercode/template#")
-SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
+ASPECT = redfoot.namespace("http://redfoot.net/3.0/aspect#")
+TEMPLATE = redfoot.namespace("http://redfoot.net/3.0/template#")
+SERVER = redfoot.namespace("http://redfoot.net/3.0/server#")
 
 _logger = redfoot.getLogger(__uri__)
 _logger.info("aspect: %s" % aspect)

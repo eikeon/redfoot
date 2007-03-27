@@ -2,12 +2,12 @@
 <rdf:RDF
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-   xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:code="http://redfoot.net/hypercode/code#"
-   xmlns:server="http://redfoot.net/hypercode/server#"
-   xmlns:template="http://redfoot.net/hypercode/template#"
-   xmlns:kid="http://redfoot.net/hypercode/kid#"
-   xmlns:aspect="http://redfoot.net/hypercode/aspect#"
+   xmlns:rdfe="http://redfoot.net/3.0/rdf#"
+   xmlns:code="http://redfoot.net/3.0/code#"
+   xmlns:server="http://redfoot.net/3.0/server#"
+   xmlns:template="http://redfoot.net/3.0/template#"
+   xmlns:kid="http://redfoot.net/3.0/kid#"
+   xmlns:aspect="http://redfoot.net/3.0/aspect#"
 >  
 
   <rdfe:Namespace rdf:about="#">
@@ -18,7 +18,7 @@
   <rdfs:Class rdf:ID="Comment">
     <rdfs:label>Comment</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:subClassOf rdf:resource="http://redfoot.net/hypercode/server#Class"/>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/3.0/server#Class"/>
     <template:content>
      <server:PagePartHandler rdf:ID="comment_handler">
       <rdfs:label>comment handler</rdfs:label>
@@ -32,7 +32,7 @@
 import time
 from rdflib.util import parse_date_time
 
-COMMENT = redfoot.namespace("http://redfoot.net/hypercode/comment#")
+COMMENT = redfoot.namespace("http://redfoot.net/3.0/comment#")
 DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
 
@@ -86,8 +86,8 @@ regarding <a href="${request.relative(resource)}">${redfoot.label(resource, reso
     <aspect:location>/add_comment/</aspect:location>
     <rdfs:label>Add Comment</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:member rdf:resource="http://redfoot.net/hypercode/comment#exclude"/>
-    <server:allow rdf:resource="http://redfoot.net/hypercode/session#User"/>
+    <rdfs:member rdf:resource="http://redfoot.net/3.0/comment#exclude"/>
+    <server:allow rdf:resource="http://redfoot.net/3.0/session#User"/>
     <template:content>
      <server:PagePartHandler rdf:ID="add_comment_content">
       <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
@@ -104,11 +104,11 @@ from rdflib.util import date_time
 from urlparse import urljoin
 from time import gmtime, time
 
-SESSION = redfoot.namespace("http://redfoot.net/hypercode/session#")
-COMMENT = redfoot.namespace("http://redfoot.net/hypercode/comment#")
+SESSION = redfoot.namespace("http://redfoot.net/3.0/session#")
+COMMENT = redfoot.namespace("http://redfoot.net/3.0/comment#")
 DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
-SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
+SERVER = redfoot.namespace("http://redfoot.net/3.0/server#")
 
 uri = request.parameters.get("uri")
 if not uri is None:
@@ -210,7 +210,7 @@ from urllib import quote
 import time
 from rdflib.util import parse_date_time
 
-COMMENT = redfoot.namespace("http://redfoot.net/hypercode/comment#")
+COMMENT = redfoot.namespace("http://redfoot.net/3.0/comment#")
 DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
 
@@ -254,7 +254,7 @@ creator_label = redfoot.label(creator) or creator.split('@')[0]
 import time
 from rdflib.util import parse_date_time
 
-COMMENT = redfoot.namespace("http://redfoot.net/hypercode/comment#")
+COMMENT = redfoot.namespace("http://redfoot.net/3.0/comment#")
 DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
 
@@ -288,7 +288,7 @@ else:
       </server:PagePartHandler>
     </template:content>  
     
-    <rdfs:member rdf:resource="http://redfoot.net/hypercode/comment#exclude"/>    
+    <rdfs:member rdf:resource="http://redfoot.net/3.0/comment#exclude"/>    
   </template:Section>
 
   <server:Page rdf:ID="comments_atom_page">
@@ -311,10 +311,10 @@ else:
 <?python
 #
 from datetime import datetime
-BLOG = redfoot.namespace("http://redfoot.net/hypercode/blog#")
+BLOG = redfoot.namespace("http://redfoot.net/3.0/blog#")
 DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
-COMMENT = redfoot.namespace("http://redfoot.net/hypercode/comment#")
+COMMENT = redfoot.namespace("http://redfoot.net/3.0/comment#")
 
 format = redfoot.module(URIRef("simple_format#module", base=redfoot.uri)).format
 

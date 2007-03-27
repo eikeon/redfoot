@@ -2,13 +2,13 @@
 <rdf:RDF
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-   xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:redfoot="http://redfoot.net/hypercode/redfoot#"
-   xmlns:server="http://redfoot.net/hypercode/server#"
-   xmlns:session="http://redfoot.net/hypercode/session#"
-   xmlns:template='http://redfoot.net/hypercode/template#'
-   xmlns:kid='http://redfoot.net/hypercode/kid#'
-   xmlns:aspect="http://redfoot.net/hypercode/aspect#"
+   xmlns:rdfe="http://redfoot.net/3.0/rdf#"
+   xmlns:redfoot="http://redfoot.net/3.0/redfoot#"
+   xmlns:server="http://redfoot.net/3.0/server#"
+   xmlns:session="http://redfoot.net/3.0/session#"
+   xmlns:template='http://redfoot.net/3.0/template#'
+   xmlns:kid='http://redfoot.net/3.0/kid#'
+   xmlns:aspect="http://redfoot.net/3.0/aspect#"
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
@@ -30,8 +30,8 @@
   <server:Page rdf:ID="issues_add_page">
     <aspect:location>/issues/add/</aspect:location>
     <rdfs:label>Add Issue</rdfs:label>
-    <rdfs:member rdf:resource="http://redfoot.net/hypercode/issue#exclude"/>
-    <server:allow rdf:resource="http://redfoot.net/hypercode/session#User"/>
+    <rdfs:member rdf:resource="http://redfoot.net/3.0/issue#exclude"/>
+    <server:allow rdf:resource="http://redfoot.net/3.0/session#User"/>
     <template:content>
      <server:PagePartHandler rdf:ID="issues_add_content">
       <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
@@ -44,11 +44,11 @@ from rdflib.util import date_time
 from time import gmtime, time
 from urllib import quote
 
-SESSION = redfoot.namespace("http://redfoot.net/hypercode/session#")
+SESSION = redfoot.namespace("http://redfoot.net/3.0/session#")
 ISSUE = redfoot.namespace("http://redfoot.net/2006/issue#")
 DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
-SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
+SERVER = redfoot.namespace("http://redfoot.net/3.0/server#")
 
 label = Literal(request.parameters.get("label"))
 comment = Literal(request.parameters.get("comment"))
@@ -153,7 +153,7 @@ from urllib import quote
     <aspect:location>/issues/</aspect:location>
     <rdfs:label>Issues</rdfs:label>
     <template:default_section_rank>23.0</template:default_section_rank>
-    <rdfs:member rdf:resource="http://redfoot.net/hypercode/comment#exclude"/>
+    <rdfs:member rdf:resource="http://redfoot.net/3.0/comment#exclude"/>
     <template:content>
       <server:PagePartHandler rdf:ID="all_issues">
         <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
@@ -163,7 +163,7 @@ from urllib import quote
 import time
 
 ISSUE = redfoot.namespace("http://redfoot.net/2006/issue#")
-SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
+SERVER = redfoot.namespace("http://redfoot.net/3.0/server#")
 DC_creator = URIRef("http://purl.org/dc/elements/1.1/creator")
 DC_created = URIRef("http://purl.org/dc/terms/created")
 
@@ -227,13 +227,13 @@ from urllib import quote
       </server:PagePartHandler>
     </template:content>  
     
-    <rdfs:member rdf:resource="http://redfoot.net/hypercode/issue#exclude"/>    
+    <rdfs:member rdf:resource="http://redfoot.net/3.0/issue#exclude"/>    
   </template:Section>
 
   <server:Page rdf:ID="issues_resolved_page">
     <aspect:location>/issues/resolved/</aspect:location>
     <rdfs:label>Resolved Issues</rdfs:label>
-    <rdfs:member rdf:resource="http://redfoot.net/hypercode/comment#exclude"/>
+    <rdfs:member rdf:resource="http://redfoot.net/3.0/comment#exclude"/>
     <template:content>
       <server:PagePartHandler rdf:ID="resolved_issues">
         <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
@@ -243,7 +243,7 @@ from urllib import quote
 import time
 
 ISSUE = redfoot.namespace("http://redfoot.net/2006/issue#")
-SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
+SERVER = redfoot.namespace("http://redfoot.net/3.0/server#")
 DC_creator = URIRef("http://purl.org/dc/elements/1.1/creator")
 DC_created = URIRef("http://purl.org/dc/terms/created")
 
@@ -282,7 +282,7 @@ issues.reverse()
       </server:PagePartHandler>
     </template:content>  
     
-    <rdfs:member rdf:resource="http://redfoot.net/hypercode/issue#exclude"/>    
+    <rdfs:member rdf:resource="http://redfoot.net/3.0/issue#exclude"/>    
   </server:Page>
 
 </rdf:RDF>  

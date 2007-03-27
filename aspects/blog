@@ -2,13 +2,13 @@
 <rdf:RDF
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-   xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:redfoot="http://redfoot.net/hypercode/redfoot#"
-   xmlns:server="http://redfoot.net/hypercode/server#"
-   xmlns:session="http://redfoot.net/hypercode/session#"
-   xmlns:template='http://redfoot.net/hypercode/template#'
-   xmlns:kid='http://redfoot.net/hypercode/kid#'
-   xmlns:aspect="http://redfoot.net/hypercode/aspect#"
+   xmlns:rdfe="http://redfoot.net/3.0/rdf#"
+   xmlns:redfoot="http://redfoot.net/3.0/redfoot#"
+   xmlns:server="http://redfoot.net/3.0/server#"
+   xmlns:session="http://redfoot.net/3.0/session#"
+   xmlns:template='http://redfoot.net/3.0/template#'
+   xmlns:kid='http://redfoot.net/3.0/kid#'
+   xmlns:aspect="http://redfoot.net/3.0/aspect#"
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
@@ -32,7 +32,7 @@
     <aspect:location>/blog/</aspect:location>    
     <rdfs:label>Blog</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:member rdf:resource="http://redfoot.net/hypercode/comment#exclude"/>    
+    <rdfs:member rdf:resource="http://redfoot.net/3.0/comment#exclude"/>    
     <server:alternate rdf:resource="/blog/atom/"/>
     <template:section rdf:resource="/blog/add_entry/"/>
     <template:default_section_rank>10.0</template:default_section_rank>
@@ -48,12 +48,12 @@ import time
 from urllib import quote
 from rdflib.util import parse_date_time
 
-SESSION = redfoot.namespace("http://redfoot.net/hypercode/session#")
-BLOG = redfoot.namespace("http://redfoot.net/hypercode/blog#")
+SESSION = redfoot.namespace("http://redfoot.net/3.0/session#")
+BLOG = redfoot.namespace("http://redfoot.net/3.0/blog#")
 DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
 
-COMMENT = redfoot.namespace("http://redfoot.net/hypercode/comment#")
+COMMENT = redfoot.namespace("http://redfoot.net/3.0/comment#")
 
 HTML = redfoot.module(URIRef("blog#html", base=redfoot.uri)).HTML
 markdown = redfoot.module(URIRef("markdown#module", base=redfoot.uri)).markdown
@@ -131,8 +131,8 @@ else:
     <aspect:location>/blog/add_entry/</aspect:location>
     <rdfs:label>Add Entry</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:member rdf:resource="http://redfoot.net/hypercode/comment#exclude"/>    
-    <server:allow rdf:resource="http://redfoot.net/hypercode/session#User"/>
+    <rdfs:member rdf:resource="http://redfoot.net/3.0/comment#exclude"/>    
+    <server:allow rdf:resource="http://redfoot.net/3.0/session#User"/>
     <template:content>
      <server:PagePartHandler rdf:ID="add_entry_content">
       <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
@@ -170,7 +170,7 @@ from urllib import quote
     <aspect:location>/put_entry/</aspect:location>
     <rdfs:label>Put Entry</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <server:allow rdf:resource="http://redfoot.net/hypercode/session#User"/>
+    <server:allow rdf:resource="http://redfoot.net/3.0/session#User"/>
     <template:content>
      <server:PagePartHandler rdf:ID="put_entry_content">
       <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
@@ -182,10 +182,10 @@ from urlparse import urljoin
 from urllib import quote
 from time import gmtime
     
-BLOG = redfoot.namespace("http://redfoot.net/hypercode/blog#")
+BLOG = redfoot.namespace("http://redfoot.net/3.0/blog#")
 DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
-SESSION = redfoot.namespace("http://redfoot.net/hypercode/session#")
+SESSION = redfoot.namespace("http://redfoot.net/3.0/session#")
 
 title = request.parameters.get("title")
 if title is not None:
@@ -264,10 +264,10 @@ from urllib import quote
 <?python
 #
 from datetime import datetime
-BLOG = redfoot.namespace("http://redfoot.net/hypercode/blog#")
+BLOG = redfoot.namespace("http://redfoot.net/3.0/blog#")
 DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
-SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
+SERVER = redfoot.namespace("http://redfoot.net/3.0/server#")
 
 format = redfoot.module(URIRef("simple_format#module", base=redfoot.uri)).format
 
@@ -339,10 +339,10 @@ now = datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
 <?python
 #
 from datetime import datetime
-BLOG = redfoot.namespace("http://redfoot.net/hypercode/blog#")
+BLOG = redfoot.namespace("http://redfoot.net/3.0/blog#")
 DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
-SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
+SERVER = redfoot.namespace("http://redfoot.net/3.0/server#")
 
 format = redfoot.module(URIRef("simple_format#module", base=redfoot.uri)).format
 

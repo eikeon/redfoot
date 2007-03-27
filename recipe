@@ -2,8 +2,8 @@
 <rdf:RDF
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-   xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:redfoot="http://redfoot.net/hypercode/redfoot#"
+   xmlns:rdfe="http://redfoot.net/3.0/rdf#"
+   xmlns:redfoot="http://redfoot.net/3.0/redfoot#"
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
@@ -12,7 +12,7 @@
   <redfoot:Module rdf:ID="module">
     <rdfs:label>Recipe Parser</rdfs:label>      
     <rdfs:comment>A module for parsing recipes into RDF</rdfs:comment>    
-    <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
+    <code:python rdf:datatype="http://redfoot.net/3.0/redfoot#Python">
 <![CDATA[
   
 import re
@@ -25,7 +25,7 @@ from rdflib import RDF, RDFS
 from datetime import datetime
 
 RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
-SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
+SERVER = redfoot.namespace("http://redfoot.net/3.0/server#")
 
 def recipes(uri=None):
     type = uri or RECIPE.Recipe

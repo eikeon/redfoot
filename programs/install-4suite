@@ -3,9 +3,9 @@
     xmlns:ft-prop="http://xmlns.4suite.org/4ss/properties#"
     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-    xmlns:rdfe="http://redfoot.net/rdf#"
-    xmlns:redfoot="http://redfoot.net/2005/redfoot#"
-    xmlns:session="http://redfoot.net/2005/session#"
+    xmlns:rdfe="http://redfoot.net/3.0/rdf#"
+    xmlns:redfoot="http://redfoot.net/3.0/redfoot#"
+    xmlns:session="http://redfoot.net/3.0/session#"
     xmlns:foaf="http://xmlns.com/foaf/0.1/"
     xmlns:owl="http://www.w3.org/2002/07/owl#"
     xmlns:skos="http://www.w3.org/2004/02/skos/core#"
@@ -73,7 +73,7 @@
         <session:hexdigest>fa9beb99e4029ad5a6615399e7bbae21356086b3</session:hexdigest>
         <rdfs:label>A program for automating the process of creating / bootstrapping / launching a 4suite repository</rdfs:label>
         <!--skos:related rdf:resource="urn:uuid:RedfootFtssConfig"/-->
-        <rdf:value rdf:datatype="http://redfoot.net/2005/redfoot#Python">
+        <rdf:value rdf:datatype="http://redfoot.net/3.0/redfoot#Python">
             <![CDATA[
 import logging, sys, os
 import rdflib
@@ -219,7 +219,7 @@ else:
     userName = superuser
     passwd = superuser_passwdHash
             
-print "Repository credentials: %s/%s"%(userName,redfoot_loader.value(redfoot.uri,rdflib.URIRef('http://redfoot.net/2005/session#hexdigest')))
+print "Repository credentials: %s/%s"%(userName,redfoot_loader.value(redfoot.uri,rdflib.URIRef('http://redfoot.net/3.0/session#hexdigest')))
 #Hand processing off to the common init routines
 if not skipInstall:
     Init.DoInit(properties,

@@ -2,14 +2,14 @@
 <rdf:RDF
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-   xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:code="http://redfoot.net/hypercode/code#"
-   xmlns:redfoot="http://redfoot.net/hypercode/redfoot#"
-   xmlns:server="http://redfoot.net/hypercode/server#"
-   xmlns:session="http://redfoot.net/hypercode/session#"
-   xmlns:template='http://redfoot.net/hypercode/template#'
-   xmlns:kid='http://redfoot.net/hypercode/kid#'
-   xmlns:aspect="http://redfoot.net/hypercode/aspect#"
+   xmlns:rdfe="http://redfoot.net/3.0/rdf#"
+   xmlns:code="http://redfoot.net/3.0/code#"
+   xmlns:redfoot="http://redfoot.net/3.0/redfoot#"
+   xmlns:server="http://redfoot.net/3.0/server#"
+   xmlns:session="http://redfoot.net/3.0/session#"
+   xmlns:template='http://redfoot.net/3.0/template#'
+   xmlns:kid='http://redfoot.net/3.0/kid#'
+   xmlns:aspect="http://redfoot.net/3.0/aspect#"
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
@@ -34,7 +34,7 @@
     <server:allow rdf:resource="#Admin"/>
   </template:Section>
 
-  <rdf:Description rdf:about="http://redfoot.net/hypercode/types/context#content_handler"> 
+  <rdf:Description rdf:about="http://redfoot.net/3.0/types/context#content_handler"> 
     <server:allow rdf:resource="#Admin"/>          
   </rdf:Description>
 

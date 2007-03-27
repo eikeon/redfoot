@@ -2,13 +2,13 @@
 <rdf:RDF 
         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-        xmlns:rdfe="http://redfoot.net/rdf#"
-        xmlns:redfoot="http://redfoot.net/hypercode/redfoot#"
-        xmlns:command="http://redfoot.net/hypercode/command#"
-        xmlns:template="http://redfoot.net/hypercode/template#"
-        xmlns:kid='http://redfoot.net/hypercode/kid#'
-        xmlns:server="http://redfoot.net/hypercode/server#"
-        xmlns:aspect="http://redfoot.net/hypercode/aspect#"
+        xmlns:rdfe="http://redfoot.net/3.0/rdf#"
+        xmlns:redfoot="http://redfoot.net/3.0/redfoot#"
+        xmlns:command="http://redfoot.net/3.0/command#"
+        xmlns:template="http://redfoot.net/3.0/template#"
+        xmlns:kid='http://redfoot.net/3.0/kid#'
+        xmlns:server="http://redfoot.net/3.0/server#"
+        xmlns:aspect="http://redfoot.net/3.0/aspect#"
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
@@ -140,7 +140,7 @@ from rdflib.URIRef import URIRef
 from datetime import datetime
 
 RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
-SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
+SERVER = redfoot.namespace("http://redfoot.net/3.0/server#")
 
 format = redfoot.module(URIRef("simple_format#module", base=redfoot.uri)).format
 recipe_module = redfoot.module(URIRef("recipe#module", base=redfoot.uri))
@@ -493,7 +493,7 @@ recipes.sort()
       <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
-SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
+SERVER = redfoot.namespace("http://redfoot.net/3.0/server#")
 recipe = redfoot.value(None, SERVER.alternate, request.uri)
 response.write(redfoot.value(recipe, RECIPE.original))
 ]]>

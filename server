@@ -2,12 +2,12 @@
 <rdf:RDF
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-   xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:code="http://redfoot.net/hypercode/code#"
-   xmlns:server="http://redfoot.net/hypercode/server#"
-   xmlns:command="http://redfoot.net/hypercode/command#"
-   xmlns:template="http://redfoot.net/hypercode/template#"
-   xmlns:kid="http://redfoot.net/hypercode/kid#"
+   xmlns:rdfe="http://redfoot.net/3.0/rdf#"
+   xmlns:code="http://redfoot.net/3.0/code#"
+   xmlns:server="http://redfoot.net/3.0/server#"
+   xmlns:command="http://redfoot.net/3.0/command#"
+   xmlns:template="http://redfoot.net/3.0/template#"
+   xmlns:kid="http://redfoot.net/3.0/kid#"
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
@@ -21,26 +21,26 @@
   <rdfs:Class rdf:ID="Server">
     <rdfs:label>Server</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:subClassOf rdf:resource="http://redfoot.net/hypercode/code#Module"/>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/3.0/code#Module"/>
   </rdfs:Class>
 
   <rdf:Property rdf:ID="server">
     <rdfs:label>server</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:domain rdf:resource="http://redfoot.net/hypercode/kernel#Kernel"/>
+    <rdfs:domain rdf:resource="http://redfoot.net/3.0/kernel#Kernel"/>
     <rdfs:range rdf:resource="#Server"/>
   </rdf:Property>
 
   <rdfs:Class rdf:ID="Handler">
     <rdfs:label>Server Handler</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:subClassOf rdf:resource="http://redfoot.net/hypercode/code#Code"/>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/3.0/code#Code"/>
   </rdfs:Class>
 
   <rdf:Property rdf:ID="handler">
     <rdfs:label>server handler</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:domain rdf:resource="http://redfoot.net/hypercode/kernel#Kernel"/>
+    <rdfs:domain rdf:resource="http://redfoot.net/3.0/kernel#Kernel"/>
     <rdfs:domain rdf:resource="#Server"/>
     <rdfs:range rdf:resource="#Handler"/>
   </rdf:Property>
@@ -57,7 +57,7 @@
 <![CDATA[
 <div xmlns:kid="http://purl.org/kid/ns#" kid:strip="">
 <?python
-Site = URIRef("http://redfoot.net/hypercode/server#Site")
+Site = URIRef("http://redfoot.net/3.0/server#Site")
 allowed = allow(Site)
 
 action = request.parameters.get("action")
@@ -72,7 +72,7 @@ if action=="set_label":
 site_label = redfoot.value(site, RDFS.label, any=True)
 
 aspects = []
-for aspect in redfoot.subjects(RDF.type, URIRef("http://redfoot.net/hypercode/aspect#Aspect")):
+for aspect in redfoot.subjects(RDF.type, URIRef("http://redfoot.net/3.0/aspect#Aspect")):
     redfoot.check(aspect)
     label = redfoot.label(aspect) or aspect
     aspects.append((label, aspect))
@@ -141,7 +141,7 @@ import rdflib, redfootlib, twisted, kid
         <server:content_type>*/*</server:content_type>
         <rdfs:label>file handler</rdfs:label>
         <server:long_running>true</server:long_running>
-        <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
+        <code:python rdf:datatype="http://redfoot.net/3.0/redfoot#Python">
 <![CDATA[
 import os
 from os.path import join, exists
@@ -186,17 +186,17 @@ if ".." not in path:
   <rdfs:Class rdf:ID="PageHandler">
     <rdfs:label>Page Handler</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:subClassOf rdf:resource="http://redfoot.net/hypercode/code#Code"/>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/3.0/code#Code"/>
   </rdfs:Class>
 
   <rdfs:Class rdf:ID="PagePartHandler">
     <rdfs:label>Page Part Handler</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:subClassOf rdf:resource="http://redfoot.net/hypercode/code#Code"/>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/3.0/code#Code"/>
     <server:display rdf:resource="">
       <code:Code rdf:ID="display">
         <rdfs:label>display</rdfs:label>
-        <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
+        <code:python rdf:datatype="http://redfoot.net/3.0/redfoot#Python">
 <![CDATA[
 
 _logger = redfoot.getLogger(__uri__)
@@ -236,28 +236,28 @@ redfoot.execute(page_part_uri, dict(globals()))
   <rdf:Property rdf:ID="allow">
     <rdfs:label>allow</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:domain rdf:resource="http://redfoot.net/hypercode/kernel#Kernel"/>
-    <rdfs:domain rdf:resource="http://redfoot.net/hypercode/server#Site"/>
-    <rdfs:domain rdf:resource="http://redfoot.net/hypercode/server#Page"/>
-    <rdfs:domain rdf:resource="http://redfoot.net/hypercode/server#PagePartHandler"/>
+    <rdfs:domain rdf:resource="http://redfoot.net/3.0/kernel#Kernel"/>
+    <rdfs:domain rdf:resource="http://redfoot.net/3.0/server#Site"/>
+    <rdfs:domain rdf:resource="http://redfoot.net/3.0/server#Page"/>
+    <rdfs:domain rdf:resource="http://redfoot.net/3.0/server#PagePartHandler"/>
     <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Class"/> <!-- TODO make this more specific.. Agent? -->
   </rdf:Property>
 
   <rdf:Property rdf:ID="session_support">
     <rdfs:label>session support</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:domain rdf:resource="http://redfoot.net/hypercode/server#Handler"/>
-    <rdfs:domain rdf:resource="http://redfoot.net/hypercode/kernel#Kernel"/>
-    <rdfs:domain rdf:resource="http://redfoot.net/hypercode/server#Site"/>
-    <rdfs:domain rdf:resource="http://redfoot.net/hypercode/server#Page"/>
+    <rdfs:domain rdf:resource="http://redfoot.net/3.0/server#Handler"/>
+    <rdfs:domain rdf:resource="http://redfoot.net/3.0/kernel#Kernel"/>
+    <rdfs:domain rdf:resource="http://redfoot.net/3.0/server#Site"/>
+    <rdfs:domain rdf:resource="http://redfoot.net/3.0/server#Page"/>
   </rdf:Property>
 
   <rdf:Property rdf:ID="display_support">
     <rdfs:label>display support</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:domain rdf:resource="http://redfoot.net/hypercode/kernel#Kernel"/>
-    <rdfs:domain rdf:resource="http://redfoot.net/hypercode/server#Site"/>
-    <rdfs:domain rdf:resource="http://redfoot.net/hypercode/server#Page"/>
+    <rdfs:domain rdf:resource="http://redfoot.net/3.0/kernel#Kernel"/>
+    <rdfs:domain rdf:resource="http://redfoot.net/3.0/server#Site"/>
+    <rdfs:domain rdf:resource="http://redfoot.net/3.0/server#Page"/>
   </rdf:Property>
 
   <rdf:Property rdf:ID="content_type">
@@ -268,15 +268,15 @@ redfoot.execute(page_part_uri, dict(globals()))
   <rdf:Property rdf:ID="supported_content_types">
     <rdfs:label>supported_content_types</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:domain rdf:resource="http://redfoot.net/hypercode/server#Page"/>
+    <rdfs:domain rdf:resource="http://redfoot.net/3.0/server#Page"/>
     <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
   </rdf:Property>
 
   <rdf:Property rdf:ID="alternate">
     <rdfs:label>alternate</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:domain rdf:resource="http://redfoot.net/hypercode/server#Page"/>
-    <rdfs:range rdf:resource="http://redfoot.net/hypercode/server#Page"/>
+    <rdfs:domain rdf:resource="http://redfoot.net/3.0/server#Page"/>
+    <rdfs:range rdf:resource="http://redfoot.net/3.0/server#Page"/>
   </rdf:Property>
 
   <rdf:Property rdf:ID="long_running">
@@ -358,9 +358,9 @@ from base64 import b64encode
 
 from cStringIO import StringIO
 
-KERNEL = redfoot.namespace("http://redfoot.net/hypercode/kernel#")
-SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
-SESSION = redfoot.namespace("http://redfoot.net/hypercode/session#")
+KERNEL = redfoot.namespace("http://redfoot.net/3.0/kernel#")
+SERVER = redfoot.namespace("http://redfoot.net/3.0/server#")
+SESSION = redfoot.namespace("http://redfoot.net/3.0/session#")
 
 
 class Request(object):
@@ -445,7 +445,7 @@ class Request(object):
 	return default
 
     def objects(self, predicate):
-        # being used in hypercode/page#put_handler
+        # being used in 3.0/page#put_handler
         sources = chain([self.uri], redfoot.types(self.uri), [self.host, redfoot.uri, KERNEL.Globals]) 
         if (self.uri, RDF.type, RDFS.Class) in redfoot:
             sources.next() # ignore self.uri
@@ -638,10 +638,10 @@ import os, sys
 from os.path import join, getsize, splitext
 from base64 import b64encode
 
-StaticPage = URIRef("http://redfoot.net/hypercode/server#StaticPage")
+StaticPage = URIRef("http://redfoot.net/3.0/server#StaticPage")
 base64Binary = URIRef("http://www.w3.org/2001/XMLSchema#base64Binary")
 
-SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
+SERVER = redfoot.namespace("http://redfoot.net/3.0/server#")
 
 # TODO: usage
 base = redfoot.absolutize(args[0])
@@ -690,7 +690,7 @@ for root, dirs, files in os.walk('html'):
         <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
-StaticPage = URIRef("http://redfoot.net/hypercode/server#StaticPage")
+StaticPage = URIRef("http://redfoot.net/3.0/server#StaticPage")
 base64Binary = URIRef("http://www.w3.org/2001/XMLSchema#base64Binary")
 
 from base64 import b64decode

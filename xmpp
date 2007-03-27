@@ -2,9 +2,9 @@
 <rdf:RDF
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-   xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:code="http://redfoot.net/hypercode/code#"
-   xmlns:command="http://redfoot.net/hypercode/command#"
+   xmlns:rdfe="http://redfoot.net/3.0/rdf#"
+   xmlns:code="http://redfoot.net/3.0/code#"
+   xmlns:command="http://redfoot.net/3.0/command#"
 >
 
   <rdfe:Namespace rdf:about="#">
@@ -35,7 +35,7 @@
   <rdfs:Class rdf:ID="Handler">
     <rdfs:label>XMPP Handler</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:subClassOf rdf:resource="http://redfoot.net/hypercode/code#Code"/>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/3.0/code#Code"/>
   </rdfs:Class>
 
   <rdf:Property rdf:ID="handler"> 
@@ -457,8 +457,8 @@ import sys, traceback, struct, time, sha, md5
 
 _logger.info("xmpp_auth %s" % sys.stdin)
 
-USER = redfoot.namespace("http://redfoot.net/hypercode/user#")
-XMPP = redfoot.namespace("http://redfoot.net/hypercode/xmpp#")
+USER = redfoot.namespace("http://redfoot.net/3.0/user#")
+XMPP = redfoot.namespace("http://redfoot.net/3.0/xmpp#")
 
 def authenticate_user(username, hostname, password):
     #_logger.debug("username '%s' hostname '%s' password '%s'" % (username, hostname, password))

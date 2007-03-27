@@ -37,7 +37,7 @@ class Namespace(object):
     def __getattr__(self, name):
         return self.term(name)
 
-redfoot_base = redfoot_loader.program.split("hypercode/kernel#")[0]
+redfoot_base = redfoot_loader.program.split("3.0/kernel#")[0]
 
 def logical_to_physical(uri):
     return URIRef(uri.replace("http://redfoot.net/", redfoot_base, 1))
@@ -50,7 +50,7 @@ __uri__ = physical_to_logical(__uri__)
 import urllib2, re
 from datetime import datetime, timedelta
 
-REDFOOT = Namespace("http://redfoot.net/hypercode/redfoot#")
+REDFOOT = Namespace("http://redfoot.net/3.0/redfoot#")
 
 def _compile(value):
     value = value.replace("\r\n", "\n")        

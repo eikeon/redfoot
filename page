@@ -2,9 +2,9 @@
 <rdf:RDF
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-   xmlns:rdfe="http://redfoot.net/rdf#"
-   xmlns:code="http://redfoot.net/hypercode/code#"
-   xmlns:server="http://redfoot.net/hypercode/server#"
+   xmlns:rdfe="http://redfoot.net/3.0/rdf#"
+   xmlns:code="http://redfoot.net/3.0/code#"
+   xmlns:server="http://redfoot.net/3.0/server#"
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
@@ -16,7 +16,7 @@
     <server:display_support rdf:resource="#display_support"/>
     <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string"><![CDATA[
 
-SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
+SERVER = redfoot.namespace("http://redfoot.net/3.0/server#")
 
 # Support tunneling requests for any resource through a server
 if request.path.startswith("/;"):
@@ -95,8 +95,8 @@ from twisted.internet.threads import deferToThread
 from twisted.web.http import datetimeToString
 from time import time
 
-KERNEL = Namespace(URIRef("http://redfoot.net/hypercode/kernel#"))
-SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
+KERNEL = Namespace(URIRef("http://redfoot.net/3.0/kernel#"))
+SERVER = redfoot.namespace("http://redfoot.net/3.0/server#")
 
 site = URIRef("/data#Site", base=request.host)
 request.site = site
@@ -105,7 +105,7 @@ if (site, None, None) not in redfoot:
     data = redfoot.get_context(redfoot.context_id(site, context_id="context"))
     data.add((site, RDF.type, SERVER.Site))
     data.add((site, SERVER.allow, URIRef("%s/data#Admin" % request.host)))
-    install = URIRef("http://redfoot.net/hypercode/aspect#install")
+    install = URIRef("http://redfoot.net/3.0/aspect#install")
     #redfoot.check(URIRef("aspects/list", base=redfoot.uri)) # since we're doing other init bits
     auth = URIRef("aspects/auth#aspect", base=redfoot.uri)
     redfoot.execute(install, aspect=auth , base=request.host)
@@ -115,7 +115,7 @@ def lookup(property, default=None):
 
 referer = request.headers.get("referer")
 if referer:
-    REFERER = redfoot.namespace("http://redfoot.net/hypercode/referer#")
+    REFERER = redfoot.namespace("http://redfoot.net/3.0/referer#")
     referer = URIRef(referer)
     c = redfoot.get_context(URIRef("referers", base=request.host), creator=__uri__)
     if not (c.identifier, RDFS.label, None) in redfoot:
@@ -232,8 +232,8 @@ _logger = redfoot.getLogger(__uri__)
 
 from rdflib import BNode
 
-SERVER = redfoot.namespace("http://redfoot.net/hypercode/server#")
-KID = redfoot.namespace("http://redfoot.net/hypercode/kid#")
+SERVER = redfoot.namespace("http://redfoot.net/3.0/server#")
+KID = redfoot.namespace("http://redfoot.net/3.0/kid#")
 
 kid_module = redfoot.module(URIRef("kid#module", base=redfoot.uri))
 
@@ -367,7 +367,7 @@ context.serialize(destination=response, base=base)
 
 from rdflib.Namespace import Namespace
 
-KERNEL = Namespace(URIRef("http://redfoot.net/hypercode/kernel#"))
+KERNEL = Namespace(URIRef("http://redfoot.net/3.0/kernel#"))
 auth = redfoot.module(URIRef("auth#module", base=redfoot.uri))
 uid = auth.authenticate(request)
 if uid and (uid, RDF.type, KERNEL.Admin) in redfoot:
@@ -380,7 +380,7 @@ if uid and (uid, RDF.type, KERNEL.Admin) in redfoot:
     #redfoot.remove_context(cid)
     context = redfoot.get_context(cid, creator=uid)
     context.remove((None, None, None))
-    context.add((cid.defrag, RDF.type, URIRef("http://redfoot.net/rdf#RDFXMLDocument")))
+    context.add((cid.defrag, RDF.type, URIRef("http://redfoot.net/3.0/rdf#RDFXMLDocument")))
     base = redfoot.context_id(cid, context_id="") # TODO: basically defrag... need better way.
     context.parse(request.content, publicID=base)
 else:
