@@ -4,6 +4,7 @@
    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
    xmlns:rdfe="http://redfoot.net/rdf#"
    xmlns:code="http://redfoot.net/hypercode/code#"
+   xmlns:server="http://redfoot.net/hypercode/server#"
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
@@ -20,6 +21,78 @@
     <rdfs:domain rdf:resource="#Entry"/>
     <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
   </rdf:Property>
+
+  <rdfs:Class rdf:ID="Template">
+    <rdfs:label>Kid Template</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://redfoot.net/rdf#Resource"/>
+    <server:display rdf:resource="">
+      <code:Code rdf:ID="kid_display">
+        <rdfs:label>kid display</rdfs:label>
+        <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
+<![CDATA[
+
+_logger = redfoot.getLogger(__uri__)
+
+from kid import XML
+from StringIO import StringIO
+
+def kid_display(page_part_uri, **args):
+    """ 
+    Due to the way kid works we can not serialize a template within a
+    template directly to the output stream. Instead we have to return
+    it as an element stream to the template it appears within. Hence
+    the create_display level of complexity.
+
+    See Also: http://www.kid-templating.org/trac/ticket/29
+    """
+    _logger.info("kid_display(%s)" % page_part_uri)
+    if page_part_uri is not None:
+        sio = StringIO()
+        disp = lookup(SERVER.display, uri=page_part_uri)
+        #if disp is None:
+            #_logger.warning("%s had no SERVER.display" % page_part_uri)
+        _w = response.write
+        response.write = sio.write
+        _logger.info("found: %s" % disp)
+        context = dict(globals())
+        context.update(args)
+        redfoot.execute(disp, context, page_part_uri=page_part_uri, fragment=True, output="xml")
+        response.write = _w
+        return XML(sio.getvalue())
+    else:
+        return XML("")
+
+_logger.info("kid_direct_display(%s)" % page_part_uri)
+if page_part_uri:
+    value = redfoot.value(page_part_uri, KID.template)
+    if value:
+        mod = kid_module.get_kid_template(page_part_uri, value)
+        global display
+        display = kid_display
+        t = mod.Template(**globals())        
+        try:
+            t.write(response, encoding="utf-8", fragment=fragment, output=output)
+        except Exception, e:
+            _logger.exception("While handling request for '%s' and trying to display %s (%s) the following exception occurred:\n" % (request.uri, redfoot.label(page_part_uri), page_part_uri))
+
+]]>
+        </code:python>
+      </code:Code>
+    </server:display>
+  </rdfs:Class>
+
+  <rdfs:Class rdf:ID="PageHandler">
+    <rdfs:label>Kid Page Handler</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="#Template"/>
+  </rdfs:Class>
+
+  <rdfs:Class rdf:ID="PagePartHandler">
+    <rdfs:label>Kid Page Part Handler</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="#Template"/>
+  </rdfs:Class>
 
   <code:Module rdf:ID="module">
     <rdfs:label>kid glue</rdfs:label>      

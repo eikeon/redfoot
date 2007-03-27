@@ -193,6 +193,20 @@ if ".." not in path:
     <rdfs:label>Page Part Handler</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:subClassOf rdf:resource="http://redfoot.net/hypercode/code#Code"/>
+    <server:display rdf:resource="">
+      <code:Code rdf:ID="display">
+        <rdfs:label>display</rdfs:label>
+        <code:python rdf:datatype="http://redfoot.net/hypercode/redfoot#Python">
+<![CDATA[
+
+_logger = redfoot.getLogger(__uri__)
+_logger.info("py_direct_display(%s)" % page_part_uri)
+redfoot.execute(page_part_uri, dict(globals())) 
+
+]]>
+        </code:python>
+      </code:Code>
+    </server:display>
   </rdfs:Class>
 
   <rdf:Property rdf:ID="page_handler">
@@ -245,11 +259,6 @@ if ".." not in path:
     <rdfs:domain rdf:resource="http://redfoot.net/hypercode/server#Site"/>
     <rdfs:domain rdf:resource="http://redfoot.net/hypercode/server#Page"/>
   </rdf:Property>
-
-  <rdfs:Datatype rdf:ID="Kid">
-    <rdfs:label>Kid</rdfs:label>
-    <rdfs:comment></rdfs:comment>
-  </rdfs:Datatype>
 
   <rdf:Property rdf:ID="content_type">
     <rdfs:label>content_type</rdfs:label>

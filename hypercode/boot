@@ -89,7 +89,7 @@ try:
 except Exception, e:
     _logger.exception(e)
 finally:
-    redfoot.close()
+    redfoot.close(commit_pending_transaction=True)
 
 ]]>
     </code:python>

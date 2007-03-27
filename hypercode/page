@@ -258,13 +258,16 @@ def display_page(uri, output=None, **args):
     else:
         output = "xml"
     response.setHeader('Content-Type', content_type)
-    display(uri, output=output, **args)
+    display(uri, fragment=False, output=output, **args)
 
 
 mod_context = globals()
 mod_context["BNode"] = BNode # no longer global
 
-def _create_display(normal):
+from kid import XML
+from StringIO import StringIO
+
+def kid_display(uri, **args):
     """ 
     Due to the way kid works we can not serialize a template within a
     template directly to the output stream. Instead we have to return
@@ -273,54 +276,57 @@ def _create_display(normal):
 
     See Also: http://www.kid-templating.org/trac/ticket/29
     """
+    sio = StringIO()
+    _w = response.write
+    response.write = sio.write
+    is_kid = (uri, KID.template, None) in redfoot
+    if is_kid:
+        direct_display = kid_direct_display
+    else:
+        direct_display = py_direct_display
+    direct_display(uri, **args)
+    response.write = _w
+    return XML(sio.getvalue())
 
-    def _display(uri, output=None, **args):
-        if uri:
-            redfoot.check(uri)
-            if not allow(uri):
-                uri = lookup(SERVER.unauthorized_content_handler)
-                assert uri, "No 'unauthorized_content' found for: %s" % uri
-            context = dict(mod_context)
-            context.update(args)
+def kid_direct_display(uri, **args):
+    context = dict(mod_context)
+    context.update(args)    
+    value = redfoot.value(uri, KID.template)
+    if value:
+        mod = kid_module.get_kid_template(uri, value)
+        context["display"] = kid_display
+        t = mod.Template(**context)        
+        try:
+            t.write(response, encoding="utf-8", 
+                    fragment=context.get("fragment") or True, output=context.get("output") or "xml")
+        except Exception, e:
+            _logger.exception("While handling request for '%s' and trying to display %s (%s) the following exception occurred:\n" % (request.uri, redfoot.label(uri), uri))
 
+def py_direct_display(uri, **args):
+    context = dict(mod_context)
+    context.update(args)    
+    redfoot.execute(uri, **context) 
 
-            value = redfoot.value(uri, KID.template)
-            if value:
-                mod = kid_module.get_kid_template(uri, value)
-                context["display"] = kid_display
-                t = mod.Template(**context)        
-                if normal:
-                    request.sources.append(uri)
-                    try:
-                        t.write(response, encoding="utf-8", fragment=True, output=output or "xml")
-                    except Exception, e:
-                        _logger.exception("While handling request for '%s' and trying to display %s (%s) the following exception occurred:\n" % (request.uri, redfoot.label(uri), uri))
-                    request.sources.pop()
-                else:
-                    # return ElementStream instead of writing directly to response
-                    request.sources.append(uri)
-                    def callback():
-                        request.sources.pop()
-                    return kid_module.CleanupElementStream(t.pull(), callback)
-            else:
-                value = redfoot.value(uri)
-                request.sources.append(uri)
-                redfoot.execute(uri, **context) 
-                request.sources.pop()
-
-                # Leaving this here for now in case we need the normal==False case here too
-                # return iterator instead of writing directly to response
-                #def d():
-                #    request.sources.append(uri)
-                #    display(uri, output=output, **args)
-                #    request.sources.pop()
-                #    if False:
-                #        yield None
-                #return d()
-    return _display
-
-display = _create_display(normal=True)
-kid_display = _create_display(normal=False)
+def display(uri, **args):
+    if uri:
+        redfoot.check(uri)
+        if not allow(uri):
+            uri = lookup(SERVER.unauthorized_content_handler)
+            assert uri, "No 'unauthorized_content' found for: %s" % uri
+        request.sources.append(uri)
+        disp = lookup(SERVER.display, uri=uri)
+        if disp is None:
+            raise Exception("%s had no SERVER.display" % uri)
+        context = dict(mod_context)
+        context.update(args)
+        redfoot.execute(disp, context, page_part_uri=uri)
+#         is_kid = (uri, KID.template, None) in redfoot
+#         if is_kid:
+#             direct_display = kid_direct_display
+#         else:
+#             direct_display = py_direct_display
+#         direct_display(uri, **args)
+        request.sources.pop()
 
 ]]>
     </code:python>

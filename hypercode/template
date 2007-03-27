@@ -56,7 +56,7 @@
   <rdfs:Class rdf:ID="Template">
     <rdfs:label>Template</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <rdfs:subClassOf rdf:resource="server#PageHandler"/>
+    <rdfs:subClassOf rdf:resource="server#KidTemplate"/>
   </rdfs:Class>
 
   <rdf:Property rdf:ID="head">
