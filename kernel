@@ -79,6 +79,7 @@ from rdflib.Graph import Graph, ConjunctiveGraph
 from rdflib.Namespace import NamespaceDict as Namespace 
 from rdflib.Journal import JournalReader, JournalWriter
 from rdflib.events import Dispatcher, Event
+from rdflib.TextIndex import TextIndex
 
 _logger = logging.getLogger("hypercode.%s" % redfoot_loader.label(__uri__))
 
@@ -101,6 +102,7 @@ class Kernel(ConjunctiveGraph):
         self.dispatcher = Dispatcher()
         self.xmpp = None
         self.__globals = None
+        self.__text_index = None
         self.map(URIRef("http://xmlns.com/foaf/0.1/"), URIRef("http://xmlns.com/foaf/0.1/index.rdf"))
         
     def _get_crypto(self):
@@ -128,6 +130,15 @@ class Kernel(ConjunctiveGraph):
 
     base = property(__get_base, __set_base)
 
+    def __get_text_index(self):
+        if self.__text_index is None:
+            self.__text_index = TextIndex(store="Sleepycat")
+            self.__text_index.open("redfoot-text_index", create=True)
+            self.__text_index.subscribe_to(self)
+            self.__text_index.link_to(self)
+        return self.__text_index
+    text_index = property(__get_text_index)
+
     def open(self, path, rebuild=False):
         _logger.debug("opening with store=%s and configuration=%s" % (self.store, path))
         if rebuild==True:    
@@ -139,6 +150,7 @@ class Kernel(ConjunctiveGraph):
             _logger.info("done rebuilding.")
         journal = JournalWriter(self.store, filename="%s-journal" % path) 
         super(Kernel, self).open(path, create=True)
+        self.text_index # so that we hook up the text indexing... may want to move this, but for now hard code it here
         onLoadHandlers = []
         for uri in self.instances(KERNEL.OnLoad):
             rank = self.value(uri, KERNEL.onLoadRank) or 0
@@ -554,6 +566,26 @@ else:
     for uri, _, value in redfoot.triples((None, RDF.value, None)):
         if isinstance(value, Literal):
             _logger.warning("%s has an old RDF.value of datatype REDFOOT.Python" % uri)
+
+]]>
+    </code:python>
+  </command:Command>
+
+  <command:Command rdf:ID="update_text_index">
+    <rdfs:label>update_text_index</rdfs:label>
+    <code:python rdf:datatype="redfoot#Python">
+<![CDATA[
+
+from optparse import OptionParser
+parser = OptionParser("""
+Update the text index""")
+
+try:
+    options, args = parser.parse_args(args)
+except SystemExit, e:
+    pass
+else:
+    redfoot.text_index.index_graph(redfoot)
 
 ]]>
     </code:python>

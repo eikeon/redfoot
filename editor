@@ -21,6 +21,7 @@
   <aspect:Aspect rdf:ID="aspect">
     <rdfs:label>Editor</rdfs:label>
     <aspect:item rdf:resource="#editor"/>
+    <aspect:item rdf:resource="#subjects"/>
   </aspect:Aspect>
 
   <template:Section rdf:ID="editor">
@@ -39,7 +40,7 @@
 <!--  <link type="text/css" rel="stylesheet" href="./css/examples.css"/>-->
   <style type="text/css">
     #uriresult {position:relative; display:inline;}
-    #uriautocomplete {position:relative;width:15em;margin-bottom:1em;}/* set width of widget here*/
+    #uriautocomplete {position:relative;width:25em;margin-bottom:1em;}/* set width of widget here*/
     #uriautocomplete {z-index:9000} /* for IE z-index of absolute divs inside relative divs issue */
     #uriinput { dipslay:none; _position:absolute;width:100%;height:1.4em;z-index:0;}  /* abs for ie quirks */
     #uricontainer {position:absolute;top:1.7em;width:100%}
@@ -124,11 +125,25 @@
 
 
 <!-- Libary begins -->
+
 <script type="text/javascript" src="http://yui.yahooapis.com/2.2.0/build/yahoo/yahoo-min.js"></script>
 <script type="text/javascript" src="http://yui.yahooapis.com/2.2.0/build/dom/dom-min.js"></script>
 <script type="text/javascript" src="http://yui.yahooapis.com/2.2.0/build/event/event-min.js"></script>
 <script type="text/javascript" src="http://yui.yahooapis.com/2.2.0/build/animation/animation-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.2.0/build/connection/connection-min.js"></script>
+
 <script type="text/javascript" src="http://yui.yahooapis.com/2.2.0/build/autocomplete/autocomplete-min.js"></script>
+
+<!--
+<script type="text/javascript" src="/yui/build/yahoo/yahoo-debug.js"></script>
+<script type="text/javascript" src="/yui/build/dom/dom-debug.js"></script>
+<script type="text/javascript" src="/yui/build/event/event-debug.js"></script>
+<script type="text/javascript" src="/yui/build/animation/animation-debug.js"></script>
+<script type="text/javascript" src="/yui/build/connection/connection-debug.js"></script>
+
+<script type="text/javascript" src="/yui/build/autocomplete/autocomplete-debug.js"></script>
+-->
+
 <!-- Library ends -->
 
 <!-- In-memory JS array begins-->
@@ -206,11 +221,13 @@ URIEditor.prototype.init = function() {
     var oACDS;
 
     // Instantiate second JS Array DataSource
-    oACDS = new YAHOO.widget.DS_JSArray(subjectsArray);
+    //oACDS = new YAHOO.widget.DS_JSArray(subjectsArray);
+    oACDS = new YAHOO.widget.DS_XHR("/subjects/", ["Result", "label","uri"]);
     oACDS.queryMatchContains = true;
 
     this.oAutoComp = new YAHOO.widget.AutoComplete('uriinput','uricontainer', oACDS);
-    this.oAutoComp.queryDelay = 0;
+    this.oAutoComp.minQueryLength = 2; 
+    this.oAutoComp.queryDelay = 0.5;
     this.oAutoComp.prehighlightClassName = "yui-ac-prehighlight";
     this.oAutoComp.typeAhead = false;
     this.oAutoComp.allowBrowserAutocomplete = false;
@@ -393,6 +410,44 @@ YAHOO.util.Event.addListener(this,'load',init);
 ]]>
     </rdf:value>
   </rdf:Description>
+
+
+  <server:Page rdf:ID="subjects">
+    <aspect:location>/subjects/</aspect:location>
+    <rdfs:label>Subjects</rdfs:label>
+    <rdfs:comment>Returns all the subject label uri pairs in JSON for the editor</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="redfoot#Resource"/>
+    <server:supported_content_types>application/json</server:supported_content_types>
+    <server:page_handler>
+      <server:PageHandler rdf:ID="SubjectsPageHandler">
+        <rdfs:label>Subjects Page Handler</rdfs:label>
+        <server:content_type>application/json</server:content_type>
+        <code:python rdf:datatype="http://redfoot.net/3.0/redfoot#Python">
+
+from rdflib import RDFS
+
+import simplejson
+
+query = request.parameters.get("query")
+
+pairs = []
+if query:
+    for s, p, o in redfoot.text_index.search(query, RDFS.label):
+        pairs.append({"label": o, "uri": s})
+
+#for s in set(redfoot.subjects(None, None)):
+#    label = redfoot.label(s)
+#    if label:
+        #pairs.append([label, s])
+#        pairs.append({"label": label, "uri": s})
+
+response.write(simplejson.dumps({"Result": pairs}))
+
+
+        </code:python>
+      </server:PageHandler>
+    </server:page_handler>
+  </server:Page>
 
 </rdf:RDF>
 
