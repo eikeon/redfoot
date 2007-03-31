@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:rdfe="http://redfoot.net/3.0/rdf#"
+   xmlns:owl="http://www.w3.org/2002/07/owl#"
+   xmlns:code="http://redfoot.net/3.0/code#"
+   xmlns:redfoot="http://redfoot.net/3.0/redfoot#"
+   xmlns:server="http://redfoot.net/3.0/server#"
+   xmlns:session="http://redfoot.net/3.0/session#"
+   xmlns:template="http://redfoot.net/3.0/template#"
+   xmlns:kid='http://redfoot.net/3.0/kid#'
+   xmlns:aspect="http://redfoot.net/3.0/aspect#"
+>
+
+  <rdfe:Namespace rdf:about="#">
+    <rdfs:label>Editor</rdfs:label>
+    <rdfs:comment>The Redfoot editor namespace.</rdfs:comment>
+  </rdfe:Namespace>
+
+  <aspect:Aspect rdf:ID="aspect">
+    <rdfs:label>Editor</rdfs:label>
+    <aspect:item rdf:resource="#editor"/>
+  </aspect:Aspect>
+
+  <template:Section rdf:ID="editor">
+    <aspect:location>/editor/</aspect:location>
+    <rdfs:label>Editor</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:member rdf:resource="http://redfoot.net/3.0/comment#exclude"/>        
+    <template:default_section_rank>55.0</template:default_section_rank>
+    <template:head_content>
+      <kid:PagePartHandler rdf:ID="editor_head">
+        <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+<![CDATA[
+<div xmlns="http://www.w3.org/1999/xhtml" xmlns:kid="http://purl.org/kid/ns#" kid:strip="">
+  <link type="text/css" rel="stylesheet" href="http://yui.yahooapis.com/2.2.0/build/reset/reset.css"/>
+  <link type="text/css" rel="stylesheet" href="http://yui.yahooapis.com/2.2.0/build/fonts/fonts.css"/>
+<!--  <link type="text/css" rel="stylesheet" href="./css/examples.css"/>-->
+  <style type="text/css">
+    #uriresult {position:relative; display:inline;}
+    #uriautocomplete {position:relative;width:15em;margin-bottom:1em;}/* set width of widget here*/
+    #uriautocomplete {z-index:9000} /* for IE z-index of absolute divs inside relative divs issue */
+    #uriinput { dipslay:none; _position:absolute;width:100%;height:1.4em;z-index:0;}  /* abs for ie quirks */
+    #uricontainer {position:absolute;top:1.7em;width:100%}
+    #uricontainer .yui-ac-content {position:absolute;width:100%;border:1px solid #404040;background:#fff;overflow:hidden;z-index:9050;}
+    #uricontainer .yui-ac-shadow {position:absolute;margin:.3em;width:100%;background:#a0a0a0;z-index:9049;}
+    #uricontainer ul {padding:5px 0;width:100%;}
+    #uricontainer li {padding:0 5px;cursor:default;white-space:nowrap;}
+    #uricontainer li.yui-ac-highlight {background:#ff0;}
+    #uricontainer li.yui-ac-prehighlight {background:#FFFFCC;}
+
+    .resource {padding: 1em;}
+
+    .label {}
+    .uri { color: gray;} /* */
+    x.uri { position: absolute; top: 1em; left: 0em; width: 0%} /* */
+    x.uri { display: none;} /* */
+
+    .undefined:first-child { content: 'undefined';}
+
+    .subject { display: inline;}
+    .subject .label {font-size: 4em;}
+    .subject .uri {font-size: 1.0em;}
+
+    .assertions {}
+    .assertion {display: block; padding-bottom: 1em;}
+
+    .assertion .label {font-size: 1.5em;}
+    .assertion .uri {font-size: 0.8em;}
+
+    .predicate {position: relative; display: block;}
+    .object {position: relative; margin-left: 8em; display: block;}
+
+    x.subject:before {content: 'Subject:';}
+    x.predicate:before {content: 'Predicate:';}
+    x.predicate:after {content: ':';}
+    x.object:before {content: 'Object:';}
+
+    #actions {margin-top: 1em;}
+
+  </style>
+</div>
+]]>
+        </kid:template>
+      </kid:PagePartHandler>
+    </template:head_content>
+    <template:content>
+      <kid:PagePartHandler rdf:ID="Editor">
+        <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+<![CDATA[
+
+<div xmlns="http://www.w3.org/1999/xhtml" xmlns:kid="http://purl.org/kid/ns#">
+ <div class="resource">  
+    <div class="undefined"></div>
+    <div class="subject" onclick="resourceEditor.edit(this);">
+      <div class="label">Pick a Subject</div>
+      <div class="uri"></div>
+    </div> 
+    <ul class="assertions"></ul>
+    <div id="actions">Actions: [ <span onclick="resourceEditor.addAssertion(this);">add assertion</span> ]</div>
+
+   <div id="grab_bag" style="display: none">
+     <div id="new_assertion">
+      <li class="assertion">
+        <div class="predicate" onclick="resourceEditor.edit(this);">
+          <div class="label">Pick Predicate</div> 
+          <div class="uri"></div>
+        </div> 
+        <div class="object" onclick="resourceEditor.edit(this);">
+          <div class="label">Pick Object</div> 
+          <div class="uri"></div>
+        </div> 
+      </li>
+     </div>
+     <form id="uriEditor" onsubmit="return resourceEditor.updateValue();">
+       <div id="uriautocomplete">
+         <input id="uriinput"></input>
+         <div id="uricontainer"></div>
+       </div>
+     </form>
+   </div>
+ </div>
+
+
+<!-- Libary begins -->
+<script type="text/javascript" src="http://yui.yahooapis.com/2.2.0/build/yahoo/yahoo-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.2.0/build/dom/dom-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.2.0/build/event/event-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.2.0/build/animation/animation-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.2.0/build/autocomplete/autocomplete-min.js"></script>
+<!-- Library ends -->
+
+<!-- In-memory JS array begins-->
+<script type="text/javascript">
+<?python
+pairs = []
+for s in set(redfoot.subjects(None, None)):
+    label = redfoot.label(s)
+    if label:
+        l = u'''["%s", "%s"]''' % (label, s)
+        l = l.encode('unicode-escape')
+        pairs.append(l)
+values = ", \n".join(pairs)
+?>
+var subjectsArray = [
+    ${values}
+];
+</script>
+<!-- In-memory JS array ends-->
+
+<script type="text/javascript">
+${redfoot.value(URIRef("#script", base=__uri__), RDF.value)}
+</script>
+
+</div>
+]]>
+        </kid:template>
+      </kid:PagePartHandler> 
+    </template:content>
+  </template:Section>
+
+  <rdf:Description rdf:ID="script">
+    <rdfs:label>Editor script</rdfs:label>
+    <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+<![CDATA[
+
+function Identifier(element) {
+    this._element = element;
+}
+/* TODO: turn uri and label into properties: http://www.webfx.nu/dhtml/mozInnerHTML/mozInnerHtml.html */
+Identifier.prototype.getURI = function() {
+    var s = this._element.getElementsByTagName("div")[1];
+    var uri = s.innerHTML;
+    return uri;
+}
+Identifier.prototype.setURI = function(uri) {
+    var s = this._element.getElementsByTagName("div")[1];
+    s.innerHTML = uri;
+}
+Identifier.prototype.getLabel = function() {
+    var s = this._element.getElementsByTagName("div")[0];
+    var label = s.innerHTML;
+    return label;
+}
+Identifier.prototype.setLabel = function(label) {
+    var s = this._element.getElementsByTagName("div")[0];
+    s.innerHTML = label;
+}
+
+
+function URIEditor(resourceEditor) {
+    this.resourceEditor = resourceEditor
+
+    var uriEditor = this;
+    YAHOO.widget.AutoComplete.prototype._origUpdateValue = YAHOO.widget.AutoComplete.prototype._updateValue
+    YAHOO.widget.AutoComplete.prototype._updateValue = function(oItem) {
+        uriEditor.target.setLabel(oItem._oResultData[0]);
+        uriEditor.target.setURI(oItem._oResultData[1]);
+        this._origUpdateValue(oItem);
+    }
+}
+
+URIEditor.prototype.init = function() {
+    // Instantiate second AutoComplete
+    var oACDS;
+
+    // Instantiate second JS Array DataSource
+    oACDS = new YAHOO.widget.DS_JSArray(subjectsArray);
+    oACDS.queryMatchContains = true;
+
+    this.oAutoComp = new YAHOO.widget.AutoComplete('uriinput','uricontainer', oACDS);
+    this.oAutoComp.queryDelay = 0;
+    this.oAutoComp.prehighlightClassName = "yui-ac-prehighlight";
+    this.oAutoComp.typeAhead = false;
+    this.oAutoComp.allowBrowserAutocomplete = false;
+    this.oAutoComp.useShadow = true;
+    this.oAutoComp.forceSelection = false;
+    this.oAutoComp.autoHighlight = false;
+    this.oAutoComp.formatResult = function(oResultItem, sQuery) {
+        var sMarkup = oResultItem[0] + " (" + oResultItem[1] + ")";
+        return (sMarkup);
+    };
+
+    var uriEditor = this;
+    this.oAutoComp.textboxBlurEvent.subscribe(function(type, args, me) {uriEditor.doneEditing()});
+            
+    var form = document.getElementById("uriEditor");
+    this.form = form;
+    this.form.parentNode.removeChild(this.form);
+    //this.addEditLinks();
+}
+
+URIEditor.prototype.edit = function(element) {
+    target = new Identifier(element);
+    this.target = target;
+    var container = target._element.parentNode;
+    this.form.className = target._element.className;
+    container.replaceChild(this.form, target._element)
+    //container.insertBefore(this.form, target._element);
+    //this.form.style.display = '';// TODO: do this via className
+    //target._element.style.display = 'none'; 
+
+    this.oAutoComp._oTextbox.value = target.getLabel(); 
+    this.oAutoComp._oTextbox.select();
+    this.oAutoComp._oTextbox.focus();
+    return false;
+}
+
+URIEditor.prototype.doneEditing = function() {
+    var container = this.form.parentNode;
+    if (container) {
+        container.replaceChild(this.target._element, this.form);
+    }
+    //this.form.style.display = 'none';
+    //target._element.style.display = '';
+    //container.removeChild(this.form);
+}
+
+URIEditor.prototype.updateValue = function() {
+    this.target.setLabel(this.oAutoComp._oTextbox.value);
+    // TODO: 
+    this.oAutoComp._oTextbox.blur();
+    this.doneEditing();
+    return false;
+}
+
+URIEditor.prototype.addEditLink = function(e) {
+    var uriEditor = this;
+    e.onclick = function(mouseEvent) {
+        uriEditor.edit(new Identifier(mouseEvent.target.parentNode));
+        return false;
+    };
+}
+
+URIEditor.prototype.addEditLinks = function() {
+    var elements = document.getElementsByTagName("a");
+    for (var i = 0; i < elements.length; i++) {
+        var e = elements[i]
+        if (e.className=='uri') {
+            this.addEditLink(e);
+        }
+    }
+}
+
+
+function ResourceEditor() {
+    this.element = YAHOO.util.Dom.getElementsByClassName("resource", null, document.body)[0];
+    this.uriEditor = new URIEditor(this);
+    this.uriEditor.init();
+}
+ResourceEditor.prototype.getSubject = function() {
+    subject_element = (YAHOO.util.Dom.getElementsByClassName("subject", null, this.element))[0];
+    i = new Identifier(subject_element);
+    return i.getURI();
+}
+//ResourceEditor.prototype.setSubject = function(subject) {
+//    subject_element = (YAHOO.util.Dom.getElementsByClassName("subject", null, this.element))[0];
+//    i = new Identifier(subject_element);
+//    i.setURI(subject);
+//}
+ResourceEditor.prototype.getPredicate = function(element) {
+    predicate_element = (YAHOO.util.Dom.getElementsByClassName("predicate", null, element))[0];
+    i = new Identifier(predicate_element);
+    return i.getURI();
+}
+//ResourceEditor.prototype.setPredicate = function(predicate) {
+//    predicate_element = (YAHOO.util.Dom.getElementsByClassName("predicate", null, this.element))[0];
+//    i = new Identifier(predicate_element);
+//    i.setURI(predicate);
+//}
+ResourceEditor.prototype.getObject = function(element) {
+    object_element = (YAHOO.util.Dom.getElementsByClassName("object", null, element))[0];
+    i = new Identifier(object_element);
+    return i.getURI();
+}
+//ResourceEditor.prototype.setObject = function(object) {
+//    object_element = (YAHOO.util.Dom.getElementsByClassName("object", null, this.element))[0];
+//    i = new Identifier(object_element);
+//    i.setURI(object);
+//}
+ResourceEditor.prototype.addAssertion = function(me) {
+    var e = me; //why is this not me.target like for edit_link??
+    while (e.className!='resource') {
+       e = e.parentNode;
+    }
+    var resource = e;
+    var assertions = resource.getElementsByTagName("ul")[0]; // TODO: make more robust
+    na = document.getElementById("new_assertion").getElementsByTagName("li")[0].cloneNode(true);
+    assertions.appendChild(na);
+    //this.uriEditor.addEditLinks();
+}
+ResourceEditor.prototype.edit = function(element) {
+    this.currentStatement = [this.getSubject(), this.getPredicate(element.parentNode), this.getObject(element.parentNode)];
+    var result = this.uriEditor.edit(element);
+    return result;
+}
+/**
+ * Some value has changed. Figure out what statement we want to ask
+ * the server to add or what statement we want the server to modify.
+ */
+ResourceEditor.prototype.updateValue = function() {
+    result = this.uriEditor.updateValue();
+    var target = this.uriEditor.target;
+    var newStatement = null;
+    var which = target._element.className;
+    if (which=="subject") {
+        this.currentStatement = null;
+        //this.setSubject(target);
+    } else if (which=="predicate") {
+        var s = this.getSubject();
+        var o = this.getObject(target._element.parentNode);
+        if (s && o) {
+            newStatement = [s, target.getURI(), o];
+        }
+    } else if (which=="object") {
+        var s = this.getSubject();
+        var p = this.getPredicate(target._element.parentNode);
+        if (s && p) {
+            newStatement = [s, p, target.getURI()];
+        }
+    } else {
+        alert('me');
+    }
+    if (newStatement && newStatement[0]!='' && newStatement[1]!='' && newStatement[2]!='') {
+        server.assert(newStatement, this.currentStatement);
+    }
+    return result;
+}
+
+function Server() {
+}
+Server.prototype.assert = function(newStatement, currentStatement) {
+    if (currentStatement) {
+        if(newStatement[0]!=currentStatement[0] || 
+           newStatement[1]!=currentStatement[1] || 
+           newStatement[2]!=currentStatement[2]) {
+            alert("changed: " + currentStatement + "->" + newStatement);
+        }
+    } else {
+        alert("asserted: " + newStatement);
+    }
+}
+server = new Server();
+
+
+init = function() {
+    resourceEditor = new ResourceEditor();
+}
+
+YAHOO.util.Event.addListener(this,'load',init);
+
+]]>
+    </rdf:value>
+  </rdf:Description>
+
+</rdf:RDF>
+
