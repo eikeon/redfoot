@@ -51,7 +51,7 @@
     <rdfs:subClassOf rdf:resource="redfoot#Resource"/>
     <server:allow rdf:resource="#Admin"/>
     <template:content>
-      <server:PagePartHandler rdf:ID="site_handler">
+      <kid:PagePartHandler rdf:ID="site_handler">
         <rdfs:label>Site Handler</rdfs:label>
         <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
@@ -115,7 +115,7 @@ import rdflib, redfootlib, twisted, kid
 </div>
 ]]>
         </kid:template>
-      </server:PagePartHandler>
+      </kid:PagePartHandler>
     </template:content>
   </rdfs:Class>
 
@@ -187,6 +187,20 @@ if ".." not in path:
     <rdfs:label>Page Handler</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:subClassOf rdf:resource="http://redfoot.net/3.0/code#Code"/>
+    <server:display rdf:resource="">
+      <code:Code rdf:ID="PageHandlerDisplay">
+        <rdfs:label>display</rdfs:label>
+        <code:python rdf:datatype="http://redfoot.net/3.0/redfoot#Python">
+<![CDATA[
+
+_logger = redfoot.getLogger(__uri__)
+_logger.info("py_direct_display(%s)" % page_part_uri)
+redfoot.execute(page_part_uri, dict(globals())) 
+
+]]>
+        </code:python>
+      </code:Code>
+    </server:display>
   </rdfs:Class>
 
   <rdfs:Class rdf:ID="PagePartHandler">

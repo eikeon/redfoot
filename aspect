@@ -37,9 +37,8 @@
     <rdfs:comment>An aspect is a set of functionality that is intented to be added to a site.</rdfs:comment>
     <rdfs:subClassOf rdf:resource="#Resource"/>
     <template:content>
-
-      <template:Content rdf:ID="UserPagePartHandler">
-        <rdfs:label>Quant User Page Part Handler</rdfs:label>
+      <kid:PagePartHandler rdf:ID="AspectPagePartHandler">
+        <rdfs:label>Aspect Page Part Handler</rdfs:label>
         <kid:template rdf:datatype="http://redfoot.net/3.0/server#Kid">
 <![CDATA[
 
@@ -66,7 +65,7 @@ if action=="install" and aspect:
 
 ]]>
         </kid:template>
-      </template:Content>
+      </kid:PagePartHandler>
     </template:content>
   </rdfs:Class>
 
@@ -121,6 +120,7 @@ for item in redfoot.objects(aspect, ASPECT.item):
   <aspect:Aspect rdf:about="browse#aspect"/>
   <aspect:Aspect rdf:about="comment#aspect"/>
   <aspect:Aspect rdf:about="doap#aspect"/>
+  <aspect:Aspect rdf:about="editor#aspect"/>
 
   <aspect:Aspect rdf:about="aspects/issues#aspect"/>
   <aspect:Aspect rdf:about="aspects/contexts#aspect"/>
