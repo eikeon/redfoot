@@ -16,10 +16,9 @@ from redfootlib import BootLoader, __version__
 
 def main():
     parser = optparse.OptionParser(usage="""\
-    usage: %prog <program_options> <program_args>
-      or
-    %prog loader <loader_option> [program <program_options> <program_args>]
+    usage: %prog [loader <loader_option>] [program <program_options> <program_args>]
 
+    example: %prog loader --help
     example: %prog loader --log-level=debug program --help""")
 
     parser.allow_interspersed_args = False
@@ -42,7 +41,7 @@ def main():
 
     loader_parser.set_defaults(program=None, set_default=False, clear_default=False,
                                update=False, verbose=False, log_levels=["INFO"], version=False, 
-                               store=None, path="__rfboot__", 
+                               store=None, path="redfoot_boot", 
                                daemon=False, name="redfoot",
                                generate_key=False, passphrase="")
 

@@ -53,7 +53,7 @@ parser.add_option("--path", dest="path", help="path to database")
 parser.add_option("--program", dest="program", help="URIRef of program for kernel to load and run. Defaults to command_runner")
 parser.add_option("--rebuild-from-journal", action="store_true", dest="rebuild_from_journal", help="rebuild the store from the journal file")    
 parser.add_option("--update", action="store_true", dest="update", help="update cached version of program")    
-parser.set_defaults(path="__rfdb__", program = None, update=False, 
+parser.set_defaults(path="redfoot_db", program = None, update=False, 
                     program="http://redfoot.net/3.0/kernel#runner")
 
 parser.allow_interspersed_args = False
