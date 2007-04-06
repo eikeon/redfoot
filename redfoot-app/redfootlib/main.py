@@ -112,9 +112,9 @@ def main():
         except KeyboardInterrupt, ki:
             passphrase = ''    
         c = loader.crypto = use_key(passphrase)
-        e = c.encrypt("Aboo,")
-        _logger.info("e: %s" % e)
-        _logger.info("??: %s" % c.decrypt(e))
+        #e = c.encrypt("testing")
+        #_logger.info("e: %s" % e)
+        #_logger.info("??: %s" % c.decrypt(e))
 
     if options.daemon:
         _logger.debug("daemonizing")
