@@ -81,6 +81,9 @@ from rdflib.Journal import JournalReader, JournalWriter
 from rdflib.events import Dispatcher, Event
 from rdflib import TextIndex
 
+# To work around rdflib 2.4.0's TextIndex indexing base64binary like
+# crazy... only index on word boundaries for now.
+import re
 TextIndex.word_pattern = re.compile(r"(?u)\S+")
 
 _logger = logging.getLogger("hypercode.%s" % redfoot_loader.label(__uri__))
