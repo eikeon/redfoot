@@ -66,7 +66,7 @@ class DocumentCreatedEvent(Event):
     <template:section_rank>19.0</template:section_rank>
     <rdfs:label>Documents</rdfs:label>
     <template:content>
-      <template:Content rdf:ID="DocumentsPagePartHandler">
+      <kid:PagePartHandler rdf:ID="DocumentsPagePartHandler">
         <rdfs:label>Documents Page Part Handler</rdfs:label>
        <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
@@ -123,7 +123,7 @@ documents.reverse()
 
 ]]>
         </kid:template>
-      </template:Content>
+      </kid:PagePartHandler>
     </template:content>
   </template:Section>
 
@@ -133,7 +133,7 @@ documents.reverse()
     <rdfs:label>Upload</rdfs:label>
     <server:allow rdf:resource="http://redfoot.net/3.0/session#User"/>
     <template:content>
-      <template:Content rdf:ID="UploadPagePartHandler">
+      <kid:PagePartHandler rdf:ID="UploadPagePartHandler">
         <rdfs:label>Upload Page Part Handler</rdfs:label>
        <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
@@ -273,7 +273,7 @@ types.sort()
 
 ]]>
         </kid:template>
-      </template:Content>
+      </kid:PagePartHandler>
     </template:content>
   </server:Page>
 
@@ -283,7 +283,7 @@ types.sort()
     <server:allow rdf:resource="http://redfoot.net/3.0/session#User"/>
     <server:long_running>true</server:long_running>
     <template:content>
-      <template:Content rdf:ID="UploadProcessPagePartHandler">
+      <kid:PagePartHandler rdf:ID="UploadProcessPagePartHandler">
         <rdfs:label>Upload Process Page Part Handler</rdfs:label>
        <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
@@ -356,7 +356,7 @@ if file:
 
 ]]>
         </kid:template>
-      </template:Content>
+      </kid:PagePartHandler>
     </template:content>
   </server:Page>
 
@@ -364,7 +364,7 @@ if file:
     <rdfs:label>Document Context</rdfs:label>
     <rdfs:subClassOf rdf:resource="http://redfoot.net/3.0/redfoot#Context"/>    
     <template:content>
-      <server:PagePartHandler rdf:ID="document_content_handler">
+      <kid:PagePartHandler rdf:ID="document_content_handler">
         <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string"><![CDATA[
 
 <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
@@ -412,7 +412,7 @@ comment = redfoot.comment(document)
 
 
       ]]></kid:template>
-      </server:PagePartHandler>
+      </kid:PagePartHandler>
     </template:content>
   </rdfs:Class>
 

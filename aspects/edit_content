@@ -33,7 +33,7 @@
     <!-- TODO: define a class specifically for those who can edit content -->
     <server:allow rdf:resource="#Admin"/>
     <template:content>
-     <server:PagePartHandler rdf:ID="edit_content_content">
+     <kid:PagePartHandler rdf:ID="edit_content_content">
       <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
   <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
@@ -89,7 +89,7 @@ if uri:
   </span>
 ]]>
       </kid:template>
-     </server:PagePartHandler> 
+     </kid:PagePartHandler> 
     </template:content>
   </server:Page>
 
@@ -100,7 +100,7 @@ if uri:
     <rdfs:comment></rdfs:comment>
     <server:allow rdf:resource="http://redfoot.net/3.0/session#User"/>
     <template:content>
-     <server:PagePartHandler rdf:ID="put_content_content">
+     <kid:PagePartHandler rdf:ID="put_content_content">
       <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
   <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
@@ -167,7 +167,7 @@ from urllib import quote
 
 ]]>
       </kid:template>
-     </server:PagePartHandler> 
+     </kid:PagePartHandler> 
     </template:content>
   </server:Page>
 

@@ -41,7 +41,7 @@
     <server:page_handler rdf:resource="#register_process"/>
   </server:Page>
 
-  <server:PagePartHandler rdf:ID="auth_register">
+  <kid:PagePartHandler rdf:ID="auth_register">
     <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string"><![CDATA[
 
  <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
@@ -83,7 +83,7 @@ else:
 
  </span> 
       ]]></kid:template>
-  </server:PagePartHandler>
+  </kid:PagePartHandler>
 
   <server:PageHandler rdf:ID="register_process">
     <server:content_type>application/xhtml+xml</server:content_type>

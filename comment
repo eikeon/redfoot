@@ -20,7 +20,7 @@
     <rdfs:comment></rdfs:comment>
     <rdfs:subClassOf rdf:resource="http://redfoot.net/3.0/server#Class"/>
     <template:content>
-     <server:PagePartHandler rdf:ID="comment_handler">
+     <kid:PagePartHandler rdf:ID="comment_handler">
       <rdfs:label>comment handler</rdfs:label>
       <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
@@ -53,7 +53,7 @@ regarding <a href="${request.relative(resource)}">${redfoot.label(resource, reso
 </div>
 ]]>
       </kid:template>
-     </server:PagePartHandler>
+     </kid:PagePartHandler>
     </template:content>
   </rdfs:Class>
 
@@ -89,7 +89,7 @@ regarding <a href="${request.relative(resource)}">${redfoot.label(resource, reso
     <rdfs:member rdf:resource="http://redfoot.net/3.0/comment#exclude"/>
     <server:allow rdf:resource="http://redfoot.net/3.0/session#User"/>
     <template:content>
-     <server:PagePartHandler rdf:ID="add_comment_content">
+     <kid:PagePartHandler rdf:ID="add_comment_content">
       <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
   <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
@@ -164,11 +164,11 @@ if uri is not None and comment:
 
 ]]>
       </kid:template>
-     </server:PagePartHandler> 
+     </kid:PagePartHandler> 
     </template:content>
   </server:Page>
 
-  <server:PagePartHandler rdf:ID="add_comment">
+  <kid:PagePartHandler rdf:ID="add_comment">
     <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 <div xmlns:kid="http://purl.org/kid/ns#" 
@@ -195,10 +195,10 @@ from urllib import quote
 </div>
 ]]>    
     </kid:template>      
-  </server:PagePartHandler>
+  </kid:PagePartHandler>
 
 
-  <server:PagePartHandler rdf:ID="comments">
+  <kid:PagePartHandler rdf:ID="comments">
     <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 <div xmlns:kid="http://purl.org/kid/ns#" 
@@ -235,7 +235,7 @@ creator_label = redfoot.label(creator) or creator.split('@')[0]
 </div>
 ]]>    
     </kid:template>      
-  </server:PagePartHandler>
+  </kid:PagePartHandler>
 
   <template:Section rdf:ID="comments_page">
     <aspect:location>/comments/</aspect:location>
@@ -244,7 +244,7 @@ creator_label = redfoot.label(creator) or creator.split('@')[0]
     <server:alternate rdf:resource="/comments/atom/"/>    
     <template:default_section_rank>20.0</template:default_section_rank>
     <template:content>
-      <server:PagePartHandler rdf:ID="all_comments">
+      <kid:PagePartHandler rdf:ID="all_comments">
         <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 <div xmlns:kid="http://purl.org/kid/ns#" 
@@ -285,7 +285,7 @@ else:
 </div>
 ]]>    
         </kid:template>      
-      </server:PagePartHandler>
+      </kid:PagePartHandler>
     </template:content>  
     
     <rdfs:member rdf:resource="http://redfoot.net/3.0/comment#exclude"/>    

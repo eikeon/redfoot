@@ -65,7 +65,7 @@ context.serialize(destination=response, format="pretty-xml")
     <rdfs:label>Ingredients</rdfs:label>
     <template:section_rank>7.0</template:section_rank>    
     <template:content>
-     <server:PagePartHandler rdf:ID="ingredients_content_handler">
+     <kid:PagePartHandler rdf:ID="ingredients_content_handler">
       <rdfs:label>Default main for Redfoot</rdfs:label>      
       <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
@@ -86,12 +86,12 @@ ingredients.sort()
 
 ]]>
       </kid:template>
-     </server:PagePartHandler>
+     </kid:PagePartHandler>
     </template:content>    
   </template:Section>
 
 
-  <server:PagePartHandler rdf:ID="recipe_xhtml_dl"> <!-- TODO: type-->
+  <kid:PagePartHandler rdf:ID="recipe_xhtml_dl"> <!-- TODO: type-->
     <rdfs:label>Recipe list</rdfs:label>      
     <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
@@ -120,9 +120,9 @@ format = redfoot.module(URIRef("simple_format#module", base=redfoot.uri)).format
 ]]>
 
     </kid:template>
-  </server:PagePartHandler>
+  </kid:PagePartHandler>
       
-  <server:PageHandler rdf:ID="recipe_atom_0.3">
+  <kid:PageHandler rdf:ID="recipe_atom_0.3">
     <rdfs:label>Recipes (Atom feed)</rdfs:label>
     <server:content_type>application/x.atom+xml</server:content_type>    
     <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
@@ -177,7 +177,7 @@ now = datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
 
 ]]>
     </kid:template>
-  </server:PageHandler>
+  </kid:PageHandler>
 
 
 
@@ -385,7 +385,7 @@ response.write("""
     </handler:text>
 -->
     <template:content>
-     <server:PagePartHandler rdf:ID="RecipeContent">
+     <kid:PagePartHandler rdf:ID="RecipeContent">
       <rdfs:label>Recipe</rdfs:label>
       <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
@@ -428,7 +428,7 @@ recipe = request.uri
 </div>
 ]]>
       </kid:template>
-     </server:PagePartHandler>
+     </kid:PagePartHandler>
     </template:content>
   </rdf:Description>
 <!--
@@ -444,7 +444,7 @@ source = redfoot.value(None, RECIPE.recipe, recipe, any=True)
 
   <rdf:Description rdf:about="http://donnafales.com/2002/07/28/recipe-schema#Ingredient">
     <template:content>
-     <server:PagePartHandler rdf:ID="IngredientContent">
+     <kid:PagePartHandler rdf:ID="IngredientContent">
       <rdfs:label>Ingredient</rdfs:label>
       <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
@@ -478,7 +478,7 @@ recipes.sort()
 </div>
 ]]>
       </kid:template>
-     </server:PagePartHandler>
+     </kid:PagePartHandler>
     </template:content>
   </rdf:Description>    
 

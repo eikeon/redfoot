@@ -33,7 +33,7 @@
     <rdfs:member rdf:resource="http://redfoot.net/3.0/issue#exclude"/>
     <server:allow rdf:resource="http://redfoot.net/3.0/session#User"/>
     <template:content>
-     <server:PagePartHandler rdf:ID="issues_add_content">
+     <kid:PagePartHandler rdf:ID="issues_add_content">
       <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
   <div xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
@@ -116,11 +116,11 @@ if label and comment and uid:
 
 ]]>
       </kid:template>
-     </server:PagePartHandler> 
+     </kid:PagePartHandler> 
     </template:content>
   </server:Page>
 
-  <server:PagePartHandler rdf:ID="issues_add">
+  <kid:PagePartHandler rdf:ID="issues_add">
     <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 <div xmlns:kid="http://purl.org/kid/ns#" 
@@ -147,7 +147,7 @@ from urllib import quote
 </div>
 ]]>    
     </kid:template>      
-  </server:PagePartHandler>
+  </kid:PagePartHandler>
 
   <template:Section rdf:ID="issues_page">
     <aspect:location>/issues/</aspect:location>
@@ -155,7 +155,7 @@ from urllib import quote
     <template:default_section_rank>23.0</template:default_section_rank>
     <rdfs:member rdf:resource="http://redfoot.net/3.0/comment#exclude"/>
     <template:content>
-      <server:PagePartHandler rdf:ID="all_issues">
+      <kid:PagePartHandler rdf:ID="all_issues">
         <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
   <div xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
@@ -224,7 +224,7 @@ from urllib import quote
   </div>
 ]]>    
         </kid:template>      
-      </server:PagePartHandler>
+      </kid:PagePartHandler>
     </template:content>  
     
     <rdfs:member rdf:resource="http://redfoot.net/3.0/issue#exclude"/>    
@@ -235,7 +235,7 @@ from urllib import quote
     <rdfs:label>Resolved Issues</rdfs:label>
     <rdfs:member rdf:resource="http://redfoot.net/3.0/comment#exclude"/>
     <template:content>
-      <server:PagePartHandler rdf:ID="resolved_issues">
+      <kid:PagePartHandler rdf:ID="resolved_issues">
         <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
   <div xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
@@ -279,7 +279,7 @@ issues.reverse()
   </div>
 ]]>    
         </kid:template>      
-      </server:PagePartHandler>
+      </kid:PagePartHandler>
     </template:content>  
     
     <rdfs:member rdf:resource="http://redfoot.net/3.0/issue#exclude"/>    

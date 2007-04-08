@@ -38,7 +38,7 @@
     <server:allow rdf:resource="#Admin"/>          
   </rdf:Description>
 
-  <server:PagePartHandler rdf:ID="contexts">
+  <kid:PagePartHandler rdf:ID="contexts">
     <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
@@ -61,7 +61,7 @@ contexts.sort()
   </span>
 ]]>
     </kid:template>
-  </server:PagePartHandler>
+  </kid:PagePartHandler>
 
   <server:Page rdf:about="/rdfxml">
     <rdfs:label>rdfxml</rdfs:label>

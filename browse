@@ -38,7 +38,7 @@
     <template:content rdf:resource="#browse"/>
   </template:Section>
 
-  <server:PagePartHandler rdf:ID="browse">
+  <kid:PagePartHandler rdf:ID="browse">
     <rdfs:label>Browse</rdfs:label>
     <rdfs:comment>
 
@@ -97,9 +97,9 @@ ${display_class(redfoot.value(request.uri, BROWSE.root) or RDFS.Resource)}
       
 ]]>
     </kid:template>
-  </server:PagePartHandler>
+  </kid:PagePartHandler>
 
-  <server:PagePartHandler rdf:ID="typeless">
+  <kid:PagePartHandler rdf:ID="typeless">
     <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string"><![CDATA[
   <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
 <?python
@@ -129,6 +129,6 @@ for subject in uniq(redfoot.subjects()):
   </span>
       
       ]]></kid:template>
-  </server:PagePartHandler>
+  </kid:PagePartHandler>
 
 </rdf:RDF>  

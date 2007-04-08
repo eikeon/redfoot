@@ -26,8 +26,9 @@
     <!-- and have this override if present  -->
     <rdfs:label>Contributors</rdfs:label>
     <template:default_section_rank>70.0</template:default_section_rank>
-    <template:content rdf:parseType="Resource">
-      <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+    <template:content>
+      <kid:PagePartHandler rdf:ID="contributors_content">
+        <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 <div xmlns="http://www.w3.org/1999/xhtml"
      xmlns:kid="http://purl.org/kid/ns#">
@@ -60,7 +61,8 @@ people.sort()
 
 </div>
 ]]>    
-      </kid:template>      
+        </kid:template>      
+      </kid:PagePartHandler>
     </template:content>
   </template:Section>
 
@@ -71,8 +73,9 @@ people.sort()
     <!-- and have this override if present  -->
     <rdfs:label>Releases</rdfs:label>
     <template:default_section_rank>50.0</template:default_section_rank>
-    <template:content rdf:parseType="Resource">
-      <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+    <template:content>
+      <kid:PagePartHandler rdf:ID="releases_content">
+        <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 <div xmlns="http://www.w3.org/1999/xhtml"
      xmlns:kid="http://purl.org/kid/ns#">
@@ -99,15 +102,17 @@ releases.reverse()
 </div>
     
 ]]>    
-      </kid:template>      
+        </kid:template>      
+      </kid:PagePartHandler>
     </template:content>
   </template:Section>
 
 
   <rdf:Description rdf:about="http://usefulinc.com/ns/doap#Project">
-    <template:content rdf:parseType="Resource">
-      <rdfs:label>Default main for Redfoot</rdfs:label>      
-      <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+    <template:content>
+      <kid:PagePartHandler rdf:ID="project_content">
+        <rdfs:label>Default main for Redfoot</rdfs:label>      
+        <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 <div xmlns="http://www.w3.org/1999/xhtml"
      xmlns:kid="http://purl.org/kid/ns#"
@@ -172,14 +177,16 @@ content_type = content_value.datatype
 
 </div>
 ]]>
-      </kid:template>
+        </kid:template>
+      </kid:PagePartHandler>
     </template:content>
   </rdf:Description>
 
   <rdf:Description rdf:about="http://usefulinc.com/ns/doap#Version">
-    <template:content rdf:parseType="Resource">
-      <rdfs:label>Default main for Redfoot</rdfs:label>      
-      <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+    <template:content>   
+      <kid:PagePartHandler rdf:ID="version_content">
+        <rdfs:label>Default main for Redfoot</rdfs:label>      
+        <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 <div xmlns="http://www.w3.org/1999/xhtml"
      xmlns:kid="http://purl.org/kid/ns#"
@@ -201,7 +208,8 @@ content_type = content_value.datatype
 
 </div>
 ]]>
-      </kid:template>
+        </kid:template>
+      </kid:PagePartHandler>
     </template:content>
   </rdf:Description>
 

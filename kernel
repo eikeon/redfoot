@@ -1329,14 +1329,77 @@ for (s, p, o), cg in redfoot.store.triples((None, SERVER.last_modified, None), N
         <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
+map = [
+       ("http://redfoot.net/2005/commands", "http://redfoot.net/3.0/command"),
+
+       ("http://redfoot.net/2005/redfoot#Namespace", "http://redfoot.net/3.0/rdf#Namespace"),
+       ("http://redfoot.net/2005/redfoot#Context", "http://redfoot.net/3.0/rdf#Context"),
+       ("http://redfoot.net/2005/redfoot#publicID", "http://redfoot.net/3.0/rdf#publicID"),
+       ("http://redfoot.net/2005/redfoot#source", "http://redfoot.net/3.0/rdf#source"),
+
+       ("http://redfoot.net/2005/session#User", "http://redfoot.net/3.0/user#User"),
+       ("http://redfoot.net/2005/session#hexdigest", "http://redfoot.net/3.0/user#hexdigest"),
+
+       ("http://redfoot.net/2005/redfoot#Python", "http://redfoot.net/3.0/code#Python"),
+       ("http://redfoot.net/2005/redfoot#Code", "http://redfoot.net/3.0/code#Code"),
+       ("http://redfoot.net/2005/redfoot#Module", "http://redfoot.net/3.0/code#Module"),
+
+#       ("http://redfoot.net/2005/template#Content", "http://redfoot.net/3.0/template#Content"),
+
+#       ("http://redfoot.net/2005/redfoot#code", "http://redfoot.net/2005/redfoot#code"),
+#       ("http://redfoot.net/2005/redfoot#Configuration", "http://redfoot.net/3.0/redfoot#Configuration"),
+#       ("http://redfoot.net/2005/redfoot#init", "http://redfoot.net/2005/redfoot#init"),
+
+#       ("http://redfoot.net/2005/issue#exclude", "http://redfoot.net/3.0/issue#exclude"),
+       ("http://redfoot.net/2005", "http://redfoot.net/3.0"),
+]
+
+for OLD, NEW in map:
+    stdout.write("%s->%s\n" % (OLD, NEW))
+    redfoot.execute(URIRef("http://redfoot.net/3.0/kernel#rename"), args=[OLD, NEW])
+    stdout.write(".\n")
+
 KERNEL = redfoot.namespace("http://redfoot.net/3.0/kernel#")
 RDFE = redfoot.namespace("http://redfoot.net/3.0/rdf#")
 
+def test(uri):
+    uri = URIRef(uri.replace("http://redfoot.net/2005", "http://redfoot.net/3.0"))
+    if not redfoot.check(uri):
+        stdout.write("didn't find: %s\n" % uri)
+
+stdout.write("subjects\n")
+subjects = set(redfoot.subjects(None, None))
+subjects = list(subjects)
+subjects.sort()
+for subject in subjects:
+    if subject.startswith("http://redfoot.net/2005"):
+        test(subject)
+        stdout.write("%s\n" % subject)
+
+stdout.write("predicates\n")
+predicates = set(redfoot.predicates(None, None))
+predicates = list(predicates)
+predicates.sort()
+for predicate in predicates:
+    if predicate.startswith("http://redfoot.net/2005"):
+        test(predicate)
+        stdout.write("%s\n" % predicate)
+
+stdout.write("objects\n")
+objects = set(redfoot.objects(None, None))
+objects = list(objects)
+objects.sort()
+for object in objects:
+    if object.startswith("http://redfoot.net/2005"):
+        test(object)
+        stdout.write("%s\n" % object)
+
 for (s, p, o), cg in redfoot.store.triples((None, RDFE.context_id, None), None):
-    for c in cg:
-        c.remove((s, p, o))
-        if (s, RDFE.publicID, None) not in redfoot:
-            c.add((s, RDFE.publicID, o))
+    stdout.write("??: %s %s\n" % (s, o))
+    #for c in cg:
+    #    c.remove((s, p, o))
+    #    if (s, RDFE.publicID, None) not in redfoot:
+    #        c.add((s, RDFE.publicID, o))
 ]]>
     </code:python>
   </command:Command>

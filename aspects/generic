@@ -95,7 +95,7 @@ else:
   </rdf:Description>
 
 
-  <redfoot:Python rdf:ID="add_resource">
+  <kid:PagePartHandler rdf:ID="add_resource">
     <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 <div xmlns:kid="http://purl.org/kid/ns#" kid:strip="">
@@ -114,12 +114,12 @@ else:
 </div>
 ]]>               
     </kid:template>
-  </redfoot:Python>
+  </kid:PagePartHandler>
 
 
 
 
-  <redfoot:Python rdf:ID="edit_resource">
+  <kid:PagePartHandler rdf:ID="edit_resource">
     <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 <div xmlns:kid="http://purl.org/kid/ns#" kid:strip="">
@@ -217,12 +217,12 @@ if o.language:
 </div>
 ]]>               
     </kid:template>
-  </redfoot:Python>
+  </kid:PagePartHandler>
 
 
 
 
-  <redfoot:Python rdf:ID="edit_triple">
+  <kid:PagePartHandler rdf:ID="edit_triple">
     <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 <div xmlns:kid="http://purl.org/kid/ns#" kid:strip="">
@@ -274,7 +274,7 @@ if object!=None:
                 c = redfoot.get_context(request.session_id)
                 redfoot.remove((request.session_id, SESSION.context, None))
                 c.add((request.session_id, SESSION.context, user_document))
-                c.add((user_document, RDF.type, REDFOOT.Context))
+                c.add((user_document, RDF.type, KERNEL.Context))
             context = redfoot.get_context(user_document, creator=uid)
 	    if object_orig!=None and object_orig!=object:
 		redfoot.remove((subject, predicate, object_orig))
@@ -423,6 +423,6 @@ else:
 </div>
 ]]>               
     </kid:template>
-  </redfoot:Python>
+  </kid:PagePartHandler>
 
 </rdf:RDF>

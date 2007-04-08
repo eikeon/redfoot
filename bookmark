@@ -27,7 +27,7 @@
     <rdfs:comment></rdfs:comment>
     <rdfs:subClassOf rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
     <template:content>
-     <server:PagePartHandler rdf:ID="BookmarkHandler">
+     <kid:PagePartHandler rdf:ID="BookmarkHandler">
       <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
   <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
@@ -79,7 +79,7 @@ categories = list(redfoot.objects(bookmark, BOOKMARK.category))
   </span>
 ]]>
       </kid:template>
-     </server:PagePartHandler> 
+     </kid:PagePartHandler> 
     </template:content>
   </owl:Class>
 
@@ -95,7 +95,7 @@ categories = list(redfoot.objects(bookmark, BOOKMARK.category))
     <rdfs:comment></rdfs:comment>
     <rdfs:subClassOf rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
     <template:content>
-     <server:PagePartHandler rdf:ID="CategoryHandler">
+     <kid:PagePartHandler rdf:ID="CategoryHandler">
       <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
   <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
@@ -140,7 +140,7 @@ bookmarks.reverse()
    </span>
 ]]>
       </kid:template>
-     </server:PagePartHandler> 
+     </kid:PagePartHandler> 
     </template:content>
   </owl:Class>
 
@@ -186,7 +186,7 @@ class BookmarkCreatedEvent(Event):
     <rdfs:member rdf:resource="http://redfoot.net/3.0/comment#exclude"/>        
     <template:default_section_rank>25.0</template:default_section_rank>
     <template:content>
-     <server:PagePartHandler rdf:ID="Bookmarks">
+     <kid:PagePartHandler rdf:ID="Bookmarks">
       <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
   <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
@@ -231,7 +231,7 @@ bookmarks.reverse()
   </span>
 ]]>
       </kid:template>
-     </server:PagePartHandler> 
+     </kid:PagePartHandler> 
     </template:content>
   </template:Section>
 

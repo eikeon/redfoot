@@ -1,4 +1,4 @@
-import logging
+import sys, types, logging
 
 _logger = logging.getLogger(__name__)
 
@@ -94,38 +94,17 @@ class BootLoader(ConjunctiveGraph):
             raise Exception("Couldn't execute %s (nothing known about resource)" % uri)
 
     def module(self, uri):
-        #_logger.info("module: %s" % self.label(uri))
-        #_logger.debug("  uri: %s" % uri)
-        #return self.execute(uri)
-        # Any reason why we'd have to do the following instead?
-        import sys, types
         self.check(uri)
-        _logger.info("creating module for: %s" % self.label(uri))
-        class Object(object):
-            pass
-        this = Object()
-        this.execute = self.execute
-        this.__uri__ = uri
-        
-        # we're currently to low level to do the following
-        # module_constructor = self.value(CODE.PythonModule, CODE.constructor)
-        # self.execute(module_constructor, this=this)
-        # 
-        module_name = this.__uri__       
-
-        _logger.debug("creating module: %s" % this.__uri__)
-        safe_module_name = "__uri___%s" % hash(this.__uri__)
+        module_name = uri       
+        _logger.debug("creating module: %s" % uri)
+        safe_module_name = "__uri___%s" % hash(uri)
         module = types.ModuleType(safe_module_name)
         module.__name__ = module_name 
-        module.__file__ = this.__uri__
+        module.__file__ = uri
         module.__ispkg__ = 0
         sys.modules[module_name] = module
-        module.__dict__.update({"redfoot_loader": self, "__uri__": this.__uri__})
-        this.execute(this.__uri__, context=module.__dict__)
-
-        #for item in dir(module):
-        #    _logger.debug("setting: '%s'" % item)
-        #    this.__setattr__(item, module.__dict__.get(item))
+        module.__dict__.update({"redfoot_loader": self, "__uri__": uri})
+        self.execute(uri, context=module.__dict__)
 
         return module
 

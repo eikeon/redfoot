@@ -37,7 +37,7 @@
     <template:section rdf:resource="/blog/add_entry/"/>
     <template:default_section_rank>10.0</template:default_section_rank>
     <template:content>
-     <server:PagePartHandler  rdf:ID="blog">
+     <kid:PagePartHandler  rdf:ID="blog">
       <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 <div xmlns:kid="http://purl.org/kid/ns#" 
@@ -123,7 +123,7 @@ else:
 </div>
 ]]>    
       </kid:template>      
-     </server:PagePartHandler>
+     </kid:PagePartHandler>
     </template:content>
   </template:Section>
 
@@ -134,7 +134,7 @@ else:
     <rdfs:member rdf:resource="http://redfoot.net/3.0/comment#exclude"/>    
     <server:allow rdf:resource="http://redfoot.net/3.0/session#User"/>
     <template:content>
-     <server:PagePartHandler rdf:ID="add_entry_content">
+     <kid:PagePartHandler rdf:ID="add_entry_content">
       <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
   <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
@@ -161,7 +161,7 @@ from urllib import quote
   </span>
 ]]>
       </kid:template>
-     </server:PagePartHandler> 
+     </kid:PagePartHandler> 
     </template:content>
   </server:Page>
 
@@ -172,7 +172,7 @@ from urllib import quote
     <rdfs:comment></rdfs:comment>
     <server:allow rdf:resource="http://redfoot.net/3.0/session#User"/>
     <template:content>
-     <server:PagePartHandler rdf:ID="put_entry_content">
+     <kid:PagePartHandler rdf:ID="put_entry_content">
       <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
   <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
@@ -241,7 +241,7 @@ from urllib import quote
 
 ]]>
       </kid:template>
-     </server:PagePartHandler> 
+     </kid:PagePartHandler> 
     </template:content>
   </server:Page>
 
@@ -252,7 +252,7 @@ from urllib import quote
     <server:supported_content_types>application/atom+xml</server:supported_content_types>
   </server:Page>
 
-  <server:PageHandler rdf:ID="atom_1.0">
+  <kid:PageHandler rdf:ID="atom_1.0">
     <rdfs:label>Redfoot Atom 1.0 Page Handler</rdfs:label>
     <server:content_type>application/atom+xml</server:content_type>    
     <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
@@ -324,9 +324,9 @@ now = datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
 
 ]]>
     </kid:template>
-  </server:PageHandler>
+  </kid:PageHandler>
 
-  <server:PageHandler rdf:ID="atom_0.3">
+  <kid:PageHandler rdf:ID="atom_0.3">
     <rdfs:label>blog feed (atom 0.3)</rdfs:label>
     <server:content_type>application/atom+xml</server:content_type>    
     <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
@@ -396,6 +396,6 @@ now = datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
 
 ]]>
     </kid:template>
-  </server:PageHandler>
+  </kid:PageHandler>
 
 </rdf:RDF>  
