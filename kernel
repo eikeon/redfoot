@@ -1352,12 +1352,14 @@ map = [
 
 #       ("http://redfoot.net/2005/issue#exclude", "http://redfoot.net/3.0/issue#exclude"),
        ("http://redfoot.net/2005", "http://redfoot.net/3.0"),
+       ("http://redfoot.net/2006", "http://redfoot.net/3.0"),
+       ("http://redfoot.net/hypercode/", "http://redfoot.net/3.0/"),
 ]
 
-for OLD, NEW in map:
-    stdout.write("%s->%s\n" % (OLD, NEW))
-    redfoot.execute(URIRef("http://redfoot.net/3.0/kernel#rename"), args=[OLD, NEW])
-    stdout.write(".\n")
+#for OLD, NEW in map:
+#    stdout.write("%s->%s\n" % (OLD, NEW))
+#    redfoot.execute(URIRef("http://redfoot.net/3.0/kernel#rename"), args=[OLD, NEW])
+#    stdout.write(".\n")
 
 KERNEL = redfoot.namespace("http://redfoot.net/3.0/kernel#")
 RDFE = redfoot.namespace("http://redfoot.net/3.0/rdf#")
@@ -1394,8 +1396,25 @@ for object in objects:
         test(object)
         stdout.write("%s\n" % object)
 
-for (s, p, o), cg in redfoot.store.triples((None, RDFE.context_id, None), None):
-    stdout.write("??: %s %s\n" % (s, o))
+
+XSD = redfoot.namespace("http://www.w3.org/2001/XMLSchema#")
+TEMPLATE = redfoot.namespace("http://redfoot.net/3.0/template#")
+KID = redfoot.namespace("http://redfoot.net/3.0/kid#")
+
+for pred in [TEMPLATE.content, TEMPLATE.head_content]:
+    for s, p, tc in redfoot.triples((None, pred, None)):
+        contexts = list(redfoot.contexts((s, p, tc)))
+        if len(contexts)>1:
+            _logger.warning("more than one context for %s" % tc)       
+        c = contexts[0]
+        v = redfoot.value(tc, RDF.value)
+        redfoot.remove((tc, RDF.value, None))
+        c.add((tc, RDF.type, KID.PagePartHandler))
+        c.add((tc, KID.template, Literal(v, datatype=XSD.string)))
+    #redfoothttp://redfoot.net/2005/server#Kid
+
+#for (s, p, o), cg in redfoot.store.triples((None, RDFE.context_id, None), None):
+#    stdout.write("??: %s %s\n" % (s, o))
     #for c in cg:
     #    c.remove((s, p, o))
     #    if (s, RDFE.publicID, None) not in redfoot:
