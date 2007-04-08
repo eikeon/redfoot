@@ -475,8 +475,9 @@ def authenticate_user(username, hostname, password):
     return False
 
 def is_user(username, hostname):
-    user_uri = URIRef("mailto:%s@%s" % (username, hostname))
-    return (user_uri, RDF.type, USER.User) in redfoot
+    uid = URIRef("xmpp:%s@%s" % (username, hostname))
+    user_uri = redfoot.value(predicate=XMPP.uid, object=uid) or uid
+    return user_uri and (user_uri, RDF.type, USER.User) in redfoot
 
 
 def main():
