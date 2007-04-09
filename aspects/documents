@@ -34,7 +34,7 @@
     <rdfs:subClassOf rdf:resource="http://redfoot.net/3.0/server#StaticPage"/>
   </rdfs:Class>
 
-  <redfoot:Module rdf:ID="module">
+  <code:Module rdf:ID="module">
     <rdfs:label></rdfs:label>      
     <rdfs:comment></rdfs:comment>    
     <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
@@ -52,7 +52,7 @@ class DocumentCreatedEvent(Event):
 
 ]]>
     </code:python>
-  </redfoot:Module>
+  </code:Module>
 
   <aspect:Aspect rdf:ID="aspect">
     <rdfs:label>Documents</rdfs:label>

@@ -72,20 +72,20 @@ redfoot.map(URIRef("http://redfoot.net/3.0"), physical)
 
 redfoot.open(options.path, rebuild=options.rebuild_from_journal)
 try:
-   program = URIRef(options.program)
-   # NOTE: Just for reference we load __uri__
-   #program = URIRef(program, base=__uri__)
-   if options.update:
-       redfoot.load(KERNEL)
-       redfoot.load(program)
-       redfoot.load(__uri__)
-   else:
-       redfoot.check(KERNEL)
-       redfoot.check(program)
-       redfoot.check(__uri__)
-   _logger.info("running: %s" % redfoot.label(program))
-   _logger.debug("  uri: %s" % program)
-   redfoot.execute(program, args=args)
+    program = URIRef(options.program)
+    # NOTE: Just for reference we load __uri__
+    #program = URIRef(program, base=__uri__)
+    if options.update:
+        redfoot.load(KERNEL)
+        redfoot.load(program)
+        redfoot.load(__uri__)
+    else:
+        redfoot.check(KERNEL)
+        redfoot.check(program)
+        redfoot.check(__uri__)
+    _logger.info("running: %s" % redfoot.label(program))
+    _logger.debug("  uri: %s" % program)
+    redfoot.execute(program, args=args)
 except Exception, e:
     _logger.exception(e)
 finally:

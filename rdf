@@ -79,7 +79,7 @@ g.serialize(destination=response)#, base=document)
 
   <rdfs:Class rdf:about="http://www.w3.org/2000/01/rdf-schema#Class">
     <template:content>
-      <server:PagePartHandler rdf:ID="class_content">
+      <kid:PagePartHandler rdf:ID="class_content">
         <rdfs:label>Display of Class</rdfs:label>
         <kid:template rdf:datatype="http://redfoot.net/3.0/server#Kid">
 <![CDATA[
@@ -176,7 +176,7 @@ superclasses = list(redfoot.objects(uri, RDFS.subClassOf)) # TODO:
 </div>
 ]]>
         </kid:template>
-      </server:PagePartHandler>
+      </kid:PagePartHandler>
     </template:content>
   </rdfs:Class>
 
