@@ -25,7 +25,7 @@
     <rdfs:comment></rdfs:comment>
     <rdfs:subClassOf rdf:resource="http://redfoot.net/3.0/server#Class"/>
     <template:content>
-     <server:PagePartHandler rdf:ID="EntryContent">
+     <kid:PagePartHandler rdf:ID="EntryContent">
       <rdfs:label>Entry</rdfs:label>
       <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
@@ -76,7 +76,7 @@ creator = redfoot.value(entry, DC.creator)
 </div>
 ]]>
       </kid:template>
-     </server:PagePartHandler>
+     </kid:PagePartHandler>
     </template:content>
   </rdfs:Class>
 
