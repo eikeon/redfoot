@@ -232,6 +232,16 @@ class Kernel(ConjunctiveGraph):
                 return URIRef(uri.replace(physical, logical, 1))
         return uri
 
+    def label(self, subject, default=''):
+        # TODO: push this subproperty support back down into rdflib
+        label = super(Kernel, self).label(subject, None)
+        if label is None:
+            for subproperty in self.transitive_subjects(RDFS.subPropertyOf, RDFS.label):
+                label = self.value(subject, subproperty, default=None, any=True)        
+                if label is not None:
+                    return label
+        return label or default
+
     def check(self, uri, creator=None):
         """
         Checks to see if redfoot knows anything about uri
