@@ -41,6 +41,9 @@
 <?python 
 
 TEMPLATE = redfoot.namespace("http://redfoot.net/3.0/template#")
+KID = redfoot.namespace("http://redfoot.net/3.0/kid#")
+SERVER = redfoot.namespace("http://redfoot.net/3.0/server#")
+CODE = redfoot.namespace("http://redfoot.net/3.0/code#")
 
 allowed = allow(URIRef("%s/edit/put_content/" % request.host))
 from urllib import quote
@@ -51,16 +54,22 @@ if uri:
     label = redfoot.label(uri)
     content = redfoot.value(uri, TEMPLATE.content)
     if content:
-        content_value = redfoot.value(content, RDF.value)
+        content_type = redfoot.value(content, RDF.type)
+        if content_type==KID.PagePartHandler:
+            content_value = redfoot.value(content, KID.template)
+        elif content_type==SERVER.PagePartHandler:
+            content_value = redfoot.value(content, CODE.python)
+        else:
+            raise Exception("Unexpected content_type: %s" % content_type)
     else: 
         content_value = None
+        content_type = KID.PagePartHandler
 
     if content_value is None:
-        content_value = Literal("", datatype=URIRef("http://redfoot.net/3.0/server#Kid"))
+        content_value = Literal("", datatype=URIRef("http://www.w3.org/2001/XMLSchema#string"))
 
-    value_list = [("Kid", URIRef("http://redfoot.net/3.0/server#Kid")), 
-                  ("Python", URIRef("http://redfoot.net/3.0/redfoot#Python"))]
-    selected = content_value.datatype
+    value_list = [("Kid", KID.PagePartHandler), 
+                  ("Python", SERVER.PagePartHandler)]
 
 ?>  
   <div kid:if="uri and allowed" kid:strip="">
@@ -71,8 +80,8 @@ if uri:
       <p>Format: 
        <select name="format">
         <span kid:for="option_label, option_value in value_list" kid:strip="">
-          <option kid:if="option_value==selected" value="${option_value}" selected="true" >${option_label}</option>
-          <option kid:if="option_value!=selected" value="${option_value}">${option_label}</option>
+          <option kid:if="option_value==content_type" value="${option_value}" selected="true" >${option_label}</option>
+          <option kid:if="option_value!=content_type" value="${option_value}">${option_label}</option>
         </span>
        </select>
        <input name="submit" type="submit" value="Submit Content" />
@@ -116,13 +125,16 @@ TEMPLATE = redfoot.namespace("http://redfoot.net/3.0/template#")
 DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
 SESSION = redfoot.namespace("http://redfoot.net/3.0/session#")
+KID = redfoot.namespace("http://redfoot.net/3.0/kid#")
 SERVER = redfoot.namespace("http://redfoot.net/3.0/server#")
+CODE = redfoot.namespace("http://redfoot.net/3.0/code#")
+XSD = redfoot.namespace("http://www.w3.org/2001/XMLSchema#")
 
 uri = request.parameters.get("uri")
 title = request.parameters.get("title")
 content_value = request.parameters.get("content") or ""
-datatype = URIRef(request.parameters.get("format") or "")
-content_value = Literal(content_value, datatype=datatype)
+content_type = URIRef(request.parameters.get("format") or "")
+content_value = Literal(content_value, datatype=XSD.string)
 if uri:
     uri = URIRef(uri)
     # We do the following get context to create the default context if one's not already created.
@@ -139,14 +151,21 @@ if uri:
             context.remove((uri, TEMPLATE.content, c))
             context.remove((c, None, None))
         context.add((uri, TEMPLATE.content, content))
-    redfoot.remove((content, RDF.value, None))
-    context.add((content, RDF.value, content_value))
+    redfoot.remove((content, None, None))
+    if content_type==KID.PagePartHandler:
+        context.add((content, RDF.type, KID.PagePartHandler))
+        context.add((content, KID.template, content_value))
+    elif content_type==SERVER.PagePartHandler:
+        context.add((content, RDF.type, SERVER.PagePartHandler))
+        context.add((content, CODE.python, content_value))
+    else:
+        raise Exception("Unexpected content type: %s" % content_type)
 
     redfoot.remove((uri, SERVER.last_modified, None))
     context.add((uri, SERVER.last_modified, Literal("%s" % time())))
 
     message = ""
-    if content_value.datatype==URIRef("http://redfoot.net/3.0/server#Kid"):
+    if content_type==KID.PagePartHandler:
         try:
             for item in XML(content_value, fragment=False):
                 pass
