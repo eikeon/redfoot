@@ -170,6 +170,9 @@ class Kernel(ConjunctiveGraph):
                 _logger.info("While trying to execute %s" % uri)
                 _logger.exception(e)
 
+    def close(self, commit_pending_transaction=False):
+        super(Kernel, self).close(path, commit_pending_transaction=commit_pending_transaction)
+        self.text_index.close(commit_pending_transaction=commit_pending_transaction)
 
     def _get_globals(self):
         if self.__globals is None:
