@@ -3,9 +3,9 @@
     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
     xmlns:owl="http://www.w3.org/2002/07/owl#"
-    xmlns:redfoot="http://redfoot.net/2005/redfoot#"
-    xmlns:template="http://redfoot.net/2005/template#"
-    xmlns:server="http://redfoot.net/2005/server#"
+    xmlns:redfoot="http://redfoot.net/3.0/redfoot#"
+    xmlns:template="http://redfoot.net/3.0/template#"
+    xmlns:kid="http://redfoot.net/3.0/kid#"
 >
 
   <redfoot:Namespace rdf:about="#">
@@ -24,8 +24,8 @@
     <rdfs:comment></rdfs:comment>
     <rdfs:subClassOf rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
     <template:content>
-     <server:PagePartHandler rdf:ID="IssueHandler">
-      <rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">
+     <kid:PagePartHandler rdf:ID="IssueHandler">
+      <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
   <span xmlns:kid="http://purl.org/kid/ns#" kid:omit="">
 <?python
@@ -56,8 +56,8 @@ except:
 
   </span>
 ]]>
-      </rdf:value>
-     </server:PagePartHandler> 
+      </kid:template>
+     </kid:PagePartHandler> 
     </template:content>
   </owl:Class>
 

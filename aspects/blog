@@ -93,13 +93,15 @@ from urllib import quote
 
   <div class="blog" kid:for="date, entry, content_value, content_type in blog">
 <?python
+_logger = redfoot.getLogger(__uri__)
+
 href = quote(entry.concrete(), ':/')
 href = request.relative(href)
 creator = redfoot.value(entry, DC.creator)
 try:
     d = parse_date_time(date)
 except:
-    redfoot.log.warning("could not parse %s as a date_time" % date)
+    _logger.warning("could not parse %s as a date_time" % date)
     d = None
 if d:
     date = time.strftime("%A %d %B, %Y", time.gmtime(d))

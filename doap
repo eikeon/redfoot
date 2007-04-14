@@ -213,4 +213,48 @@ content_type = content_value.datatype
     </template:content>
   </rdf:Description>
 
+
+  <template:Section rdf:ID="projects">
+    <aspect:location>/projects/</aspect:location>
+    <rdfs:label>Projects</rdfs:label>
+    <template:default_section_rank>75.0</template:default_section_rank>
+    <template:content>
+      <kid:PagePartHandler rdf:ID="projects_content">
+        <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+<![CDATA[
+<div xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:kid="http://purl.org/kid/ns#">
+
+<?python 
+FOAF = redfoot.namespace("http://xmlns.com/foaf/0.1/")
+DOAP = redfoot.namespace("http://usefulinc.com/ns/doap#")
+projects = []
+seen = set()
+CAT = URIRef("/projects#using_rdflib", base=request.host)
+for project in redfoot.subjects(DOAP.category, CAT):
+    if project not in seen:
+        seen.add(project)
+        label = redfoot.label(project) or project
+        projects.append((label, project))
+projects.sort()
+?>
+
+<p>Have a project you'd like to have listed here? If so, assert that your doap:Project has doap:category of ${CAT} and send us a pointer to your doap (for now leave a comment on this page).
+</p>
+
+<ul>
+  <li kid:for="label, project in projects">
+    <a href="${redfoot.value(project, DOAP.homepage)}">${label}</a>
+    <p>${redfoot.value(project, DOAP.description, any=True)}</p>
+  </li>
+</ul>
+
+</div>
+
+]]>    
+        </kid:template>      
+      </kid:PagePartHandler>
+    </template:content>
+  </template:Section>
+
 </rdf:RDF>  

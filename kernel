@@ -1414,6 +1414,24 @@ XSD = redfoot.namespace("http://www.w3.org/2001/XMLSchema#")
 TEMPLATE = redfoot.namespace("http://redfoot.net/3.0/template#")
 KID = redfoot.namespace("http://redfoot.net/3.0/kid#")
 
+#<rdf:value rdf:datatype="http://redfoot.net/2005/server#Kid">&
+# ->
+#<kid:PagePartHandler><kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+
+for s, p, o in redfoot.triples((None, RDF.value, None)):
+    if isinstance(o, Literal):
+        if o.datatype==URIRef("http://redfoot.net/2005/server#Kid"):
+            #redfoot.remove((s, p, o))
+            #redfoot.add((s, KID.template, Literal(o, datatype=XSD.string)))
+            stdout.write("%s types: %s\n" % (s, repr(list(redfoot.objects(s, RDF.type)))))
+            redfoot.remove((s, RDF.type, None))
+            redfoot.add((s, RDF.type, KID.PagePartHandler))
+
+# remove 'installed' aspects
+for context in list(redfoot.contexts()):
+    if context.identifier.endswith("_aspect"):
+        redfoot.remove_context(context)
+
 for pred in [TEMPLATE.content, TEMPLATE.head_content]:
     for s, p, tc in redfoot.triples((None, pred, None)):
         contexts = list(redfoot.contexts((s, p, tc)))

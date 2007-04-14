@@ -45,7 +45,7 @@ from time import gmtime, time
 from urllib import quote
 
 SESSION = redfoot.namespace("http://redfoot.net/3.0/session#")
-ISSUE = redfoot.namespace("http://redfoot.net/2006/issue#")
+ISSUE = redfoot.namespace("http://redfoot.net/3.0/issue#")
 DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
 SERVER = redfoot.namespace("http://redfoot.net/3.0/server#")
@@ -162,7 +162,7 @@ from urllib import quote
 <?python 
 import time
 
-ISSUE = redfoot.namespace("http://redfoot.net/2006/issue#")
+ISSUE = redfoot.namespace("http://redfoot.net/3.0/issue#")
 SERVER = redfoot.namespace("http://redfoot.net/3.0/server#")
 DC_creator = URIRef("http://purl.org/dc/elements/1.1/creator")
 DC_created = URIRef("http://purl.org/dc/terms/created")
@@ -242,7 +242,7 @@ from urllib import quote
 <?python 
 import time
 
-ISSUE = redfoot.namespace("http://redfoot.net/2006/issue#")
+ISSUE = redfoot.namespace("http://redfoot.net/3.0/issue#")
 SERVER = redfoot.namespace("http://redfoot.net/3.0/server#")
 DC_creator = URIRef("http://purl.org/dc/elements/1.1/creator")
 DC_created = URIRef("http://purl.org/dc/terms/created")
