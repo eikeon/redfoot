@@ -298,7 +298,7 @@ else:
     <server:supported_content_types>application/x.atom+xml</server:supported_content_types>
   </server:Page>
 
-  <server:PageHandler rdf:ID="comments_atom_0.3">
+  <kid:PageHandler rdf:ID="comments_atom_0.3">
     <rdfs:label>comments feed (atom 0.3)</rdfs:label>
     <server:content_type>application/x.atom+xml</server:content_type>    
     <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
@@ -357,7 +357,7 @@ now = datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
 
 ]]>
     </kid:template>
-  </server:PageHandler>
+  </kid:PageHandler>
 
   <code:Module rdf:ID="module">
     <rdfs:label></rdfs:label>      
