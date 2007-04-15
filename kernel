@@ -1343,7 +1343,7 @@ for (s, p, o), cg in redfoot.store.triples((None, SERVER.last_modified, None), N
         <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
-_logger = logging.getLogger(__uri__)
+_logger = redfoot.getLogger(__uri__)
 
 map = [
        ("http://redfoot.net/2005/commands", "http://redfoot.net/3.0/command"),
