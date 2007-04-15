@@ -229,6 +229,7 @@ if o.language:
 <?python
 from rdflib.util import from_n3
 
+KERNEL = redfoot.namespace("http://redfoot.net/3.0/kernel#")
 SESSION = redfoot.namespace("http://redfoot.net/3.0/session#")
 
 subject = from_n3(request.parameters.get("subject"))
