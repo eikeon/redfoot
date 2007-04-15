@@ -3,21 +3,21 @@
         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
         xmlns:rdfe="http://redfoot.net/3.0/rdf#"
-        xmlns:redfoot="http://redfoot.net/3.0/redfoot#"
         xmlns:command="http://redfoot.net/3.0/command#"
         xmlns:template="http://redfoot.net/3.0/template#"
-        xmlns:kid='http://redfoot.net/3.0/kid#'
+        xmlns:kid="http://redfoot.net/3.0/kid#"
         xmlns:server="http://redfoot.net/3.0/server#"
         xmlns:aspect="http://redfoot.net/3.0/aspect#"
+        xmlns:code="http://redfoot.net/3.0/code#"
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
   </rdfe:RDFXMLDocument>
   
-  <redfoot:Namespace rdf:about="#">
+  <rdfe:Namespace rdf:about="#">
     <rdfs:label>Recipes</rdfs:label>
     <rdfs:comment>The Redfoot recipes namespace.</rdfs:comment>
-  </redfoot:Namespace>
+  </rdfe:Namespace>
 
   <aspect:Aspect rdf:ID="aspect">
     <rdfs:label>Recipes</rdfs:label>
@@ -179,12 +179,7 @@ now = datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
     </kid:template>
   </kid:PageHandler>
 
-
-
-<!-- recipes commands bit follows: -->
-
-
-  <commands:Command rdf:ID=""submit_recipe">
+  <command:Command rdf:ID="submit_recipe">
     <rdfs:label>submit_recipe</rdfs:label>
     <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
@@ -210,9 +205,9 @@ recipe_module.parse(message.payload, context, recipe_uri)
 
 ]]>
     </code:python>
-  </commands:Command>
+  </command:Command>
 
-  <commands:Command rdf:ID="ingredients">
+  <command:Command rdf:ID="ingredients">
     <rdfs:label>ingredients</rdfs:label>
     <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
@@ -224,7 +219,7 @@ for i in redfoot.subjects(RDF.type, RECIPE.Ingredient):
 
 ]]>
     </code:python>
-  </commands:Command>
+  </command:Command>
 
   <command:Command rdf:ID="update_recipes">
     <rdfs:label>update recipes</rdfs:label>      
@@ -290,11 +285,9 @@ for arg in args:
       </code:python>
     </command:Command>
 
-    <commands:command rdf:parseType="Resource">
+    <command:command rdf:ID="parse_ingred">
       <rdfs:label>parse_ingred</rdfs:label>
-      <redfoot:code rdf:parseType="Resource">
-        <rdfs:label>Default program for Redfoot</rdfs:label>      
-        <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+      <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
 RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
@@ -321,15 +314,12 @@ if parser.unknown_tokens:
             print e                             
 
 ]]>
-        </code:python>
-      </redfoot:code>
-    </commands:command>
+      </code:python>
+    </command:command>
 
-    <commands:command rdf:parseType="Resource">
+    <command:command rdf:ID="remove_recipe">
       <rdfs:label>remove_recipe</rdfs:label>
-      <redfoot:code rdf:parseType="Resource">
-        <rdfs:label>Default program for Redfoot</rdfs:label>      
-        <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+      <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
 def remove(r):
@@ -344,15 +334,12 @@ for arg in args:
     redfoot.remove((None, None, uri))
 
 ]]>
-        </code:python>
-      </redfoot:code>
+      </code:python>
+    </command:command>
 
-    </commands:command>
-
-    <commands:command>
-      <commands:Command rdf:ID="recipes_missing">
-        <rdfs:label>recipes_missing</rdfs:label>
-        <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+    <command:Command rdf:ID="recipes_missing">
+      <rdfs:label>recipes_missing</rdfs:label>
+      <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
 RECIPE = redfoot.namespace("http://donnafales.com/2002/07/28/recipe-schema#")
@@ -362,11 +349,8 @@ for recipe in redfoot.subjects(RDF.type, RECIPE.Recipe):
         print recipe
 
 ]]>
-        </code:python>
-      </commands:Command>
-    </commands:command>
-
-  </redfoot:Configuration>>
+      </code:python>
+    </command:Command>
 
 
   <rdf:Description rdf:about="http://donnafales.com/2002/07/28/recipe-schema#Recipe">
