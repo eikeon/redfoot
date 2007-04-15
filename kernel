@@ -1343,6 +1343,8 @@ for (s, p, o), cg in redfoot.store.triples((None, SERVER.last_modified, None), N
         <code:python rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
 <![CDATA[
 
+_logger = logging.getLogger(__uri__)
+
 map = [
        ("http://redfoot.net/2005/commands", "http://redfoot.net/3.0/command"),
 
@@ -1438,11 +1440,12 @@ for pred in [TEMPLATE.content, TEMPLATE.head_content]:
         contexts = list(redfoot.contexts((s, p, tc)))
         if len(contexts)>1:
             _logger.warning("more than one context for %s" % tc)       
-        c = contexts[0]
-        v = redfoot.value(tc, RDF.value)
-        redfoot.remove((tc, RDF.value, None))
-        c.add((tc, RDF.type, KID.PagePartHandler))
-        c.add((tc, KID.template, Literal(v, datatype=XSD.string)))
+        for c in contexts:
+            c = contexts[0]
+            v = redfoot.value(tc, RDF.value)
+            redfoot.remove((tc, RDF.value, None))
+            c.add((tc, RDF.type, KID.PagePartHandler))
+            c.add((tc, KID.template, Literal(v, datatype=XSD.string)))
     #redfoothttp://redfoot.net/2005/server#Kid
 
 #for (s, p, o), cg in redfoot.store.triples((None, RDFE.context_id, None), None):
