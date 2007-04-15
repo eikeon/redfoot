@@ -32,6 +32,7 @@
     <rdfs:comment></rdfs:comment>
     <rdfs:member rdf:resource="http://redfoot.net/3.0/comment#exclude"/>        
     <template:default_section_rank>55.0</template:default_section_rank>
+    <server:allow rdf:resource="#Admin"/>
     <template:head_content>
       <kid:PagePartHandler rdf:ID="editor_head">
         <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
@@ -567,6 +568,7 @@ YAHOO.util.Event.addListener(this,'load',init);
   <server:Page rdf:ID="subjects">
     <aspect:location>/subjects/</aspect:location>
     <rdfs:label>Subjects</rdfs:label>
+    <server:allow rdf:resource="#Admin"/>
     <rdfs:comment>Returns all the subject label uri pairs in JSON for the editor</rdfs:comment>
     <rdfs:subClassOf rdf:resource="redfoot#Resource"/>
     <server:supported_content_types>application/json</server:supported_content_types>
@@ -604,6 +606,7 @@ response.write(simplejson.dumps({"Result": pairs}))
   <server:Page rdf:ID="assertions">
     <aspect:location>/editor/assertions/</aspect:location>
     <rdfs:label>Assertions</rdfs:label>
+    <server:allow rdf:resource="#Admin"/>
     <rdfs:comment>Returns all the subject label uri pairs in JSON for the editor</rdfs:comment>
     <rdfs:subClassOf rdf:resource="redfoot#Resource"/>
     <server:supported_content_types>application/json</server:supported_content_types>
@@ -673,6 +676,7 @@ response.write(simplejson.dumps(assertions))
   <server:Page rdf:ID="assert">
     <aspect:location>/editor/assert/</aspect:location>
     <rdfs:label>Assert</rdfs:label>
+    <server:allow rdf:resource="#Admin"/>
     <rdfs:comment>Returns all the subject label uri pairs in JSON for the editor</rdfs:comment>
     <rdfs:subClassOf rdf:resource="redfoot#Resource"/>
     <server:supported_content_types>application/json</server:supported_content_types>
