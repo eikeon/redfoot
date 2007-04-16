@@ -35,6 +35,7 @@
 >
 <?python
 import time
+from markdown import Markdown
 from rdflib.util import parse_date_time
 
 BLOG = redfoot.namespace("http://redfoot.net/3.0/blog#")
@@ -70,6 +71,9 @@ creator = redfoot.value(entry, DC.creator)
   <span kid:if="content_value" kid:strip="">
     <p kid:strip="" kid:if="content_type==URIRef('http://www.w3.org/TR/REC-html40')">${HTML(content_value)}</p>
     <p kid:strip="" kid:if="content_type==URIRef('http://www.w3.org/1999/xhtml')">${XML(content_value)}</p>
+    <p kid:strip="" kid:if="content_type==URIRef('http://redfoot.net/3.0/markdown#format')">
+      ${HTML(Markdown(content_value).toString())}
+    </p>
     <pre kid:if="not content_type">${content_value}</pre>
   </span>
 

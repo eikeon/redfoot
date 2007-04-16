@@ -148,7 +148,7 @@ from urllib import quote
   <div kid:if="allowed" kid:strip="">
     <form action="/put_entry/" method="post">
       <p>Title: <input type="text" name="title" value="" style="width: 100%"/></p>
-      <p>Format: <select name="format"><option value="http://www.w3.org/1999/xhtml">xhtml</option><option value="" selected="True">text</option></select></p>
+      <p>Format: <select name="format"><option value="http://redfoot.net/3.0/markdown#format">markdown</option><option value="http://www.w3.org/1999/xhtml">xhtml</option><option value="" selected="True">text</option></select></p>
       <p>Content:<textarea name="content" cols="" rows="30" style="width: 100%"></textarea></p>
       <p><input name="submit" type="submit" value="Submit Entry" /></p>
     </form>    
