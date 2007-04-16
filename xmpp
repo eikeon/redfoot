@@ -236,7 +236,7 @@ class Client(xmpp.Client):
             else:
                 if not to.startswith("xmpp:"):
                     _logger.warning("Not adding '%s'. Not a xmpp id" % to)
-                    users.append(to)
+                users.append(to)
         else:
             users.append(to)
         for user in users:
