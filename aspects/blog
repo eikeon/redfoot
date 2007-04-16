@@ -134,7 +134,7 @@ else:
     <rdfs:label>Add Entry</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:member rdf:resource="http://redfoot.net/3.0/comment#exclude"/>    
-    <server:allow rdf:resource="http://redfoot.net/3.0/session#User"/>
+    <server:allow rdf:resource="http://redfoot.net/3.0/user#User"/>
     <template:content>
      <kid:PagePartHandler rdf:ID="add_entry_content">
       <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
@@ -172,7 +172,7 @@ from urllib import quote
     <aspect:location>/put_entry/</aspect:location>
     <rdfs:label>Put Entry</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <server:allow rdf:resource="http://redfoot.net/3.0/session#User"/>
+    <server:allow rdf:resource="http://redfoot.net/3.0/user#User"/>
     <template:content>
      <kid:PagePartHandler rdf:ID="put_entry_content">
       <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
