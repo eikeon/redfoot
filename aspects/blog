@@ -47,6 +47,7 @@
 import time
 from urllib import quote
 from rdflib.util import parse_date_time
+from markdown import Markdown
 
 SESSION = redfoot.namespace("http://redfoot.net/3.0/session#")
 BLOG = redfoot.namespace("http://redfoot.net/3.0/blog#")
@@ -112,8 +113,11 @@ else:
     <p class="meta" kid:if="creator or date"> <span kid:if="creator" class="blog_by_line">by ${redfoot.label(creator) or creator} </span>
         <span kid:if="date">on ${date}</span>:
     </p>
-    <p kid:strip="" kid:if="content_type=='http://www.w3.org/TR/REC-html40'">${HTML(content_value)}</p>
-    <p kid:strip="" kid:if="content_type=='http://www.w3.org/1999/xhtml'">${XML(content_value)}</p>
+    <p kid:strip="" kid:if="content_type==URIRef('http://www.w3.org/TR/REC-html40')">${HTML(content_value)}</p>
+    <p kid:strip="" kid:if="content_type==URIRef('http://www.w3.org/1999/xhtml')">${XML(content_value)}</p>
+    <p kid:strip="" kid:if="content_type==URIRef('http://redfoot.net/3.0/markdown#format')">
+      ${HTML(Markdown(content_value).toString())}
+    </p>
     <pre kid:if="not content_type">${content_value}</pre>
     <?python comments = list(redfoot.objects(entry.concrete(), COMMENT.comment))?> 
     <p kid:if="comments" style="font-size: small;"><a href="${quote(entry.concrete(), ':/')}#comments">(${len(comments)}) comments</a></p>
