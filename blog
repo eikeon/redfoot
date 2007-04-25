@@ -166,7 +166,6 @@ from urlparse import urljoin
 from time import mktime
 from rdflib.util import date_time
 
-SESSION = redfoot.namespace("http://redfoot.net/3.0/session#")
 BLOG = redfoot.namespace("http://redfoot.net/3.0/blog#")
 DC = redfoot.namespace("http://purl.org/dc/elements/1.1/")
 DCTERMS = redfoot.namespace("http://purl.org/dc/terms/")
