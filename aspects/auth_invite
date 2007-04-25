@@ -1,28 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rdf:RDF
-  xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
-  xmlns:rdfs='http://www.w3.org/2000/01/rdf-schema#'
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
   xmlns:rdfe="http://redfoot.net/3.0/rdf#"
   xmlns:code="http://redfoot.net/3.0/code#"
-  xmlns:redfoot='http://redfoot.net/3.0/redfoot#'
+  xmlns:redfoot="http://redfoot.net/3.0/redfoot#"
   xmlns:server="http://redfoot.net/3.0/server#"
-  xmlns:template='http://redfoot.net/3.0/template#'
-  xmlns:kid='http://redfoot.net/3.0/kid#'
+  xmlns:template="http://redfoot.net/3.0/template#"
+  xmlns:kid="http://redfoot.net/3.0/kid#"
   xmlns:aspect="http://redfoot.net/3.0/aspect#"
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
   </rdfe:RDFXMLDocument>
   
-  <redfoot:Namespace rdf:about="#">
+  <rdfe:Namespace rdf:about="#">
     <rdfs:label>Auth Invite</rdfs:label>
     <rdfs:comment>The Redfoot auth invite namespace.</rdfs:comment>
-  </redfoot:Namespace>
+  </rdfe:Namespace>
 
   <aspect:Aspect rdf:ID="aspect">
     <rdfs:label>Authentication (Invite)</rdfs:label>
     <rdfs:comment></rdfs:comment>
-    <!-- TODO: this has not been converted to aspect yet... -->
     <aspect:item rdf:resource="#login_page"/>
     <aspect:item rdf:resource="#login_process_page"/>
     <aspect:item rdf:resource="#logout_page"/>
@@ -35,12 +34,6 @@
     <rdfs:label>authentication support</rdfs:label>
     <rdfs:comment>
     </rdfs:comment>
-    <!--
-need to load #auth with a command like:
-redfoot load http://redfoot.net/dev/content/auth http://localhost:8080 "#auth_context"
-
-in which case "" should be a server:Site
-      -->
   </rdf:Description>
 
   <rdfs:Class rdf:ID="User">
