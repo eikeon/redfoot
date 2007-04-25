@@ -87,7 +87,7 @@ regarding <a href="${request.relative(resource)}">${redfoot.label(resource, reso
     <rdfs:label>Add Comment</rdfs:label>
     <rdfs:comment></rdfs:comment>
     <rdfs:member rdf:resource="http://redfoot.net/3.0/comment#exclude"/>
-    <server:allow rdf:resource="http://redfoot.net/3.0/session#User"/>
+    <server:allow rdf:resource="http://redfoot.net/3.0/user#User"/>
     <template:content>
      <kid:PagePartHandler rdf:ID="add_comment_content">
       <kid:template rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
