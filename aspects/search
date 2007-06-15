@@ -7,13 +7,28 @@
    xmlns:commands="http://redfoot.net/3.0/commands#"
    xmlns:server="http://redfoot.net/3.0/server#"
    xmlns:aspect="http://redfoot.net/3.0/aspect#"
-   xmlns:kid='http://redfoot.net/3.0/kid#'
+   xmlns:template="http://redfoot.net/3.0/template#"
+   xmlns:kid="http://redfoot.net/3.0/kid#"
 >
 
   <rdfe:RDFXMLDocument rdf:about="">
   </rdfe:RDFXMLDocument>
   
-  <server:PagePartHandler rdf:ID="v1">
+  <aspect:Aspect rdf:ID="aspect">
+    <rdfs:label>Search</rdfs:label>
+    <aspect:item rdf:resource="#search_page"/>
+  </aspect:Aspect>
+ 
+  <template:Section rdf:ID="search_page">
+    <aspect:location>/search/</aspect:location>
+    <rdfs:label>Search</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:member rdf:resource="http://redfoot.net/3.0/comment#exclude"/>
+    <template:default_section_rank>60.0</template:default_section_rank>
+    <template:content rdf:resource="#search"/>
+  </template:Section>
+
+ <kid:PagePartHandler rdf:ID="search">
     <rdfs:label>Search</rdfs:label>
     <rdfs:comment>
 Searches through all the labels and literals in the database for ones containing at least one of the search terms... returning the instances corresponding to assertions containing these matching terms. Instances with BNode identifiers are excluded from the search result as are instances of type RDFS.Class and RDF.Property (and http://owl.mindswap.org/2003/ont/owlweb.rdf#ProgramData).
@@ -38,7 +53,7 @@ def ismatch(object, value, redfoot):
 from rdflib.util import uniq
 
 search_string = request.parameters.get("q", None)
-if search_string:
+if False and search_string:
     q = search_string.lower()
     terms = q.split(" ")        
     instances = uniq(redfoot.subjects())
@@ -68,7 +83,24 @@ if search_string:
                     filtered_instances.append((instance, types))
                     break
         instances = filtered_instances
-    
+
+if search_string:
+    instances = set()
+    filtered_instances = []
+
+    for s, p, o in redfoot.text_index.search(search_string):
+        instances.add(s)
+
+    for instance in instances:    
+        if isinstance(instance, URIRef):
+            types = []
+            for type in redfoot.objects(instance, RDF.type):
+                label = redfoot.label(type)
+                if label:
+                    types.append(label)
+            filtered_instances.append((instance, types))
+    instances = filtered_instances    
+
 ?>
 
 
@@ -107,6 +139,6 @@ if search_string:
 
 
       ]]></kid:template>
-  </server:PagePartHandler>
+  </kid:PagePartHandler>
 
 </rdf:RDF>  
