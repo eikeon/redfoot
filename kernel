@@ -261,7 +261,7 @@ class Kernel(ConjunctiveGraph):
                     _logger.warning("couldn't load %s while checking: %s\n" % (uri, e))
         else: 
             _logger.warning("%r is not an instance of rdflib.URIRef\n" % uri)
-            raise ValueError("wrong type")
+            #raise ValueError("wrong type")
         return (uri, None, None) in self
 
     def load(self, location, format="xml", publicID=None, creator=None, scutter=False):
