@@ -135,6 +135,7 @@ ${redfoot.value(URIRef("#json_script", base=__uri__), RDF.value)}
          <div id="uricontainer"></div>
        </div>
      </form>
+     <textarea id="textEditor" onblur="resourceEditor.updateValue();"></textarea>
    </div>
  </div>
 
@@ -293,6 +294,7 @@ URIEditor.prototype.init = function() {
     this.oAutoComp.useShadow = true;
     this.oAutoComp.forceSelection = false;
     this.oAutoComp.autoHighlight = false;
+    this.oAutoComp.maxResultsDisplayed = 20;
     this.oAutoComp.formatResult = function(oResultItem, sQuery) {
         var sMarkup = oResultItem[0] + " (" + oResultItem[1] + ")";
         return (sMarkup);
@@ -304,6 +306,7 @@ URIEditor.prototype.init = function() {
     var form = document.getElementById("uriEditor");
     this.form = form;
     this.form.parentNode.removeChild(this.form);
+    this.text_box = document.getElementById("textEditor");
 }
 
 URIEditor.prototype.edit = function(element) {
@@ -323,6 +326,15 @@ URIEditor.prototype.edit = function(element) {
         //this.oAutoComp._oTextbox.value = data["label"]; 
         this.oAutoComp._oTextbox.select();
         this.oAutoComp._oTextbox.focus();
+    } else if (data["type"]=="Literal") {
+        this.text_box.value = data["value"];
+        this.target = target;
+        var container = target._element.parentNode;
+        this.form.className = target._element.className;
+        container.replaceChild(this.text_box, target._element)
+        //this.text_box.value = "the value";
+        this.text_box.select();
+        this.text_box.focus();
     } else {
         alert("Unexpected type: ", data["type"]);
     }
@@ -330,19 +342,32 @@ URIEditor.prototype.edit = function(element) {
 }
 
 URIEditor.prototype.doneEditing = function() {
-    var container = this.form.parentNode;
-    if (container) {
-        container.replaceChild(this.target._element, this.form);
+    var editor;
+    var data = this.target.getData();
+    if (data["type"]=="URIRef") {
+        editor = this.form;
+    } else if (data["type"]=="Literal") {
+        editor = this.text_box;
+    } else {
+        alert("Unexpected type: ", data["type"]);
     }
-    //this.form.style.display = 'none';
-    //target._element.style.display = '';
-    //container.removeChild(this.form);
+    var container = editor.parentNode;
+    if (container) {
+        container.replaceChild(this.target._element, editor);
+    }
 }
 
 URIEditor.prototype.updateValue = function() {
-    this.target.setLabel(this.oAutoComp._oTextbox.value);
-    // TODO: 
-    this.oAutoComp._oTextbox.blur();
+    var data = this.target.getData();
+    if (data["type"]=="URIRef") {
+        this.target.setLabel(this.oAutoComp._oTextbox.value);
+        // TODO: 
+        this.oAutoComp._oTextbox.blur();
+    } else if (data["type"]=="Literal") {
+        this.target.setData({"type": "Literal", "value": this.text_box.value, "datatype": "", "language": ""});
+    } else {
+        alert("Unexpected type: ", data["type"]);
+    }
     this.doneEditing();
     return false;
 }
@@ -361,14 +386,14 @@ ResourceEditor.prototype.setSubject = function(label, uri) {
     if (uri) {
         this.addAssertions();
     } else {
-        var value = "http://TODO/abc/" + encodeURIComponent(label);
+        var value = "http://" + document.location.host + "/" + encodeURIComponent(label);
         var new_uri = window.prompt("create new resource with uri:", value);
         subject_element = (YAHOO.util.Dom.getElementsByClassName("subject", null, this.element))[0];
         var i = new Node(subject_element);
         i.setURI(new_uri); 
         // TODO: support for literals, bnodes
         // TODO: add callback to assert so we could have it call addAssertions
-        //server.assert(["add", [new_uri, "http://www.w3.org/2000/01/rdf-schema#label", "label"]]);
+        server.assert([["add", [{"type": "URIRef", "uri": new_uri}, {"type": "URIRef", "uri": "http://www.w3.org/2000/01/rdf-schema#label"}, {"type": "Literal", "value": label, datatype: "", language: ""}]]]);
         this.addAssertions();
     }
 
@@ -586,7 +611,8 @@ query = request.parameters.get("query")
 pairs = []
 if query:
     for s, p, o in redfoot.text_index.search(query, RDFS.label):
-        pairs.append({"label": o, "uri": s})
+        if o is not None: # bug workaround, I think. TODO: check if text_index is not being properly updated
+            pairs.append({"label": o, "uri": s})
 
 #for s in set(redfoot.subjects(None, None)):
 #    label = redfoot.label(s)
@@ -640,6 +666,9 @@ if subject:
     # TODO: support for BNodes
     data = simplejson.loads(subject)
     subject = node(data)
+
+    if (subject, RDF.type, None) not in redfoot:
+        redfoot.add((subject, RDF.type, RDFS.Resource))
 
     initial_predicates = [RDFS.label, RDFS.comment, RDF.type]
     remaining_predicates = []
