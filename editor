@@ -108,7 +108,7 @@ ${redfoot.value(URIRef("#json_script", base=__uri__), RDF.value)}
     <div class="subject" onclick="resourceEditor.editSubject(this);">
       <div class="type">URIRef</div>
       <div class="label">Pick a Subject</div>
-      <div class="uri"></div>
+      <div class="uri" onclick="resourceEditor.viewSubject(this);"></div>
     </div> 
     <ul class="assertions"></ul>
     <div id="actions">Actions: [ <span onclick="resourceEditor.addAssertion(this);">add assertion</span> ]</div>
@@ -386,7 +386,7 @@ ResourceEditor.prototype.setSubject = function(label, uri) {
     if (uri) {
         this.addAssertions();
     } else {
-        var value = "http://" + document.location.host + "/" + encodeURIComponent(label);
+        var value = "http://" + document.location.host + "/" + encodeURIComponent(label.replace(" ", "_"));
         var new_uri = window.prompt("create new resource with uri:", value);
         subject_element = (YAHOO.util.Dom.getElementsByClassName("subject", null, this.element))[0];
         var i = new Node(subject_element);
@@ -499,6 +499,11 @@ ResourceEditor.prototype.editSubject = function(element) {
     var result = this.uriEditor.edit(element);
     return result;
 }
+ResourceEditor.prototype.viewSubject = function(element) {
+    uri = element.innerHTML;
+    document.location = uri
+    return false;
+}
 ResourceEditor.prototype.edit = function(element) {
     this.currentStatement = [this.getSubject(), 
                              this.getPredicate(element.parentNode), 
@@ -580,6 +585,7 @@ server = new Server();
 
 init = function() {
     resourceEditor = new ResourceEditor();
+    // TODO: get value of uri query parameter and call resource.setResource
 }
 
 YAHOO.util.Event.addListener(this,'load',init);
