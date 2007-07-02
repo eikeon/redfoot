@@ -501,7 +501,7 @@ ResourceEditor.prototype.editSubject = function(element) {
 }
 ResourceEditor.prototype.viewSubject = function(element) {
     uri = element.innerHTML;
-    document.location = uri
+    document.location = uri.replace("#", "/");
     return false;
 }
 ResourceEditor.prototype.edit = function(element) {
