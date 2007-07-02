@@ -533,7 +533,15 @@ ResourceEditor.prototype.updateValue = function() {
         var s = this.getSubject();
         var p = this.getPredicate(target._element.parentNode);
         if (s && p) {
-            newStatement = [s, p, target.getData()];
+            var o = target.getData();
+            if (o) {
+                ;
+            } else {
+                var label = target.getLabel();
+                o = "http://" + document.location.host + "/instances#" + encodeURIComponent(label.replace(" ", "_"));
+            }
+            newStatement = [s, p, o];
+
         }
     } else {
         alert('me');
