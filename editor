@@ -748,9 +748,10 @@ def node(data):
             return URIRef(data["uri"])
         else:
             label = data["label"]
-            nuri = "%s/instances#%s" % (request.host,  quote(label.replace(" ", "_")))
+            nuri = URIRef("%s/instances#%s" % (request.host,  quote(label.replace(" ", "_"))))
             _logger.info("coining: '%s'" % nuri)
-            return URIRef(nuri)
+            redfoot.add((nuri, RDFS.label, Literal(data["label"])))
+            return nuri
     elif data["type"]=="BNode":
         return BNode(data["bnode"])        
     elif data["type"]=="Literal":
