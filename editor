@@ -731,6 +731,7 @@ response.write(simplejson.dumps(assertions))
 _logger = redfoot.getLogger(__uri__)
 
 from rdflib import RDFS
+from urllib import quote
 
 import simplejson
 
@@ -743,7 +744,13 @@ _logger.info("got change '%s'" % change)
 def node(data):
     _logger.info("data: '%s'" % repr(data))
     if data["type"]=="URIRef":
-        return URIRef(data["uri"])
+        if data["uri"]:
+            return URIRef(data["uri"])
+        else:
+            label = data["label"]
+            nuri = "%s/instances#%s" % (request.host,  quote(label.replace(" ", "_")))
+            _logger.info("coining: '%s'" % nuri)
+            return URIRef(nuri)
     elif data["type"]=="BNode":
         return BNode(data["bnode"])        
     elif data["type"]=="Literal":
