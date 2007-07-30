@@ -458,8 +458,7 @@ ResourceEditor.prototype.addAssertions = function() {
     var request = YAHOO.util.Connect.asyncRequest('GET', sUrl, callback);
 }
 ResourceEditor.prototype.addAssertion = function(me, data) {
-    //var e = me; //why is this not me.target like for edit_link??
-    var e = this.element;
+    var e = me; //why is this not me.target like for edit_link??
     while (e.className!='resource') {
        e = e.parentNode;
     }
