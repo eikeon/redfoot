@@ -534,7 +534,7 @@ ResourceEditor.prototype.updateValue = function() {
         var p = this.getPredicate(target._element.parentNode);
         if (s && p) {
             var o = target.getData();
-            if (o) {
+            if (o && o.getURI()) {
                 ;
             } else {
                 var label = target.getLabel();
