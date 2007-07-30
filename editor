@@ -117,15 +117,15 @@ ${redfoot.value(URIRef("#json_script", base=__uri__), RDF.value)}
      <div id="new_assertion">
       <li class="assertion">
         <div class="action"><span onclick="resourceEditor.cloneAssertion(this)">+</span> <span onclick="resourceEditor.removeAssertion(this)">-</span></div>
-        <div class="predicate">
+        <div class="predicate" onclick="resourceEditor.edit(this);">
           <div class="type">URIRef</div>
-          <div class="label" onclick="resourceEditor.edit(this);">Pick Predicate</div> 
-          <div class="uri" onclick="resourceEditor.viewSubject(this);"></div>
+          <div class="label">Pick Predicate</div> 
+          <div class="uri"></div>
         </div> 
-        <div class="object">
+        <div class="object" onclick="resourceEditor.edit(this);">
           <div class="type">URIRef</div>
-          <div class="label" onclick="resourceEditor.edit(this);">Pick Object</div> 
-          <div class="uri" onclick="resourceEditor.viewSubject(this);"></div>
+          <div class="label">Pick Object</div> 
+          <div class="uri"></div>
         </div> 
       </li>
      </div>
@@ -220,7 +220,7 @@ Node.prototype.setData = function(data) {
         e.removeChild(e.firstChild);
     };
     if (data["type"]=="URIRef") {
-        e.innerHTML = "<div class='type'>URIRef</div><div class='label'>"+ data["label"] + "</div><div class='uri'>" + data["uri"] + "</div>";
+        e.innerHTML = "<div class='type'>URIRef</div><div class='label'>"+ data["label"] + "</div><div class='uri' onclick='resourceEditor.viewSubject(this);'>" + data["uri"] + "</div>";
     }
     else if (data["type"]=="BNode") {
         e.innerHTML = "<div class='type'>BNode</div><div class='label'>"+ data["label"] + "</div><div class='bnode'>" + data["bnode"] + "</div>";
@@ -505,7 +505,6 @@ ResourceEditor.prototype.viewSubject = function(element) {
     return false;
 }
 ResourceEditor.prototype.edit = function(element) {
-    var element = element.parentNode;
     this.currentStatement = [this.getSubject(), 
                              this.getPredicate(element.parentNode), 
                              this.getObject(element.parentNode)];
