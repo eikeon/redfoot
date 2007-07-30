@@ -187,7 +187,7 @@ Node.prototype._getValue = function(name) {
 }
 Node.prototype._setValue = function(name, s) {
     var e = (YAHOO.util.Dom.getElementsByClassName(name, null, this._element))[0];
-    e.innerHTML = s
+    e.value = s
 }
 Node.prototype.getData = function() {
     element = this._element;
@@ -220,7 +220,7 @@ Node.prototype.setData = function(data) {
         e.removeChild(e.firstChild);
     };
     if (data["type"]=="URIRef") {
-        e.innerHTML = "<div class='type'>URIRef</div><div class='label'>"+ data["label"] + "</div><div onclick='resourceEditor.viewSubject(this);'><div class='uri'>" + data["uri"] + "</div></div>";
+        e.innerHTML = "<div class='type'>URIRef</div><div class='label'>"+ data["label"] + "</div><div class='uri' onclick='resourceEditor.viewSubject(this);'>" + data["uri"] + "</div>";
     }
     else if (data["type"]=="BNode") {
         e.innerHTML = "<div class='type'>BNode</div><div class='label'>"+ data["label"] + "</div><div class='bnode'>" + data["bnode"] + "</div>";
