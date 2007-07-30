@@ -386,7 +386,7 @@ ResourceEditor.prototype.setSubject = function(label, uri) {
     if (uri) {
         this.addAssertions();
     } else {
-        var value = "http://" + document.location.host + "/instances#" + encodeURIComponent(label.replace(" ", "_"));
+        var value = "http://" + document.location.host + "/instances#" + encodeURIComponent(label.replace(/ /g, "_"));
         var new_uri = window.prompt("create new resource with uri:", value);
         subject_element = (YAHOO.util.Dom.getElementsByClassName("subject", null, this.element))[0];
         var i = new Node(subject_element);
@@ -538,7 +538,7 @@ ResourceEditor.prototype.updateValue = function() {
                 ;
             } else {
                 var label = target.getLabel();
-                var new_uri = "http://" + document.location.host + "/instances#" + encodeURIComponent(label.replace(" ", "_"));
+                var new_uri = "http://" + document.location.host + "/instances#" + encodeURIComponent(label.replace(/ /g, "_"));
                 target.setURI(new_uri);
             }
             newStatement = [s, p, o];
