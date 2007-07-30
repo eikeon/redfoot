@@ -187,7 +187,7 @@ Node.prototype._getValue = function(name) {
 }
 Node.prototype._setValue = function(name, s) {
     var e = (YAHOO.util.Dom.getElementsByClassName(name, null, this._element))[0];
-    e.value = s
+    e.innerHTML = s
 }
 Node.prototype.getData = function() {
     element = this._element;
