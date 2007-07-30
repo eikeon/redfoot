@@ -220,7 +220,7 @@ Node.prototype.setData = function(data) {
         e.removeChild(e.firstChild);
     };
     if (data["type"]=="URIRef") {
-        e.innerHTML = "<div class='type'>URIRef</div><div class='label'>"+ data["label"] + "</div><div class='uri' onclick='resourceEditor.viewSubject(this);'>" + data["uri"] + "</div>";
+        e.innerHTML = "<div class='type'>URIRef</div><div class='label'>"+ data["label"] + "</div><div onclick='resourceEditor.viewSubject(this);'><div class='uri'>" + data["uri"] + "</div></div>";
     }
     else if (data["type"]=="BNode") {
         e.innerHTML = "<div class='type'>BNode</div><div class='label'>"+ data["label"] + "</div><div class='bnode'>" + data["bnode"] + "</div>";
