@@ -120,12 +120,12 @@ ${redfoot.value(URIRef("#json_script", base=__uri__), RDF.value)}
         <div class="predicate" onclick="resourceEditor.edit(this);">
           <div class="type">URIRef</div>
           <div class="label">Pick Predicate</div> 
-          <div class="uri"></div>
+          <div class="uri" onclick="resourceEditor.viewSubject(this);"></div>
         </div> 
         <div class="object" onclick="resourceEditor.edit(this);">
           <div class="type">URIRef</div>
           <div class="label">Pick Object</div> 
-          <div class="uri"></div>
+          <div class="uri" onclick="resourceEditor.viewSubject(this);"></div>
         </div> 
       </li>
      </div>
@@ -539,6 +539,7 @@ ResourceEditor.prototype.updateValue = function() {
             } else {
                 var label = target.getLabel();
                 o = "http://" + document.location.host + "/instances#" + encodeURIComponent(label.replace(" ", "_"));
+                target.setURI(o);
             }
             newStatement = [s, p, o];
 
