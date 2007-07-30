@@ -237,7 +237,9 @@ Node.prototype.getURI = function() {
     return this._getValue("uri")
 }
 Node.prototype.setURI = function(uri) {
-    return this._setValue("uri", uri)
+    var data = {"type": "URIRef", "uri": uri, "label": this.getLabel()};
+    this.setData(data)
+    //return this._setValue("uri", uri)
 }
 Node.prototype.getLabel = function() {
     return this._getValue("label")
