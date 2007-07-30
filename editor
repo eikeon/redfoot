@@ -117,14 +117,14 @@ ${redfoot.value(URIRef("#json_script", base=__uri__), RDF.value)}
      <div id="new_assertion">
       <li class="assertion">
         <div class="action"><span onclick="resourceEditor.cloneAssertion(this)">+</span> <span onclick="resourceEditor.removeAssertion(this)">-</span></div>
-        <div class="predicate" onclick="resourceEditor.edit(this);">
+        <div class="predicate">
           <div class="type">URIRef</div>
-          <div class="label">Pick Predicate</div> 
+          <div class="label" onclick="resourceEditor.edit(this.parentNode);">Pick Predicate</div> 
           <div class="uri" onclick="resourceEditor.viewSubject(this);"></div>
         </div> 
-        <div class="object" onclick="resourceEditor.edit(this);">
+        <div class="object">
           <div class="type">URIRef</div>
-          <div class="label">Pick Object</div> 
+          <div class="label" onclick="resourceEditor.edit(this.parentNode);">Pick Object</div> 
           <div class="uri" onclick="resourceEditor.viewSubject(this);"></div>
         </div> 
       </li>
