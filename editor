@@ -538,8 +538,8 @@ ResourceEditor.prototype.updateValue = function() {
                 ;
             } else {
                 var label = target.getLabel();
-                o = "http://" + document.location.host + "/instances#" + encodeURIComponent(label.replace(" ", "_"));
-                target.setURI(o);
+                var new_uri = "http://" + document.location.host + "/instances#" + encodeURIComponent(label.replace(" ", "_"));
+                target.setURI(new_uri);
             }
             newStatement = [s, p, o];
 
